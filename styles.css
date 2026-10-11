@@ -563,7 +563,7 @@ a.index__icon:hover { color: var(--ink); }
 .media .brand img,
 .brand .brand__logo { width: 56%; max-width: 420px; height: auto; object-fit: contain; }
 .preview__logo.brand { padding: 0; }
-.preview__logo.brand img { width: 62%; }
+.preview__logo.brand img { width: 50%; }   /* podgląd na stronie głównej — o 20% mniejsze niż w panelu */
 
 @keyframes aurora {
   0%   { transform: translate(0) rotate(0) scale(1); }
