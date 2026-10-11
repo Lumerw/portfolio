@@ -368,6 +368,9 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 .hero__icon { position: absolute; inset: 0; width: 32px; height: 32px; visibility: hidden; }
 .hero__icon.is-on { visibility: visible; }
 
+/* Hasło: główny komunikat — 28 px także na telefonie */
+.hero__title { font-size: 28px; text-wrap: balance; }
+
 /* Imię jako podpis nad hasłem */
 .hero__name { font-weight: var(--fw-medium); margin-bottom: var(--s-1); }
 .hero__role { font-weight: var(--fw-regular); color: var(--ink-2); }
@@ -777,23 +780,24 @@ html:has(.sheet:target) { overflow: hidden; }
 /* Elementy tylko do PDF (rok na okładce, tekst case study, QR) */
 .print-only { display: none; }
 
-/* Telefon: kontakt jako odwrócony blok — czarny w trybie jasnym, jasny w ciemnym.
+/* Stopka = kontakt jako odwrócony blok — czarny w trybie jasnym, jasny w ciemnym.
    Wyraźny koniec strony i jedyne miejsce z wezwaniem do działania. */
-@media (max-width: 767px) {
-  .site-footer {
-    --paper:  #111111;
-    --ink:    #FAFAF7;
-    --ink-2:  #A3A39E;
-    --ink-3:  #8C8C87;
-    --hair:   rgba(250, 250, 247, .16);
-    --accent: #7DA2FF;
-    background: var(--paper);
-    color: var(--ink);
-  }
-  .site-footer__in { padding-block: var(--s-6) var(--s-5); }
-  .site-footer__in::before { display: none; }
+.site-footer {
+  --paper:  #111111;
+  --ink:    #FAFAF7;
+  --ink-2:  #A3A39E;
+  --ink-3:  #8C8C87;
+  --hair:   rgba(250, 250, 247, .16);
+  --accent: #7DA2FF;
+  background: var(--paper);
+  color: var(--ink);
 }
-@media (max-width: 767px) and (prefers-color-scheme: dark) {
+.site-footer__in::before { display: none; }
+@media (max-width: 767px) {
+  .site-footer { margin-top: var(--s-5); }
+  .site-footer__in { padding-block: var(--s-6) var(--s-5); }
+}
+@media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .site-footer {
     --paper:  #FAFAF7;
     --ink:    #111111;
@@ -803,15 +807,13 @@ html:has(.sheet:target) { overflow: hidden; }
     --accent: #2450D8;
   }
 }
-@media (max-width: 767px) {
-  :root[data-theme="dark"] .site-footer {
-    --paper:  #FAFAF7;
-    --ink:    #111111;
-    --ink-2:  #6E6E6A;
-    --ink-3:  #73736E;
-    --hair:   rgba(17, 17, 17, .14);
-    --accent: #2450D8;
-  }
+:root[data-theme="dark"] .site-footer {
+  --paper:  #FAFAF7;
+  --ink:    #111111;
+  --ink-2:  #6E6E6A;
+  --ink-3:  #73736E;
+  --hair:   rgba(17, 17, 17, .14);
+  --accent: #2450D8;
 }
 
 /* Desktop: kropka akcentu jest już przy znaku i aktywnym wierszu — w stopce byłaby trzecia */

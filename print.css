@@ -23,6 +23,10 @@
   --accent: #2450D8;
 }
 .mono { filter: none !important; }
+/* Stopka (strona kontaktu) w druku też jasna */
+.site-footer, :root[data-theme="dark"] .site-footer, :root:not([data-theme="light"]) .site-footer {
+  --paper: #FAFAF7; --ink: #111111; --ink-2: #6E6E6A; --ink-3: #73736E; --hair: rgba(17, 17, 17, .14); --accent: #2450D8;
+}
 
 :root {
   --margin: 0;

@@ -48,7 +48,7 @@ function indexRow(p, i) {
           <a class="index__row${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" aria-haspopup="dialog">
             <span class="index__no t-meta">${num(i)}</span>
             <span class="index__title">${esc(p.title)}</span>
-            <span class="index__year t-meta">${esc(p.year)}</span>
+            <span class="index__year t-meta">${esc(p.type)}</span>
           </a>
         </li>`;
 }
@@ -94,7 +94,7 @@ function hero(c, t) {
   const captions = c.projects.map((p, i) => `
         <div class="preview__caption${i === 0 ? ' is-active' : ''}" data-project="${p.id}">
           <img class="sygnet${mono(p.sygnet.src)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
-          <span class="t-meta">${num(i)} ${esc(p.title)} — ${esc(t.projects[p.id].meta.join(' · '))} — ${esc(p.year)}</span>
+          <span class="t-meta">${num(i)} ${esc(p.title)} — ${esc(t.projects[p.id].meta.join(' · '))}</span>
         </div>`).join('');
 
   // Trzy miejsca na ikony obok znaku. Każde ma wszystkie ikony (ładowane raz); widoczna jest jedna.
@@ -123,7 +123,7 @@ function hero(c, t) {
             ${liIcon}
           </li>
           <li ${reveal(n + 4)}>
-            <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year"></span></a>
+            <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year t-meta">${esc(t.ui.downloadType)}</span></a>
           </li>
         </ul>
       </nav>${clients(c, t)}
@@ -205,7 +205,7 @@ function project(p, i, c, t) {
       <img class="sygnet sheet__sygnet${mono(p.sygnet.src)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
       <span class="t-meta sheet__no">${num(i)}</span>
       <h2 id="${p.id}-title" class="t-project">${esc(p.title)}</h2>
-      <span class="t-meta sheet__year">${esc(p.year)}</span>
+      <span class="t-meta sheet__year">${esc(p.type)}</span>
       ${link}`;
 
   const body = `${promo(p, tp)}

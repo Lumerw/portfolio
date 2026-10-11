@@ -55,7 +55,8 @@ export const shared = {
     {
       id: 'teraz',
       title: 'teraz',
-      year: '2026',                  // [potwierdź]
+      type: 'marketplace',           // typ projektu — po prawej w indeksie
+      year: '2026',                  // [potwierdź] — tylko w PDF
       symbol: 'teraz',
       logo:   { src: 'assets/teraz/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/teraz/sygnet.svg' },
@@ -73,7 +74,8 @@ export const shared = {
     {
       id: 'loom',
       title: 'loom.studio',
-      year: '2026',                  // [potwierdź]
+      type: 'studio',
+      year: '2026',                  // [potwierdź] — tylko w PDF
       symbol: 'loom',
       logo:   { src: 'assets/loom/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/loom/sygnet.svg' },
@@ -91,7 +93,8 @@ export const shared = {
     {
       id: 'rehab',
       title: 'reh.ab',
-      year: '2026',                  // [potwierdź]
+      type: 'pitch deck',
+      year: '2026',                  // [potwierdź] — tylko w PDF
       symbol: 'rehab',
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/rehab/sygnet.svg' },
@@ -122,6 +125,7 @@ export const pl = {
     indexLabel: 'Projekty',
     about: 'o mnie',
     download: 'pobierz PDF',
+    downloadType: 'portfolio',
     problem: 'Problem',
     solution: 'Rozwiązanie',
     result: 'Efekt',
@@ -225,6 +229,7 @@ export const en = {
     indexLabel: 'Projects',
     about: 'about',
     download: 'download PDF',
+    downloadType: 'portfolio',
     problem: 'Problem',
     solution: 'Solution',
     result: 'Result',
