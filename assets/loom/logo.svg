@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120">
+<g transform="translate(0 12) scale(2)" fill="none" stroke="#111111" stroke-width=".75">
+<style>.hanko{fill:#2450D8;stroke:none}</style>
+<path class="stroke" style="--i:0" d="M14 8V21.5M14 26.5V40" pathLength="1"/><path class="stroke" style="--i:1" d="M24 8V11.5M24 16.5V31.5M24 36.5V40" pathLength="1"/><path class="stroke" style="--i:2" d="M34 8V21.5M34 26.5V40" pathLength="1"/><path class="stroke" style="--i:3" d="M8 14H11.5M16.5 14H31.5M36.5 14H40" pathLength="1"/><path class="stroke" style="--i:4" d="M8 24H21.5M26.5 24H40" pathLength="1"/><path class="stroke" style="--i:5" d="M8 34H11.5M16.5 34H31.5M36.5 34H40" pathLength="1"/>
+</g>
+<text x="124" y="78" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="52" font-weight="500" letter-spacing="-1" fill="#111111">loom.studio</text>
+</svg>

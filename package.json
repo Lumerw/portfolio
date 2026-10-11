@@ -1,0 +1,24 @@
+{
+  "name": "portfolio-lumer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Portfolio one-pager + PDF. Strona: czysty HTML/CSS/JS. Node tylko do narzędzi.",
+  "scripts": {
+    "dev": "node tools/serve.mjs --dev",
+    "build": "node tools/build-html.mjs",
+    "assets": "node tools/build-assets.mjs",
+    "shots": "node tools/screenshots.mjs",
+    "qr": "node tools/build-qr.mjs",
+    "pdf": "node tools/build-pdf.mjs",
+    "images": "node tools/optimize-images.mjs",
+    "og": "node tools/build-og.mjs",
+    "audit": "node tools/audit.mjs"
+  },
+  "devDependencies": {
+    "lighthouse": "^13.5.0",
+    "playwright": "~1.63.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.34.4"
+  }
+}

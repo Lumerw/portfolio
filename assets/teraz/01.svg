@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#FAFAF7"/>
+<rect x=".5" y=".5" width="799" height="499" fill="none" stroke="rgba(17,17,17,.14)" vector-effect="non-scaling-stroke"/>
+<g transform="translate(350 200) scale(2.0833333333333335)" fill="none" stroke="#111111" stroke-width="1">
+<style>path,circle,rect{vector-effect:non-scaling-stroke}.hanko{fill:#2450D8;stroke:none}</style>
+<circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/>
+</g>
+</svg>

@@ -1,0 +1,834 @@
+/* ==========================================================================
+   Tokeny — wszystkie decyzje wizualne w jednym miejscu (brief 4.1–4.5)
+   ========================================================================== */
+:root {
+  /* Kolor */
+  --paper: #FAFAF7;
+  --ink:   #111111;
+  --ink-2: #6E6E6A;                 /* tekst pomocniczy, 4.9:1 */
+  --ink-3: #73736E;                 /* metadane: przyciemnione z #A8A8A3, żeby mieć 4.5:1 (patrz README) */
+  --ink-4: #A8A8A3;                 /* wartość z briefu — tylko elementy nietekstowe */
+  --hair:  rgba(17, 17, 17, .14);
+  --accent: #2450D8;                /* jedyny akcent (kropki, stan aktywny) — 6.3:1 na papierze */
+  --veil:  rgba(0, 0, 0, .5);       /* przyciemnienie nad panelem: widać, że klik wraca */
+
+  /* Typografia */
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fs-name: 22px;                  /* imię, tytuły sekcji */
+  --fs-project: 18px;               /* tytuł projektu w case study */
+  --fs-text: 15px;
+  --fs-meta: 12px;
+  --fs-mail: 22px;
+  --lh-text: 1.6;
+  --lh-tight: 1.2;
+  --tracking-tight: -0.01em;
+
+  /* Odstępy: wielokrotności 8 px */
+  --s-1: 8px;
+  --s-2: 16px;
+  --s-3: 24px;
+  --s-4: 32px;
+  --s-5: 40px;
+  --s-6: 48px;
+  --s-8: 64px;
+  --s-12: 96px;
+  --section-gap: min(24vh, 200px);
+  --header-h: 56px;
+  --footer-h: 96px;                 /* stopka na desktopie — podgląd mieści się nad nią */
+  --sheet-top: var(--s-4);          /* odstęp panelu od góry ekranu */
+  --hairline: 1px;
+
+  /* Siatka */
+  --cols: 12;
+  --gutter: 24px;
+  --margin: 24px;
+  --max: 1280px;
+
+  /* Ruch */
+  --ease: cubic-bezier(.65, 0, .35, 1);
+  --t-draw: 1.8s;
+  --t-fade: 600ms;
+  --t-stagger: 80ms;
+  --t-line: 400ms;
+  --t-swap: 500ms;
+  --t-sheet: 700ms;                 /* wysuwanie panelu */
+  --rise: 8px;
+}
+
+@media (min-width: 768px) {
+  :root { --margin: 6vw; --sheet-top: var(--s-8); }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --fs-name: 28px;
+    --fs-project: 20px;
+    --fs-mail: 28px;
+  }
+}
+
+/* Tryb ciemny: domyślnie wg systemu, przełącznik w nagłówku zapisuje wybór (data-theme). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:  #121211;
+    --ink:    #EDEDE8;
+    --ink-2:  #A3A39E;              /* 7.4:1 */
+    --ink-3:  #8C8C87;              /* 5.5:1 */
+    --ink-4:  #5A5A56;
+    --hair:   rgba(237, 237, 232, .16);
+    --accent: #7DA2FF;              /* 7.6:1 */
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper:  #121211;
+  --ink:    #EDEDE8;
+  --ink-2:  #A3A39E;
+  --ink-3:  #8C8C87;
+  --ink-4:  #5A5A56;
+  --hair:   rgba(237, 237, 232, .16);
+  --accent: #7DA2FF;
+}
+
+/* Grafiki jednokolorowe (SVG z czarną kreską) odwrócone w trybie ciemnym */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .mono { filter: invert(1) hue-rotate(180deg); }
+}
+:root[data-theme="dark"] .mono { filter: invert(1) hue-rotate(180deg); }
+
+/* Linie 0,5 px na ekranach retina */
+@media (min-resolution: 2dppx) {
+  :root { --hairline: .5px; }
+}
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-h);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-text);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-text);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+h1, h2, h3, h4 { font-size: inherit; font-weight: var(--fw-medium); }
+img, svg, video { display: block; max-width: 100%; }
+img, video { height: auto; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--ink); color: var(--paper); }
+
+/* Focus: cienka linia zamiast systemowej obwódki */
+:focus { outline: none; }
+:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Siatka 12 kolumn
+   ========================================================================== */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--max) + 2 * var(--margin));
+  margin-inline: auto;
+  padding-inline: var(--margin);
+}
+
+/* Mobile: jedna kolumna. Od 768 px: 12 kolumn. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--gutter);
+}
+
+.grid > * { grid-column: 1 / -1; }
+
+@media (min-width: 768px) {
+  .grid { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   Typografia
+   ========================================================================== */
+.t-name {
+  font-size: var(--fs-name);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.t-project {
+  font-size: var(--fs-project);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.t-text {
+  font-size: var(--fs-text);
+  line-height: var(--lh-text);
+  max-width: 34em;
+}
+
+.t-muted { color: var(--ink-2); }
+
+.t-meta {
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.rule {
+  border: 0;
+  border-top: var(--hairline) solid var(--hair);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Symbole (SVG, kreska 1 px)
+   ========================================================================== */
+.symbol {
+  --size: 48;                       /* rozmiar w px, ustawiany przy użyciu */
+  width: calc(var(--size) * 1px);
+  height: calc(var(--size) * 1px);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: calc(48 / var(--size)); /* zawsze 1 px na ekranie */
+  overflow: visible;
+}
+
+/* Bez vector-effect: non-scaling-stroke. Chrome liczy wtedy kreskowanie w pikselach ekranu,
+   więc pathLength="1" przestaje działać i symbol > 48 px rysuje się tylko w części.
+   Grubość 1 px trzyma za to stroke-width liczony z --size. */
+.symbol .hanko { fill: var(--accent); stroke: none; }
+
+/* Rysowanie kreską. Stan końcowy jest domyślny — bez JS i w druku znak jest narysowany. */
+.is-drawing .symbol .stroke {
+  /* 1.02 zamiast 1: bez szwu w miejscu, gdzie linia się zamyka */
+  stroke-dasharray: 1.02;
+  stroke-dashoffset: 1.02;
+  animation: draw var(--t-draw) var(--ease) forwards;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+.is-drawing .symbol .hanko {
+  opacity: 0;
+  animation: appear var(--t-fade) var(--ease) forwards;
+  animation-delay: calc(var(--t-draw) * .8);
+}
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes appear { to { opacity: 1; } }
+
+/* ==========================================================================
+   Obrazy i placeholdery — zawsze w docelowej proporcji
+   ========================================================================== */
+.media {
+  position: relative;
+  aspect-ratio: var(--ratio, 4 / 5);
+  background: var(--paper);
+}
+
+.media img,
+.media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media--16x10 { --ratio: 16 / 10; }
+.media--4x5   { --ratio: 4 / 5; }
+
+/* ==========================================================================
+   Nagłówek (brief 5.0)
+   ========================================================================== */
+.skip {
+  position: absolute;
+  left: var(--margin);
+  top: -100px;
+  z-index: 20;
+  padding: var(--s-1) 0;
+  font-size: var(--fs-meta);
+}
+.skip:focus-visible { top: var(--s-2); }
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--paper);      /* niewidoczne tło: tylko żeby treść nie wchodziła pod znak */
+}
+
+.site-header__in {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Przełącznik trybu (lewy górny róg) i języka — mają sens tylko z JS */
+.theme {
+  display: none;
+  width: 32px;
+  height: 32px;
+  margin-left: -8px;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+}
+.js .theme { display: inline-flex; }
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  color: var(--ink);
+}
+
+.site-header__nav a,
+.lang { padding-block: var(--s-1); }
+
+/* Przełącznik języka ma sens tylko z JS */
+.lang { display: none; }
+.js .lang { display: inline; }
+
+.lang [data-lang] { color: var(--ink-3); transition: color var(--t-line) var(--ease); }
+html[lang="pl"] .lang [data-lang="pl"],
+html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
+
+/* ==========================================================================
+   Strona główna: jeden ekran — nagłówek, hero z indeksem, stopka
+   ========================================================================== */
+#app {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+#app > main { flex: 1; }
+
+/* ==========================================================================
+   Hero + indeks (brief 5.1)
+   ========================================================================== */
+.hero {
+  padding-top: clamp(var(--s-4), 5vh, var(--s-12));
+  row-gap: var(--s-8);
+}
+
+/* Znak (później zdjęcie) + trzy szybko zmieniające się ikony.
+   Maska wygasza pasek ikon w prawo: 100% → 0% krycia. */
+.hero__top {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-bottom: var(--s-4);
+}
+.hero__mark .symbol { --size: 40; }
+.hero__icons {
+  display: flex;
+  gap: var(--s-2);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0%, transparent 100%);
+}
+/* Ikony o 20% mniejsze od znaku (zdjęcia): 32 px */
+.hero__slot { position: relative; width: 32px; height: 32px; }
+.hero__icon { position: absolute; inset: 0; width: 32px; height: 32px; visibility: hidden; }
+.hero__icon.is-on { visibility: visible; }
+
+/* Imię jako podpis nad hasłem */
+.hero__name { font-weight: var(--fw-medium); margin-bottom: var(--s-1); }
+.hero__role { font-weight: var(--fw-regular); color: var(--ink-2); }
+.hero__line { margin-top: var(--s-2); max-width: 30em; }
+
+.index { margin-top: var(--s-6); }
+
+/* Wiersz „o mnie” z ikonką LinkedIn po prawej (osobny link obok wiersza) */
+.index__item--icon { position: relative; }
+.index__icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  padding: var(--s-1) 0 var(--s-1) var(--s-1);
+  color: var(--ink-2);
+  transition: color var(--t-line) var(--ease);
+}
+a.index__icon:hover { color: var(--ink); }
+
+/* ==========================================================================
+   Karuzela firm — powolna pętla, pauza po najechaniu, bez ruchu przy reduced-motion
+   ========================================================================== */
+.clients { margin-top: var(--s-12); }
+.clients__title { margin-bottom: var(--s-3); }
+.clients__marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+.clients__track {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+.clients__marquee:hover .clients__track { animation-play-state: paused; }
+@media (min-width: 1024px) { .clients { margin-top: var(--s-5); } }
+.clients__list { display: flex; align-items: center; gap: var(--s-5); padding-right: var(--s-5); }
+.clients__list img { height: 32px; width: auto; }
+
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .clients__marquee { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
+  .clients__list[aria-hidden] { display: none; }
+}
+
+.index__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--s-5) 1fr auto;
+  align-items: baseline;
+  min-height: 56px;                 /* wygodny cel dotyku na telefonie */
+  padding-block: var(--s-2);
+  border-bottom: var(--hairline) solid var(--hair);
+}
+
+.index li:first-child .index__row { border-top: var(--hairline) solid var(--hair); }
+
+.index__row:focus-visible { outline: none; }
+
+/* Linia wydłużająca się od lewej */
+.index__row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t-line) var(--ease);
+}
+
+.index__row:hover::after,
+.index__row:focus-visible::after { transform: scaleX(1); }
+
+.index__year { text-align: right; }
+
+/* Telefon i tablet: sam stos linków, bez podglądu */
+.hero__preview { display: none; }
+
+@media (min-width: 768px) {
+  .hero__intro { grid-column: 1 / 9; }
+}
+
+/* Desktop: indeks po lewej, podgląd po prawej */
+@media (min-width: 1024px) {
+  .hero { align-items: start; padding-bottom: var(--s-6); }
+  .hero__intro { grid-column: 1 / 6; }
+  .hero__preview {
+    display: block;
+    grid-column: 7 / -1;
+  }
+
+  .index__row.is-active::after { transform: scaleX(1); }
+
+  /* Kropka akcentu przy aktywnym wierszu */
+  .index__row[data-project]::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * var(--s-3));
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    margin-top: -2.5px;
+    border-radius: 50%;           /* kropka, nie zaokrąglony kontener */
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity var(--t-line) var(--ease);
+  }
+  .index__row.is-active::before { opacity: 1; }
+}
+
+/* Podgląd 4:5 — mieści się w pierwszym ekranie */
+.preview {
+  width: min(100%, calc((100svh - var(--header-h) - var(--footer-h) - var(--s-12) - var(--s-8)) * 4 / 5));
+  margin-left: auto;
+}
+
+.preview { outline: var(--hairline) solid var(--hair); outline-offset: calc(-1 * var(--hairline)); }
+
+/* Logo projektu na środku podglądu */
+.preview__logo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15%;
+  opacity: 0;
+  transition: opacity var(--t-swap) var(--ease);
+}
+.preview__logo.is-active { opacity: 1; }
+.preview__logo img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
+
+.preview__captions {
+  position: relative;
+  width: min(100%, calc((100svh - var(--header-h) - var(--footer-h) - var(--s-12) - var(--s-8)) * 4 / 5));
+  margin: var(--s-2) 0 0 auto;
+  min-height: var(--s-3);
+}
+
+.preview__caption {
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  opacity: 0;
+  /* stary podpis znika szybciej, nowy wchodzi po nim — tekst się nie nakłada */
+  transition: opacity calc(var(--t-swap) * .4) var(--ease);
+}
+.preview__caption.is-active {
+  opacity: 1;
+  transition: opacity calc(var(--t-swap) * .6) var(--ease) calc(var(--t-swap) * .4);
+}
+.sygnet { width: 20px; height: 20px; flex: none; object-fit: contain; }
+
+/* ==========================================================================
+   Panele wysuwane od dołu: projekty (wideo) i „o mnie”.
+   Otwiera je kotwica (#teraz, #o-mnie…) przez :target — działa bez JS.
+   main.js dokłada: focus w panelu, Esc, tło nieaktywne (inert), powrót focusu.
+   ========================================================================== */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  visibility: hidden;
+  transition: visibility 0s linear var(--t-sheet);
+}
+.sheet:target {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* Zasłona: ten sam papier, półprzezroczysty — bez cienia i rozmycia */
+.sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--veil);
+  opacity: 0;
+  transition: opacity var(--t-sheet) var(--ease);
+}
+.sheet:target .sheet__backdrop { opacity: 1; }
+
+.sheet__panel {
+  position: absolute;
+  inset: var(--sheet-top) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border-top: var(--hairline) solid var(--hair);
+  transform: translateY(100%);
+  transition: transform var(--t-sheet) var(--ease);
+}
+.sheet:target .sheet__panel { transform: none; }
+
+/* Strona pod spodem się nie przewija */
+html:has(.sheet:target) { overflow: hidden; }
+
+.sheet__bar {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  height: calc(var(--header-h) + var(--s-1));
+  padding-top: 24px;
+}
+.sheet__sygnet { align-self: center; }
+.sheet__bar .symbol { --size: 16; align-self: center; flex: none; }
+.sheet__year, .sheet__no { display: none; }
+.sheet__link { color: var(--ink); border-bottom: var(--hairline) solid var(--ink); margin-left: auto; white-space: nowrap; }
+.sheet__close { margin-left: auto; align-self: center; }
+.sheet__link + .sheet__close { margin-left: var(--s-2); }
+
+.sheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: var(--s-3) var(--s-6);
+}
+
+/* Projekt: wideo zawsze w całości na ekranie — na telefonie u góry, wyżej wyśrodkowane */
+.sheet--project .sheet__body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .sheet--project .sheet__body { align-items: center; }
+}
+.sheet__video {
+  width: min(100%, calc((100svh - var(--sheet-top) - var(--header-h) - var(--s-3) - var(--s-6)) * var(--ar)));
+}
+.sheet__video video { background: var(--ink); object-fit: contain; }
+
+/* Ekran pionowy → kwadrat, poziomy → 16:9 */
+.sheet__video--wide { display: none; }
+@media (orientation: landscape) {
+  .sheet__video--square { display: none; }
+  .sheet__video--wide { display: block; }
+}
+
+@media (min-width: 768px) {
+  .sheet__year, .sheet__no { display: inline; }
+}
+
+/* ==========================================================================
+   O mnie (brief 5.3) — w panelu
+   ========================================================================== */
+.about { row-gap: var(--s-5); }
+.about__portrait { width: 66%; }
+.about__label { margin-top: var(--s-6); }
+
+/* Wiersze: rok — miejsce — rola */
+.rows { margin-top: var(--s-2); }
+.row {
+  display: grid;
+  grid-template-columns: var(--s-8) 1fr;
+  column-gap: var(--s-2);
+  align-items: baseline;
+  padding-block: var(--s-2);
+  border-bottom: var(--hairline) solid var(--hair);
+}
+.row:first-child { border-top: var(--hairline) solid var(--hair); }
+.row__role { grid-column: 2; }
+
+.details { margin-top: var(--s-6); display: grid; gap: var(--s-3); }
+.detail dd { margin: var(--s-1) 0 0; }
+
+@media (min-width: 768px) {
+  .row { grid-template-columns: var(--s-8) 1fr 1fr; }
+  .row__role { grid-column: auto; }
+  .about__text { grid-column: 1 / 9; }
+  .about__portrait { grid-column: 1 / 6; width: auto; }
+}
+
+@media (min-width: 1024px) {
+  .about__text { grid-column: 1 / 6; grid-row: 1; }
+  .about__portrait { grid-column: 9 / -1; grid-row: 1; }
+}
+
+/* ==========================================================================
+   Stopka = kontakt (minimalna)
+   Telefon: mail, profile, pełnej szerokości przycisk, ©.  Desktop: jedna linia.
+   ========================================================================== */
+.site-footer { margin-top: var(--s-8); }
+.site-footer__in {
+  display: grid;
+  grid-template-areas: "contact" "button" "copy";
+  gap: var(--s-3);
+  padding-block: var(--s-3);
+}
+/* Linia tylko na szerokość treści, jak w indeksie */
+.site-footer__in::before {
+  content: "";
+  position: absolute;
+  left: var(--margin);
+  right: var(--margin);
+  top: 0;
+  border-top: var(--hairline) solid var(--hair);
+}
+.site-footer__in { position: relative; }
+.site-footer__contact { grid-area: contact; display: grid; gap: var(--s-1); }
+.site-footer__button  { grid-area: button; }
+.site-footer__copy    { grid-area: copy; display: flex; align-items: center; gap: var(--s-1); }
+
+@media (min-width: 768px) {
+  .site-footer { margin-top: 0; }
+  .site-footer__in {
+    grid-template-areas: "copy contact button";
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    column-gap: var(--s-6);
+  }
+  .site-footer__contact { display: flex; align-items: center; gap: var(--s-4); }
+}
+
+.contact__mail {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.mail {
+  overflow-wrap: anywhere;
+  border-bottom: var(--hairline) solid var(--ink);
+}
+
+.copy {
+  display: none;                    /* bez JS nie ma czego kliknąć */
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-2);
+  transition: color var(--t-line) var(--ease);
+}
+.js .copy { display: inline-flex; }
+.copy:hover { color: var(--ink); }
+
+.icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+.copy__status {
+  opacity: 0;
+  transition: opacity var(--t-fade) var(--ease);
+}
+.copy__status.is-on { opacity: 1; }
+
+.contact__links { display: flex; flex-wrap: wrap; }
+.contact__links li + li::before {
+  content: "·";
+  padding-inline: var(--s-1);
+}
+.contact__links a { color: var(--ink); border-bottom: var(--hairline) solid var(--hair); transition: border-color var(--t-line) var(--ease); }
+.contact__links a:hover { border-color: var(--ink); }
+
+/* Przycisk: włosowa ramka, bez zaokrągleń; po najechaniu wypełnienie tuszem */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding-inline: var(--s-4);
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  transition: background-color var(--t-line) var(--ease), color var(--t-line) var(--ease);
+}
+.button:hover,
+.button:focus-visible { background: var(--ink); color: var(--paper); }
+.button--small { min-height: 32px; padding-inline: var(--s-2); font-size: var(--fs-meta); }
+
+/* Elementy tylko do PDF (rok na okładce, tekst case study, QR) */
+.print-only { display: none; }
+
+/* Telefon: kontakt jako odwrócony blok — czarny w trybie jasnym, jasny w ciemnym.
+   Wyraźny koniec strony i jedyne miejsce z wezwaniem do działania. */
+@media (max-width: 767px) {
+  .site-footer {
+    --paper:  #111111;
+    --ink:    #FAFAF7;
+    --ink-2:  #A3A39E;
+    --ink-3:  #8C8C87;
+    --hair:   rgba(250, 250, 247, .16);
+    --accent: #7DA2FF;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .site-footer__in { padding-block: var(--s-6) var(--s-5); }
+  .site-footer__in::before { display: none; }
+}
+@media (max-width: 767px) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .site-footer {
+    --paper:  #FAFAF7;
+    --ink:    #111111;
+    --ink-2:  #6E6E6A;
+    --ink-3:  #73736E;
+    --hair:   rgba(17, 17, 17, .14);
+    --accent: #2450D8;
+  }
+}
+@media (max-width: 767px) {
+  :root[data-theme="dark"] .site-footer {
+    --paper:  #FAFAF7;
+    --ink:    #111111;
+    --ink-2:  #6E6E6A;
+    --ink-3:  #73736E;
+    --hair:   rgba(17, 17, 17, .14);
+    --accent: #2450D8;
+  }
+}
+
+/* Desktop: kropka akcentu jest już przy znaku i aktywnym wierszu — w stopce byłaby trzecia */
+@media (min-width: 1024px) { .site-footer .dot { display: none; } }
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ==========================================================================
+   Wejście na stronę: znak się rysuje, potem wolno pojawia się tekst (brief 4.5)
+   ========================================================================== */
+.reveal {
+  display: inline-block;
+  animation: rise var(--t-fade) var(--ease) both;
+  /* tekst rusza przy ~60% rysowania znaku, nie na samym końcu — mniej czekania */
+  animation-delay: calc(var(--t-draw) * .6 + var(--n, 0) * var(--t-stagger));
+}
+li.reveal { display: list-item; }
+
+.no-intro .reveal { animation: none; }
+.no-intro .hero__mark.is-drawing .symbol .stroke { animation: none; stroke-dashoffset: 0; }
+.no-intro .hero__mark.is-drawing .symbol .hanko { animation: none; opacity: 1; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(var(--rise)); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   Ruch wyłączony na życzenie systemu
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .is-drawing .symbol .stroke { stroke-dashoffset: 0; }
+  .is-drawing .symbol .hanko { opacity: 1; }
+}

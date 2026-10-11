@@ -1,0 +1,174 @@
+/* ==========================================================================
+   Druk / PDF (brief, sekcja 8)
+   A4 poziomo (297 × 210 mm). Margines strony = 0, a 14 mm to wewnętrzny odstęp
+   każdej strony — dzięki temu papier jest wydrukowany aż do krawędzi. Sześć stron:
+   1 okładka (hero) · 2 o mnie (panel) · 3–5 projekty (panele) · 6 kontakt (stopka)
+   Panele na ekranie pokazują tylko wideo; w druku zamiast wideo jest pełne case study.
+   Plik ładowany z media="print" — działa też przy zwykłym Ctrl+P.
+   ========================================================================== */
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+/* Druk zawsze jasny, niezależnie od trybu na ekranie */
+:root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+  color-scheme: light;
+  --paper: #FAFAF7;
+  --ink:   #111111;
+  --ink-2: #6E6E6A;
+  --ink-3: #73736E;
+  --ink-4: #A8A8A3;
+  --hair:  rgba(17, 17, 17, .14);
+  --accent: #2450D8;
+}
+.mono { filter: none !important; }
+
+:root {
+  --margin: 0;
+  --gutter: 6mm;
+  --page-h: 209.5mm;                /* 210 mm minus zapas na zaokrąglenia */
+  --page-pad: 14mm;
+  --fs-name: 28px;
+  --fs-project: 20px;
+}
+
+html, body {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  background: var(--paper);
+}
+html { overflow: visible !important; }
+
+/* Bez ruchu: wszystko w stanie końcowym, symbole narysowane */
+*, *::before, *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.reveal { opacity: 1 !important; transform: none !important; }
+.symbol .stroke { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+.symbol .hanko { opacity: 1 !important; }
+
+/* Tylko ekranowe */
+.skip, .site-header, .index, .hero__preview, .hero__icons, .clients, .sheet__backdrop, .sheet__close,
+.sheet__video, .copy, .copy__status, .site-footer__button { display: none !important; }
+
+.print-only { display: block; }
+
+.wrap { max-width: none; padding-inline: 0; }
+.grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+
+/* Kolejność stron: okładka, o mnie, projekty, kontakt */
+#app { display: flex; flex-direction: column; min-height: 0; }
+.sheets { display: contents; }
+#app > main      { order: 1; flex: none; }  /* flex: 1 z ekranu zjadałby wysokość strony */
+.sheet--about    { order: 2; }
+.sheet--project  { order: 3; }
+#app > .site-footer { order: 4; }
+
+/* Panele jako zwykłe strony */
+.sheet {
+  position: static;
+  visibility: visible;
+  break-before: page;
+}
+.sheet__panel {
+  position: static;
+  transform: none;
+  border: 0;
+  display: block;
+}
+.sheet__body { overflow: visible; padding: 0; display: block !important; }
+.sheet__year, .sheet__no { display: inline; }
+
+main, .sheet, .site-footer { break-inside: avoid; }
+main, .sheet { height: var(--page-h); padding: var(--page-pad); }
+
+/* 1 — okładka: znak u góry, imię i zdanie na dole */
+main { display: flex; }
+.hero { display: block; padding: 0; width: 100%; height: 100%; }
+.hero__intro {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.hero__mark { margin: 0; }
+.hero__mark .symbol { --size: 48; }
+.hero__name { margin-top: auto; }
+.hero__year { margin-top: var(--s-4); }
+
+/* Pasek panelu = nagłówek strony: symbol, numer, tytuł, rok, link */
+.sheet__bar {
+  height: auto;
+  padding: 0 0 4mm;
+  border-bottom: var(--hairline) solid var(--hair);
+}
+.sheet__link { margin-left: auto; }
+
+/* 2 — o mnie: tekst 1–6, portret 9–12 */
+.about { margin-top: 10mm; row-gap: 8mm; align-content: start; }
+.about__text     { grid-column: 1 / 7; grid-row: 1; }
+.about__portrait { grid-column: 9 / -1; grid-row: 1; width: auto; }
+.about__label { margin-top: 8mm; }
+.rows { margin-top: 2mm; }
+.row { grid-template-columns: var(--s-8) 1fr 1fr; padding-block: 2.5mm; }
+.row__role { grid-column: auto; }
+.details { margin-top: 8mm; gap: 4mm; }
+
+/* 3–5 — projekt: tekst 1–4, obrazy 6–12.
+   Obraz główny + para 4:5 ułożona pionowo obok — mieści się na jednej stronie. */
+.case__meta { margin-top: 3mm; }
+.case__body {
+  display: grid;
+  margin-top: 10mm;
+  column-gap: var(--gutter);
+}
+.case__text  { grid-column: 1 / 5; }
+.case__lead { max-width: 30em; }
+.case__facts { display: grid; margin-top: 8mm; gap: 5mm; }
+.case__fact dd { margin: 1.5mm 0 0; }
+.case__media {
+  grid-column: 6 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 4.33fr) minmax(0, 1fr);   /* wysokość 16:10 = wysokość dwóch 4:5 */
+  gap: 6mm;
+  align-items: start;
+}
+.case__pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6mm; }
+
+/* 6 — kontakt: tytuł, zdanie, mail, profile, QR, © */
+.site-footer { margin: 0; break-before: page; background: var(--paper); color: var(--ink); height: var(--page-h); padding: var(--page-pad); }
+.site-footer__in {
+  height: 100%;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40mm;
+  grid-template-rows: auto auto auto auto 1fr auto;
+  grid-template-areas:
+    "title   qr"
+    "line    qr"
+    "contact qr"
+    "contact qr"
+    ".       ."
+    "copy    copy";
+  column-gap: 12mm;
+  row-gap: 0;
+}
+.site-footer__in::before { display: none; }
+.site-footer__title   { grid-area: title; }
+.site-footer__line    { grid-area: line; margin-top: var(--s-2); max-width: 30em; }
+.site-footer__contact { grid-area: contact; display: grid; gap: var(--s-3); margin-top: 12mm; align-content: start; }
+.site-footer__copy    { grid-area: copy; }
+.site-footer .dot     { display: block; }
+.mail {
+  font-size: var(--fs-name);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--lh-tight);
+}
+.contact__links { font-size: var(--fs-text); }
+.contact__qr { grid-area: qr; align-self: start; }
+.contact__qr img { width: 32mm; height: 32mm; }
+.contact__qr figcaption { margin-top: 3mm; }
+
+a { text-decoration: none; }

@@ -1,0 +1,7 @@
+node_modules/
+screenshots/
+.DS_Store
+
+# Notatki wewnętrzne — nie publikujemy
+BRIEF.md
+.claude/

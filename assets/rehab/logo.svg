@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120">
+<g transform="translate(0 12) scale(2)" fill="none" stroke="#111111" stroke-width=".75">
+<style>.hanko{fill:#2450D8;stroke:none}</style>
+<rect class="stroke" style="--i:0" x="8" y="8" width="32" height="32" pathLength="1"/><path class="stroke" style="--i:1" d="M24 16V32" pathLength="1"/><path class="stroke" style="--i:2" d="M16 24H32" pathLength="1"/>
+</g>
+<text x="124" y="78" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="52" font-weight="500" letter-spacing="-1" fill="#111111">reh.ab</text>
+</svg>
