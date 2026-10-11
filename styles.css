@@ -560,7 +560,9 @@ a.index__icon:hover { color: var(--ink); }
    ========================================================================== */
 .sheet {
   position: fixed;
-  inset: 0;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  height: 100dvh;                   /* wysokość widocznego okna — z paskami Safari */
   z-index: 30;
   visibility: hidden;
   transition: visibility 0s linear var(--t-sheet);
@@ -618,25 +620,42 @@ html:has(.sheet:target) { overflow: hidden; }
   padding-block: var(--s-3) var(--s-6);
 }
 
-/* Projekt: wideo zawsze w całości na ekranie — na telefonie u góry, wyżej wyśrodkowane */
+/* Projekt: wideo zawsze w całości na ekranie, bez przewijania */
 .sheet--project .sheet__body {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
-@media (min-width: 768px) {
-  .sheet--project .sheet__body { align-items: center; }
-}
-.sheet__video {
-  width: min(100%, calc((100svh - var(--sheet-top) - var(--header-h) - var(--s-3) - var(--s-6)) * var(--ar)));
-}
-.sheet__video video { background: var(--ink); object-fit: contain; }
+.sheet__video { outline: var(--hairline) solid var(--hair); outline-offset: calc(-1 * var(--hairline)); }
+.sheet__video video { background: var(--ink); }
 
-/* Ekran pionowy → kwadrat, poziomy → 16:9 */
+/* Ekran pionowy: kadr 9:16 wypełnia całe wolne miejsce panelu (szerokość × wysokość okna
+   minus pasek), dopasowany do każdej proporcji ekranu — nadmiar przycina object-fit: cover. */
 .sheet__video--wide { display: none; }
+@media (orientation: portrait) {
+  .sheet--project .sheet__body {
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+    padding-block: var(--s-2) var(--s-3);
+  }
+  .sheet__video--vertical {
+    flex: 1 1 auto;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+  .sheet__video--vertical img,
+  .sheet__video--vertical video { object-fit: cover; }
+}
+
+/* Ekran poziomy: 16:9 w całości, ograniczone wysokością okna (bez zmian) */
 @media (orientation: landscape) {
-  .sheet__video--square { display: none; }
-  .sheet__video--wide { display: block; }
+  .sheet__video--vertical { display: none; }
+  .sheet__video--wide {
+    display: block;
+    width: min(100%, calc((100dvh - var(--sheet-top) - var(--header-h) - var(--s-1) - var(--s-3) - var(--s-6)) * var(--ar)));
+  }
+  .sheet__video--wide video { object-fit: contain; }
 }
 
 @media (min-width: 768px) {

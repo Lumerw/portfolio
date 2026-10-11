@@ -22,13 +22,13 @@ ${symbolInner(name)}
 
 // Symbol wyśrodkowany na papierze, włosowa ramka. Kreska 1 px niezależnie od skali obrazu
 // (tu non-scaling-stroke jest bezpieczny, bo placeholder się nie animuje).
-function placeholder(name, w, h) {
+function placeholder(name, w, h, { frame = true } = {}) {
   const size = Math.min(w, h) * 0.2;
   const s = size / 48;
   const x = (w - size) / 2, y = (h - size) / 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
 <rect width="${w}" height="${h}" fill="${PAPER}"/>
-<rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" fill="none" stroke="${HAIR}" vector-effect="non-scaling-stroke"/>
+${frame ? `<rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" fill="none" stroke="${HAIR}" vector-effect="non-scaling-stroke"/>` : ''}
 <g transform="translate(${x} ${y}) scale(${s})" fill="none" stroke="${INK}" stroke-width="1">
 <style>path,circle,rect{vector-effect:non-scaling-stroke}.hanko{fill:${HANKO};stroke:none}</style>
 ${symbolInner(name)}
@@ -91,7 +91,8 @@ for (const p of shared.projects) {
     await out(img.src, placeholder(p.symbol, img.w / 2, img.h / 2));
   }
   for (const v of Object.values(p.video)) {
-    if (v.poster.endsWith('.svg')) await out(v.poster, placeholder(p.symbol, v.w / 2, v.h / 2));
+    // Bez ramki: plakat bywa przycinany (object-fit: cover), ramkę rysuje CSS na figurze.
+    if (v.poster.endsWith('.svg')) await out(v.poster, placeholder(p.symbol, v.w / 2, v.h / 2, { frame: false }));
   }
   if (p.logo.src.endsWith('.svg')) await out(p.logo.src, logoFile(p.symbol, p.title, p.logo.w, p.logo.h));
   if (p.sygnet.src.endsWith('.svg')) await out(p.sygnet.src, sygnetFile(p.symbol));

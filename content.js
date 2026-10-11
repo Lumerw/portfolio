@@ -46,7 +46,8 @@ export const shared = {
   // Projekt:
   //  logo   — na środku podglądu (desktop), najlepiej SVG
   //  sygnet — favicon / sygnet przy opisie zakresu i w panelu (kwadrat)
-  //  video  — pętla w panelu: square 1:1 (ekran pionowy) i wide 16:9 (ekran poziomy);
+  //  video  — pętla w panelu: vertical 9:16 (ekran pionowy — kadr wypełnia cały wolny ekran,
+  //           brzegi mogą się lekko przyciąć) i wide 16:9 (ekran poziomy);
   //           src = plik mp4 (bez dźwięku), poster = kadr; bez src widać poster-placeholder
   //  images — main 16:10, a i b 4:5 — tylko w PDF
 
@@ -61,7 +62,7 @@ export const shared = {
       logo:   { src: 'assets/teraz/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/teraz/sygnet.svg' },
       video: {
-        square: { src: '', poster: 'assets/teraz/video-1x1.svg', w: 1080, h: 1080 },
+        vertical: { src: '', poster: 'assets/teraz/video-9x16.svg', w: 1080, h: 1920 },
         wide:   { src: '', poster: 'assets/teraz/video-16x9.svg', w: 1920, h: 1080 },
       },
       href: 'https://teraz.design',  // [potwierdź]
@@ -80,7 +81,7 @@ export const shared = {
       logo:   { src: 'assets/loom/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/loom/sygnet.svg' },
       video: {
-        square: { src: '', poster: 'assets/loom/video-1x1.svg', w: 1080, h: 1080 },
+        vertical: { src: '', poster: 'assets/loom/video-9x16.svg', w: 1080, h: 1920 },
         wide:   { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 },
       },
       href: 'https://loom.studio',   // [potwierdź]
@@ -99,7 +100,7 @@ export const shared = {
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/rehab/sygnet.svg' },
       video: {
-        square: { src: '', poster: 'assets/rehab/video-1x1.svg', w: 1080, h: 1080 },
+        vertical: { src: '', poster: 'assets/rehab/video-9x16.svg', w: 1080, h: 1920 },
         wide:   { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 },
       },
       href: '[https://domena-reh.ab]',

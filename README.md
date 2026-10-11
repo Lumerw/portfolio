@@ -44,7 +44,7 @@ Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = mi
 | `shared.icons` | trzy miejsca obok znaku (zmiana co 450 ms — `ICON_MS` w `main.js`) |
 | `shared.clients` | karuzela firm: `name` (tekst alternatywny), `logo` (najlepiej SVG, jeden kolor) |
 | `projects[].logo`, `.sygnet` | logo na środku podglądu; sygnet / favicon przy zakresie prac i w panelu |
-| `projects[].video.square`, `.wide` | wideo 1:1 (ekran pionowy) i 16:9 (poziomy): `src` mp4 bez dźwięku, `poster` kadr |
+| `projects[].video.vertical`, `.wide` | wideo 9:16 (ekran pionowy — wypełnia cały wolny ekran, brzegi mogą się lekko przyciąć) i 16:9 (poziomy): `src` mp4 bez dźwięku, `poster` kadr |
 | `projects[].images` | `main` 16:10, `a`, `b` 4:5 — tylko w PDF |
 | `pl/en.projects.*` | zakres prac, opis, problem / rozwiązanie / efekt (PDF; limit 120 słów sprawdza build) |
 | `pl/en.about` | panel „o mnie” i strona 2 PDF |
@@ -58,7 +58,7 @@ Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = mi
 
 ### Wideo
 
-Wrzuć `assets/<projekt>/promo-1x1.mp4` i `promo-16x9.mp4` (H.264, bez ścieżki dźwiękowej, krótka pętla, najlepiej < 4 MB) i wpisz je w `video.square.src` / `video.wide.src`. Jako `poster` daj pierwszy kadr (`.jpg`). Przykład kompresji:
+Wrzuć `assets/<projekt>/promo-9x16.mp4` i `promo-16x9.mp4` (H.264, bez ścieżki dźwiękowej, krótka pętla, najlepiej < 4 MB) i wpisz je w `video.vertical.src` / `video.wide.src`. Na telefonie kadr dopasowuje się do ekranu (cover), więc ważne treści trzymaj w środkowych ~80% kadru. Jako `poster` daj pierwszy kadr (`.jpg`). Przykład kompresji:
 
 ```bash
 ffmpeg -i wejscie.mov -an -vf scale=1920:-2 -c:v libx264 -crf 26 -preset slow -movflags +faststart promo-16x9.mp4
