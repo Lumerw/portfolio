@@ -65,6 +65,29 @@ Wrzuć `assets/<projekt>/promo-9x16.mp4` i `promo-16x9.mp4` (H.264, bez ścieżk
 ffmpeg -i wejscie.mov -an -vf scale=1920:-2 -c:v libx264 -crf 26 -preset slow -movflags +faststart promo-16x9.mp4
 ```
 
+## Synchronizacja marek projektów
+
+Projekt z polem `sync: 'https://…'` w `content.js` ma logo, sygnet i kolory pobierane automatycznie ze swojej strony:
+
+- **codziennie** (GitHub Actions, `.github/workflows/sync-brands.yml`) albo ręcznie: zakładka *Actions* → „Synchronizacja marek projektów” → *Run workflow*, lokalnie `npm run sync-brands`;
+- gdy coś się zmieniło: przebudowa `index.html` i PDF, commit, publikacja — zmiana logo na stronie projektu pojawia się w portfolio najpóźniej po dobie;
+- pliki zapisywane są w repozytorium (`assets/<projekt>/*-sync.svg`, `brands.generated.js`) — odwiedzający nie łączą się ze stronami projektów;
+- gdy strona projektu nie działa albo plik jest podejrzany (SVG ze skryptem, zły kolor), zostaje ostatnia dobra wersja.
+
+Strona projektu powinna wystawić stały plik **`/brand.json`**:
+
+```json
+{
+  "logo": "/brand/logo-white.svg",
+  "sygnet": "/brand/sygnet.svg",
+  "bg": "#000000",
+  "aurora": ["#1D3E93F2", "#146EF480", "#0A1A3FF2", "#FC8AD31F"],
+  "speed": "26s"
+}
+```
+
+Bez `brand.json` synchronizowany jest tylko sygnet (z favicony SVG strony).
+
 ## Wdrożenie: GitHub Pages z własną domeną
 
 1. `npm run build && npm run pdf && npm run og` — zbudowany `index.html`, PDF-y i obraz OG trafiają do repozytorium.

@@ -1,0 +1,63 @@
+# Codzienna synchronizacja assetów marki ze stron projektów (pole `sync` w content.js).
+# Gdy coś się zmieniło: przebudowa index.html i PDF, commit, publikacja na GitHub Pages.
+# Ręcznie: Actions → „Synchronizacja marek projektów” → Run workflow.
+name: Synchronizacja marek projektów
+
+on:
+  schedule:
+    - cron: '17 4 * * *'   # codziennie ok. 6:17 czasu polskiego
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: sync-brands
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Pobierz assety marki
+        run: npm run sync-brands
+
+      - name: Czy coś się zmieniło?
+        id: diff
+        run: |
+          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Przeglądarka do PDF
+        if: steps.diff.outputs.changed == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Przebuduj stronę i PDF
+        if: steps.diff.outputs.changed == 'true'
+        run: npm run build && npm run pdf
+
+      - name: Zapisz i opublikuj
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Synchronizacja marek: nowe assety ze stron projektów"
+          git push
+          # push z tokenem akcji nie zawsze uruchamia budowanie Pages — wywołaj je jawnie
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" || true

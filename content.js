@@ -1,4 +1,7 @@
 // Cała treść strony i PDF. Edytujesz tylko ten plik.
+// (Assety marki z pola `sync` pobiera automatycznie tools/sync-brands.mjs → brands.generated.js.)
+import { synced } from './brands.generated.js';
+
 // Wszystko w [nawiasach] to miejsca do uzupełnienia albo potwierdzenia.
 //
 // shared — dane wspólne dla obu języków (linki, lata, obrazy)
@@ -59,6 +62,9 @@ export const shared = {
       type: 'marketplace',           // typ projektu — po prawej w indeksie
       year: '2026',                  // [potwierdź] — tylko w PDF
       symbol: 'teraz',
+      // Synchronizacja marki: codziennie pobiera logo, sygnet i kolory z teraz.eu (brand.json / favicon).
+      // Poniższe wartości to stan wyjściowy — zsynchronizowane je nadpisują.
+      sync: 'https://teraz.eu',
       // Assety marki pobrane z teraz.eu (logo, sygnet, kolory i aurora z ich CSS).
       // mono: false — kolorowe, nie odwracaj w trybie ciemnym.
       logo:   { src: 'assets/teraz/wordmark-white.svg', w: 575, h: 178, mono: false },
@@ -328,5 +334,14 @@ export const en = {
     line: '[One inviting sentence, e.g. “Happy to talk about a project or a role.”]',
   },
 };
+
+// Assety zsynchronizowane ze stron projektów nadpisują wartości z `shared.projects`.
+for (const p of shared.projects) {
+  const s = synced[p.id];
+  if (!s) continue;
+  if (s.logo) p.logo = s.logo;
+  if (s.sygnet) p.sygnet = s.sygnet;
+  if (s.brand) p.brand = { ...p.brand, ...s.brand };
+}
 
 export const content = { shared, pl, en };

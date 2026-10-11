@@ -13,6 +13,7 @@
     "pdf": "node tools/build-pdf.mjs",
     "images": "node tools/optimize-images.mjs",
     "og": "node tools/build-og.mjs",
+    "sync-brands": "node tools/sync-brands.mjs",
     "audit": "node tools/audit.mjs"
   },
   "devDependencies": {
