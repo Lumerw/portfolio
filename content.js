@@ -59,13 +59,21 @@ export const shared = {
       type: 'marketplace',           // typ projektu — po prawej w indeksie
       year: '2026',                  // [potwierdź] — tylko w PDF
       symbol: 'teraz',
-      logo:   { src: 'assets/teraz/logo.svg', w: 480, h: 120 },
-      sygnet: { src: 'assets/teraz/sygnet.svg' },
+      // Assety marki pobrane z teraz.eu (logo, sygnet, kolory i aurora z ich CSS).
+      // mono: false — kolorowe, nie odwracaj w trybie ciemnym.
+      logo:   { src: 'assets/teraz/wordmark-white.svg', w: 575, h: 178, mono: false },
+      sygnet: { src: 'assets/teraz/sygnet.svg', mono: false },
+      // Tło podglądu w stylu marki: czerń + animowana aurora (gradienty z teraz.eu, 26 s).
+      brand: {
+        bg: '#000000',
+        aurora: ['#1D3E93F2', '#146EF480', '#0A1A3FF2', '#FC8AD31F'],
+        speed: '26s',
+      },
       video: {
         vertical: { src: '', poster: 'assets/teraz/video-9x16.svg', w: 1080, h: 1920 },
         wide:   { src: '', poster: 'assets/teraz/video-16x9.svg', w: 1920, h: 1080 },
       },
-      href: 'https://teraz.design',  // [potwierdź]
+      href: 'https://teraz.eu',      // testowo
       images: {
         main:    { src: 'assets/teraz/01.svg',      w: 1600, h: 1000 },
         a:       { src: 'assets/teraz/02.svg',      w: 1200, h: 1500 },

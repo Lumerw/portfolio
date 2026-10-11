@@ -40,7 +40,15 @@ function header(c, t) {
 }
 
 // Grafiki jednokolorowe (ikony, sygnety, logo, placeholdery SVG) — w trybie ciemnym odwracane.
-const mono = src => (String(src).endsWith('.svg') ? ' mono' : '');
+// Przyjmuje ścieżkę albo obiekt obrazu; `mono: false` wyłącza odwracanie (kolorowe assety marki).
+const mono = img => {
+  const src = typeof img === 'string' ? img : img.src;
+  const on = typeof img === 'object' && 'mono' in img ? img.mono : String(src).endsWith('.svg');
+  return on ? ' mono' : '';
+};
+
+// Tło w stylu marki projektu (projects[].brand): kolor + animowana aurora.
+const brandStyle = b => `--brand-bg:${esc(b.bg)};${b.aurora.map((c, i) => `--a${i + 1}:${esc(c)}`).join(';')};--brand-speed:${esc(b.speed || '26s')}`;
 
 function indexRow(p, i) {
   return `
@@ -88,12 +96,12 @@ function hero(c, t) {
 
   // Logo projektu na środku podglądu (bez gradientów — na razie papier).
   const logos = c.projects.map((p, i) => `
-        <div class="preview__logo${i === 0 ? ' is-active' : ''}" data-project="${p.id}">
-          <img class="${mono(p.logo.src).trim()}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+        <div class="preview__logo${p.brand ? ' brand' : ''}${i === 0 ? ' is-active' : ''}" data-project="${p.id}"${p.brand ? ` style="${brandStyle(p.brand)}"` : ''}>
+          <img class="${mono(p.logo).trim()}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
         </div>`).join('');
   const captions = c.projects.map((p, i) => `
         <div class="preview__caption${i === 0 ? ' is-active' : ''}" data-project="${p.id}">
-          <img class="sygnet${mono(p.sygnet.src)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
+          <img class="sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
           <span class="t-meta">${num(i)} ${esc(p.title)} — ${esc(t.projects[p.id].meta.join(' · '))}</span>
         </div>`).join('');
 
@@ -178,9 +186,13 @@ function sheet({ id, cls, bar, body, t }) {
 function promo(p, tp) {
   return Object.entries(p.video).map(([kind, v]) => {
     const ratio = `--ratio:${v.w} / ${v.h}; --ar:${(v.w / v.h).toFixed(4)}`;
+    // Bez wideo, ale z marką: plansza w stylu projektu (aurora + logo) zamiast placeholdera.
+    const brandPoster = p.brand
+      ? `<div class="brand" style="${brandStyle(p.brand)}" role="img" aria-label="${esc(tp.alt.video)}"><img class="brand__logo${mono(p.logo)}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt=""></div>`
+      : null;
     const media = v.src && isReal(v.src)
       ? `<video src="${esc(v.src)}" poster="${esc(v.poster)}" width="${v.w}" height="${v.h}" muted loop playsinline preload="none" aria-label="${esc(tp.alt.video)}"></video>`
-      : `<img class="${mono(v.poster).trim()}" src="${esc(v.poster)}" width="${v.w}" height="${v.h}" alt="${esc(tp.alt.video)}" loading="lazy" decoding="async">`;
+      : brandPoster || `<img class="${mono(v.poster).trim()}" src="${esc(v.poster)}" width="${v.w}" height="${v.h}" alt="${esc(tp.alt.video)}" loading="lazy" decoding="async">`;
     return `
       <figure class="sheet__video sheet__video--${kind} media" style="${ratio}">
         ${media}
@@ -202,7 +214,7 @@ function project(p, i, c, t) {
             </div>`;
 
   const bar = `
-      <img class="sygnet sheet__sygnet${mono(p.sygnet.src)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
+      <img class="sygnet sheet__sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
       <span class="t-meta sheet__no">${num(i)}</span>
       <h2 id="${p.id}-title" class="t-project">${esc(p.title)}</h2>
       <span class="t-meta sheet__year">${esc(p.type)}</span>

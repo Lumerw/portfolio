@@ -43,7 +43,8 @@ Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = mi
 | `shared.siteUrl` | QR w PDF, adresy Open Graph i `canonical` — **wpisz po ustaleniu domeny** |
 | `shared.icons` | trzy miejsca obok znaku (zmiana co 450 ms — `ICON_MS` w `main.js`) |
 | `shared.clients` | karuzela firm: `name` (tekst alternatywny), `logo` (najlepiej SVG, jeden kolor) |
-| `projects[].logo`, `.sygnet` | logo na środku podglądu; sygnet / favicon przy zakresie prac i w panelu |
+| `projects[].logo`, `.sygnet` | logo na środku podglądu; sygnet / favicon przy zakresie prac i w panelu. `mono: false` = kolorowy asset marki (bez odwracania w trybie ciemnym) |
+| `projects[].brand` | opcjonalnie: plansza w stylu marki — `bg` (tło), `aurora` (4 kolory rozmytych gradientów), `speed` (czas animacji). Używana w podglądzie i w panelu, dopóki nie ma wideo. Przykład: teraz (assety z teraz.eu) |
 | `projects[].video.vertical`, `.wide` | wideo 9:16 (ekran pionowy — wypełnia cały wolny ekran, brzegi mogą się lekko przyciąć) i 16:9 (poziomy): `src` mp4 bez dźwięku, `poster` kadr |
 | `projects[].images` | `main` 16:10, `a`, `b` 4:5 — tylko w PDF |
 | `pl/en.projects.*` | zakres prac, opis, problem / rozwiązanie / efekt (PDF; limit 120 słów sprawdza build) |

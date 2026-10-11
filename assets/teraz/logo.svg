@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120">
-<g transform="translate(0 12) scale(2)" fill="none" stroke="#111111" stroke-width=".75">
-<style>.hanko{fill:#2450D8;stroke:none}</style>
-<circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/>
-</g>
-<text x="124" y="78" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="52" font-weight="500" letter-spacing="-1" fill="#111111">teraz</text>
-</svg>

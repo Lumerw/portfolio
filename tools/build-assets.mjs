@@ -94,8 +94,9 @@ for (const p of shared.projects) {
     // Bez ramki: plakat bywa przycinany (object-fit: cover), ramkę rysuje CSS na figurze.
     if (v.poster.endsWith('.svg')) await out(v.poster, placeholder(p.symbol, v.w / 2, v.h / 2, { frame: false }));
   }
-  if (p.logo.src.endsWith('.svg')) await out(p.logo.src, logoFile(p.symbol, p.title, p.logo.w, p.logo.h));
-  if (p.sygnet.src.endsWith('.svg')) await out(p.sygnet.src, sygnetFile(p.symbol));
+  // Prawdziwe assety marki (mono: false) zostają nietknięte — placeholdery tylko dla reszty.
+  if (p.logo.mono !== false && p.logo.src.endsWith('.svg')) await out(p.logo.src, logoFile(p.symbol, p.title, p.logo.w, p.logo.h));
+  if (p.sygnet.mono !== false && p.sygnet.src.endsWith('.svg')) await out(p.sygnet.src, sygnetFile(p.symbol));
 }
 
 for (const [i, src] of shared.icons.entries()) {

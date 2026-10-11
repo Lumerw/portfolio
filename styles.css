@@ -529,6 +529,48 @@ a.index__icon:hover { color: var(--ink); }
   transition: opacity var(--t-swap) var(--ease);
 }
 .preview__logo.is-active { opacity: 1; }
+
+/* ==========================================================================
+   Plansza w stylu marki projektu (projects[].brand): tło + animowana aurora
+   z rozmytych gradientów radialnych — odwzorowanie hero z teraz.eu.
+   ========================================================================== */
+.brand {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-bg);
+}
+.brand::before {
+  content: "";
+  position: absolute;
+  inset: -35% -25%;
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(28px);
+  background:
+    radial-gradient(34% 40% at 38% 18%, var(--a1, transparent), transparent 70%),
+    radial-gradient(30% 34% at 66% 10%, var(--a2, transparent), transparent 72%),
+    radial-gradient(42% 36% at 50% 40%, var(--a3, transparent), transparent 76%),
+    radial-gradient(22% 26% at 84% 34%, var(--a4, transparent), transparent 70%);
+  animation: aurora var(--brand-speed, 26s) ease-in-out infinite alternate;
+  will-change: transform;
+}
+/* Logo na planszy marki: zawsze w całości, niezależnie od reguł dla wideo/obrazów w ramce */
+.media .brand img,
+.brand .brand__logo { width: 56%; max-width: 420px; height: auto; object-fit: contain; }
+.preview__logo.brand { padding: 0; }
+.preview__logo.brand img { width: 62%; }
+
+@keyframes aurora {
+  0%   { transform: translate(0) rotate(0) scale(1); }
+  33%  { transform: translate(6%, 4%) rotate(7deg) scale(1.08); }
+  66%  { transform: translate(-5%, 6%) rotate(-5deg) scale(1.04); }
+  100% { transform: translate(3%, -4%) rotate(4deg) scale(1.1); }
+}
 .preview__logo img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
 
 .preview__captions {
