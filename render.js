@@ -56,13 +56,17 @@ function indexRow(p, i) {
 // Ikonka LinkedIn kreską 1 px: ramka + „in”.
 const linkedinIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
 
+// Ikonki w kolumnie numerów: „i” (o mnie) i pobieranie (PDF), kreska 1 px.
+const infoIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 7v4.5"/><circle cx="8" cy="4.8" r=".6" fill="currentColor" stroke="none"/></svg>`;
+const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg>`;
+
 // Karuzela firm: lista + jej kopia (aria-hidden) dla płynnej pętli.
 function clients(c, t) {
   const items = hidden => c.clients.map(k => `
           <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" alt="${hidden ? '' : esc(k.name)}" loading="lazy" decoding="async"></li>`).join('');
   return `
       <section class="clients" aria-labelledby="clients-title">
-        <h2 id="clients-title" class="clients__title t-meta">${esc(t.ui.clients)}</h2>
+        <h2 id="clients-title" class="visually-hidden">${esc(t.ui.clients)}</h2>
         <div class="clients__marquee">
         <div class="clients__track">
           <ul class="clients__list">${items(false)}
@@ -115,11 +119,11 @@ function hero(c, t) {
       <nav class="index" aria-label="${esc(t.ui.indexLabel)}">
         <ul>${c.projects.map(indexRow).join('')}
           <li class="reveal index__item--icon" style="--n:${n + 3}">
-            <a class="index__row index__row--sub" href="#o-mnie" aria-haspopup="dialog"><span class="index__no"></span><span class="index__title">${esc(t.ui.about)}</span><span class="index__year"></span></a>
+            <a class="index__row index__row--sub" href="#o-mnie" aria-haspopup="dialog"><span class="index__no">${infoIcon}</span><span class="index__title">${esc(t.ui.about)}</span><span class="index__year"></span></a>
             ${liIcon}
           </li>
           <li ${reveal(n + 4)}>
-            <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no"></span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year t-meta">PDF</span></a>
+            <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year"></span></a>
           </li>
         </ul>
       </nav>${clients(c, t)}

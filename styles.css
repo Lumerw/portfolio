@@ -393,7 +393,6 @@ a.index__icon:hover { color: var(--ink); }
    Karuzela firm — powolna pętla, pauza po najechaniu, bez ruchu przy reduced-motion
    ========================================================================== */
 .clients { margin-top: var(--s-12); }
-.clients__title { margin-bottom: var(--s-3); }
 .clients__marquee {
   overflow: hidden;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
@@ -405,7 +404,17 @@ a.index__icon:hover { color: var(--ink); }
   animation: marquee 40s linear infinite;
 }
 .clients__marquee:hover .clients__track { animation-play-state: paused; }
-@media (min-width: 1024px) { .clients { margin-top: var(--s-5); } }
+/* Desktop: karuzela na dole kolumny, wyrównana do dolnej krawędzi ramki podglądu
+   (pod ramką jest jeszcze podpis: 16 px odstępu + 24 px wysokości). */
+@media (min-width: 1024px) {
+  .hero__intro {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(var(--s-2) + var(--s-3));
+  }
+  .clients { margin-top: auto; padding-top: var(--s-5); }
+}
 .clients__list { display: flex; align-items: center; gap: var(--s-5); padding-right: var(--s-5); }
 .clients__list img { height: 32px; width: auto; }
 
@@ -449,6 +458,10 @@ a.index__icon:hover { color: var(--ink); }
 
 .index__year { text-align: right; }
 
+/* Ikonki „i” i pobierania w kolumnie numerów */
+.index__no { display: flex; align-self: center; }
+.index__glyph { width: 14px; height: 14px; color: var(--ink-3); }
+
 /* Telefon i tablet: sam stos linków, bez podglądu */
 .hero__preview { display: none; }
 
@@ -458,7 +471,7 @@ a.index__icon:hover { color: var(--ink); }
 
 /* Desktop: indeks po lewej, podgląd po prawej */
 @media (min-width: 1024px) {
-  .hero { align-items: start; padding-bottom: var(--s-6); }
+  .hero { align-items: start; padding-bottom: var(--s-4); }
   .hero__intro { grid-column: 1 / 6; }
   .hero__preview {
     display: block;
@@ -484,11 +497,20 @@ a.index__icon:hover { color: var(--ink); }
   .index__row.is-active::before { opacity: 1; }
 }
 
-/* Podgląd 4:5 — mieści się w pierwszym ekranie */
-.preview {
-  width: min(100%, calc((100svh - var(--header-h) - var(--footer-h) - var(--s-12) - var(--s-8)) * 4 / 5));
+/* Podgląd: wysokość = wysokość lewej kolumny (góra przy znaku, dół przy karuzeli),
+   proporcja 4:5, najwyżej szerokość kolumny. Kolumna jest kontenerem (cq*),
+   więc ramka i podpis liczą tę samą szerokość: --pw. */
+.hero__preview {
+  align-self: stretch;
+  container-type: size;
+}
+.preview,
+.preview__captions {
+  --pw: min(100cqw, (100cqh - var(--s-2) - var(--s-3)) * 4 / 5);
+  width: var(--pw);
   margin-left: auto;
 }
+.preview { aspect-ratio: 4 / 5; }
 
 .preview { outline: var(--hairline) solid var(--hair); outline-offset: calc(-1 * var(--hairline)); }
 
@@ -508,8 +530,7 @@ a.index__icon:hover { color: var(--ink); }
 
 .preview__captions {
   position: relative;
-  width: min(100%, calc((100svh - var(--header-h) - var(--footer-h) - var(--s-12) - var(--s-8)) * 4 / 5));
-  margin: var(--s-2) 0 0 auto;
+  margin-top: var(--s-2);
   min-height: var(--s-3);
 }
 
@@ -682,12 +703,15 @@ html:has(.sheet:target) { overflow: hidden; }
 @media (min-width: 768px) {
   .site-footer { margin-top: 0; }
   .site-footer__in {
+    padding-block: var(--s-2);
     grid-template-areas: "copy contact button";
     grid-template-columns: 1fr auto auto;
     align-items: center;
     column-gap: var(--s-6);
   }
-  .site-footer__contact { display: flex; align-items: center; gap: var(--s-4); }
+  /* Profile po lewej, mail tuż obok przycisku „kontakt” */
+  .site-footer__contact { display: flex; align-items: center; gap: var(--s-5); }
+  .site-footer__contact .contact__links { order: -1; }
 }
 
 .contact__mail {
