@@ -1,5 +1,6 @@
 # Codzienna synchronizacja assetów marki ze stron projektów (pole `sync` w content.js).
-# Gdy coś się zmieniło: przebudowa index.html i PDF, commit, publikacja na GitHub Pages.
+# Gdy coś się zmieniło: przebudowa index.html, commit, publikacja na GitHub Pages.
+# PDF nie jest tu przebudowywany: serwer GitHuba nie ma fontu Helvetica — PDF generuj na Macu (npm run pdf).
 # Ręcznie: Actions → „Synchronizacja marek projektów” → Run workflow.
 name: Synchronizacja marek projektów
 
@@ -41,13 +42,9 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Przeglądarka do PDF
+      - name: Przebuduj stronę
         if: steps.diff.outputs.changed == 'true'
-        run: npx playwright install --with-deps chromium
-
-      - name: Przebuduj stronę i PDF
-        if: steps.diff.outputs.changed == 'true'
-        run: npm run build && npm run pdf
+        run: npm run build
 
       - name: Zapisz i opublikuj
         if: steps.diff.outputs.changed == 'true'

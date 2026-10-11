@@ -70,7 +70,8 @@ ffmpeg -i wejscie.mov -an -vf scale=1920:-2 -c:v libx264 -crf 26 -preset slow -m
 Projekt z polem `sync: 'https://…'` w `content.js` ma logo, sygnet i kolory pobierane automatycznie ze swojej strony:
 
 - **codziennie** (GitHub Actions, `.github/workflows/sync-brands.yml`) albo ręcznie: zakładka *Actions* → „Synchronizacja marek projektów” → *Run workflow*, lokalnie `npm run sync-brands`;
-- gdy coś się zmieniło: przebudowa `index.html` i PDF, commit, publikacja — zmiana logo na stronie projektu pojawia się w portfolio najpóźniej po dobie;
+- gdy coś się zmieniło: przebudowa `index.html`, commit, publikacja — zmiana logo na stronie projektu pojawia się w portfolio najpóźniej po dobie;
+- PDF automat nie przebudowuje (serwer GitHuba nie ma Helvetiki) — po zmianie marki odśwież go na Macu: `git pull && npm run pdf`, commit i push;
 - pliki zapisywane są w repozytorium (`assets/<projekt>/*-sync.svg`, `brands.generated.js`) — odwiedzający nie łączą się ze stronami projektów;
 - gdy strona projektu nie działa albo plik jest podejrzany (SVG ze skryptem, zły kolor), zostaje ostatnia dobra wersja.
 
