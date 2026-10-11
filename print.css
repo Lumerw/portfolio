@@ -20,12 +20,12 @@
   --ink-3: #73736E;
   --ink-4: #A8A8A3;
   --hair:  rgba(17, 17, 17, .14);
-  --accent: #2450D8;
+  --accent: #111111;
 }
 .mono { filter: none !important; }
 /* Stopka (strona kontaktu) w druku też jasna */
 .site-footer, :root[data-theme="dark"] .site-footer, :root:not([data-theme="light"]) .site-footer {
-  --paper: #FAFAF7; --ink: #111111; --ink-2: #6E6E6A; --ink-3: #73736E; --hair: rgba(17, 17, 17, .14); --accent: #2450D8;
+  --paper: #FAFAF7; --ink: #111111; --ink-2: #6E6E6A; --ink-3: #73736E; --hair: rgba(17, 17, 17, .14); --accent: #111111;
 }
 
 :root {
@@ -163,7 +163,6 @@ main { display: flex; }
 .site-footer__line    { grid-area: line; margin-top: var(--s-2); max-width: 30em; }
 .site-footer__contact { grid-area: contact; display: grid; gap: var(--s-3); margin-top: 12mm; align-content: start; }
 .site-footer__copy    { grid-area: copy; }
-.site-footer .dot     { display: block; }
 .mail {
   font-size: var(--fs-name);
   font-weight: var(--fw-medium);

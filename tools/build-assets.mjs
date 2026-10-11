@@ -12,7 +12,7 @@ import { symbolInner, SYMBOL_NAMES } from '../symbols.js';
 import { shared } from '../content.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PAPER = '#FAFAF7', INK = '#111111', HAIR = 'rgba(17,17,17,.14)', HANKO = '#2450D8';
+const PAPER = '#FAFAF7', INK = '#111111', HAIR = 'rgba(17,17,17,.14)', HANKO = '#111111';
 
 const symbolFile = name => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="${INK}" stroke-width="1">
 <style>.hanko{fill:${HANKO};stroke:none}</style>

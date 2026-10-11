@@ -304,7 +304,7 @@ function footer(c, t) {
     </ul>
   </div>
   <a class="button site-footer__button" href="${esc(url(c.calendly))}" target="_blank" rel="noopener">${esc(t.ui.contactButton)}</a>
-  <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)} <span class="dot" aria-hidden="true"></span></p>
+  <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - ${esc(c.siteUrl)}">
     <figcaption class="t-meta">${esc(t.ui.qr)} - ${esc(c.siteUrl.replace(/^https?:\/\//, ''))}</figcaption>

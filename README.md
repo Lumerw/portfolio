@@ -121,6 +121,6 @@ Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokł
 - **Symbole bez `vector-effect: non-scaling-stroke`.** W Chrome ta właściwość psuje `pathLength` (symbol > 48 px rysował się w części). Grubość 1 px trzyma `stroke-width` liczony z `--size`.
 - **Animowane linie symboli** mają klasę `.stroke`, a CSS nie wybiera ich przez `[pathLength]` — Chrome nie przeliczał stylu po takim selektorze i animacja nie ruszała.
 - **Portret w duotonie** robi `npm run images` (sharp), nie filtr CSS — wygląda tak samo na stronie i w PDF.
-- **Znak w nagłówku** pojawia się dopiero po przewinięciu poniżej znaku w hero, a kropka w stopce jest ukryta na desktopie — najwyżej dwie kropki hanko na ekranie.
+- **Marka czarno-biała:** bez koloru akcentu (zamiast czerwonej/niebieskiej kropki z briefu). Kropka w znaku osobistym ma kolor tuszu; aktywny wiersz indeksu oznacza tylko podkreślenie. Kolory mają wyłącznie marki projektów (np. teraz).
 - **PDF:** strona drukowana ma margines 0, a 14 mm to wewnętrzny odstęp (inaczej Chrome zostawia białe marginesy zamiast papieru). Kolejność stron ustawia `order` w `print.css`.
 - **CSS i JS nie są minifikowane** (brief: bez bundlera). Lighthouse to sugeruje, ale wynik i tak jest 99–100.

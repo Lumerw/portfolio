@@ -2,7 +2,7 @@
 <rect width="600" height="750" fill="#FAFAF7"/>
 <rect x=".5" y=".5" width="599" height="749" fill="none" stroke="rgba(17,17,17,.14)" vector-effect="non-scaling-stroke"/>
 <g transform="translate(240 315) scale(2.5)" fill="none" stroke="#111111" stroke-width="1">
-<style>path,circle,rect{vector-effect:non-scaling-stroke}.hanko{fill:#2450D8;stroke:none}</style>
+<style>path,circle,rect{vector-effect:non-scaling-stroke}.hanko{fill:#111111;stroke:none}</style>
 <rect class="stroke" style="--i:0" x="8" y="8" width="32" height="32" pathLength="1"/><path class="stroke" style="--i:1" d="M24 16V32" pathLength="1"/><path class="stroke" style="--i:2" d="M16 24H32" pathLength="1"/>
 </g>
 </svg>

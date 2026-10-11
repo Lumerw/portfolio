@@ -15,7 +15,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
   body { width: 1200px; height: 630px; background: #FAFAF7; color: #111; padding: 72px 80px;
          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
   .symbol { width: 72px; height: 72px; fill: none; stroke: #111; stroke-width: .67; }
-  .symbol .hanko { fill: #2450D8; stroke: none; }
+  .symbol .hanko { fill: #111; stroke: none; }
   .name { margin-top: auto; font-size: 24px; font-weight: 500; }
   .name span { font-weight: 400; color: #6E6E6A; }
   h1 { margin-top: 12px; font-size: 64px; font-weight: 500; letter-spacing: -.01em; line-height: 1.1; }
