@@ -24,7 +24,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
           border-top: 1px solid rgba(17,17,17,.14); font-size: 18px; color: #73736E; }
 </style></head><body>
   ${symbol('personal')}
-  <div class="name">${esc(shared.name)} <span>— ${esc(pl.hero.role)}</span></div>
+  <div class="name">${esc(shared.name)} <span>- ${esc(pl.hero.role)}</span></div>
   <h1>${esc(pl.hero.title)}</h1>
   <p>${esc(pl.hero.line)}</p>
   <div class="meta"><span>${shared.projects.map(p => esc(p.title)).join(' · ')}</span><span>${esc(shared.year)}</span></div>

@@ -31,7 +31,7 @@ function header(c, t) {
   <div class="wrap site-header__in">
     <button class="theme" type="button" data-theme-switch aria-label="${esc(t.ui.themeDark)}" data-label-dark="${esc(t.ui.themeDark)}" data-label-light="${esc(t.ui.themeLight)}">${themeIcon}</button>
     <div class="site-header__nav t-meta">
-      <button class="lang" type="button" data-lang-switch aria-label="PL / EN — ${esc(t.ui.langSwitchLabel)}">
+      <button class="lang" type="button" data-lang-switch aria-label="PL / EN - ${esc(t.ui.langSwitchLabel)}">
         <span data-lang="pl">PL</span> / <span data-lang="en">EN</span>
       </button>
     </div>
@@ -102,7 +102,8 @@ function hero(c, t) {
   const captions = c.projects.map((p, i) => `
         <div class="preview__caption${i === 0 ? ' is-active' : ''}" data-project="${p.id}">
           <img class="sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
-          <span class="t-meta">${num(i)} ${esc(p.title)} — ${esc(t.projects[p.id].meta.join(' · '))}</span>
+          <span class="t-meta preview__text">${esc(p.title)} - ${esc(t.projects[p.id].tagline)}</span>
+          ${url(p.href) !== '#' ? `<a class="link-u t-meta" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a>` : ''}
         </div>`).join('');
 
   // Trzy miejsca na ikony obok znaku. Każde ma wszystkie ikony (ładowane raz); widoczna jest jedna.
@@ -120,7 +121,7 @@ function hero(c, t) {
         <div class="hero__icons" aria-hidden="true">${icons}
         </div>
       </div>
-      <p class="hero__name"><span ${reveal(0)}>${esc(c.name)} <span class="hero__role">— ${esc(t.hero.role)}</span></span></p>
+      <p class="hero__name"><span ${reveal(0)}>${esc(c.name)} <span class="hero__role">- ${esc(t.hero.role)}</span></span></p>
       <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
       <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
       <p class="hero__year t-meta print-only">${esc(c.year)}</p>
@@ -136,7 +137,7 @@ function hero(c, t) {
         </ul>
       </nav>${clients(c, t)}
     </div>
-    <div class="hero__preview" aria-hidden="true">
+    <div class="hero__preview">
       <div class="preview media media--4x5">${logos}
       </div>
       <div class="preview__captions">${captions}
@@ -173,7 +174,7 @@ function sheet({ id, cls, bar, body, t }) {
   <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
   <div class="sheet__panel">
     <div class="sheet__bar wrap">${bar}
-      <a class="sheet__close button button--small" href="#start" data-close>${esc(t.ui.close)}</a>
+      <a class="sheet__close" href="#start" data-close aria-label="${esc(t.ui.close)}"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
     </div>
     <div class="sheet__body wrap">${body}
     </div>
@@ -205,7 +206,7 @@ function project(p, i, c, t) {
   const tp = t.projects[p.id];
   const opts = { widths: c.imageWidths };
   const link = url(p.href) !== '#'
-    ? `<a class="sheet__link t-meta" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a>`
+    ? `<a class="sheet__link link-u t-meta" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a>`
     : '';
   const fact = key => `
             <div class="case__fact">
@@ -305,8 +306,8 @@ function footer(c, t) {
   <a class="button site-footer__button" href="${esc(url(c.calendly))}" target="_blank" rel="noopener">${esc(t.ui.contactButton)}</a>
   <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)} <span class="dot" aria-hidden="true"></span></p>
   <figure class="contact__qr print-only">
-    <img src="assets/qr.svg" width="96" height="96" alt="QR — ${esc(c.siteUrl)}">
-    <figcaption class="t-meta">${esc(t.ui.qr)} — ${esc(c.siteUrl.replace(/^https?:\/\//, ''))}</figcaption>
+    <img src="assets/qr.svg" width="96" height="96" alt="QR - ${esc(c.siteUrl)}">
+    <figcaption class="t-meta">${esc(t.ui.qr)} - ${esc(c.siteUrl.replace(/^https?:\/\//, ''))}</figcaption>
   </figure>
  </div>
 </footer>`;
@@ -338,7 +339,7 @@ export function renderMeta(content, lang) {
     `<meta property="og:image" content="${esc(abs('assets/og.jpg'))}">`,
     `<meta property="og:image:width" content="1200">`,
     `<meta property="og:image:height" content="630">`,
-    `<meta property="og:image:alt" content="${esc(c.name)} — ${esc(m.description)}">`,
+    `<meta property="og:image:alt" content="${esc(c.name)} - ${esc(m.description)}">`,
     `<meta property="og:locale" content="${lang === 'pl' ? 'pl_PL' : 'en_US'}">`,
     `<meta name="twitter:card" content="summary_large_image">`,
   ].filter(Boolean).join('\n  ');

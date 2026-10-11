@@ -72,7 +72,7 @@
 /* Tryb ciemny: domyślnie wg systemu, przełącznik w nagłówku zapisuje wybór (data-theme). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper:  #121211;
+    --paper:  #000000;
     --ink:    #EDEDE8;
     --ink-2:  #A3A39E;              /* 7.4:1 */
     --ink-3:  #8C8C87;              /* 5.5:1 */
@@ -83,7 +83,7 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper:  #121211;
+  --paper:  #000000;
   --ink:    #EDEDE8;
   --ink-2:  #A3A39E;
   --ink-3:  #8C8C87;
@@ -515,7 +515,16 @@ a.index__icon:hover { color: var(--ink); }
 }
 .preview { aspect-ratio: 4 / 5; }
 
-.preview { outline: var(--hairline) solid var(--hair); outline-offset: calc(-1 * var(--hairline)); }
+/* Cienka ramka w kolorze linii (--hair) — rysowana nad grafiką, widoczna też na czarnej planszy w trybie ciemnym */
+.preview::after,
+.sheet__video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: var(--hairline) solid var(--hair);
+  pointer-events: none;
+}
 
 /* Logo projektu na środku podglądu */
 .preview__logo {
@@ -586,13 +595,17 @@ a.index__icon:hover { color: var(--ink); }
   align-items: center;
   gap: var(--s-2);
   opacity: 0;
+  visibility: hidden;               /* ukryty podpis nie łapie focusu ani kliknięć */
   /* stary podpis znika szybciej, nowy wchodzi po nim — tekst się nie nakłada */
-  transition: opacity calc(var(--t-swap) * .4) var(--ease);
+  transition: opacity calc(var(--t-swap) * .4) var(--ease), visibility 0s linear calc(var(--t-swap) * .4);
 }
 .preview__caption.is-active {
   opacity: 1;
-  transition: opacity calc(var(--t-swap) * .6) var(--ease) calc(var(--t-swap) * .4);
+  visibility: visible;
+  transition: opacity calc(var(--t-swap) * .6) var(--ease) calc(var(--t-swap) * .4), visibility 0s;
 }
+.preview__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preview__caption .link-u { margin-left: auto; }
 .sygnet { width: 20px; height: 20px; flex: none; object-fit: contain; }
 
 /* ==========================================================================
@@ -642,16 +655,28 @@ html:has(.sheet:target) { overflow: hidden; }
 .sheet__bar {
   flex: none;
   display: flex;
-  align-items: baseline;
+  align-items: center;              /* sygnet, numer, nazwa i typ na jednej osi */
   gap: var(--s-2);
   height: calc(var(--header-h) + var(--s-1));
-  padding-top: 24px;
+  padding-top: var(--s-2);
 }
-.sheet__sygnet { align-self: center; }
 .sheet__bar .symbol { --size: 16; align-self: center; flex: none; }
 .sheet__year, .sheet__no { display: none; }
-.sheet__link { color: var(--ink); border-bottom: var(--hairline) solid var(--ink); margin-left: auto; white-space: nowrap; }
-.sheet__close { margin-left: auto; align-self: center; }
+/* Link z podkreśleniem: „zobacz projekt ↗” (panel i podpis pod podglądem) */
+.link-u { color: var(--ink); border-bottom: var(--hairline) solid var(--ink); white-space: nowrap; }
+.sheet__link { margin-left: auto; }
+/* Zamknij: sam krzyżyk, kreska 1 px; pole kliknięcia 40 × 40 */
+.sheet__close {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: -12px;              /* krzyżyk wyrównany do prawej krawędzi treści */
+  color: var(--ink);
+}
+.sheet__close .icon { width: 16px; height: 16px; }
 .sheet__link + .sheet__close { margin-left: var(--s-2); }
 
 .sheet__body {
@@ -668,7 +693,7 @@ html:has(.sheet:target) { overflow: hidden; }
   align-items: center;
   justify-content: center;
 }
-.sheet__video { outline: var(--hairline) solid var(--hair); outline-offset: calc(-1 * var(--hairline)); }
+
 .sheet__video video { background: var(--ink); }
 
 /* Ekran pionowy: kadr 9:16 wypełnia całe wolne miejsce panelu (szerokość × wysokość okna
