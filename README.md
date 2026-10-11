@@ -28,6 +28,8 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 - **Strona główna = jeden ekran:** przełącznik trybu ciemnego (lewy górny róg) i PL/EN; znak + trzy zmieniające się ikony, imię z rolą, hasło, akapit, indeks projektów, karuzela firm „Pracowałem z”; na desktopie podgląd z logo projektu po prawej; na dole stopka z kontaktem (na telefonie jako odwrócony blok: czarny w trybie jasnym, jasny w ciemnym).
 - **Tryb ciemny:** domyślnie wg systemu, wybór zapamiętany. Grafiki z klasą `mono` (SVG: ikony, sygnety, logo, logo firm, placeholdery) są w nim odwracane — jeśli wgrasz kolorowe logo, zamień je na PNG/JPG albo usuń `mono` w `render.js`. PDF zawsze jasny.
 - **Panele wysuwane od dołu:** kliknięcie projektu otwiera `#teraz` / `#loom` / `#rehab` z wideo w pętli; „o mnie” otwiera `#o-mnie`. Działają przez CSS `:target`, więc także bez JS, a każdy projekt ma własny link (np. `…/#loom`). Przycisk „wstecz” zamyka panel. `main.js` dokłada focus w panelu, Esc, nieaktywne tło (`inert`), powrót focusu i sterowanie wideo.
+- **Auto-przewijanie (desktop):** kreska pod aktywnym projektem wypełnia się przez 3 s (`--t-auto` w `styles.css`, `AUTO_MS` w `main.js`), potem podgląd przechodzi do następnego projektu. Pauza po najechaniu kursorem na listę lub podgląd, przy otwartym panelu i przy ograniczonym ruchu w systemie.
+- **Brandbook:** klik w znak z ikonami otwiera panel `#brandbook` — na razie pusty, treść dodasz w `render.js` (funkcja `brandbook`). Nie trafia do PDF.
 - **PDF** ma pełne case study (tekst + obrazy) — na stronie te treści są ukryte (`.print-only`).
 
 ## Jak podmienić treść

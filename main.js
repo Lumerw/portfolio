@@ -183,8 +183,52 @@ function close() {
 
 addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
+/* Auto-przewijanie projektów (desktop): kreska pod aktywnym wierszem wypełnia się przez AUTO_MS,
+   potem podgląd przechodzi do następnego projektu. Pauza: kursor na liście lub podglądzie,
+   focus z klawiatury w liście, otwarty panel, karta w tle. Bez ruchu w systemie — wyłączone. */
+const AUTO_MS = 3000; // = --t-auto w styles.css
+const autoMedia = matchMedia('(min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference)');
+const projectIds = content.shared.projects.map(p => p.id);
+let autoTimer = null;
+let hovering = false;
+
+function stopAuto() {
+  clearTimeout(autoTimer);
+  autoTimer = null;
+  for (const row of app.querySelectorAll('.index__row.is-playing')) row.classList.remove('is-playing');
+}
+
+function startAuto() {
+  stopAuto();
+  if (!autoMedia.matches || hovering || openSheet() || document.hidden) return;
+  const focused = document.activeElement;
+  if (focused?.closest?.('.index') && focused.matches(':focus-visible')) return;
+  const row = app.querySelector(`.index__row[data-project="${active}"]`);
+  if (!row) return;
+  void row.offsetWidth; // animacja kreski zawsze od zera
+  row.classList.add('is-playing');
+  autoTimer = setTimeout(() => {
+    activate(projectIds[(projectIds.indexOf(active) + 1) % projectIds.length]);
+    startAuto();
+  }, AUTO_MS);
+}
+
+const inAutoZone = el => !!el?.closest?.('.index, .hero__preview');
+app.addEventListener('pointerover', e => {
+  if (!hovering && inAutoZone(e.target)) { hovering = true; stopAuto(); }
+});
+app.addEventListener('pointerout', e => {
+  if (hovering && inAutoZone(e.target) && !inAutoZone(e.relatedTarget)) { hovering = false; startAuto(); }
+});
+app.addEventListener('focusin', e => { if (e.target.closest('.index') && e.target.matches(':focus-visible')) stopAuto(); });
+app.addEventListener('focusout', e => { if (e.target.closest('.index') && !inAutoZone(e.relatedTarget)) startAuto(); });
+document.addEventListener('visibilitychange', () => (document.hidden ? stopAuto() : startAuto()));
+autoMedia.addEventListener('change', startAuto);
+
 addEventListener('hashchange', syncSheet);
+addEventListener('hashchange', () => (openSheet() ? stopAuto() : startAuto()));
 syncSheet();
+startAuto();
 
 // Po zmianie języka DOM jest nowy: przywróć aktywny projekt i stan panelu.
 new MutationObserver(() => {
@@ -193,4 +237,5 @@ new MutationObserver(() => {
   activate(id);
   syncSheet();
   syncThemeButton();
+  if (!openSheet()) startAuto();
 }).observe(app, { childList: true });

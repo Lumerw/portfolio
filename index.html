@@ -48,14 +48,14 @@
 <main id="tresc">
   <section id="start" class="hero wrap grid" aria-labelledby="hero-title">
     <div class="hero__intro">
-      <div class="hero__top">
-        <div class="hero__mark is-drawing"><svg class="symbol symbol--personal " viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg></div>
-        <div class="hero__icons" aria-hidden="true">
+      <a class="hero__top" href="#brandbook" aria-haspopup="dialog" aria-label="Brandbook">
+        <span class="hero__mark is-drawing"><svg class="symbol symbol--personal " viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg></span>
+        <span class="hero__icons" aria-hidden="true">
           <span class="hero__slot"><img class="hero__icon mono is-on" src="assets/icons/01.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/02.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/03.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/04.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/05.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/06.svg" width="40" height="40" alt=""></span>
           <span class="hero__slot"><img class="hero__icon mono" src="assets/icons/01.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/02.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/03.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/04.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/05.svg" width="40" height="40" alt=""><img class="hero__icon mono is-on" src="assets/icons/06.svg" width="40" height="40" alt=""></span>
           <span class="hero__slot"><img class="hero__icon mono" src="assets/icons/01.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/02.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/03.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/04.svg" width="40" height="40" alt=""><img class="hero__icon mono is-on" src="assets/icons/05.svg" width="40" height="40" alt=""><img class="hero__icon mono" src="assets/icons/06.svg" width="40" height="40" alt=""></span>
-        </div>
-      </div>
+        </span>
+      </a>
       <p class="hero__name"><span class="reveal" style="--n:0">Wojciech Lumer <span class="hero__role">- projektant</span></span></p>
       <h1 id="hero-title" class="t-name hero__title"><span class="reveal" style="--n:1">Design to to, jak coś działa.</span></h1>
       <p class="hero__line t-text t-muted"><span class="reveal" style="--n:2">Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio.</span></p>
@@ -369,6 +369,18 @@
           </dl>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+<section id="brandbook" class="sheet sheet--brandbook" role="dialog" aria-modal="true" aria-labelledby="brandbook-title">
+  <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
+  <div class="sheet__panel">
+    <div class="sheet__bar wrap">
+      <svg class="symbol symbol--personal sheet__symbol" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg>
+      <h2 id="brandbook-title" class="t-project">Brandbook</h2>
+      <a class="sheet__close" href="#start" data-close aria-label="zamknij"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
+    </div>
+    <div class="sheet__body wrap">
     </div>
   </div>
 </section>

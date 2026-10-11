@@ -54,6 +54,7 @@
   --t-line: 400ms;
   --t-swap: 500ms;
   --t-sheet: 700ms;                 /* wysuwanie panelu */
+  --t-auto: 3s;                     /* auto-przewijanie projektów (desktop) — to samo co AUTO_MS w main.js */
   --rise: 8px;
 }
 
@@ -352,7 +353,9 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
   display: flex;
   align-items: center;
   gap: var(--s-2);
+  width: max-content;               /* klikalny tylko znak z ikonami → panel „Brandbook” */
   margin-bottom: var(--s-4);
+  color: var(--ink);
 }
 .hero__mark .symbol { --size: 40; }
 .hero__icons {
@@ -481,6 +484,9 @@ a.index__icon:hover { color: var(--ink); }
 
   .index__row.is-active::after { transform: scaleX(1); }
 
+  /* Auto-przewijanie: kreska pod aktywnym wierszem wypełnia się przez --t-auto, potem następny projekt */
+  .index__row.is-playing::after { animation: index-progress var(--t-auto) linear forwards; }
+
 }
 
 /* Podgląd: wysokość = wysokość lewej kolumny (góra przy znaku, dół przy karuzeli),
@@ -556,6 +562,11 @@ a.index__icon:hover { color: var(--ink); }
 .brand .brand__logo { width: 56%; max-width: 420px; height: auto; object-fit: contain; }
 .preview__logo.brand { padding: 0; }
 .preview__logo.brand img { width: 50%; }   /* podgląd na stronie głównej — o 20% mniejsze niż w panelu */
+
+@keyframes index-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
 
 @keyframes aurora {
   0%   { transform: translate(0) rotate(0) scale(1); }

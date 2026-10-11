@@ -58,6 +58,7 @@ html { overflow: visible !important; }
 .sheet__video, .copy, .copy__status, .site-footer__button { display: none !important; }
 
 .print-only { display: block; }
+.sheet--brandbook { display: none !important; }   /* pusty panel — nie trafia do PDF */
 
 .wrap { max-width: none; padding-inline: 0; }
 .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }

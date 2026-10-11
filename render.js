@@ -116,11 +116,11 @@ function hero(c, t) {
   return `
   <section id="start" class="hero wrap grid" aria-labelledby="hero-title">
     <div class="hero__intro">
-      <div class="hero__top">
-        <div class="hero__mark is-drawing">${symbol('personal')}</div>
-        <div class="hero__icons" aria-hidden="true">${icons}
-        </div>
-      </div>
+      <a class="hero__top" href="#brandbook" aria-haspopup="dialog" aria-label="${esc(t.ui.brandbook)}">
+        <span class="hero__mark is-drawing">${symbol('personal')}</span>
+        <span class="hero__icons" aria-hidden="true">${icons}
+        </span>
+      </a>
       <p class="hero__name"><span ${reveal(0)}>${esc(c.name)} <span class="hero__role">- ${esc(t.hero.role)}</span></span></p>
       <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
       <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
@@ -280,6 +280,14 @@ function about(c, t) {
   return sheet({ id: 'o-mnie', cls: 'sheet--about', bar, body, t });
 }
 
+// Brandbook - panel na przyszłość, na razie pusty (otwiera go znak z ikonami w hero).
+function brandbook(c, t) {
+  const bar = `
+      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
+      <h2 id="brandbook-title" class="t-project">${esc(t.ui.brandbook)}</h2>`;
+  return sheet({ id: 'brandbook', cls: 'sheet--brandbook', bar, body: '', t });
+}
+
 // Ikonka kopiowania: dwa przesunięte kwadraty, kreska 1 px — w stylu symboli.
 const copyIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="9" height="9"/><path d="M5.5 2.5h8v8"/></svg>`;
 
@@ -318,7 +326,7 @@ export function render(content, lang) {
   return `${header(c, t)}
 <main id="tresc">${hero(c, t)}
 </main>${footer(c, t)}
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${about(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${about(c, t)}${brandbook(c, t)}
 </div>
 `;
 }
