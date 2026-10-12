@@ -11,13 +11,15 @@ const PORT = 8094;
 const URL = `http://localhost:${PORT}/`;
 const server = await serve(PORT);
 const results = [];
-const check = (name, ok, note = '') => { results.push({ name, ok, note }); };
+const check = (name, ok, note = '') => { results.push({ name, ok, note }); console.error(`  … ${name}: ${ok ? 'ok' : 'NIE'}`); };
 
 /* ---------- Lighthouse ---------- */
-const chrome = await chromeLauncher.launch({ chromePath: chromium.executablePath(), chromeFlags: ['--headless=new'] });
 const MIN = { performance: 95, accessibility: 100, 'best-practices': 95, seo: 95 };
 for (const [label, config] of [['telefon', undefined], ['desktop', desktopConfig]]) {
-  const { lhr } = await lighthouse(URL, { port: chrome.port, output: 'json', logLevel: 'error' }, config);
+  // Świeża przeglądarka na każdy przebieg — dwa przebiegi w jednej potrafiły się zawiesić.
+  const chrome = await chromeLauncher.launch({ chromePath: chromium.executablePath(), chromeFlags: ['--headless=new'] });
+  const { lhr } = await lighthouse(URL, { port: chrome.port, output: 'json', logLevel: 'error', maxWaitForLoad: 20000 }, config);
+  await chrome.kill();
   const scores = Object.fromEntries(Object.entries(lhr.categories).map(([k, v]) => [k, Math.round(v.score * 100)]));
   const ok = Object.entries(MIN).every(([k, min]) => scores[k] >= min);
   const failing = Object.values(lhr.audits)
@@ -27,8 +29,6 @@ for (const [label, config] of [['telefon', undefined], ['desktop', desktopConfig
     `Perf ${scores.performance} · A11y ${scores.accessibility} · BP ${scores['best-practices']} · SEO ${scores.seo}` +
     (failing.length ? ` · do poprawy: ${failing.join(', ')}` : ''));
 }
-await chrome.kill();
-
 /* ---------- Lista kontrolna ---------- */
 const browser = await chromium.launch();
 
