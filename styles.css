@@ -339,6 +339,16 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 }
 #app > main { flex: 1; }
 
+/* Desktop: hero w optycznym środku wolnego miejsca między nagłówkiem a stopką —
+   wolna przestrzeń dzielona 40:60 (trochę powyżej środka geometrycznego), minimum 16 / 24 px. */
+@media (min-width: 1024px) {
+  #app > main {
+    display: grid;
+    grid-template-rows: minmax(var(--s-2), 2fr) auto minmax(var(--s-3), 3fr);   /* minima w proporcji 2:3 */
+  }
+  #app > main > .hero { grid-row: 2; padding-top: 0; padding-bottom: 0; }
+}
+
 /* ==========================================================================
    Hero + indeks (brief 5.1)
    ========================================================================== */
