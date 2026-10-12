@@ -55,7 +55,7 @@ html { overflow: visible !important; }
 
 /* Tylko ekranowe */
 .skip, .site-header, .index, .hero__preview, .hero__icons, .clients, .sheet__backdrop, .sheet__close,
-.sheet__video, .copy, .copy__status, .site-footer__button { display: none !important; }
+.sheet__video, .sheet__caption, .reel__toggle, .copy, .copy__status, .site-footer__button { display: none !important; }
 
 .print-only { display: block; }
 .sheet--brandbook { display: none !important; }   /* pusty panel — nie trafia do PDF */
@@ -84,6 +84,8 @@ html { overflow: visible !important; }
   display: block;
 }
 .sheet__body { overflow: visible; padding: 0; display: block !important; }
+/* Ciało panelu projektu na ekranie jest kontenerem rozmiaru i ucina nadmiar — w druku zwykły blok */
+.sheet__body, .sheet--project .sheet__body { container-type: normal; overflow: visible; }
 .sheet__year, .sheet__no { display: inline; }
 
 main, .sheet, .site-footer { break-inside: avoid; }

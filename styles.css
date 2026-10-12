@@ -54,7 +54,8 @@
   --t-line: 400ms;
   --t-swap: 500ms;
   --t-sheet: 700ms;                 /* wysuwanie panelu */
-  --t-auto: 3s;                     /* auto-przewijanie projektów (desktop) — to samo co AUTO_MS w main.js */
+  --t-auto: 3s;                     /* auto-przewijanie projektów (desktop) — to samo co AUTO_MS w main.js;
+                                       wiersz z planszą animowaną nadpisuje je na REEL_MS (render.js) */
   --rise: 8px;
 }
 
@@ -494,8 +495,9 @@ a.index__icon:hover { color: var(--ink); }
 
   .index__row.is-active::after { transform: scaleX(1); }
 
-  /* Auto-przewijanie: kreska pod aktywnym wierszem wypełnia się przez --t-auto, potem następny projekt */
-  .index__row.is-playing::after { animation: index-progress var(--t-auto) linear forwards; }
+  /* Auto-przewijanie: kreska pod aktywnym wierszem wypełnia się przez --t-auto, potem następny projekt.
+     --auto-delay (ujemne, z main.js) = wznowienie w miejscu fazy planszy animowanej */
+  .index__row.is-playing::after { animation: index-progress var(--t-auto) linear var(--auto-delay, 0s) forwards; }
 
 }
 
@@ -585,6 +587,438 @@ a.index__icon:hover { color: var(--ink); }
   100% { transform: translate(3%, -4%) rotate(4deg) scale(1.1); }
 }
 .preview__logo img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
+
+/* ==========================================================================
+   Reel — plansza animowana teraz „Dwie role, jedna rozmowa” (projects[].reel)
+   Pętla 8 s (--t-reel = REEL_MS w render.js): plakat (znak + hasło z falką + legenda)
+   → słuchacz (róż, „?”, trzy potrzeby) → ekspert (błękit, „!”) → rozmowa 1:1 → plakat.
+   Zasady: płaski CSS; animowane tylko opacity i translate / rotate / scale; jedyny filtr to aurora
+   z .brand::before. Zegar 8 s steruje tylko kryciem pól kolorów, ich ruch to wolne, niezależne pętle.
+   Jednostki cq tylko na potomkach .reel: zmienne formatu na .reel--*, zmienne progów na .reel__stage.
+   Kolory wyłącznie marki — bez --paper / --ink, więc tryb ciemny niczego nie zmienia.
+   ========================================================================== */
+.preview__logo--reel { padding: 0; }
+.reel {
+  container: reel / size;
+  --reel-play: paused;
+  --tz-pink: #FC8AD3;
+  --tz-blue: #146EF4;
+  --tz-red: #FF4054;
+  --tz-ink-pink: #111;
+  --tz-tile: #161616;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -.01em;                                 /* krój = dziedziczona Helvetica portfolio */
+  animation: reel-clock var(--t-reel, 8s) linear infinite; /* zegar fazy dla main.js */
+}
+@keyframes reel-clock { from, to { opacity: 1; } }
+
+/* Gra tylko aktywny podgląd i otwarty panel; przy otwartym panelu podgląd stoi */
+.preview__logo.is-active .reel,
+.sheet:target .reel { --reel-play: running; }
+html:has(.sheet:target) .preview .reel,
+.preview .reel.is-held,
+.sheet:target .reel.is-paused { --reel-play: paused; }
+/* .is-held (main.js): po najechaniu / focusie podgląd staje na szwie pętli (klatka 0 = plakat).
+   Bez JS: trzy pętle (24 s) i stop na plakacie - 0% = 100%, więc forwards zostawia ten sam kadr */
+html:not(.js) .reel,
+html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-mode: forwards !important; }
+.reel, .reel::before, .reel::after,
+.reel *, .reel *::before, .reel *::after { animation-play-state: var(--reel-play) !important; }
+
+/* Geometria formatów (zmienne; cq rozwiązują się tam, gdzie są użyte) */
+.reel--4x5 {
+  --pad: 7.5cqw; --lw: 50cqw; --l-s: .44;                 /* logo w nagłówku 22cqw (97 px przy 439) */
+  --claim-fs: 4.6cqw; --claim-gap: calc(var(--lw) * .16); --leg-fs: max(12px, 2.9cqw);
+  --f-size: 100cqw; --fm-size: 110cqw; --fl-x: 28cqw; --fl-y: 34cqh; --fe-x: 72cqw; --fe-y: 74cqh;
+  --rl-top: 22cqh; --role-w: 70cqw; --re-w: 64cqw; --rgap: 2.2cqw;
+  --pill-fs: 3.2cqw; --need-fs: 5.4cqw; --line-fs: 5.4cqw; --sub-fs: max(12px, 3cqw);
+  --gq-h: 38cqh; --gq-from: 30cqw 0; --gx-h: 34cqh; --gx-from: -30cqw 0;
+  --call-top: 16cqh; --call-bot: 8cqh; --cgap: 3.6cqw;
+  --ts: 40cqw; --tgap: 4cqw; --ring: max(2px, .55cqw);
+  --chip-fs: max(12px, 2.7cqw); --title-fs: 5cqw; --title-w: 84cqw; --cap-fs: max(12px, 3.1cqw);
+}
+.reel--16x9 {
+  --pad: 4.2cqw; --lw: 30cqw; --l-s: .45;                 /* nagłówek 13.5cqw: 72.5 px przy 537 */
+  --claim-fs: max(13px, 2.4cqw); --claim-gap: calc(var(--lw) * .16); --leg-fs: max(12px, 1.3cqw);
+  --f-size: 70cqw; --fm-size: 90cqw; --fl-x: 24cqw; --fl-y: 40cqh; --fe-x: 76cqw; --fe-y: 40cqh;
+  --rl-top: 24cqh; --role-w: 40cqw; --re-w: 40cqw; --rgap: 1.05cqw;
+  --pill-fs: max(12px, 1.5cqw); --need-fs: max(15px, 2.9cqw); --line-fs: max(15px, 2.9cqw); --sub-fs: max(12px, 1.3cqw);
+  --gq-h: 48cqh; --gq-from: 0 40cqh; --gx-h: 48cqh; --gx-from: 0 40cqh;  /* góra 58cqh, kropka przycięta krawędzią */
+  --call-top: 12cqh; --call-bot: 6cqh; --cgap: max(10px, 2cqh);
+  --ts: 25cqw; --tgap: 2.6cqw; --ring: max(2px, .3cqw);
+  --chip-fs: max(12px, 1.3cqw); --title-fs: max(14px, 2.4cqw); --title-w: 80cqw; --cap-fs: max(12px, 1.5cqw);
+}
+.reel__stage { position: absolute; inset: 0; }
+/* Ciemna linia przy krawędzi kadru (pod linią --hair ramki): biały glif przycięty krawędzią
+   nie zlewa się z jasną stroną. Tylko stałe kolory - tryb ciemny bez zmian */
+.reel__stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / .85);
+  pointer-events: none;
+}
+
+/* Pola kolorów ról: statyczne gradienty bez filtra. Kolor = krycie na zegarze 8 s, ruch = wolny dryf 17–31 s */
+.reel__field {
+  position: absolute;
+  width: var(--f-size);
+  height: var(--f-size);
+  left: calc(var(--x) - var(--f-size) / 2);
+  top: calc(var(--y) - var(--f-size) / 2);
+  pointer-events: none;
+}
+.reel__field--l {
+  --x: var(--fl-x); --y: var(--fl-y);
+  opacity: .35;
+  background:
+    radial-gradient(46% 38% at 47% 53%, rgb(252 138 211 / .38), rgb(252 138 211 / .14) 55%, transparent 100%),
+    radial-gradient(26% 30% at 66% 34%, rgb(252 138 211 / .16), transparent 100%);
+  animation: reel-op-l var(--t-reel, 8s) ease-in-out infinite, reel-drift-a 23s ease-in-out infinite alternate, reel-swell 17s ease-in-out infinite alternate;
+}
+.reel__field--e {
+  --x: var(--fe-x); --y: var(--fe-y);
+  opacity: .35;
+  background:
+    radial-gradient(46% 38% at 53% 47%, rgb(20 110 244 / .55), rgb(20 110 244 / .2) 55%, transparent 100%),
+    radial-gradient(26% 30% at 34% 66%, rgb(29 62 147 / .5), transparent 100%);
+  animation: reel-op-e var(--t-reel, 8s) ease-in-out infinite, reel-drift-b 29s ease-in-out infinite alternate, reel-swell 19s ease-in-out infinite alternate;
+}
+.reel__field--m {
+  --f-size: var(--fm-size); --x: 50cqw; --y: 50cqh;
+  opacity: 0;
+  background:
+    radial-gradient(34% 30% at 38% 50%, rgb(252 138 211 / .30), transparent 100%),
+    radial-gradient(34% 30% at 62% 50%, rgb(20 110 244 / .45), transparent 100%);
+  animation: reel-op-m var(--t-reel, 8s) ease-in-out infinite, reel-drift-a 31s ease-in-out infinite alternate;
+}
+@keyframes reel-drift-a { from { translate: -4cqw 3cqh; rotate: -10deg; } to { translate: 5cqw -4cqh; rotate: 14deg; } }
+@keyframes reel-drift-b { from { translate: 4cqw -3cqh; rotate: 12deg; } to { translate: -5cqw 4cqh; rotate: -12deg; } }
+@keyframes reel-swell   { from { scale: .92; } to { scale: 1.08; } }
+@keyframes reel-op-l { 0%, 13.75% { opacity: .35; } 23.75%, 36.25% { opacity: 1; } 46.25%, 58.75% { opacity: .45; } 66.25%, 81.25% { opacity: .2; } 88.75%, 100% { opacity: .35; } }
+@keyframes reel-op-e { 0%, 13.75% { opacity: .35; } 23.75%, 36.25% { opacity: .25; } 46.25%, 58.75% { opacity: 1; } 66.25%, 81.25% { opacity: .2; } 88.75%, 100% { opacity: .35; } }
+@keyframes reel-op-m { 0%, 58.75% { opacity: 0; } 66.25%, 81.25% { opacity: 1; } 88.75%, 100% { opacity: 0; } }
+
+/* Znak: ułożony w rozmiarze plakatu i zmniejszany do nagłówka — ostry i nadal element LCP.
+   --lr = wysokość / szerokość / 2 (render.js; dla 575 × 178 = .15478) */
+.brand.reel .reel__logo {                                  /* (0,3,0) wygrywa z .media .brand img (0,2,1) */
+  position: absolute;
+  left: calc(50cqw - var(--lw) / 2);
+  top: calc(50cqh - var(--lw) * var(--lr, .15478));
+  width: var(--lw);
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+  transform-origin: 0 0;
+  --hx: calc(var(--pad) - 50cqw + var(--lw) / 2);
+  --hy: calc(var(--pad) - 50cqh + var(--lw) * var(--lr, .15478));
+  animation: reel-logo var(--t-reel, 8s) cubic-bezier(.65, 0, .35, 1) infinite;
+}
+@keyframes reel-logo { 0%, 11.25% { translate: 0 0; scale: 1; } 18.75%, 81.25% { translate: var(--hx) var(--hy); scale: var(--l-s); } 88.75%, 100% { translate: 0 0; scale: 1; } }
+
+/* Hasło, falka (wycieranie przesunięciem — tylko kompozycja) i legenda ról */
+.reel__claim {
+  position: absolute;
+  inset-inline: 0;
+  margin: 0;
+  text-align: center;
+  line-height: 1.1;
+  top: calc(50cqh + var(--lw) * var(--lr, .15478) + var(--claim-gap));
+  font-size: var(--claim-fs);
+  animation: reel-claim var(--t-reel, 8s) linear infinite;
+}
+.reel__key { position: relative; display: inline-block; white-space: nowrap; }
+.reel__falka {
+  position: absolute;
+  left: -3%;
+  width: 106%;
+  bottom: -.55em;
+  height: .6em;
+  overflow: hidden;
+  animation: reel-falka-w var(--t-reel, 8s) linear infinite;
+}
+.reel__falka-in {                                         /* przeciwruch na opakowaniu, nie na <svg> (kompozycja) */
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: reel-falka-i var(--t-reel, 8s) linear infinite;
+}
+.reel .reel__falka svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  overflow: visible;
+  fill: none;
+}
+.reel__falka path { stroke: var(--tz-red); stroke-width: max(2px, .11em); stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.reel__legend {
+  position: absolute;
+  inset-inline: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  gap: .6em;
+  top: calc(50cqh + var(--lw) * var(--lr, .15478) + var(--claim-gap) + var(--claim-fs) * 2.3);
+  font-size: var(--leg-fs);
+  animation: reel-legend var(--t-reel, 8s) linear infinite;
+}
+.reel__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  padding: .32em .8em .32em .6em;
+  border-radius: 999px;
+  background: rgb(255 255 255 / .12);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.reel__legend span::before { content: ""; width: .62em; height: .62em; border-radius: 50%; background: var(--tz-pink); }
+.reel__legend span + span::before { background: var(--tz-blue); }
+@keyframes reel-claim  { 0%, 9.375% { opacity: 1; translate: 0 0; } 12.5% { opacity: 0; translate: 0 0; } 12.51%, 85% { opacity: 0; translate: 0 .4em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 90%, 100% { opacity: 1; translate: 0 0; } }
+@keyframes reel-legend { 0%, 9.375% { opacity: 1; translate: 0 0; } 12.5% { opacity: 0; translate: 0 0; } 12.51%, 86.875% { opacity: 0; translate: 0 .4em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 91.875%, 100% { opacity: 1; translate: 0 0; } }
+/* falka: wytarcie do przodu 600–900 ms, niewidoczny skok, rysowanie 7000–7500 ms (krzywa marki) */
+@keyframes reel-falka-w { 0%, 7.5% { translate: 0 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 11.25% { translate: 100% 0; } 11.26%, 87.5% { translate: -100% 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 93.75%, 100% { translate: 0 0; } }
+@keyframes reel-falka-i { 0%, 7.5% { translate: 0 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 11.25% { translate: -100% 0; } 11.26%, 87.5% { translate: 100% 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 93.75%, 100% { translate: 0 0; } }
+
+/* Bloki ról: słuchacz (lewa góra) i ekspert (4:5 prawy dół, 16:9 prawa góra) — po przekątnej */
+.reel__role { position: absolute; margin: 0; display: flex; flex-direction: column; gap: var(--rgap); }
+.reel__role--l { left: var(--pad); top: var(--rl-top); align-items: flex-start; text-align: left; max-width: var(--role-w); }
+.reel--4x5 .reel__role--e  { right: var(--pad); bottom: 10cqh;      align-items: flex-end; text-align: right; max-width: var(--re-w); }
+.reel--16x9 .reel__role--e { right: var(--pad); top: var(--rl-top); align-items: flex-end; text-align: right; max-width: var(--re-w); }
+.reel__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .38em;
+  padding: .34em .9em .34em .62em;
+  border-radius: 999px;
+  font-size: var(--pill-fs);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.reel .reel__pill svg,
+.reel .reel__cap svg { width: 1.2em; height: 1.2em; fill: currentColor; flex: none; }
+.reel__role--l .reel__pill { background: var(--tz-pink); color: var(--tz-ink-pink); }   /* 8.6:1 */
+.reel__role--e .reel__pill { background: var(--tz-blue); color: #fff; }               /* 4.61:1 — pogrubione, min. 12 px, pełne tło */
+.reel__needs { display: flex; flex-direction: column; gap: .06em; }
+.reel__need { font-size: var(--need-fs); line-height: 1.08; letter-spacing: -.02em; white-space: nowrap; }
+.reel__line { font-size: var(--line-fs); line-height: 1.08; letter-spacing: -.02em; text-wrap: balance; }
+.reel__short { display: none; font-size: var(--line-fs); line-height: 1.08; letter-spacing: -.02em; white-space: nowrap; }
+.reel__sub { font-size: var(--sub-fs); line-height: 1.3; font-weight: 400; color: rgb(255 255 255 / .86); }
+.reel--16x9 .reel__sub { display: none; }
+.reel__role > *, .reel__need { opacity: 0; animation: var(--t-reel, 8s) linear infinite; }
+.reel__needs { opacity: 1; animation: none; }
+.reel__role--l .reel__pill { animation-name: reel-l0; }
+.reel__need:nth-child(1)   { animation-name: reel-l1; }
+.reel__need:nth-child(2)   { animation-name: reel-l2; }
+.reel__need:nth-child(3)   { animation-name: reel-l3; }
+.reel__role--l .reel__sub  { animation-name: reel-l4; }
+.reel__role--e .reel__pill { animation-name: reel-e0; }
+.reel__role--e .reel__line { animation-name: reel-e1; }
+.reel__role--e .reel__sub  { animation-name: reel-e2; }
+/* Wejście 400 ms od dołu, wyjście 250 ms wszystkich razem (4700–4950 ms), potem niewidoczny powrót: 0% = 100% */
+@keyframes reel-l0 { 0%, 17.5%   { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 22.5%, 58.75%  { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-l1 { 0%, 20%     { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 25%, 58.75%    { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-l2 { 0%, 23.125% { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 28.125%, 58.75% { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-l3 { 0%, 26.25%  { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 31.25%, 58.75%  { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-l4 { 0%, 29.375% { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 34.375%, 58.75% { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-e0 { 0%, 38.75%  { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 43.75%, 58.75%  { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-e1 { 0%, 41.25%  { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 46.25%, 58.75%  { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-e2 { 0%, 43.75%  { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 48.75%, 58.75%  { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+
+/* Glify: „?” = słuchacz pyta, „!” = ekspert odpowiada. Białe, duże, przycięte z boku lub od dołu, bez obrotu */
+.reel .reel__glyph { position: absolute; width: auto; max-width: none; opacity: 0; }   /* <span> z <svg> w środku */
+.reel .reel__glyph svg { display: block; width: 100%; height: 100%; max-width: none; fill: #fff; }
+.reel .reel__glyph--q { height: var(--gq-h); aspect-ratio: 158.7 / 233.4; animation: reel-gq var(--t-reel, 8s) linear infinite; }
+.reel .reel__glyph--x { height: var(--gx-h); aspect-ratio: 71.4 / 230.4;  animation: reel-gx var(--t-reel, 8s) linear infinite; }
+.reel--4x5  .reel__glyph--q { right: -13cqw; top: 14cqh; }         /* przycięty z prawej */
+.reel--4x5  .reel__glyph--x { left: 2cqw; bottom: -6cqh; }         /* przycięty od dołu; prawa krawędź ok. 15cqw - z dala od tekstu eksperta */
+.reel--16x9 .reel__glyph--q { left: 5cqw; bottom: -6cqh; }         /* od dołu, pod tekstem słuchacza; widać część kropki */
+.reel--16x9 .reel__glyph--x { right: 10cqw; bottom: -6cqh; }       /* od dołu, pod tekstem eksperta; widać część kropki */
+@keyframes reel-gq { 0%, 15%    { opacity: 0; translate: var(--gq-from); animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 22.5%, 58.75%  { opacity: 1; translate: 0 0; animation-timing-function: cubic-bezier(.4, 0, 1, 1); } 62.5%, 100% { opacity: 0; translate: var(--gq-from); } }
+@keyframes reel-gx { 0%, 36.25% { opacity: 0; translate: var(--gx-from); animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 43.75%, 58.75% { opacity: 1; translate: 0 0; animation-timing-function: cubic-bezier(.4, 0, 1, 1); } 62.5%, 100% { opacity: 0; translate: var(--gx-from); } }
+
+/* Rozmowa 1:1: kolumna wyśrodkowana między nagłówkiem a dołem — bez pustej tercji w żadnym formacie */
+.reel__call {
+  position: absolute;
+  inset: var(--call-top) 0 var(--call-bot);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cgap);
+}
+.reel__tiles { display: flex; gap: var(--tgap); }
+.reel__tile {
+  position: relative;
+  width: var(--ts);
+  height: var(--ts);
+  border-radius: calc(var(--ts) * .1);
+  background: var(--tz-tile);
+  box-shadow: 0 2.2cqw 4cqw -1.4cqw rgb(0 0 0 / .55);
+  opacity: 0;
+  animation: var(--t-reel, 8s) linear infinite;
+}
+.reel__tile--l { --role: var(--tz-pink); --from: calc(var(--ts) * -.45) 0; animation-name: reel-tile-l; }
+.reel__tile--e { --role: var(--tz-blue); --from: calc(var(--ts) * .45) 0;  animation-name: reel-tile-e; }
+.reel__avatar {
+  position: absolute;
+  left: 30%;
+  top: 20%;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: rgb(255 255 255 / .1);
+  display: grid;
+  place-items: center;
+}
+.reel .reel__avatar svg { width: 50%; height: 50%; fill: #fff; }
+.reel__chip {
+  position: absolute;
+  left: 7%;
+  bottom: 7%;
+  display: inline-flex;
+  align-items: center;
+  gap: .42em;
+  padding: .3em .72em .3em .55em;
+  border-radius: 999px;
+  background: rgb(0 0 0 / .6);
+  font-size: var(--chip-fs);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.reel__chip::before { content: ""; width: .62em; height: .62em; border-radius: 50%; background: var(--role); }
+.reel__ring { position: absolute; inset: 0; border-radius: inherit; opacity: 0; animation: var(--t-reel, 8s) linear infinite; }
+.reel__tile--l .reel__ring { animation-name: reel-ring-l; }
+.reel__tile--e .reel__ring { animation-name: reel-ring-e; }
+.reel__ring::before,
+.reel__ring::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.reel__ring::before { box-shadow: inset 0 0 0 var(--ring) var(--role); }                                   /* obwódka mówiącego */
+.reel__ring::after  { box-shadow: 0 0 0 var(--ring) var(--role); animation: reel-speak 2s cubic-bezier(0, 0, .2, 1) infinite; } /* puls „speak” marki, 0,5 Hz */
+@keyframes reel-speak { 0% { scale: 1; opacity: .7; } 70%, 100% { scale: 1.07; opacity: 0; } }
+.reel__title {
+  margin: 0;
+  max-width: var(--title-w);
+  text-align: center;
+  font-size: var(--title-fs);
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+  opacity: 0;
+  animation: reel-title var(--t-reel, 8s) linear infinite;
+}
+.reel__cap {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  padding: .36em .9em .36em .65em;
+  border-radius: 999px;
+  background: rgb(0 0 0 / .78);
+  font-size: var(--cap-fs);
+  line-height: 1.15;
+  white-space: nowrap;
+  opacity: 0;
+  animation: reel-cap var(--t-reel, 8s) linear infinite;
+}
+.reel__cap-short { display: none; }
+@keyframes reel-tile-l { 0%, 60.625% { opacity: 0; translate: var(--from); scale: .9; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 67.5%, 81.25% { opacity: 1; translate: 0 0; scale: 1; } 85% { opacity: 0; translate: 0 0; scale: .94; } 85.01%, 100% { opacity: 0; translate: var(--from); scale: .9; } }
+@keyframes reel-tile-e { 0%, 61.625% { opacity: 0; translate: var(--from); scale: .9; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 68.5%, 81.25% { opacity: 1; translate: 0 0; scale: 1; } 85% { opacity: 0; translate: 0 0; scale: .94; } 85.01%, 100% { opacity: 0; translate: var(--from); scale: .9; } }
+@keyframes reel-ring-l { 0%, 68.125% { opacity: 0; } 71.25%, 74.375% { opacity: 1; } 77.5%, 100% { opacity: 0; } }
+@keyframes reel-ring-e { 0%, 74.375% { opacity: 0; } 77.5%, 85% { opacity: 1; } 85.01%, 100% { opacity: 0; } }
+@keyframes reel-title { 0%, 63.125% { opacity: 0; translate: 0 .4em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 68.125%, 81.25% { opacity: 1; translate: 0 0; } 84.375% { opacity: 0; translate: 0 0; } 84.4%, 100% { opacity: 0; translate: 0 .4em; } }
+@keyframes reel-cap   { 0%, 65%      { opacity: 0; translate: 0 .4em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 70%, 81.25%    { opacity: 1; translate: 0 0; } 84.375% { opacity: 0; translate: 0 0; } 84.4%, 100% { opacity: 0; translate: 0 .4em; } }
+
+/* Progi (po wszystkich regułach bazowych) */
+/* tablet 4:5 (od 600 px szerokości): spokojniejsze rozmiary etykiet */
+@container reel (min-width: 600px) and (aspect-ratio < 1) {
+  .reel__stage { --pill-fs: 2.7cqw; --chip-fs: 2.3cqw; --cap-fs: 2.6cqw; --leg-fs: 2.4cqw; --sub-fs: 2.6cqw; }
+}
+/* desktop, panel 16:9 (od 900 px szerokości) */
+@container reel (min-width: 900px) and (aspect-ratio > 1) {
+  .reel__stage { --l-s: .4333; }
+  .reel--16x9 .reel__sub { display: block; }
+}
+/* KOMPAKT: telefony, 16:9 węższe niż 480 px (272–439). Warunek proporcji wyklucza ramkę 4:5 o szerokości 439 px */
+@container reel (max-width: 479px) and (aspect-ratio > 1) {
+  .reel__stage {
+    --lw: 34cqw; --claim-fs: max(16px, 6.4cqw); --pill-fs: max(12px, 3.7cqw); --line-fs: max(15px, 5.4cqw); --rgap: 1.6cqw;
+    --gq-h: 88cqh; --gx-h: 88cqh; --gq-from: 0 40cqh; --gx-from: 0 40cqh;
+    --ts: 32cqw; --tgap: 3cqw; --call-top: 8cqh; --call-bot: 8cqh; --cgap: 2.4cqw; --cap-fs: max(12px, 3.8cqw);
+  }
+  .brand.reel .reel__logo { transform-origin: 50% 50%; animation-name: reel-c-logo; }    /* bez logo w nagłówku */
+  .reel .reel__claim { top: calc(50cqh - 1.25em); animation-name: reel-c-claim; }
+  .reel .reel__key { display: block; width: max-content; margin-inline: auto; }          /* hasło w 2 liniach */
+  .reel .reel__falka { animation-name: reel-c-falka-w; }
+  .reel .reel__falka-in { animation-name: reel-c-falka-i; }
+  .reel .reel__legend, .reel .reel__title, .reel .reel__chip,
+  .reel .reel__needs, .reel .reel__line, .reel .reel__sub { display: none; }
+  .reel .reel__short { display: block; }
+  .reel .reel__role { left: var(--pad); right: auto; top: auto; bottom: 12cqh; align-items: flex-start; text-align: left; max-width: 62cqw; } /* jedno wspólne miejsce */
+  .reel .reel__role--l > * { animation-name: reel-c-l; }
+  .reel .reel__role--e > * { animation-name: reel-c-e; }
+  .reel .reel__glyph--q { left: auto; top: auto; right: -6cqw; bottom: -14cqh; animation-name: reel-c-gq; }
+  .reel .reel__glyph--x { left: auto; top: auto; right: 8cqw;  bottom: -14cqh; animation-name: reel-c-gx; }
+  .reel .reel__cap-long { display: none; }
+  .reel .reel__cap-short { display: inline; }
+  .reel .reel__tile--l, .reel .reel__tile--e { --from: 0 calc(var(--ts) * .2); } /* od dołu - z boku kafelek przejeżdżałby pod przełącznikiem pauzy */
+}
+@keyframes reel-c-logo    { 0%, 11.25% { opacity: 1; scale: 1; } 15%, 95.625% { opacity: 0; scale: .96; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 100% { opacity: 1; scale: 1; } }
+@keyframes reel-c-claim   { 0%, 84.375% { opacity: 0; translate: 0 .4em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 88.75%, 94.375% { opacity: 1; translate: 0 0; } 97.5% { opacity: 0; translate: 0 0; } 97.51%, 100% { opacity: 0; translate: 0 .4em; } }
+@keyframes reel-c-falka-w { 0%, 87.5% { translate: -100% 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 92.5%, 93.75% { translate: 0 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 96.25% { translate: 100% 0; } 96.26%, 100% { translate: -100% 0; } }
+@keyframes reel-c-falka-i { 0%, 87.5% { translate: 100% 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 92.5%, 93.75% { translate: 0 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 96.25% { translate: -100% 0; } 96.26%, 100% { translate: 100% 0; } }
+@keyframes reel-c-l  { 0%, 15% { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 20%, 36.25% { opacity: 1; translate: 0 0; } 39.375% { opacity: 0; translate: 0 -.3em; } 39.4%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-c-e  { 0%, 40% { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 45%, 58.75% { opacity: 1; translate: 0 0; } 61.875% { opacity: 0; translate: 0 -.3em; } 61.9%, 100% { opacity: 0; translate: 0 .5em; } }
+@keyframes reel-c-gq { 0%, 15% { opacity: 0; translate: var(--gq-from); animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 22.5%, 36.25% { opacity: 1; translate: 0 0; animation-timing-function: cubic-bezier(.4, 0, 1, 1); } 40%, 100% { opacity: 0; translate: var(--gq-from); } }
+@keyframes reel-c-gx { 0%, 40% { opacity: 0; translate: var(--gx-from); animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 46.25%, 58.75% { opacity: 1; translate: 0 0; animation-timing-function: cubic-bezier(.4, 0, 1, 1); } 62.5%, 100% { opacity: 0; translate: var(--gx-from); } }
+
+/* Pauza (tylko w panelu, tylko z JS): okrągły przycisk 40 × 40 obok planszy, nie w niej */
+.reel__toggle { display: none; }
+.js .reel__toggle {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: rgb(0 0 0 / .6);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25);
+  color: #fff;
+  cursor: pointer;
+}
+.reel__toggle svg { width: 14px; height: 14px; fill: currentColor; }
+.reel__toggle .reel__ico-play,
+.reel__toggle[aria-pressed="true"] .reel__ico-pause { display: none; }
+.reel__toggle[aria-pressed="true"] .reel__ico-play { display: block; }
+/* Focus niezależny od motywu (--ink na ciemnej planszy byłby niewidoczny w jasnym trybie) */
+.reel__toggle:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 767px) and (orientation: portrait) {
+  /* kompakt: lewy górny róg, mniejszy i bliżej rogu - z dala od kafelka słuchacza (32 px > 24 px celu) */
+  .js .reel__toggle { right: auto; left: 6px; top: 6px; width: 32px; height: 32px; }
+  .reel__toggle svg { width: 12px; height: 12px; }
+}
+
+/* Bez ruchu: globalne animation: none zatrzymuje wszystko; tu sensowna klatka stała —
+   znak w nagłówku, oba kafelki z obwódkami, tytuł i podpis rozmowy, hasło z narysowaną falką na dole */
+@media (prefers-reduced-motion: reduce) {
+  .brand.reel .reel__logo { translate: var(--hx) var(--hy); scale: var(--l-s); }
+  .reel__field--l, .reel__field--e { opacity: .35; }
+  .reel__field--m { opacity: 1; }
+  .reel__tile, .reel__ring, .reel__title, .reel__cap { opacity: 1; }
+  .reel__ring::after, .reel__glyph, .reel__role, .reel__legend, .js .reel__toggle { display: none; }
+  .reel .reel__claim { top: auto; bottom: calc(var(--pad) + .5em); opacity: 1; }
+  .reel .reel__call { bottom: calc(var(--pad) + var(--claim-fs) * 2.8); }
+  .reel__falka, .reel__falka-in { translate: none; }        /* stała, w pełni narysowana */
+  @container reel (max-width: 479px) and (aspect-ratio > 1) {
+    .brand.reel .reel__logo, .reel .reel__claim { opacity: 0; }
+    .reel .reel__call { bottom: var(--call-bot); }
+  }
+}
 
 .preview__captions {
   position: relative;
@@ -691,42 +1125,52 @@ html:has(.sheet:target) { overflow: hidden; }
   padding-block: var(--s-3) var(--s-6);
 }
 
-/* Projekt: wideo zawsze w całości na ekranie, bez przewijania */
+/* Projekt: wideo albo plansza zawsze w całości, bez przewijania. Dwa formaty:
+   16:9 - telefon, desktop i każdy ekran poziomy; 4:5 - min. 768 px + pionowo (tablet).
+   Ramka = największy prostokąt w proporcji, który mieści się w ciele panelu (cq liczone z ciała). */
 .sheet--project .sheet__body {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
-
+@media screen { .sheet--project .sheet__body { container-type: size; } }   /* nigdy w druku: size zeruje wysokość */
+.sheet__video {
+  flex: none;
+  width: 100%;                                    /* zapas bez jednostek cq */
+  width: min(100cqw, 100cqh * var(--ar));
+}
 .sheet__video video { background: var(--ink); }
+.sheet__video--4x5 { display: none; }
+.sheet__caption { display: none; }
 
-/* Ekran pionowy: kadr 9:16 wypełnia całe wolne miejsce panelu (szerokość × wysokość okna
-   minus pasek), dopasowany do każdej proporcji ekranu — nadmiar przycina object-fit: cover. */
-.sheet__video--wide { display: none; }
 @media (orientation: portrait) {
-  .sheet--project .sheet__body {
-    flex-direction: column;
-    align-items: stretch;
-    overflow: hidden;
-    padding-block: var(--s-2) var(--s-3);
-  }
-  .sheet__video--vertical {
-    flex: 1 1 auto;
-    min-height: 0;
-    aspect-ratio: auto;
-  }
-  .sheet__video--vertical img,
-  .sheet__video--vertical video { object-fit: cover; }
+  .sheet--project .sheet__body { padding-block: var(--s-2) var(--s-3); }
 }
-
-/* Ekran poziomy: 16:9 w całości, ograniczone wysokością okna (bez zmian) */
-@media (orientation: landscape) {
-  .sheet__video--vertical { display: none; }
-  .sheet__video--wide {
+/* = warunek 4:5; trzymaj w zgodzie z main.js (matchMedia) */
+@media (min-width: 768px) and (orientation: portrait) {
+  .sheet__video--16x9 { display: none; }
+  .sheet__video--4x5 { display: block; }
+}
+/* Telefon pionowo: panel tuli się do treści od dołu - ramka 16:9 na całą szerokość + podpis */
+@media screen and (max-width: 767px) and (orientation: portrait) {
+  .sheet--project .sheet__panel { top: auto; max-height: calc(100% - var(--sheet-top)); }
+  .sheet--project .sheet__body {
+    flex: none;
     display: block;
-    width: min(100%, calc((100dvh - var(--sheet-top) - var(--header-h) - var(--s-1) - var(--s-3) - var(--s-6)) * var(--ar)));
+    container-type: inline-size;
+    overflow: visible;
+    padding-block: var(--s-1) var(--s-5);
   }
-  .sheet__video--wide video { object-fit: contain; }
+  .sheet__video { width: 100%; }
+  .sheet__caption { display: flex; gap: var(--s-2); margin-top: var(--s-2); }
+}
+/* Telefon poziomo (niski ekran): cieńszy pasek i mniejszy odstęp od góry - więcej miejsca na kadr */
+@media (orientation: landscape) and (max-height: 500px) {
+  .sheet { --sheet-top: var(--s-1); }
+  .sheet__bar { height: var(--s-6); padding-top: 0; }
+  .sheet--project .sheet__body { padding-block: 0 var(--s-2); }
 }
 
 @media (min-width: 768px) {

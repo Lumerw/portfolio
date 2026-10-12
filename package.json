@@ -14,7 +14,8 @@
     "images": "node tools/optimize-images.mjs",
     "og": "node tools/build-og.mjs",
     "sync-brands": "node tools/sync-brands.mjs",
-    "audit": "node tools/audit.mjs"
+    "audit": "node tools/audit.mjs",
+    "check-reel": "node tools/reel-check.mjs"
   },
   "devDependencies": {
     "lighthouse": "^13.5.0",

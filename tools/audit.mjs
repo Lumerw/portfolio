@@ -107,7 +107,8 @@ const browser = await chromium.launch();
   await ctx.close();
 }
 
-// Zero ciasteczek, zero zewnętrznych requestów (strona + otwarty panel).
+// Zero ciasteczek, zero zewnętrznych requestów (strona + otwarty panel z wideo i panel z planszą teraz).
+// Pozostałe testy planszy teraz (formaty, bramka, 8 s, ruch, bez JS): npm run check-reel.
 {
   const ctx = await browser.newContext();
   const p = await ctx.newPage();
@@ -115,6 +116,8 @@ const browser = await chromium.launch();
   p.on('request', r => { if (!r.url().startsWith(`http://localhost:${PORT}`)) external.add(new URL(r.url()).host); });
   await p.goto(URL, { waitUntil: 'networkidle' });
   await p.click('.index__row[data-project="loom"]');
+  await p.waitForTimeout(1200);
+  await p.evaluate(() => { location.hash = 'teraz'; });
   await p.waitForTimeout(1200);
   const cookies = await ctx.cookies();
   check('Zero ciasteczek i zewnętrznych requestów', !cookies.length && !external.size,

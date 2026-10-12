@@ -49,9 +49,12 @@ export const shared = {
   // Projekt:
   //  logo   - na środku podglądu (desktop), najlepiej SVG
   //  sygnet - favicon / sygnet przy opisie zakresu i w panelu (kwadrat)
-  //  video  - pętla w panelu: vertical 9:16 (ekran pionowy - kadr wypełnia cały wolny ekran,
-  //           brzegi mogą się lekko przyciąć) i wide 16:9 (ekran poziomy);
-  //           src = plik mp4 (bez dźwięku), poster = kadr; bez src widać poster-placeholder
+  //  video  - pętla w panelu, dwa formaty (CSS pokazuje jeden):
+  //           '16x9' - telefon, desktop i każdy ekran poziomy;
+  //           '4x5'  - tablet pionowo (min. 768 px + orientacja pionowa) = ta sama proporcja co podgląd na stronie;
+  //           src = plik mp4 (bez dźwięku), poster = kadr
+  //  reel   - true: zamiast postera animowana plansza marki (8 s, render.js → reel()) - w panelu i w podglądzie.
+  //           Kolejność: prawdziwe wideo (src) > reel > plansza marki (brand) > poster
   //  images - main 16:10, a i b 4:5 - tylko w PDF
 
   // Kolejność = kolejność na stronie. Numer nadawany automatycznie: 01, 02, 03.
@@ -76,9 +79,10 @@ export const shared = {
         speed: '26s',
       },
       video: {
-        vertical: { src: '', poster: 'assets/teraz/video-9x16.svg', w: 1080, h: 1920 },
-        wide:   { src: '', poster: 'assets/teraz/video-16x9.svg', w: 1920, h: 1080 },
+        '16x9': { src: '', poster: 'assets/teraz/video-16x9.svg', w: 1920, h: 1080 }, // telefon, desktop, każdy ekran poziomy
+        '4x5':  { src: '', poster: 'assets/teraz/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
       },
+      reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” (dopóki nie ma src)
       href: 'https://teraz.eu',      // testowo
       images: {
         main:    { src: 'assets/teraz/01.svg',      w: 1600, h: 1000 },
@@ -95,8 +99,8 @@ export const shared = {
       logo:   { src: 'assets/loom/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/loom/sygnet.svg' },
       video: {
-        vertical: { src: '', poster: 'assets/loom/video-9x16.svg', w: 1080, h: 1920 },
-        wide:   { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 },
+        '16x9': { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 }, // telefon, desktop, każdy ekran poziomy
+        '4x5':  { src: '', poster: 'assets/loom/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
       },
       href: 'https://loom.studio',   // [potwierdź]
       images: {
@@ -114,8 +118,8 @@ export const shared = {
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/rehab/sygnet.svg' },
       video: {
-        vertical: { src: '', poster: 'assets/rehab/video-9x16.svg', w: 1080, h: 1920 },
-        wide:   { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 },
+        '16x9': { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 }, // telefon, desktop, każdy ekran poziomy
+        '4x5':  { src: '', poster: 'assets/rehab/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
       },
       href: '[https://domena-reh.ab]',
       images: {
@@ -164,6 +168,7 @@ export const pl = {
     brandbook: 'Brandbook',
     contactButton: 'kontakt',
     qr: 'wersja www',
+    reelPause: 'zatrzymaj animację', // przycisk pauzy planszy w panelu (stan: aria-pressed)
   },
   hero: {
     role: 'projektant',                                   // podpis przy imieniu nad hasłem
@@ -175,9 +180,30 @@ export const pl = {
       meta: ['projekt produktu', 'UX/UI', 'identyfikacja', 'development z AI'], // [potwierdź]
       tagline: 'marketplace ekspertów dla branży kreatywnej', // krótki opis pod podglądem
       lead: 'Platforma typu marketplace łącząca ekspertów ze słuchaczami, z sekcją społeczności.',
-      problem: '[Problem: 2–3 zdania.]',
-      solution: '[Rozwiązanie: 2–3 zdania.]',
-      result: '[Efekt: 1–2 zdania lub liczby.] W planach: płatności Stripe, ekspansja na Ukrainę i rynek kreatywny Europy Wschodniej.',
+      // Plansza animowana (reel, 8 s). Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
+      reel: {
+        label: 'teraz - rozmowy wideo 1:1 z ekspertami branży kreatywnej. Słuchacz przychodzi po przegląd portfolio, feedback do projektu albo plan na karierę, a odpowiada mu ekspert z 5+ lat praktyki. Wideo 30 albo 60 minut. Darmowe konto, płatność przez Escrow, 0% prowizji w becie. Porozmawiajmy tu i teraz.',
+        claimA: 'porozmawiajmy',
+        claimKey: 'tu i teraz',          // z falką pod spodem
+        listener: 'słuchacz',
+        listeners: 'słuchacze',
+        need1: 'przegląd portfolio',
+        need2: 'feedback do projektu',
+        need3: 'plan na karierę',
+        listenerShort: 'portfolio, kariera', // telefon
+        listenerSub: 'darmowe konto, płatność przez Escrow',
+        expert: 'ekspert',
+        experts: 'eksperci',
+        expertLine: 'odpowiada praktyk, 5+\u00a0lat w branży', // \u00a0: „5+” nie zostaje sam na końcu linii
+        expertShort: '5+ lat praktyki',  // telefon
+        expertSub: '0% prowizji w becie',
+        callTitle: 'słuchacz pyta, ekspert odpowiada',
+        call: 'wideo 1:1, 30 albo 60 minut',
+        callShort: 'wideo 1:1, 30/60 min', // telefon
+      },
+      problem: '[Problem: 2-3 zdania.]',
+      solution: '[Rozwiązanie: 2-3 zdania.]',
+      result: '[Efekt: 1-2 zdania lub liczby.] W planach: płatności Stripe, ekspansja na Ukrainę i rynek kreatywny Europy Wschodniej.',
       alt: {
         video: 'teraz - [opis wideo promocyjnego]',
         logo: 'teraz - logo',
@@ -190,9 +216,9 @@ export const pl = {
       meta: ['założyciel', 'identyfikacja', 'projekt strony w Figmie', 'wdrożenie'], // [potwierdź]
       tagline: 'studio projektowe w modelu subskrypcji', // krótki opis pod podglądem
       lead: 'Strona-wizytówka i studio projektowe w modelu subskrypcji: stała miesięczna opłata za pracę projektową.',
-      problem: '[Problem: 2–3 zdania.]',
-      solution: 'Styl inspirowany Bauhausem, font Haus, wersje PL/EN, subskrypcje i panel klienta na Stripe. [Dopisz 1–2 zdania.]',
-      result: '[Efekt: 1–2 zdania lub liczby.]',
+      problem: '[Problem: 2-3 zdania.]',
+      solution: 'Styl inspirowany Bauhausem, font Haus, wersje PL/EN, subskrypcje i panel klienta na Stripe. [Dopisz 1-2 zdania.]',
+      result: '[Efekt: 1-2 zdania lub liczby.]',
       alt: {
         video: 'loom.studio - [opis wideo promocyjnego]',
         logo: 'loom.studio - logo',
@@ -205,9 +231,9 @@ export const pl = {
       meta: ['koncepcja', 'narracja', 'projekt', 'development'], // [potwierdź]
       tagline: 'pitch deck platformy łączącej gaming ze zdrowiem psychicznym', // krótki opis pod podglądem
       lead: 'Strona-pitch deck dla koncepcji platformy łączącej gaming ze zdrowiem psychicznym.',
-      problem: '[Problem: 2–3 zdania.]',
-      solution: 'Prezentacja inwestorska w formie strony www, bez ciasteczek i zbierania danych. [Dopisz 1–2 zdania.]',
-      result: '[Efekt: 1–2 zdania lub liczby.]',
+      problem: '[Problem: 2-3 zdania.]',
+      solution: 'Prezentacja inwestorska w formie strony www, bez ciasteczek i zbierania danych. [Dopisz 1-2 zdania.]',
+      result: '[Efekt: 1-2 zdania lub liczby.]',
       alt: {
         video: 'reh.ab - [opis wideo promocyjnego]',
         logo: 'reh.ab - logo',
@@ -220,7 +246,7 @@ export const pl = {
   about: {
     title: 'O mnie',
     portraitAlt: 'Wojciech Lumer - portret', // [potwierdź po dodaniu zdjęcia]
-    bio: '[Bio: 3–4 zdania. Kim jesteś, czym się zajmujesz, co cię wyróżnia, czego szukasz.]',
+    bio: '[Bio: 3-4 zdania. Kim jesteś, czym się zajmujesz, co cię wyróżnia, czego szukasz.]',
     experience: [
       { year: '2026', place: 'loom.studio', role: 'założyciel, projektant' },
       { year: '[rok]', place: '[miejsce]', role: '[rola]' },
@@ -272,6 +298,7 @@ export const en = {
     brandbook: 'Brandbook',
     contactButton: 'contact',
     qr: 'website',
+    reelPause: 'pause animation',
   },
   hero: {
     role: 'designer',
@@ -282,10 +309,31 @@ export const en = {
     teraz: {
       meta: ['product design', 'UX/UI', 'identity', 'AI-assisted development'],
       tagline: 'marketplace of experts for the creative industry', // krótki opis pod podglądem
-      lead: 'A marketplace platform connecting experts with listeners, with a community section.',
-      problem: '[Problem: 2–3 sentences.]',
-      solution: '[Solution: 2–3 sentences.]',
-      result: '[Result: 1–2 sentences or numbers.] Next: Stripe payments, expansion to Ukraine and the Eastern European creative market.',
+      lead: 'A marketplace platform connecting experts with learners, with a community section.',
+      // Plansza animowana (reel, 8 s). „learner” - angielski termin teraz.eu (dosłownie: listener).
+      reel: {
+        label: 'teraz - 1:1 video calls with creative industry experts. A learner comes for a portfolio review, project feedback or a career plan, and an expert with 5+ years of practice answers. Calls last 30 or 60 minutes. Free account, escrow-protected payment, 0% commission during the beta. Let’s talk here and now.',
+        claimA: 'let’s talk',            // apostrof jak u teraz („Let’s talk”)
+        claimKey: 'here and now',
+        listener: 'learner',
+        listeners: 'learners',
+        need1: 'portfolio review',
+        need2: 'project feedback',
+        need3: 'career plan',
+        listenerShort: 'portfolio, career',
+        listenerSub: 'free account, escrow-protected payment',
+        expert: 'expert',
+        experts: 'experts',
+        expertLine: 'a pro answers, 5+\u00a0years in the field', // \u00a0: „5+” zostaje przy „years”
+        expertShort: '5+ yrs of practice',
+        expertSub: '0% commission during the beta',
+        callTitle: 'a learner asks, an expert answers', // 1:1, jak w PL
+        call: '1:1 video, 30 or 60 minutes',
+        callShort: '1:1 video, 30/60 min',
+      },
+      problem: '[Problem: 2-3 sentences.]',
+      solution: '[Solution: 2-3 sentences.]',
+      result: '[Result: 1-2 sentences or numbers.] Next: Stripe payments, expansion to Ukraine and the Eastern European creative market.',
       alt: {
         video: 'teraz - [promo video description]',
         logo: 'teraz - logo',
@@ -298,9 +346,9 @@ export const en = {
       meta: ['founder', 'identity', 'website design in Figma', 'build'],
       tagline: 'subscription-based design studio', // krótki opis pod podglądem
       lead: 'A studio website and a subscription design studio: a fixed monthly fee for design work.',
-      problem: '[Problem: 2–3 sentences.]',
-      solution: 'Bauhaus-inspired style, the Haus typeface, PL/EN versions, subscriptions and a client panel on Stripe. [Add 1–2 sentences.]',
-      result: '[Result: 1–2 sentences or numbers.]',
+      problem: '[Problem: 2-3 sentences.]',
+      solution: 'Bauhaus-inspired style, the Haus typeface, PL/EN versions, subscriptions and a client panel on Stripe. [Add 1-2 sentences.]',
+      result: '[Result: 1-2 sentences or numbers.]',
       alt: {
         video: 'loom.studio - [promo video description]',
         logo: 'loom.studio - logo',
@@ -313,9 +361,9 @@ export const en = {
       meta: ['concept', 'narrative', 'design', 'development'],
       tagline: 'pitch deck for a platform connecting gaming and mental health', // krótki opis pod podglądem
       lead: 'A pitch-deck website for a platform concept connecting gaming and mental health.',
-      problem: '[Problem: 2–3 sentences.]',
-      solution: 'An investor presentation built as a website, with no cookies and no data collection. [Add 1–2 sentences.]',
-      result: '[Result: 1–2 sentences or numbers.]',
+      problem: '[Problem: 2-3 sentences.]',
+      solution: 'An investor presentation built as a website, with no cookies and no data collection. [Add 1-2 sentences.]',
+      result: '[Result: 1-2 sentences or numbers.]',
       alt: {
         video: 'reh.ab - [promo video description]',
         logo: 'reh.ab - logo',
@@ -328,7 +376,7 @@ export const en = {
   about: {
     title: 'About',
     portraitAlt: 'Wojciech Lumer - portrait',
-    bio: '[Bio: 3–4 sentences.]',
+    bio: '[Bio: 3-4 sentences.]',
     experience: [
       { year: '2026', place: 'loom.studio', role: 'founder, designer' },
       { year: '[year]', place: '[place]', role: '[role]' },

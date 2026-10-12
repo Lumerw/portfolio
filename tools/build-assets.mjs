@@ -91,7 +91,8 @@ for (const p of shared.projects) {
     await out(img.src, placeholder(p.symbol, img.w / 2, img.h / 2));
   }
   for (const v of Object.values(p.video)) {
-    // Bez ramki: plakat bywa przycinany (object-fit: cover), ramkę rysuje CSS na figurze.
+    // Plakaty obu formatów panelu: video-16x9.svg i video-4x5.svg (połowa wymiarów z content.js).
+    // Bez ramki: ramkę rysuje CSS na figurze.
     if (v.poster.endsWith('.svg')) await out(v.poster, placeholder(p.symbol, v.w / 2, v.h / 2, { frame: false }));
   }
   // Prawdziwe assety marki (mono: false) zostają nietknięte — placeholdery tylko dla reszty.

@@ -34,6 +34,46 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
   }
 
+  // Plansza animowana (projects[].reel): te same klucze w pl i en, niepusty opis, bez długich myślników,
+  // limity znaków (dłuższy tekst wyjdzie poza kadr na telefonie). Błąd przerywa build, limit tylko ostrzega.
+  const REEL_MAX = {
+    listener: 12, expert: 12, listeners: 14, experts: 14,
+    listenerShort: 20, expertShort: 20, callShort: 20,
+    need1: 22, need2: 22, need3: 22,
+    expertLine: 40, listenerSub: 40, expertSub: 40,
+    callTitle: 36, call: 32, label: 320,
+  };
+  const errors = [];
+  for (const p of content.shared.projects.filter(p => p.reel)) {
+    const [pl, en] = ['pl', 'en'].map(l => content[l].projects[p.id]?.reel);
+    if (!pl || !en) { errors.push(`${p.title}: brak tekstów reel (pl i en)`); continue; }
+    const keys = l => Object.keys(l).sort().join(',');
+    if (keys(pl) !== keys(en)) errors.push(`${p.title}: różne klucze reel w pl i en`);
+    for (const [lang, r] of [['pl', pl], ['en', en]]) {
+      if (!String(r.label || '').trim()) errors.push(`${p.title} (${lang}): pusty reel.label`);
+      for (const [k, v] of Object.entries(r)) {
+        if (typeof v !== 'string') { errors.push(`${p.title} (${lang}): reel.${k} musi być tekstem`); continue; }
+        if (/[—–]/.test(v)) errors.push(`${p.title} (${lang}): reel.${k} ma długi myślnik - użyj „-”`);
+        if (REEL_MAX[k] && v.length > REEL_MAX[k]) console.warn(`⚠ ${p.title} (${lang}): reel.${k} ma ${v.length} znaków - limit ${REEL_MAX[k]}`);
+      }
+      const claim = `${r.claimA} ${r.claimKey}`;
+      if (claim.length > 26) console.warn(`⚠ ${p.title} (${lang}): hasło reel ma ${claim.length} znaków - limit 26`);
+    }
+    for (const lang of ['pl', 'en']) {
+      if (!content[lang].ui.reelPause) errors.push(`(${lang}): brak ui.reelPause`);
+    }
+  }
+  // Cała treść (nie tylko reel): krótki łącznik „-” zamiast długich myślników.
+  const walk = (v, path) => {
+    if (typeof v === 'string') { if (/[—–]/.test(v)) errors.push(`${path}: długi myślnik - użyj „-”`); }
+    else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) walk(x, `${path}.${k}`);
+  };
+  for (const k of ['shared', 'pl', 'en']) walk(content[k], k);
+  if (errors.length) {
+    for (const e of errors) console.error(`✗ ${e}`);
+    process.exit(1);
+  }
+
   await writeFile(file, html);
   console.log('index.html ← content.js (pl)');
 }

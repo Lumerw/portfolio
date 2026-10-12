@@ -1,7 +1,7 @@
 // Zachowanie strony: PL/EN, indeks ↔ podgląd, panele, kopiowanie maila.
 // Treść i szablony: content.js, render.js. Bez JS strona działa na kotwicach i :target.
 import { content } from './content.js';
-import { render } from './render.js';
+import { render, REEL_MS } from './render.js';
 
 const root = document.documentElement;
 const app = document.getElementById('app');
@@ -90,6 +90,39 @@ function activate(id) {
   for (const el of app.querySelectorAll('.index__row[data-project], .preview__logo, .preview__caption')) {
     el.classList.toggle('is-active', el.dataset.project === id);
   }
+  restartReel(app.querySelector(`.preview__logo[data-project="${id}"]`)); // plansza zawsze od początku pętli
+  if (interacting()) holdAtSeam(); else releaseHold();
+}
+
+/* Plansza animowana (reel): cały ruch to CSS; tu tylko start od zera i odczyt fazy pętli.
+   Granie / pauzę ustawia CSS (--reel-play): aktywny podgląd albo otwarty panel. */
+function restartReel(scope) {
+  for (const el of scope?.querySelectorAll('.reel') ?? []) for (const a of el.getAnimations({ subtree: true })) a.currentTime = 0;
+}
+// Faza pętli (ms) w podglądzie projektu - odczyt z animacji-zegara reel-clock.
+function reelPhase(id) {
+  const a = app.querySelector(`.preview__logo[data-project="${id}"] .reel`)?.getAnimations().find(x => x.animationName === 'reel-clock');
+  return a ? Number(a.currentTime) || 0 : 0;
+}
+
+/* WCAG 2.2.2: gdy użytkownik jest przy liście / podglądzie (auto-przewijanie stoi), plansza w podglądzie
+   kończy bieżącą pętlę i staje na szwie (klatka 0 = 8000 = plakat). Rusza znów przy zmianie projektu
+   albo wznowieniu auto-przewijania. Najwyżej jedna pętla ruchu po rozpoczęciu interakcji. */
+let holdTimer;
+const interacting = () => {
+  const f = document.activeElement;
+  return hovering || !!(f?.closest?.('.index') && f.matches(':focus-visible'));
+};
+function releaseHold() {
+  clearTimeout(holdTimer);
+  for (const el of app.querySelectorAll('.preview .reel.is-held')) el.classList.remove('is-held');
+}
+function holdAtSeam() {
+  const el = app.querySelector(`.preview__logo[data-project="${active}"] .reel`);
+  if (el?.classList.contains('is-held')) return; // już stoi na plakacie
+  releaseHold();
+  if (!el) return;
+  holdTimer = setTimeout(() => el.classList.add('is-held'), REEL_MS - (reelPhase(active) % REEL_MS));
 }
 
 // Symbol rysuje się na nowo.
@@ -111,6 +144,7 @@ app.addEventListener('focusin', onIndex);
    Tu: tło nieaktywne, focus w panelu, Esc, powrót focusu, pauza wideo. */
 let opener = null;      // element, który otworzył panel — wraca do niego focus
 let openedHere = false; // panel otwarty kliknięciem na stronie → zamknięcie = krok wstecz w historii
+let sheetWasOpen = false; // poprzedni stan - plansza w podglądzie rusza od zera dopiero po zamknięciu panelu
 
 const openSheet = () => {
   const id = decodeURIComponent(location.hash.slice(1));
@@ -123,6 +157,9 @@ function syncSheet() {
   for (const el of app.querySelectorAll('.site-header, main, .site-footer, .skip')) el.inert = !!sheet;
   for (const v of app.querySelectorAll('.sheet video')) if (v.closest('.sheet') !== sheet) v.pause();
   playVisible(sheet);
+  if (sheet) restartReel(sheet);                                              // panel: plansza od zera
+  else if (sheetWasOpen) restartReel(app.querySelector('.preview__logo.is-active')); // powrót na stronę główną
+  sheetWasOpen = !!sheet;
   if (sheet) {
     redraw(sheet.querySelector('.sheet__bar'));
     // Po starcie animacji, żeby przeglądarka nie przewijała do panelu.
@@ -133,7 +170,7 @@ function syncSheet() {
   }
 }
 
-// Pętla wideo: gra tylko widoczna wersja (kwadrat albo 16:9) w otwartym panelu.
+// Pętla wideo: gra tylko widoczna wersja (16:9 albo 4:5) w otwartym panelu.
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 function playVisible(sheet) {
   if (!sheet) return;
@@ -144,7 +181,29 @@ function playVisible(sheet) {
     v.controls = reduceMotion.matches; // bez ruchu: użytkownik sam włącza
   }
 }
-matchMedia('(orientation: landscape)').addEventListener('change', () => playVisible(openSheet()));
+// = warunek formatu 4:5 w styles.css (tablet pionowo). Po obrocie focus z ukrytego przełącznika
+// pauzy przechodzi na przełącznik widocznego formatu (zamiast na body).
+matchMedia('(min-width: 768px) and (orientation: portrait)').addEventListener('change', () => {
+  const sheet = openSheet();
+  playVisible(sheet);
+  const f = document.activeElement;
+  if (sheet && f?.matches('.reel__toggle') && f.offsetParent === null) {
+    [...sheet.querySelectorAll('.reel__toggle')].find(t => t.offsetParent !== null)?.focus({ preventScroll: true });
+  }
+});
+
+/* Pauza planszy animowanej w panelu. Stan niesie aria-pressed; etykieta stała.
+   Stan wspólny dla obu formatów panelu (16:9 i 4:5) - obrót tabletu nie wznawia ruchu.
+   Po zmianie języka (nowy DOM) plansza znów gra. */
+app.addEventListener('click', e => {
+  const b = e.target.closest('.reel__toggle');
+  if (!b) return;
+  const paused = b.getAttribute('aria-pressed') !== 'true';
+  for (const f of b.closest('.sheet')?.querySelectorAll('.sheet__video') ?? [b.parentElement]) {
+    f.querySelector('.reel')?.classList.toggle('is-paused', paused);
+    f.querySelector('.reel__toggle')?.setAttribute('aria-pressed', String(paused));
+  }
+});
 
 /* Ikony obok znaku: szybka zmiana, każda pozycja przejmuje ikonę z lewej. */
 const ICON_MS = 450;
@@ -186,7 +245,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 /* Auto-przewijanie projektów (desktop): kreska pod aktywnym wierszem wypełnia się przez AUTO_MS,
    potem podgląd przechodzi do następnego projektu. Pauza: kursor na liście lub podglądzie,
    focus z klawiatury w liście, otwarty panel, karta w tle. Bez ruchu w systemie — wyłączone. */
-const AUTO_MS = 3000; // = --t-auto w styles.css
+const AUTO_MS = 3000; // = --t-auto (projekty bez planszy animowanej); wiersz z planszą ma data-dwell = REEL_MS
 const autoMedia = matchMedia('(min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference)');
 const projectIds = content.shared.projects.map(p => p.id);
 let autoTimer = null;
@@ -198,37 +257,44 @@ function stopAuto() {
   for (const row of app.querySelectorAll('.index__row.is-playing')) row.classList.remove('is-playing');
 }
 
-function startAuto() {
+// resume = true: wznowienie (kursor wyszedł, karta wróciła…) - plansza w podglądzie grała dalej,
+// więc kreska i czas do przejścia liczą się od bieżącej fazy pętli, a nie od zera.
+function startAuto(resume = false) {
   stopAuto();
-  if (!autoMedia.matches || hovering || openSheet() || document.hidden) return;
-  const focused = document.activeElement;
-  if (focused?.closest?.('.index') && focused.matches(':focus-visible')) return;
+  if (openSheet() || document.hidden) return;
+  // Bez auto-przewijania (interakcja, ekran dotykowy) plansza w podglądzie kończy pętlę i staje.
+  if (!autoMedia.matches || interacting()) { holdAtSeam(); return; }
   const row = app.querySelector(`.index__row[data-project="${active}"]`);
   if (!row) return;
-  void row.offsetWidth; // animacja kreski zawsze od zera
+  releaseHold();
+  const ms = Number(row.dataset.dwell) || AUTO_MS;
+  let done = resume ? reelPhase(active) % ms : 0;
+  if (ms - done < 1000) done = 0; // za mało do końca - pełny czas zamiast mignięcia
+  row.style.setProperty('--auto-delay', `${-done}ms`); // kreska zaczyna w miejscu fazy
+  void row.offsetWidth; // animacja kreski zawsze od nowa
   row.classList.add('is-playing');
   autoTimer = setTimeout(() => {
     activate(projectIds[(projectIds.indexOf(active) + 1) % projectIds.length]);
     startAuto();
-  }, AUTO_MS);
+  }, ms - done);
 }
 
 const inAutoZone = el => !!el?.closest?.('.index, .hero__preview');
 app.addEventListener('pointerover', e => {
-  if (!hovering && inAutoZone(e.target)) { hovering = true; stopAuto(); }
+  if (!hovering && inAutoZone(e.target)) { hovering = true; stopAuto(); holdAtSeam(); }
 });
 app.addEventListener('pointerout', e => {
-  if (hovering && inAutoZone(e.target) && !inAutoZone(e.relatedTarget)) { hovering = false; startAuto(); }
+  if (hovering && inAutoZone(e.target) && !inAutoZone(e.relatedTarget)) { hovering = false; startAuto(true); }
 });
-app.addEventListener('focusin', e => { if (e.target.closest('.index') && e.target.matches(':focus-visible')) stopAuto(); });
-app.addEventListener('focusout', e => { if (e.target.closest('.index') && !inAutoZone(e.relatedTarget)) startAuto(); });
-document.addEventListener('visibilitychange', () => (document.hidden ? stopAuto() : startAuto()));
-autoMedia.addEventListener('change', startAuto);
+app.addEventListener('focusin', e => { if (e.target.closest('.index') && e.target.matches(':focus-visible')) { stopAuto(); holdAtSeam(); } });
+app.addEventListener('focusout', e => { if (e.target.closest('.index') && !inAutoZone(e.relatedTarget)) startAuto(true); });
+document.addEventListener('visibilitychange', () => (document.hidden ? stopAuto() : startAuto(true)));
+autoMedia.addEventListener('change', () => startAuto(true));
 
 addEventListener('hashchange', syncSheet);
 addEventListener('hashchange', () => (openSheet() ? stopAuto() : startAuto()));
 syncSheet();
-startAuto();
+startAuto(true);
 
 // Po zmianie języka DOM jest nowy: przywróć aktywny projekt i stan panelu.
 new MutationObserver(() => {
