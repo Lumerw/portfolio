@@ -183,14 +183,17 @@ function playVisible(sheet) {
 }
 // = warunek formatu 4:5 w styles.css (tablet pionowo). Po obrocie focus z ukrytego przełącznika
 // pauzy przechodzi na przełącznik widocznego formatu (zamiast na body).
-matchMedia('(min-width: 768px) and (orientation: portrait)').addEventListener('change', () => {
+// = warunek formatu 9:16 (telefon pionowo) - ta sama obsługa
+const onFormatChange = () => {
   const sheet = openSheet();
   playVisible(sheet);
   const f = document.activeElement;
   if (sheet && f?.matches('.reel__toggle') && f.offsetParent === null) {
     [...sheet.querySelectorAll('.reel__toggle')].find(t => t.offsetParent !== null)?.focus({ preventScroll: true });
   }
-});
+};
+matchMedia('(min-width: 768px) and (orientation: portrait)').addEventListener('change', onFormatChange);
+matchMedia('(max-width: 767px) and (orientation: portrait)').addEventListener('change', onFormatChange);
 
 /* Pauza planszy animowanej w panelu. Stan niesie aria-pressed; etykieta stała.
    Stan wspólny dla obu formatów panelu (16:9 i 4:5) - obrót tabletu nie wznawia ruchu.

@@ -50,7 +50,8 @@ export const shared = {
   //  logo   - na środku podglądu (desktop), najlepiej SVG
   //  sygnet - favicon / sygnet przy opisie zakresu i w panelu (kwadrat)
   //  video  - pętla w panelu, dwa formaty (CSS pokazuje jeden):
-  //           '16x9' - telefon, desktop i każdy ekran poziomy;
+  //           '16x9' - desktop i każdy ekran poziomy (także telefon obrócony);
+  //           '9x16' - telefon pionowo (< 768 px + orientacja pionowa) - kadr na całą wysokość panelu;
   //           '4x5'  - tablet pionowo (min. 768 px + orientacja pionowa) = ta sama proporcja co podgląd na stronie;
   //           src = plik mp4 (bez dźwięku), poster = kadr
   //  reel   - true: zamiast postera animowana plansza marki (8 s, render.js → reel()) - w panelu i w podglądzie.
@@ -79,8 +80,9 @@ export const shared = {
         speed: '26s',
       },
       video: {
-        '16x9': { src: '', poster: 'assets/teraz/video-16x9.svg', w: 1920, h: 1080 }, // telefon, desktop, każdy ekran poziomy
+        '16x9': { src: '', poster: 'assets/teraz/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/teraz/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
+        '9x16': { src: '', poster: 'assets/teraz/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” (dopóki nie ma src)
       href: 'https://teraz.eu',      // testowo
@@ -99,8 +101,9 @@ export const shared = {
       logo:   { src: 'assets/loom/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/loom/sygnet.svg' },
       video: {
-        '16x9': { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 }, // telefon, desktop, każdy ekran poziomy
+        '16x9': { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/loom/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
+        '9x16': { src: '', poster: 'assets/loom/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       href: 'https://loom.studio',   // [potwierdź]
       images: {
@@ -118,8 +121,9 @@ export const shared = {
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/rehab/sygnet.svg' },
       video: {
-        '16x9': { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 }, // telefon, desktop, każdy ekran poziomy
+        '16x9': { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/rehab/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
+        '9x16': { src: '', poster: 'assets/rehab/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       href: '[https://domena-reh.ab]',
       images: {

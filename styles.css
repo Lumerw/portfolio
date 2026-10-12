@@ -692,6 +692,17 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
   --ts: 25cqw; --tgap: 2.6cqw; --ring: max(2px, .3cqw);
   --chip-fs: max(12px, 1.3cqw); --title-fs: max(14px, 2.4cqw); --title-w: 80cqw; --cap-fs: max(12px, 1.5cqw);
 }
+.reel--9x16 {                                             /* telefon pionowo: kompozycja 4:5 rozciągnięta na wysoki kadr */
+  --pad: 7.5cqw; --lw: max(157px, 58cqw); --l-s: .46;    /* nagłówek >= 72 px (minimum marki) także przy 220 px */
+  --claim-fs: max(16px, 5.8cqw); --claim-gap: calc(var(--lw) * .16); --leg-fs: max(12px, 3.5cqw);
+  --f-size: 125cqw; --fm-size: 135cqw; --fl-x: 30cqw; --fl-y: 32cqh; --fe-x: 70cqw; --fe-y: 72cqh;
+  --rl-top: 20cqh; --role-w: 80cqw; --re-w: 76cqw; --rgap: 2.6cqw;
+  --pill-fs: max(12px, 3.9cqw); --need-fs: 6.8cqw; --line-fs: 6.8cqw; --sub-fs: max(12px, 3.7cqw);
+  --gq-h: 30cqh; --gq-from: 30cqw 0; --gx-h: 26cqh; --gx-from: -30cqw 0;
+  --call-top: 16cqh; --call-bot: 10cqh; --cgap: 4.5cqw;
+  --ts: 41cqw; --tgap: 4cqw; --ring: max(2px, .6cqw);
+  --chip-fs: max(12px, 3.4cqw); --title-fs: 6.2cqw; --title-w: 86cqw; --cap-fs: max(12px, 3.7cqw);
+}
 .reel__stage { position: absolute; inset: 0; }
 /* Ciemna linia przy krawędzi kadru (pod linią --hair ramki): biały glif przycięty krawędzią
    nie zlewa się z jasną stroną. Tylko stałe kolory - tryb ciemny bez zmian */
@@ -830,7 +841,7 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 /* Bloki ról: słuchacz (lewa góra) i ekspert (4:5 prawy dół, 16:9 prawa góra) — po przekątnej */
 .reel__role { position: absolute; margin: 0; display: flex; flex-direction: column; gap: var(--rgap); }
 .reel__role--l { left: var(--pad); top: var(--rl-top); align-items: flex-start; text-align: left; max-width: var(--role-w); }
-.reel--4x5 .reel__role--e  { right: var(--pad); bottom: 10cqh;      align-items: flex-end; text-align: right; max-width: var(--re-w); }
+.reel--4x5 .reel__role--e, .reel--9x16 .reel__role--e { right: var(--pad); bottom: 10cqh;      align-items: flex-end; text-align: right; max-width: var(--re-w); }
 .reel--16x9 .reel__role--e { right: var(--pad); top: var(--rl-top); align-items: flex-end; text-align: right; max-width: var(--re-w); }
 .reel__pill {
   display: inline-flex;
@@ -877,8 +888,11 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 .reel .reel__glyph svg { display: block; width: 100%; height: 100%; max-width: none; fill: #fff; }
 .reel .reel__glyph--q { height: var(--gq-h); aspect-ratio: 158.7 / 233.4; animation: reel-gq var(--t-reel, 8s) linear infinite; }
 .reel .reel__glyph--x { height: var(--gx-h); aspect-ratio: 71.4 / 230.4;  animation: reel-gx var(--t-reel, 8s) linear infinite; }
-.reel--4x5  .reel__glyph--q { right: -13cqw; top: 14cqh; }         /* przycięty z prawej */
-.reel--4x5  .reel__glyph--x { left: 2cqw; bottom: -6cqh; }         /* przycięty od dołu; prawa krawędź ok. 15cqw - z dala od tekstu eksperta */
+.reel--4x5  .reel__glyph--q { right: -13cqw; top: 14cqh; }
+.reel--9x16 .reel__glyph--q { right: -16cqw; top: 13cqh; }         /* jak 4:5, niżej od przycisku pauzy */         /* przycięty z prawej */
+.reel--4x5  .reel__glyph--x { left: 2cqw; bottom: -6cqh; }
+.reel--9x16 .reel__glyph--x { left: 2cqw; bottom: -5cqh; }
+.reel--9x16 .reel__role--l .reel__sub { max-width: 60cqw; }      /* zawija się przed „?” przy prawej krawędzi */         /* przycięty od dołu; prawa krawędź ok. 15cqw - z dala od tekstu eksperta */
 .reel--16x9 .reel__glyph--q { left: 5cqw; bottom: -6cqh; }         /* od dołu, pod tekstem słuchacza; widać część kropki */
 .reel--16x9 .reel__glyph--x { right: 10cqw; bottom: -6cqh; }       /* od dołu, pod tekstem eksperta; widać część kropki */
 @keyframes reel-gq { 0%, 15%    { opacity: 0; translate: var(--gq-from); animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 22.5%, 58.75%  { opacity: 1; translate: 0 0; animation-timing-function: cubic-bezier(.4, 0, 1, 1); } 62.5%, 100% { opacity: 0; translate: var(--gq-from); } }
@@ -1042,8 +1056,8 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 .reel__toggle[aria-pressed="true"] .reel__ico-play { display: block; }
 /* Focus niezależny od motywu (--ink na ciemnej planszy byłby niewidoczny w jasnym trybie) */
 .reel__toggle:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-@media (max-width: 767px) and (orientation: portrait) {
-  /* kompakt: lewy górny róg, mniejszy i bliżej rogu - z dala od kafelka słuchacza (32 px > 24 px celu) */
+/* Kompakt 16:9 (np. telefon obrócony, kadr < 480 px): lewy górny róg, mniejszy - z dala od kafelka słuchacza */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 640px) {
   .js .reel__toggle { right: auto; left: 6px; top: 6px; width: 32px; height: 32px; }
   .reel__toggle svg { width: 12px; height: 12px; }
 }
@@ -1187,7 +1201,7 @@ html:has(.sheet:target) { overflow: hidden; }
   width: min(100cqw, 100cqh * var(--ar));
 }
 .sheet__video video { background: var(--ink); }
-.sheet__video--4x5 { display: none; }
+.sheet__video--4x5, .sheet__video--9x16 { display: none; }
 .sheet__caption { display: none; }
 
 @media (orientation: portrait) {
@@ -1198,18 +1212,13 @@ html:has(.sheet:target) { overflow: hidden; }
   .sheet__video--16x9 { display: none; }
   .sheet__video--4x5 { display: block; }
 }
-/* Telefon pionowo: panel tuli się do treści od dołu - ramka 16:9 na całą szerokość + podpis */
+/* Telefon pionowo: kadr 9:16 na pełną wysokość panelu (100dvh - z paskami Safari), bez przewijania;
+   = warunek formatu 9:16 w main.js (matchMedia) */
 @media screen and (max-width: 767px) and (orientation: portrait) {
-  .sheet--project .sheet__panel { top: auto; max-height: calc(100% - var(--sheet-top)); }
-  .sheet--project .sheet__body {
-    flex: none;
-    display: block;
-    container-type: inline-size;
-    overflow: visible;
-    padding-block: var(--s-1) var(--s-5);
-  }
-  .sheet__video { width: 100%; }
-  .sheet__caption { display: flex; gap: var(--s-2); margin-top: var(--s-2); }
+  .sheet__video--16x9 { display: none; }
+  .sheet__video--9x16 { display: block; width: 100%; width: min(100cqw, (100cqh - var(--s-5)) * var(--ar)); }
+  .sheet__caption { display: flex; gap: var(--s-2); margin-top: var(--s-2); max-width: 100%; }
+  .sheet__caption span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }   /* jedna linia - kadr liczy na nią 40 px */
 }
 /* Telefon poziomo (niski ekran): cieńszy pasek i mniejszy odstęp od góry - więcej miejsca na kadr */
 @media (orientation: landscape) and (max-height: 500px) {

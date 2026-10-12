@@ -46,9 +46,10 @@ const FRAMES = [
   { id: 'sheet-844x390', vw: 844, vh: 390, kind: 'sheet', fmt: '16x9', size: [564, 317], minH: 300 },
   { id: 'sheet-667x375', vw: 667, vh: 375, kind: 'sheet', fmt: '16x9', size: [537, 302] },
   { id: 'sheet-568x320', vw: 568, vh: 320, kind: 'sheet', fmt: '16x9', size: [439, 247], compact: true },
-  { id: 'sheet-430x932', vw: 430, vh: 932, kind: 'sheet', fmt: '16x9', size: [382, 215], compact: true },
-  { id: 'sheet-375x667', vw: 375, vh: 667, kind: 'sheet', fmt: '16x9', size: [327, 184], compact: true, panelH: 331 },
-  { id: 'sheet-320x568', vw: 320, vh: 568, kind: 'sheet', fmt: '16x9', size: [272, 153], compact: true },
+  { id: 'sheet-430x932', vw: 430, vh: 932, kind: 'sheet', fmt: '9x16', size: [382, 679] },   // telefon pionowo: 9:16 na pełną wysokość panelu
+  { id: 'sheet-375x667', vw: 375, vh: 667, kind: 'sheet', fmt: '9x16', size: [276, 490] },
+  { id: 'sheet-390x664', vw: 390, vh: 664, kind: 'sheet', fmt: '9x16', size: [274, 487] },   // iPhone 14 w Safari (paski)
+  { id: 'sheet-320x568', vw: 320, vh: 568, kind: 'sheet', fmt: '9x16', size: [220, 391] },
 ];
 const frame = id => FRAMES.find(f => f.id === id);
 
@@ -541,8 +542,9 @@ async function visualGroup(browser) {
             if (phonePortrait) {
               if (!fi.caption) fmts.push(`${f.id}: brak widocznego .sheet__caption`);
               const p = fi.panel;
-              if (!p || Math.abs(p.y + p.h - f.vh) > 1.5 || p.h > f.vh - 60) fmts.push(`${f.id}: panel nie przylega do dołu (góra ${Math.round(p?.y)}, wys. ${Math.round(p?.h)})`);
-              else if (f.panelH && Math.abs(p.h - f.panelH) > 15) fmts.push(`${f.id}: panel ${Math.round(p.h)} px, ma być ok. ${f.panelH}`);
+              // 9:16 na pełną wysokość panelu: panel sięga dołu ekranu, kadr + podpis mieszczą się w nim bez przewijania
+              if (!p || Math.abs(p.y + p.h - f.vh) > 1.5) fmts.push(`${f.id}: panel nie sięga dołu ekranu (góra ${Math.round(p?.y)}, wys. ${Math.round(p?.h)})`);
+              else if (shown[0] && shown[0].y + shown[0].h > p.y + p.h) fmts.push(`${f.id}: kadr wychodzi poza panel`);
             } else if (fi.caption) fmts.push(`${f.id}: .sheet__caption widoczny poza telefonem w pionie`);
           }
         }
@@ -996,7 +998,7 @@ async function budgetGroup(browser) {
       for (const r of b.per) if (r.n > 60) bad.push(`${lang} ${r.where}: ${r.n} elementów`);
       if (b.total > 800) bad.push(`${lang}: DOM ${b.total} elementów`);
       const bytes = b.per.reduce((s, r) => s + r.bytes, 0);
-      if (bytes > 15 * 1024) bad.push(`${lang}: HTML reeli ${(bytes / 1024).toFixed(1)} KB`);
+      if (bytes > 20 * 1024) bad.push(`${lang}: HTML reeli ${(bytes / 1024).toFixed(1)} KB`);   // 4 kopie: podgląd + 16:9, 4:5, 9:16
       notes.push(`${lang}: reel ${[...new Set(b.per.map(r => r.n))].join('/')} el. × ${b.per.length}, DOM ${b.total}, HTML ${(bytes / 1024).toFixed(1)} KB`);
     } catch (e) {
       bad.push(`${lang}: błąd: ${e.message.split('\n')[0]}`);
@@ -1004,7 +1006,7 @@ async function budgetGroup(browser) {
       await ctx.close();
     }
   }
-  check('Budżet: <= 60 elementów na .reel, DOM <= 800, HTML reeli <= 15 KB', !bad.length, list(bad.length ? bad : notes));
+  check('Budżet: <= 60 elementów na .reel, DOM <= 800, HTML reeli <= 20 KB', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- Sieć: zero zewnętrznych requestów i ciasteczek ---------- */

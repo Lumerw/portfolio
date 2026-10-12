@@ -66,7 +66,7 @@ const mono = img => {
 const brandStyle = b => `--brand-bg:${esc(b.bg)};${b.aurora.map((c, i) => `--a${i + 1}:${esc(c)}`).join(';')};--brand-speed:${esc(b.speed || '26s')}`;
 
 /* Plansza animowana „Dwie role, jedna rozmowa” (projects[].reel): 8 s w pętli, sam CSS (styles.css → Reel).
-   fmt: '16x9' | '4x5'. Kolory i logo z p.brand / p.logo, więc synchronizacja marki działa także tu.
+   fmt: '16x9' | '4x5' | '9x16'. Kolory i logo z p.brand / p.logo, więc synchronizacja marki działa także tu.
    decorative: kopia na stronie głównej (tekst niesie podpis pod ramką); w panelu role=img + aria-label.
    Glify i falka ruszają się na opakowaniach <span>, nie na <svg>: Chromium nie przenosi animacji
    elementu <svg> na kompozytor i przelicza wtedy styl w każdej klatce. */
@@ -247,10 +247,10 @@ function sheet({ id, cls, bar, body, t }) {
 </section>`;
 }
 
-// Wideo promocyjne w pętli: 16:9 (telefon, desktop, ekran poziomy) i 4:5 (tablet pionowo) - CSS wybiera jedno.
+// Wideo promocyjne w pętli: 16:9 (desktop, ekran poziomy), 4:5 (tablet pionowo) i 9:16 (telefon pionowo) - CSS wybiera jedno.
 // Kolejność: prawdziwe wideo (src) > plansza animowana (reel) > plansza marki (brand) > poster-placeholder.
 // Odtwarzaniem wideo steruje main.js; reel ma obok przycisk pauzy (rodzeństwo role=img, nie w środku).
-// Pod ramką podpis (nazwa - opis) - widoczny tylko na telefonie pionowo, gdzie panel tuli się do treści.
+// Pod ramką podpis (nazwa - opis) - widoczny tylko na telefonie pionowo.
 function promo(p, tp, t) {
   const figures = Object.entries(p.video).map(([fmt, v]) => {
     const ratio = `--ratio:${v.w} / ${v.h}; --ar:${(v.w / v.h).toFixed(4)}`;
