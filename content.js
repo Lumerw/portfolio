@@ -179,10 +179,10 @@ export const pl = {
     teraz: {
       meta: ['projekt produktu', 'UX/UI', 'identyfikacja', 'development z AI'], // [potwierdź]
       tagline: 'marketplace ekspertów dla branży kreatywnej', // krótki opis pod podglądem
-      lead: 'Platforma typu marketplace łącząca ekspertów ze słuchaczami, z sekcją społeczności.',
+      lead: 'Platforma typu marketplace łącząca słuchaczy z ekspertami, z sekcją społeczności.',
       // Plansza animowana (reel, 8 s). Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
       reel: {
-        label: 'teraz - rozmowy wideo 1:1 z ekspertami branży kreatywnej. Słuchacz przychodzi po przegląd portfolio, feedback do projektu albo plan na karierę, a odpowiada mu ekspert z 5+ lat praktyki. Wideo 30 albo 60 minut. Darmowe konto, płatność przez Escrow, 0% prowizji w becie. Porozmawiajmy tu i teraz.',
+        label: 'teraz - rozmowy wideo 1:1 słuchaczy z ekspertami branży kreatywnej. Słuchacz przychodzi po przegląd portfolio, feedback do projektu albo plan na karierę, a odpowiada mu ekspert z 5+ lat praktyki. Wideo 30 albo 60 minut. Darmowe konto, płatność przez Escrow, 0% prowizji w becie. Porozmawiajmy tu i teraz.',
         claimA: 'porozmawiajmy',
         claimKey: 'tu i teraz',          // z falką pod spodem
         listener: 'słuchacz',
@@ -309,25 +309,25 @@ export const en = {
     teraz: {
       meta: ['product design', 'UX/UI', 'identity', 'AI-assisted development'],
       tagline: 'marketplace of experts for the creative industry', // krótki opis pod podglądem
-      lead: 'A marketplace platform connecting experts with learners, with a community section.',
-      // Plansza animowana (reel, 8 s). „learner” - angielski termin teraz.eu (dosłownie: listener).
+      lead: 'A marketplace platform connecting listeners with experts, plus a community section.',
+      // Plansza animowana (reel, 8 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
-        label: 'teraz - 1:1 video calls with creative industry experts. A learner comes for a portfolio review, project feedback or a career plan, and an expert with 5+ years of practice answers. Calls last 30 or 60 minutes. Free account, escrow-protected payment, 0% commission during the beta. Let’s talk here and now.',
+        label: 'teraz - 1:1 video calls for listeners with creative industry experts. A listener comes for a portfolio review, project feedback or a career plan, and an expert with 5+ years of practice answers. Calls last 30 or 60 minutes. Free account, payment via Escrow, 0% commission during the beta. Let’s talk here and now.',
         claimA: 'let’s talk',            // apostrof jak u teraz („Let’s talk”)
         claimKey: 'here and now',
-        listener: 'learner',
-        listeners: 'learners',
+        listener: 'listener',
+        listeners: 'listeners',
         need1: 'portfolio review',
         need2: 'project feedback',
         need3: 'career plan',
         listenerShort: 'portfolio, career',
-        listenerSub: 'free account, escrow-protected payment',
+        listenerSub: 'free account, payment via Escrow',
         expert: 'expert',
         experts: 'experts',
         expertLine: 'a pro answers, 5+\u00a0years in the field', // \u00a0: „5+” zostaje przy „years”
         expertShort: '5+ yrs of practice',
         expertSub: '0% commission during the beta',
-        callTitle: 'a learner asks, an expert answers', // 1:1, jak w PL
+        callTitle: 'a listener asks, an expert answers', // 1:1, jak w PL
         call: '1:1 video, 30 or 60 minutes',
         callShort: '1:1 video, 30/60 min',
       },

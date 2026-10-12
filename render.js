@@ -427,5 +427,9 @@ export function renderMeta(content, lang) {
     `<meta property="og:image:alt" content="${esc(c.name)} - ${esc(m.description)}">`,
     `<meta property="og:locale" content="${lang === 'pl' ? 'pl_PL' : 'en_US'}">`,
     `<meta name="twitter:card" content="summary_large_image">`,
+    // Open Sans planszy teraz (700 hasło, 600 legenda): plakat w podglądzie desktopu widać od razu.
+    // Tylko desktop - na telefonie nie ma podglądu, fonty pobierają się przy otwarciu panelu.
+    ...(c.projects.some(p => p.reel) ? [700, 600].map(w =>
+      `<link rel="preload" href="assets/fonts/open-sans-${w}-sub.woff2" as="font" type="font/woff2" crossorigin media="(min-width: 1024px)">`) : []),
   ].filter(Boolean).join('\n  ');
 }

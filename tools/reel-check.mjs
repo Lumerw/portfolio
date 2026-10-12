@@ -35,7 +35,9 @@ const run = key => !ONLY || ONLY.includes(key);
 const TIMES = [0, 500, 1000, 1500, 2200, 3000, 3800, 4500, 5000, 5600, 6300, 7000, 7300, 7900];
 const FRAMES = [
   { id: 'home-1440x900', vw: 1440, vh: 900, kind: 'home', fmt: '4x5', size: [487, 609] },
-  { id: 'home-1024x768', vw: 1024, vh: 768, kind: 'home', fmt: '4x5', size: [439, 548] },
+  { id: 'home-1024x768', vw: 1024, vh: 768, kind: 'home', fmt: '4x5', size: [423, 529] },   // niski desktop (max-height 780px)
+  { id: 'home-1366x768', vw: 1366, vh: 768, kind: 'home', fmt: '4x5', size: [423, 529] },
+  { id: 'home-1280x800', vw: 1280, vh: 800, kind: 'home', fmt: '4x5', size: [455, 569] },  // niski desktop (max-height 840px)
   { id: 'sheet-768x1024', vw: 768, vh: 1024, kind: 'sheet', fmt: '4x5', size: [676, 845] },
   { id: 'sheet-1024x1366', vw: 1024, vh: 1366, kind: 'sheet', fmt: '4x5', size: [901, 1126] },
   { id: 'sheet-1440x900', vw: 1440, vh: 900, kind: 'sheet', fmt: '16x9', size: [1243, 699] },
