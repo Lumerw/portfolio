@@ -16,6 +16,7 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 | `npm run build` | wpisuje polską treść z `content.js` do `index.html` (strona działa bez JS, szybciej się ładuje). **Przed wdrożeniem.** |
 | `npm run images` | AVIF/WebP/JPG 640/1280/1920 z obrazów `.jpg`/`.png` wpisanych w `content.js`; portret od razu w duotonie |
 | `npm run pdf` | `portfolio-lumer-pl.pdf` i `-en.pdf` + QR; sprawdza 6 stron i rozmiar < 8 MB |
+| `npm run deck` | `portfolio-lumer-1080-pl.pdf` i `-en.pdf`: karuzela 1080 × 1080 na LinkedIn / Instagram (8 slajdów, klikalny spis i linki); sprawdza liczbę stron, kadr i linki |
 | `npm run og` | `assets/og.jpg` 1200×630 (obraz do linków w mailu / na LinkedInie) |
 | `npm run assets` | symbole, favicony i wektorowe placeholdery |
 | `npm run audit` | Lighthouse (telefon + desktop) i lista kontrolna z briefu (sekcja 10), w tym zero zewnętrznych żądań z otwartym `#loom` i `#teraz`. Testy akceptacyjne planszy teraz: `npm run check-reel` |
@@ -115,6 +116,25 @@ Bez `brand.json` synchronizowany jest tylko sygnet (z favicony SVG strony).
 
 Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokładnie tak, jak są.
 
+## PDF 1080 × 1080 (karuzela)
+
+`npm run deck` (`tools/build-deck.mjs` + `tools/deck.css`) składa 8 kwadratowych slajdów w stylu strony:
+
+1. start - hasło, akapit i spis projektów (klik przenosi do slajdu);
+2. dla każdego projektu dwa slajdy: **plansza marki** w ramce, jak podgląd na stronie, i **szczegóły** - lead, zrzut desktop + telefon, zakres i 4 fakty;
+3. kontakt - odwrócony blok jak stopka: mail, www, QR.
+
+Plansze są zbudowane z komunikacji wizualnej projektów:
+- **teraz** - aurora i logo z teraz.eu, hasło w Open Sans z falką;
+- **loom.studio** - oś czerń / papier, logo na osi i trzy figury Bauhausu, wszystko z brand kitu w repozytorium `loomstudio`;
+- **reh.ab** - głęboka czerwień, hasło Helvetica Bold i gradient „her” z CSS projektu.
+
+Font Haus (loom) jest na licencji, więc w PDF jest tylko logo w krzywych i zrzuty ekranu.
+
+- Teksty: `pl/en.deck` w `content.js` (fakty o projektach: `deck.projects.<id>.facts`).
+- Zrzuty: `shared.projects[].deck` → `assets/deck/` (desktop 1600 × 1000, telefon 480 × 1039, JPG).
+- Nowy zrzut: zrób go w 1440 × 900 (2x) i 390 × 844 (3x), bez banera cookies, i podmień plik.
+
 ## Asystent AI („zapytaj AI”)
 
 Przycisk z tęczową poświatą stoi w stopce obok „kontakt” i otwiera panel `#agent` z czatem (telefon: pełny panel; od 768 px wąska kolumna w prawym dolnym rogu). Teksty: `pl/en.agent` w `content.js`, silnik: `agent.js`, obsługa czatu: `main.js`.
@@ -161,7 +181,8 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 | `agent.js` | silnik asystenta AI: odpowiedzi lokalne, wiedza i instrukcja dla modelu, zapytanie do Workera |
 | `agent/` | Cloudflare Worker (pośrednik do Claude API) i jego konfiguracja |
 | `symbols.js` | geometria symboli — jedno źródło dla strony i plików SVG |
-| `tools/` | serwer, build, PDF, QR, OG, obrazy, assety, audyt, zrzuty |
+| `tools/` | serwer, build, PDF (A4 i 1080 × 1080), QR, OG, obrazy, assety, audyt, zrzuty |
+| `assets/deck/` | zrzuty stron projektów i assety marek do PDF 1080 × 1080 |
 
 ## Decyzje odbiegające od briefu
 

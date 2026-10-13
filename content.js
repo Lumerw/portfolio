@@ -108,6 +108,8 @@ export const shared = {
         a:       { src: 'assets/teraz/02.svg',      w: 1200, h: 1500 },
         b:       { src: 'assets/teraz/03.svg',      w: 1200, h: 1500 },
       },
+      // PDF 1080 × 1080 (npm run deck): zrzuty prawdziwej strony projektu, desktop 16:10 i telefon.
+      deck: { desktop: 'assets/deck/teraz-desktop.jpg', phone: 'assets/deck/teraz-phone.jpg' },
     },
     {
       id: 'loom',
@@ -128,6 +130,8 @@ export const shared = {
         a:       { src: 'assets/loom/02.svg',      w: 1200, h: 1500 },
         b:       { src: 'assets/loom/03.svg',      w: 1200, h: 1500 },
       },
+      // PDF 1080 × 1080 (npm run deck): zrzuty prawdziwej strony projektu, desktop 16:10 i telefon.
+      deck: { desktop: 'assets/deck/loom-desktop.jpg', phone: 'assets/deck/loom-phone.jpg' },
     },
     {
       id: 'rehab',
@@ -142,12 +146,14 @@ export const shared = {
         '4x5':  { src: '', poster: 'assets/rehab/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
         '9x16': { src: '', poster: 'assets/rehab/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
-      href: '[https://domena-reh.ab]',
+      href: 'https://lumerw.github.io/reh.ab/',
       images: {
         main:    { src: 'assets/rehab/01.svg',      w: 1600, h: 1000 },
         a:       { src: 'assets/rehab/02.svg',      w: 1200, h: 1500 },
         b:       { src: 'assets/rehab/03.svg',      w: 1200, h: 1500 },
       },
+      // PDF 1080 × 1080 (npm run deck): zrzuty prawdziwej strony projektu, desktop 16:10 i telefon.
+      deck: { desktop: 'assets/deck/rehab-desktop.jpg', phone: 'assets/deck/rehab-phone.jpg' },
     },
   ],
 };
@@ -314,6 +320,24 @@ export const pl = {
     rulesYes: ['dużo pustej przestrzeni', 'podziały wyłącznie liniami 1 px', 'jeden kolor: tusz albo papier', 'małe stopnie pisma, dwie grubości'],
     rulesNo: ['kolory akcentu w mojej marce', 'cienie, gradienty i zaokrąglenia', 'wersaliki i pogrubienia w zdaniu', 'ozdobne ikony i emoji'],
     rulesNote: 'Kolory i gradienty mają tylko marki projektów (np. teraz) - wewnątrz ich ramek. Jedyny wyjątek: tęczowa poświata asystenta AI.',
+  },
+  // PDF 1080 × 1080 (npm run deck): karuzela na LinkedIn / Instagram, linki klikalne.
+  deck: {
+    file: 'portfolio-lumer-1080-pl.pdf',
+    label: 'portfolio 2026',
+    back: 'spis',                    // link powrotu na każdym slajdzie
+    contactRow: 'kontakt',           // ostatni wiersz spisu
+    visit: 'zobacz projekt ↗',
+    soon: 'strona wkrótce online',
+    scope: 'Zakres',
+    facts: 'W skrócie',
+    contactTitle: 'Porozmawiajmy.',
+    site: 'portfolio online',
+    projects: {
+      teraz: { facts: ['rozmowy wideo 1:1, 30 albo 60 minut', 'eksperci z 5+ lat praktyki', 'darmowe konto, płatność przez Escrow', '0% prowizji w becie'] },
+      loom: { facts: ['subskrypcja: jedno zadanie naraz, średnio 48 godzin', 'płatności i panel klienta na Stripe', 'rezerwacje rozmów przez Calendly', 'asystent AI na stronie, wersje PL i EN'] },
+      rehab: { facts: ['wsparcie zdrowia psychicznego tam, gdzie są gracze', 'serwery z psychologiem lub psychiatrą, który gra', '12-tygodniowy pilotaż z 4 miarami sukcesu', 'WCAG 2.2 AA, każda liczba ze źródłem'] },
+    },
   },
   // Asystent AI: panel #agent. answers = tryb lokalny (bez shared.agent.endpoint).
   agent: {
@@ -516,6 +540,23 @@ export const en = {
     rulesYes: ['plenty of empty space', 'dividers only as 1 px lines', 'one colour: ink or paper', 'small type sizes, two weights'],
     rulesNo: ['accent colours in my brand', 'shadows, gradients and rounded corners', 'all caps and bold inside a sentence', 'decorative icons and emoji'],
     rulesNote: 'Colours and gradients belong only to project brands (e.g. teraz) - inside their frames. The one exception: the rainbow glow of the AI assistant.',
+  },
+  deck: {
+    file: 'portfolio-lumer-1080-en.pdf',
+    label: 'portfolio 2026',
+    back: 'contents',
+    contactRow: 'contact',
+    visit: 'view project ↗',
+    soon: 'site coming soon',
+    scope: 'Scope',
+    facts: 'In short',
+    contactTitle: 'Let’s talk.',
+    site: 'portfolio online',
+    projects: {
+      teraz: { facts: ['1:1 video calls, 30 or 60 minutes', 'experts with 5+ years of practice', 'free account, payment via Escrow', '0% commission in beta'] },
+      loom: { facts: ['subscription: one task at a time, 48 hours on average', 'Stripe payments and client portal', 'calls booked through Calendly', 'AI assistant on the site, PL and EN versions'] },
+      rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist or psychiatrist who plays', 'a 12-week pilot with 4 success measures', 'WCAG 2.2 AA, every number sourced'] },
+    },
   },
   agent: {
     button: 'ask AI',

@@ -9,7 +9,7 @@ import { symbol } from './symbols.js';
 // Plansza animowana teraz (reel): jedna pętla. Trafia do --t-reel oraz do data-dwell / --t-auto wiersza indeksu.
 export const REEL_MS = 8000;
 // Ścieżki wpisane w HTML (bez dodatkowych plików): glify „?” i „!” z teraz, ikony ról, falka, pauza / start.
-const RP = {
+export const RP = {
   q: 'M66.3 152.1C49.2 105.6 94.5 85.2 94.5 47.7C94.5 36.6 89.7 18.9 68.4 14.4L41.1 55.8L0 34.5C17.7 11.1 43.5 0 83.1 0C126.3 0 158.7 15.9 158.7 49.2C158.7 100.8 80.7 106.2 80.7 152.1H66.3ZM75.3 233.4C59.1 233.4 45.3 219.3 45.3 203.1C45.3 186.9 59.1 173.1 75.3 173.1C91.5 173.1 105.6 186.9 105.6 203.1C105.6 219.3 91.5 233.4 75.3 233.4Z',
   x: 'M71.4 0 42.9 149.1H28.5L0 0H71.4ZM36 230.4C19.8 230.4 6 216.3 6 200.1C6 183.9 19.8 170.1 36 170.1C52.2 170.1 66.3 183.9 66.3 200.1C66.3 216.3 52.2 230.4 36 230.4Z',
   headphones: 'M2.5 12A9.5 9.5 0 0 1 21.5 12V20A1.5 1.5 0 0 1 20 21.5H17A1.5 1.5 0 0 1 15.5 20V14.5A1.5 1.5 0 0 1 17 13H18.5V12A6.5 6.5 0 0 0 5.5 12V13H7A1.5 1.5 0 0 1 8.5 14.5V20A1.5 1.5 0 0 1 7 21.5H4A1.5 1.5 0 0 1 2.5 20Z',
