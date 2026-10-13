@@ -18,7 +18,8 @@
     "check-reel": "node tools/reel-check.mjs",
     "check-agent": "node tools/agent-check.mjs",
     "deck": "node tools/build-deck.mjs",
-    "covers": "node tools/build-covers.mjs"
+    "covers": "node tools/build-covers.mjs",
+    "cv": "node tools/build-cv.mjs"
   },
   "devDependencies": {
     "lighthouse": "^13.5.0",

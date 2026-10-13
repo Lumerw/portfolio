@@ -196,7 +196,7 @@ function hero(c, t) {
         <span class="hero__icons" aria-hidden="true">${icons}
         </span>
       </a>
-      <p class="hero__name"><span ${reveal(0)}>${esc(c.name)} <span class="hero__role">- ${esc(t.hero.role)}</span></span></p>
+      <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}</span></p>
       <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
       <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
       <p class="hero__year t-meta print-only">${esc(c.year)}</p>
@@ -335,6 +335,7 @@ function project(p, i, c, t) {
 }
 
 // O mnie (brief 5.3) — w panelu.
+// Panel „o mnie” - na razie wyłączony (na stronie i w PDF); dane about zasilają asystenta i CV (npm run cv).
 function about(c, t) {
   const a = t.about;
   const rows = a.experience.filter(e => clean(e.place)).map(e => `
@@ -511,7 +512,7 @@ export function render(content, lang) {
   return `${header(c, t)}
 <main id="tresc">${hero(c, t)}
 </main>${footer(c, t)}
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${about(c, t)}${brandbook(c, t)}${agent(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}
 </div>
 `;
 }

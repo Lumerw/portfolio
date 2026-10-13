@@ -397,7 +397,6 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 
 /* Imię jako podpis nad hasłem */
 .hero__name { font-weight: var(--fw-medium); margin-bottom: var(--s-1); }
-.hero__role { font-weight: var(--fw-regular); color: var(--ink-2); }
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
 
 .index { margin-top: var(--s-6); }
@@ -1138,9 +1137,6 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
   transition: transform var(--t-sheet) var(--ease);
 }
 .sheet:target .sheet__panel { transform: none; }
-
-/* Panel „o mnie” na razie tylko w PDF (strona 2) - na ekranie wiersz „o mnie” prowadzi na LinkedIn */
-@media screen { .sheet--about { display: none; } }
 
 /* Strona pod spodem się nie przewija */
 html:has(.sheet:target) { overflow: hidden; }

@@ -5,3 +5,6 @@ screenshots/
 # Notatki wewnętrzne — nie publikujemy
 BRIEF.md
 .claude/
+
+# CV do wysyłania (npm run cv) - prywatne, nie publikujemy
+private/

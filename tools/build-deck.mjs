@@ -43,7 +43,7 @@ function deck(lang) {
     <section class="slide slide--start" id="s-start">
       ${top(1, symbol('personal', { cls: 'top__mark' }), `<span class="t-meta">${esc(D.label)}</span>`)}
       <div class="start">
-        <p class="start__name"><span>${esc(c.name)}</span> - ${esc(t.hero.role)}</p>
+        <p class="start__name"><span>${esc(c.name)}</span></p>
         <h1 class="start__title">${esc(t.hero.title)}</h1>
         <p class="start__line">${esc(t.hero.line)}</p>
         <nav class="index">${projects.map((p, i) => `

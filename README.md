@@ -15,8 +15,9 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 | `npm run dev` | serwer podglądu; zmiany w `content.js` widać po odświeżeniu |
 | `npm run build` | wpisuje polską treść z `content.js` do `index.html` (strona działa bez JS, szybciej się ładuje). **Przed wdrożeniem.** |
 | `npm run images` | AVIF/WebP/JPG 640/1280/1920 z obrazów `.jpg`/`.png` wpisanych w `content.js`; portret od razu w duotonie |
-| `npm run pdf` | `portfolio-lumer-pl.pdf` i `-en.pdf` + QR; sprawdza 6 stron i rozmiar < 8 MB |
+| `npm run pdf` | `portfolio-lumer-pl.pdf` i `-en.pdf` + QR; sprawdza 5 stron i rozmiar < 8 MB |
 | `npm run covers` | plansze marek na stronę (`cover-4x5/16x9/9x16.webp` dla projektów z polem `cover`) i obrazy case study do PDF A4 (`01-03.jpg` ze zrzutów i planszy); potem `npm run images` |
+| `npm run cv` | CV na jedną stronę 1080 × 1080 (PL i EN) do wysyłania → `private/` (poza repozytorium); projekty, doświadczenie, kompetencje, narzędzia, kontakt z Calendly i QR |
 | `npm run deck` | `portfolio-lumer-1080-pl.pdf` i `-en.pdf`: karuzela 1080 × 1080 na LinkedIn / Instagram (8 slajdów, klikalny spis i linki); sprawdza liczbę stron, kadr i linki |
 | `npm run og` | `assets/og.jpg` 1200×630 (obraz do linków w mailu / na LinkedInie) |
 | `npm run assets` | symbole, favicony i wektorowe placeholdery |
@@ -43,9 +44,10 @@ Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = mi
 
 | Pole | Gdzie się pokazuje |
 |---|---|
-| `shared.name` + `pl/en.hero.role` | podpis nad hasłem („Wojciech Lumer — projektant”) |
+| `shared.name` | imię nad hasłem (bez roli) |
+| `pl/en.hero.role` | rola - tylko w CV, danych dla Google i asystencie (na stronie nad hasłem jest samo imię) |
 | `pl/en.hero.title`, `.line` | hasło (h1: „Design is how it works.” / „Design to to, jak coś działa.”) i akapit pod nim; też okładka PDF i `og.jpg` |
-| `shared.calendly` | przycisk „kontakt” — **wpisz swój link Calendly**; do tego czasu przycisk otwiera maila |
+| `shared.calendly` | przycisk „kontakt” → kalendarz Calendly (30 min); też w CV, PDF 1080 i u asystenta |
 | `shared.email`, `shared.links` | stopka (profile: Instagram, LinkedIn, Facebook, GitHub, Behance), przycisk „kontakt”, dane dla Google, asystent, PDF; LinkedIn = wiersz „o mnie” w indeksie |
 | `shared.siteUrl` | QR w PDF, adresy Open Graph, `canonical`, dane strukturalne, `sitemap.xml` i `robots.txt` — **zmień po podpięciu domeny** |
 | `shared.icons` | trzy miejsca obok znaku i sześć w brandbooku: każde zmienia się we własnym, losowym rytmie 0,5-1,1 s (`ICON_MS` w `main.js`) i nigdy nie pokazuje tej samej ikony co sąsiad |
@@ -58,7 +60,7 @@ Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = mi
 | `projects[].reel` | `true` = plansza animowana zamiast postera, w panelu i w podglądzie na stronie głównej (teraz). Teksty w `pl/en.projects.<id>.reel` (te same klucze w obu językach; limity znaków i brak długich myślników sprawdza `npm run build`), etykieta pauzy w `ui.reelPause` |
 | `projects[].images` | `main` 16:10, `a`, `b` 4:5 — tylko w PDF |
 | `pl/en.projects.*` | zakres prac, opis, problem / rozwiązanie / efekt (PDF; limit 120 słów sprawdza build) |
-| `pl/en.about` | strona 2 PDF (panel „o mnie” jest na razie wyłączony na stronie - wiersz „o mnie” prowadzi na LinkedIn) |
+| `pl/en.about` | doświadczenie i narzędzia - CV i asystent (panel „o mnie” jest na razie wyłączony na stronie i w PDF - wiersz „o mnie” prowadzi na LinkedIn) |
 
 ### Obrazy
 
@@ -179,7 +181,7 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 | `content.js` | cała treść: `shared`, `pl`, `en` |
 | `render.js` | szablony HTML — wspólne dla przeglądarki i buildu |
 | `styles.css` | tokeny na górze, potem reset, siatka, typografia, komponenty, ruch |
-| `print.css` | PDF: A4 poziomo, 6 stron |
+| `print.css` | PDF: A4 poziomo, 5 stron |
 | `main.js` | PL/EN, indeks ↔ podgląd, panele, ikony, wideo, kopiowanie maila, czat asystenta, wstawianie grafik interaktywnych |
 | `live.js` | grafiki interaktywne loom.studio i reh.ab (znaczniki + gradient WebGL i fizyka figur) |
 | `agent.js` | silnik asystenta AI: odpowiedzi lokalne, wiedza i instrukcja dla modelu, zapytanie do Workera |
@@ -196,7 +198,8 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 - **Animowane linie symboli** mają klasę `.stroke`, a CSS nie wybiera ich przez `[pathLength]` — Chrome nie przeliczał stylu po takim selektorze i animacja nie ruszała.
 - **Portret w duotonie** robi `npm run images` (sharp), nie filtr CSS — wygląda tak samo na stronie i w PDF.
 - **Grafiki interaktywne loom.studio i reh.ab zamiast wideo** (decyzja właściciela, 13.10.2026). Przeniesione z kodu projektów: shader `flow-gl.ts` i fizyka `hero-physics.ts` z loom.studio, hero reh.ab z `css/style.css` i `js/main.js` (pisanie, taśma i cytaty w czystym CSS). Bez logo i napisów w loom. Żeby strona startowała lekko (DOM ≤ 800, Lighthouse), grafika jest wstawiana dopiero w aktywnym podglądzie / otwartym panelu nad statyczną planszą (`cover`), która jest jej pierwszą klatką - bez JS i przy ograniczonym ruchu zostaje plansza. W panelu przycisk pauzy (WCAG 2.2.2). Tekst reh.ab po angielsku w obu wersjach (to tekst marki), długie myślniki zamienione na „-”.
-- **„O mnie” → LinkedIn** (decyzja właściciela, 13.10.2026): panel „o mnie” wyłączony na ekranie (`.sheet--about` tylko w druku), w indeksie wiersz z ikoną LinkedIn.
+- **„O mnie” → LinkedIn** (decyzja właściciela, 13.10.2026): panel „o mnie” wyłączony na stronie i w PDF A4 (5 stron: okładka, 3 projekty, kontakt; szablon `about()` zostaje w `render.js`), w indeksie wiersz z ikoną LinkedIn. Nad hasłem samo imię, bez roli.
+- **CV poza repozytorium:** `npm run cv` zapisuje do `private/` (w `.gitignore`) - CV jest do wysyłania, nie do publikacji.
 - **Tęczowa poświata asystenta AI** (decyzja właściciela, 13.10.2026) - jedyny kolor marki osobistej, zapisany jako wyjątek w brandbooku. Gradient obraca się przez `transform` (bez przemalowywania), przy ograniczonym ruchu stoi. Przycisk w stopce obok „kontakt”, nie pływający w rogu: strona główna to jeden ekran, a pływający przycisk zasłaniałby podgląd na desktopie i panele na telefonie.
 - **Marka czarno-biała:** bez koloru akcentu (zamiast czerwonej/niebieskiej kropki z briefu). Kropka w znaku osobistym ma kolor tuszu; aktywny wiersz indeksu oznacza tylko podkreślenie. Kolory mają wyłącznie marki projektów (np. teraz).
 - **PDF:** strona drukowana ma margines 0, a 14 mm to wewnętrzny odstęp (inaczej Chrome zostawia białe marginesy zamiast papieru). Kolejność stron ustawia `order` w `print.css`.

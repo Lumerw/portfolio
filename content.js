@@ -14,7 +14,7 @@ export const shared = {
   siteUrl: 'https://lumerw.github.io/portfolio', // adres strony - QR w PDF, Open Graph; zmień po podpięciu domeny
   email: 'wojciechlumer@gmail.com',
   // Przycisk „kontakt” - link do kalendarza spotkań. [Wpisz swój link Calendly]
-  calendly: '[https://calendly.com/…]',  // dopóki to placeholder, przycisk „kontakt” otwiera maila
+  calendly: 'https://calendly.com/wojciechlumer/30min',  // przycisk „kontakt” (placeholder = mail)
   // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
     { label: 'Instagram', href: 'https://www.instagram.com/wojciechlumer/' },
@@ -295,8 +295,8 @@ export const pl = {
     portraitAlt: 'Wojciech Lumer - portret', // [potwierdź po dodaniu zdjęcia]
     bio: '[Bio: 3-4 zdania. Kim jesteś, czym się zajmujesz, co cię wyróżnia, czego szukasz.]',
     experience: [
-      { year: '2026', place: 'loom.studio', role: 'założyciel, projektant' },
-      { year: '[rok]', place: '[miejsce]', role: '[rola]' },
+      { year: '2025.05 - teraz', place: 'Promotrafic', role: 'AI designer' },
+      { year: '2023.11 - teraz', place: 'loom.studio', role: 'założyciel, projektant' },
     ],
     education: '[Uniwersytet SWPS - kierunek, lata]',
     languages: '[polski - ojczysty · angielski - poziom]',
@@ -340,6 +340,18 @@ export const pl = {
     rulesYes: ['dużo pustej przestrzeni', 'podziały wyłącznie liniami 1 px', 'jeden kolor: tusz albo papier', 'małe stopnie pisma, dwie grubości'],
     rulesNo: ['kolory akcentu w mojej marce', 'cienie, gradienty i zaokrąglenia', 'wersaliki i pogrubienia w zdaniu', 'ozdobne ikony i emoji'],
     rulesNote: 'Kolory i gradienty mają tylko marki projektów (np. teraz) - wewnątrz ich ramek. Jedyny wyjątek: tęczowa poświata asystenta AI.',
+  },
+  // CV 1080 × 1080 do wysyłania (npm run cv → private/, poza repozytorium). Linki klikalne.
+  cv: {
+    file: 'cv-wojciech-lumer-pl.pdf',
+    projects: 'Projekty',
+    experience: 'Doświadczenie',
+    skills: 'Kompetencje',
+    tools: 'Narzędzia',
+    view: 'zobacz ↗',
+    call: 'umów rozmowę ↗',
+    portfolio: 'portfolio',
+    skillsList: ['identyfikacja wizualna', 'UX/UI i projekt stron', 'front-end: HTML, CSS, JS, Next.js', 'projektowanie i development z AI', 'dostępność WCAG 2.2'],
   },
   // PDF 1080 × 1080 (npm run deck): karuzela na LinkedIn / Instagram, linki klikalne.
   deck: {
@@ -515,8 +527,8 @@ export const en = {
     portraitAlt: 'Wojciech Lumer - portrait',
     bio: '[Bio: 3-4 sentences.]',
     experience: [
-      { year: '2026', place: 'loom.studio', role: 'founder, designer' },
-      { year: '[year]', place: '[place]', role: '[role]' },
+      { year: '2025.05 - now', place: 'Promotrafic', role: 'AI designer' },
+      { year: '2023.11 - now', place: 'loom.studio', role: 'founder, designer' },
     ],
     education: '[SWPS University - field, years]',
     languages: '[Polish - native · English - level]',
@@ -560,6 +572,17 @@ export const en = {
     rulesYes: ['plenty of empty space', 'dividers only as 1 px lines', 'one colour: ink or paper', 'small type sizes, two weights'],
     rulesNo: ['accent colours in my brand', 'shadows, gradients and rounded corners', 'all caps and bold inside a sentence', 'decorative icons and emoji'],
     rulesNote: 'Colours and gradients belong only to project brands (e.g. teraz) - inside their frames. The one exception: the rainbow glow of the AI assistant.',
+  },
+  cv: {
+    file: 'cv-wojciech-lumer-en.pdf',
+    projects: 'Projects',
+    experience: 'Experience',
+    skills: 'Skills',
+    tools: 'Tools',
+    view: 'view ↗',
+    call: 'book a call ↗',
+    portfolio: 'portfolio',
+    skillsList: ['visual identity', 'UX/UI and web design', 'front-end: HTML, CSS, JS, Next.js', 'AI-assisted design and development', 'accessibility, WCAG 2.2'],
   },
   deck: {
     file: 'portfolio-lumer-1080-en.pdf',

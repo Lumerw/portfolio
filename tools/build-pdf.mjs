@@ -1,6 +1,6 @@
 // PDF z tej samej strony przez print.css (Playwright / Chromium).
 //   npm run pdf  →  portfolio-<slug>-pl.pdf, portfolio-<slug>-en.pdf
-// Po wygenerowaniu sprawdza: 6 stron, linki, rozmiar < 8 MB.
+// Po wygenerowaniu sprawdza: 5 stron, linki, rozmiar < 8 MB.
 
 import { chromium } from 'playwright';
 import { readFile, stat } from 'node:fs/promises';
@@ -12,7 +12,7 @@ import { content } from '../content.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 8093;
-const EXPECTED_PAGES = 6;
+const EXPECTED_PAGES = 5;   // okładka, 3 projekty, kontakt („o mnie” na razie wyłączone)
 const MAX_BYTES = 8 * 1024 * 1024;
 
 await buildQr();
