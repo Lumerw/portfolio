@@ -217,37 +217,37 @@ app.addEventListener('click', e => {
   }
 });
 
-/* Ikony obok znaku: szybka zmiana, każda pozycja przejmuje ikonę z lewej. */
-const ICON_MS = 450;
-let iconStep = 0;
-function tickIcons() {
-  const slots = app.querySelectorAll('.hero__slot');
-  const n = content.shared.icons.length;
-  if (!slots.length || n < 2) return;
-  iconStep = (iconStep + 1) % n;
-  slots.forEach((slot, i) => {
-    const on = (iconStep - i + n) % n;
-    [...slot.children].forEach((img, k) => img.classList.toggle('is-on', k === on));
-  });
-}
-if (!reduceMotion.matches) setInterval(tickIcons, ICON_MS);
-
-/* Brandbook: te same ikony co w hero, ale każde miejsce zmienia się we własnym, losowym rytmie
-   (BB_ICON_MS, trochę wolniej niż w hero) i nigdy nie pokazuje tej samej ikony co sąsiad.
-   Jedno <img> na miejsce (zmiana src) - pliki są już w pamięci po hero. Tylko przy otwartym panelu. */
-const BB_ICON_MS = [500, 1100];
-function tickBrandbookIcon(k) {
-  const imgs = [...app.querySelectorAll('[data-bb-icon]')];
-  const icons = content.shared.icons;
-  if (imgs[k] && openSheet()?.id === 'brandbook') {
-    const shown = new Set([k - 1, k, k + 1].map(i => imgs[i]?.getAttribute('src')));
-    const free = icons.filter(src => !shown.has(src));
-    const src = free[Math.floor(Math.random() * free.length)];
-    if (src) { imgs[k].src = src; imgs[k].classList.toggle('mono', src.endsWith('.svg')); }
+/* Ikony (hero i brandbook): każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
+   i nigdy nie pokazuje tej samej ikony co sąsiad - bez mechanicznego przesuwania całego rzędu.
+   Hero: w miejscu leżą wszystkie ikony, widoczna ma .is-on. Brandbook: jedno <img> na miejsce,
+   zmienia się src (pliki są już w pamięci po hero). Każdy zestaw rusza tylko, gdy go widać. */
+const ICON_MS = [500, 1100];
+const ICON_SETS = [
+  {
+    sel: '.hero__slot',
+    live: () => !openSheet(),
+    get: slot => slot.querySelector('.is-on')?.getAttribute('src'),
+    set: (slot, src) => { for (const img of slot.children) img.classList.toggle('is-on', img.getAttribute('src') === src); },
+  },
+  {
+    sel: '[data-bb-icon]',
+    live: () => openSheet()?.id === 'brandbook',
+    get: img => img.getAttribute('src'),
+    set: (img, src) => { img.src = src; img.classList.toggle('mono', src.endsWith('.svg')); },
+  },
+];
+function tickIcon(set, k) {
+  const slots = [...app.querySelectorAll(set.sel)];
+  if (slots[k] && set.live()) {
+    const shown = new Set([k - 1, k, k + 1].map(i => slots[i] && set.get(slots[i])));
+    const free = content.shared.icons.filter(src => !shown.has(src));
+    if (free.length) set.set(slots[k], free[Math.floor(Math.random() * free.length)]);
   }
-  setTimeout(() => tickBrandbookIcon(k), BB_ICON_MS[0] + Math.random() * (BB_ICON_MS[1] - BB_ICON_MS[0]));
+  setTimeout(() => tickIcon(set, k), ICON_MS[0] + Math.random() * (ICON_MS[1] - ICON_MS[0]));
 }
-if (!reduceMotion.matches && content.shared.icons.length > 3) content.shared.icons.slice(0, 6).forEach((_, k) => tickBrandbookIcon(k));
+if (!reduceMotion.matches && content.shared.icons.length > 3) {
+  for (const set of ICON_SETS) app.querySelectorAll(set.sel).forEach((_, k) => tickIcon(set, k));
+}
 
 app.addEventListener('click', e => {
   const link = e.target.closest('a[href^="#"]');
