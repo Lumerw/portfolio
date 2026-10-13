@@ -1,0 +1,20 @@
+# Cloudflare Worker asystenta AI. Wdrożenie (z folderu projektu):
+#   npx wrangler login
+#   npx wrangler secret put ANTHROPIC_API_KEY -c agent/wrangler.toml
+#   npx wrangler deploy -c agent/wrangler.toml
+# Adres z wyniku (https://portfolio-agent.<konto>.workers.dev) wpisz w content.js → shared.agent.endpoint.
+name = "portfolio-agent"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Strony, które mogą pytać (po przecinku). localhost działa zawsze - do testów.
+ALLOWED_ORIGINS = "https://lumerw.github.io"
+# Model Claude. Taniej: claude-haiku-5-5 albo claude-sonnet-5-5.
+MODEL = "claude-opus-5-5"
+
+# Najwyżej 10 pytań na minutę z jednego adresu IP.
+[[ratelimits]]
+name = "LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

@@ -1,6 +1,7 @@
 # Automatyczne testy przy każdym pushu i pull requeście.
 # 1) index.html, sitemap.xml i robots.txt muszą być zbudowane z aktualnego content.js (npm run build).
-# 2) Testy planszy i strony w Chromium (tools/reel-check.mjs): kadry, języki, tryb ciemny, bez JS, ruch.
+# 2) Testy asystenta AI: tryb lokalny i Worker z podstawionym Claude API (tools/agent-check.mjs).
+# 3) Testy planszy i strony w Chromium (tools/reel-check.mjs): kadry, języki, tryb ciemny, bez JS, ruch.
 # Runner macOS - ma Helveticę, więc układ wygląda jak na Twoim Macu.
 name: Testy
 
@@ -38,6 +39,9 @@ jobs:
             echo "::error::index.html nie zgadza się z content.js - uruchom lokalnie: npm run build i zapisz zmiany"
             exit 1
           }
+
+      - name: Testy asystenta AI (bez sieci)
+        run: node tools/agent-check.mjs
 
       - name: Chromium dla Playwright
         run: npx playwright install chromium

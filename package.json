@@ -15,7 +15,8 @@
     "og": "node tools/build-og.mjs",
     "sync-brands": "node tools/sync-brands.mjs",
     "audit": "node tools/audit.mjs",
-    "check-reel": "node tools/reel-check.mjs"
+    "check-reel": "node tools/reel-check.mjs",
+    "check-agent": "node tools/agent-check.mjs"
   },
   "devDependencies": {
     "lighthouse": "^13.5.0",

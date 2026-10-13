@@ -20,6 +20,7 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 | `npm run assets` | symbole, favicony i wektorowe placeholdery |
 | `npm run audit` | Lighthouse (telefon + desktop) i lista kontrolna z briefu (sekcja 10), w tym zero zewnętrznych żądań z otwartym `#loom` i `#teraz`. Testy akceptacyjne planszy teraz: `npm run check-reel` |
 | `npm run check-reel` | testy akceptacyjne planszy animowanej teraz (ok. 2 min, port 8601): klatki PL/EN w 13 kadrach, szew i matematyka pętli, formaty paneli, bramka, auto-przewijanie 8 s, PL/EN, przełącznik pauzy, ograniczony ruch, błyski, budżet DOM, sieć, bez JS, tryb ciemny; zrzuty błędów w `/private/tmp/claude-501/reel-qa/check/`. Wybrane grupy: `-- --only=visual,gate --lang=pl` |
+| `npm run check-agent` | testy asystenta AI bez sieci: tryb lokalny (PL/EN) i Worker z podstawionym Claude API |
 | `npm run shots -- index.html` | zrzuty 375 / 768 / 1440 px do `screenshots/` |
 
 `specimen.html` to strona robocza z tokenami, siatką i symbolami (klawisz G = siatka). Nie jest częścią portfolio (`noindex`).
@@ -31,7 +32,7 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 - **Panele wysuwane od dołu:** kliknięcie projektu otwiera `#teraz` / `#loom` / `#rehab` z wideo w pętli (albo planszą animowaną); „o mnie” otwiera `#o-mnie`. Ramka ma zawsze pełny kadr, bez przycinania: 16:9 na desktopie i każdym ekranie poziomym, 4:5 na tablecie pionowo, 9:16 na telefonie pionowo. Na telefonie pionowo panel ma pełną wysokość ekranu (z paskami Safari), a kadr 9:16 wypełnia ją bez przewijania, z jednowierszowym podpisem pod spodem; na niskim ekranie poziomym (≤ 500 px wysokości) pasek panelu jest cieńszy, a odstęp od góry mniejszy. Działają przez CSS `:target`, więc także bez JS, a każdy projekt ma własny link (np. `…/#loom`). Przycisk „wstecz” zamyka panel. `main.js` dokłada focus w panelu, Esc, nieaktywne tło (`inert`), powrót focusu i sterowanie wideo.
 - **Auto-przewijanie (desktop):** kreska pod aktywnym projektem wypełnia się przez 3 s (`--t-auto` w `styles.css`, `AUTO_MS` w `main.js`), potem podgląd przechodzi do następnego projektu. Projekt z planszą animowaną (`reel`) trwa jedną pełną pętlę - 8 s (`REEL_MS` w `render.js` → `data-dwell` wiersza), a kreska jest zsynchronizowana z pętlą także po wznowieniu (zjechanie kursorem, powrót karty). Pauza po najechaniu kursorem na listę lub podgląd, przy otwartym panelu i przy ograniczonym ruchu w systemie. W czasie pauzy (i bez auto-przewijania, np. na ekranie dotykowym) plansza w podglądzie kończy bieżącą pętlę i staje na plakacie (`.is-held`, WCAG 2.2.2); rusza znów przy zmianie projektu albo wznowieniu.
 - **Plansza animowana teraz („Dwie role, jedna rozmowa”):** 8 s w pętli, sam CSS (sekcja „Reel” w `styles.css`, szablon `reel()` w `render.js`). Plakat (znak + „porozmawiajmy tu i teraz” z falką) → słuchacz (róż, „?”, trzy potrzeby) → ekspert (błękit, „!”) → rozmowa wideo 1:1 → plakat; ostatnia klatka = pierwsza. Gra tylko aktywny podgląd albo otwarty panel; w panelu jest przycisk pauzy. Na telefonie (ramka 16:9 węższa niż 480 px) wersja kompaktowa: jeden blok roli naraz, bez logo w nagłówku. Przy ograniczonym ruchu - stała klatka (oba kafelki, tytuł rozmowy, hasło). Kolory i logo z `projects[].brand` / `.logo`, więc synchronizacja marki działa także tu; w trybie ciemnym plansza wygląda tak samo.
-- **Brandbook:** klik w znak z ikonami otwiera panel `#brandbook` z zasadami marki osobistej: znak (jasny / ciemny, rozmiary), kolory z kontrastem, typografia, symbole i ikony, siatka, ruch, zasady tak / nie. Wartości kolorów w `shared.brandbook.colors`, teksty w `pl/en.brandbook`, szablon `brandbook()` w `render.js`. Nie trafia do PDF.
+- **Brandbook:** klik w znak z ikonami otwiera panel `#brandbook` z zasadami marki osobistej: znak (jasny / ciemny, rozmiary), kolory z kontrastem, typografia, symbole i ikony, siatka, ruch, zasady tak / nie. Ikony zmieniają się jak w hero, ale każde miejsce we własnym, losowym rytmie (0,5-1,1 s, `BB_ICON_MS` w `main.js`) i nigdy nie pokazuje tej samej ikony co sąsiad; tylko przy otwartym panelu. Wartości kolorów w `shared.brandbook.colors`, teksty w `pl/en.brandbook`, szablon `brandbook()` w `render.js`. Nie trafia do PDF.
 - **PDF** ma pełne case study (tekst + obrazy) — na stronie te treści są ukryte (`.print-only`).
 
 ## Jak podmienić treść
@@ -114,6 +115,27 @@ Bez `brand.json` synchronizowany jest tylko sygnet (z favicony SVG strony).
 
 Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokładnie tak, jak są.
 
+## Asystent AI („zapytaj AI”)
+
+Przycisk z tęczową poświatą stoi w stopce obok „kontakt” i otwiera panel `#agent` z czatem (telefon: pełny panel; od 768 px wąska kolumna w prawym dolnym rogu). Teksty: `pl/en.agent` w `content.js`, silnik: `agent.js`, obsługa czatu: `main.js`.
+
+- **Tryb lokalny (teraz):** dopóki `shared.agent.endpoint` jest placeholderem, asystent odpowiada gotowymi zdaniami z `content.js` (projekty, kontakt, narzędzia, doświadczenie, marka, PDF). Pytania nie opuszczają strony.
+- **Tryb AI:** odpowiada Claude, wyłącznie na podstawie treści portfolio (`knowledge()` w `agent.js` - wszystko z `content.js` bez [placeholderów]). Klucz API nie może być w przeglądarce, dlatego pośredniczy darmowy Cloudflare Worker (`agent/worker.js`): sprawdza adres strony (CORS), limituje 10 pytań na minutę z IP i przycina rozmowę. Gdy AI nie odpowiada, czat wraca do trybu lokalnego.
+
+Włączenie trybu AI (raz, ok. 10 min):
+
+1. Klucz API: [console.anthropic.com](https://console.anthropic.com) → API Keys. Ustaw tam też miesięczny limit wydatków.
+2. Konto Cloudflare (darmowe), potem w folderze projektu:
+   ```bash
+   npx wrangler login
+   npx wrangler secret put ANTHROPIC_API_KEY -c agent/wrangler.toml
+   npx wrangler deploy -c agent/wrangler.toml
+   ```
+3. Adres z wyniku (`https://portfolio-agent.<konto>.workers.dev`) wpisz w `shared.agent.endpoint`, potem `npm run build` i wypchnij zmiany.
+4. Po każdej zmianie `content.js` wdroż Workera ponownie (`npx wrangler deploy -c agent/wrangler.toml`) - wiedza jest w nim wbudowana.
+
+Model ustawia `MODEL` w `agent/wrangler.toml` (domyślnie `claude-opus-5-5`; taniej: `claude-sonnet-5-5`, `claude-haiku-5-5`). Własna domena: dopisz ją w `ALLOWED_ORIGINS`.
+
 ## Wyszukiwarki
 
 `npm run build` dopisuje do `<head>` dane strukturalne schema.org `Person` (imię, rola, opis, mail, adres strony, `sameAs` tylko z prawdziwych linków profili) i tworzy `sitemap.xml` + `robots.txt` z `shared.siteUrl`. Na adresie `lumerw.github.io/portfolio` roboty czytają `robots.txt` tylko z głównej domeny, więc mapę strony zgłoś ręcznie w Google Search Console; po podpięciu własnej domeny zadziała sama.
@@ -135,7 +157,9 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 | `render.js` | szablony HTML — wspólne dla przeglądarki i buildu |
 | `styles.css` | tokeny na górze, potem reset, siatka, typografia, komponenty, ruch |
 | `print.css` | PDF: A4 poziomo, 6 stron |
-| `main.js` | PL/EN, indeks ↔ podgląd, panele, ikony, wideo, kopiowanie maila |
+| `main.js` | PL/EN, indeks ↔ podgląd, panele, ikony, wideo, kopiowanie maila, czat asystenta |
+| `agent.js` | silnik asystenta AI: odpowiedzi lokalne, wiedza i instrukcja dla modelu, zapytanie do Workera |
+| `agent/` | Cloudflare Worker (pośrednik do Claude API) i jego konfiguracja |
 | `symbols.js` | geometria symboli — jedno źródło dla strony i plików SVG |
 | `tools/` | serwer, build, PDF, QR, OG, obrazy, assety, audyt, zrzuty |
 
@@ -146,6 +170,7 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 - **Symbole bez `vector-effect: non-scaling-stroke`.** W Chrome ta właściwość psuje `pathLength` (symbol > 48 px rysował się w części). Grubość 1 px trzyma `stroke-width` liczony z `--size`.
 - **Animowane linie symboli** mają klasę `.stroke`, a CSS nie wybiera ich przez `[pathLength]` — Chrome nie przeliczał stylu po takim selektorze i animacja nie ruszała.
 - **Portret w duotonie** robi `npm run images` (sharp), nie filtr CSS — wygląda tak samo na stronie i w PDF.
+- **Tęczowa poświata asystenta AI** (decyzja właściciela, 13.10.2026) - jedyny kolor marki osobistej, zapisany jako wyjątek w brandbooku. Gradient obraca się przez `transform` (bez przemalowywania), przy ograniczonym ruchu stoi. Przycisk w stopce obok „kontakt”, nie pływający w rogu: strona główna to jeden ekran, a pływający przycisk zasłaniałby podgląd na desktopie i panele na telefonie.
 - **Marka czarno-biała:** bez koloru akcentu (zamiast czerwonej/niebieskiej kropki z briefu). Kropka w znaku osobistym ma kolor tuszu; aktywny wiersz indeksu oznacza tylko podkreślenie. Kolory mają wyłącznie marki projektów (np. teraz).
 - **PDF:** strona drukowana ma margines 0, a 14 mm to wewnętrzny odstęp (inaczej Chrome zostawia białe marginesy zamiast papieru). Kolejność stron ustawia `order` w `print.css`.
 - **Formaty panelu: 16:9, 4:5 i 9:16** (decyzja właściciela). Telefon pionowo (< 768 px) dostaje 9:16 na pełną wysokość panelu - kompozycja animacji jak 4:5, rozciągnięta na wysoki kadr (`.reel--9x16`). Tablet pionowo dostaje 4:5 (ta sama proporcja co podgląd na stronie głównej). Wszystko inne, także telefon obrócony, dostaje 16:9. Ramka zawsze w całości, bez przycinania. Warunki są w `styles.css` i w `main.js` (matchMedia) - trzymaj je w zgodzie.

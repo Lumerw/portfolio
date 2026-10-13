@@ -7,6 +7,12 @@ const root = document.documentElement;
 const app = document.getElementById('app');
 const LANGS = ['pl', 'en'];
 
+// Asystent AI (stan na górze - panel #agent może być otwarty już przy wejściu na stronę)
+const chat = [];        // [{ role: 'user' | 'assistant', content, answer? }]
+let agentBusy = false;
+let agentMod = null;
+const loadAgent = () => (agentMod ??= import('./agent.js'));
+
 // localStorage bywa zablokowany (tryb prywatny, wyłączone dane witryny).
 const store = {
   get() { try { return localStorage.getItem('lang'); } catch { return null; } },
@@ -163,7 +169,10 @@ function syncSheet() {
   if (sheet) {
     redraw(sheet.querySelector('.sheet__bar'));
     // Po starcie animacji, żeby przeglądarka nie przewijała do panelu.
-    requestAnimationFrame(() => sheet.querySelector('[data-close]').focus({ preventScroll: true }));
+    // Czat: od razu pole pytania (na dotykowych - krzyżyk, żeby nie wyskakiwała klawiatura).
+    if (sheet.id === 'agent') loadAgent();
+    const first = sheet.id === 'agent' && matchMedia('(hover: hover)').matches ? sheet.querySelector('#agent-q') : null;
+    requestAnimationFrame(() => (first ?? sheet.querySelector('[data-close]')).focus({ preventScroll: true }));
   } else {
     opener?.focus({ preventScroll: true });
     opener = null;
@@ -222,6 +231,23 @@ function tickIcons() {
   });
 }
 if (!reduceMotion.matches) setInterval(tickIcons, ICON_MS);
+
+/* Brandbook: te same ikony co w hero, ale każde miejsce zmienia się we własnym, losowym rytmie
+   (BB_ICON_MS, trochę wolniej niż w hero) i nigdy nie pokazuje tej samej ikony co sąsiad.
+   Jedno <img> na miejsce (zmiana src) - pliki są już w pamięci po hero. Tylko przy otwartym panelu. */
+const BB_ICON_MS = [500, 1100];
+function tickBrandbookIcon(k) {
+  const imgs = [...app.querySelectorAll('[data-bb-icon]')];
+  const icons = content.shared.icons;
+  if (imgs[k] && openSheet()?.id === 'brandbook') {
+    const shown = new Set([k - 1, k, k + 1].map(i => imgs[i]?.getAttribute('src')));
+    const free = icons.filter(src => !shown.has(src));
+    const src = free[Math.floor(Math.random() * free.length)];
+    if (src) { imgs[k].src = src; imgs[k].classList.toggle('mono', src.endsWith('.svg')); }
+  }
+  setTimeout(() => tickBrandbookIcon(k), BB_ICON_MS[0] + Math.random() * (BB_ICON_MS[1] - BB_ICON_MS[0]));
+}
+if (!reduceMotion.matches && content.shared.icons.length > 3) content.shared.icons.slice(0, 6).forEach((_, k) => tickBrandbookIcon(k));
 
 app.addEventListener('click', e => {
   const link = e.target.closest('a[href^="#"]');
@@ -306,5 +332,105 @@ new MutationObserver(() => {
   activate(id);
   syncSheet();
   syncThemeButton();
+  restoreChat();
   if (!openSheet()) startAuto();
 }).observe(app, { childList: true });
+
+/* Asystent AI (panel #agent). Rozmowa żyje w pamięci strony (przetrwa zmianę języka),
+   silnik agent.js ładuje się przy pierwszym pytaniu: AI przez shared.agent.endpoint albo tryb lokalny.
+   Odpowiedzi trafiają do DOM jako tekst (textContent) - żadnego HTML z zewnątrz. */
+
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+};
+// Adresy www i maile w odpowiedzi AI → linki; reszta zwykłym tekstem.
+function appendText(node, text) {
+  let i = 0;
+  for (const m of text.matchAll(/https?:\/\/[^\s)]*[^\s).,;:!?]|[\w.+-]+@[\w-]+(\.[\w-]+)+/g)) {
+    node.append(text.slice(i, m.index));
+    const a = el('a', 'link-u', m[0]);
+    a.href = m[0].startsWith('http') ? m[0] : `mailto:${m[0]}`;
+    if (m[0].startsWith('http')) { a.target = '_blank'; a.rel = 'noopener'; }
+    node.append(a);
+    i = m.index + m[0].length;
+  }
+  node.append(text.slice(i));
+}
+function addMsg(role, payload) {
+  const log = app.querySelector('.agent__log');
+  if (!log) return null;
+  const li = el('li', `agent__msg agent__msg--${role === 'user' ? 'user' : 'bot'}`);
+  if (role === 'user') li.textContent = payload;
+  else {
+    if (payload.offline) li.append(el('span', 'agent__offline t-meta', content[root.lang].agent.offline));
+    appendText(li, payload.text);
+    if (payload.items?.length) li.append(listOf(payload.items));
+    if (payload.links?.length) {
+      const p = el('p', 'agent__links t-meta');
+      for (const l of payload.links) {
+        const a = el('a', 'link-u', l.label);
+        a.href = l.href;
+        if (l.ext) { a.target = '_blank'; a.rel = 'noopener'; }
+        if (l.download) a.setAttribute('download', '');
+        p.append(a);
+      }
+      li.append(p);
+    }
+  }
+  log.append(li);
+  log.scrollTop = log.scrollHeight;
+  return li;
+}
+function listOf(items) {
+  const ul = el('ul');
+  for (const it of items) ul.append(el('li', '', it));
+  return ul;
+}
+function restoreChat() {
+  if (!chat.length) return;
+  app.querySelector('[data-agent]')?.classList.add('has-chat');
+  for (const m of chat) addMsg(m.role, m.role === 'user' ? m.content : m.answer);
+}
+
+async function askAgent(q) {
+  q = q.trim().slice(0, 500);
+  if (!q || agentBusy) return;
+  agentBusy = true;
+  app.querySelector('[data-agent]').classList.add('has-chat');
+  chat.push({ role: 'user', content: q });
+  addMsg('user', q);
+  const typing = addMsg('typing', { text: '' });
+  typing?.classList.add('agent__typing');
+  typing?.replaceChildren(el('span', 'visually-hidden', content[root.lang].agent.typing), el('i'), el('i'), el('i'));
+  const t0 = performance.now();
+  try {
+    const { ask } = await loadAgent();
+    const answer = await ask(content, root.lang, chat.map(({ role, content: c }) => ({ role, content: c })));
+    const wait = 500 - (performance.now() - t0);   // tryb lokalny odpowiada od razu - bez „wskakiwania”
+    if (wait > 0) await new Promise(r => setTimeout(r, wait));
+    chat.push({ role: 'assistant', content: [answer.text, ...(answer.items ?? [])].join('\n'), answer });
+    app.querySelector('.agent__typing')?.remove();
+    addMsg('assistant', answer);
+  } finally {
+    app.querySelector('.agent__typing')?.remove();
+    agentBusy = false;
+  }
+}
+
+app.addEventListener('submit', e => {
+  const form = e.target.closest('[data-agent-form]');
+  if (!form) return;
+  e.preventDefault();
+  if (agentBusy) return;                 // poprzednia odpowiedź jeszcze idzie - tekst zostaje w polu
+  askAgent(form.elements.q.value);
+  form.elements.q.value = '';
+});
+app.addEventListener('click', e => {
+  const b = e.target.closest('[data-ask]');
+  if (!b) return;
+  askAgent(b.dataset.ask);
+  app.querySelector('#agent-q')?.focus({ preventScroll: true });
+});

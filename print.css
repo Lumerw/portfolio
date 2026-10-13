@@ -55,10 +55,10 @@ html { overflow: visible !important; }
 
 /* Tylko ekranowe */
 .skip, .site-header, .index, .hero__preview, .hero__icons, .clients, .sheet__backdrop, .sheet__close,
-.sheet__video, .sheet__caption, .reel__toggle, .copy, .copy__status, .site-footer__button { display: none !important; }
+.sheet__video, .sheet__caption, .reel__toggle, .copy, .copy__status, .site-footer__actions { display: none !important; }
 
 .print-only { display: block; }
-.sheet--brandbook { display: none !important; }   /* pusty panel — nie trafia do PDF */
+.sheet--brandbook, .sheet--agent { display: none !important; }   /* brandbook i czat nie trafiają do PDF */
 
 .wrap { max-width: none; padding-inline: 0; }
 .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }

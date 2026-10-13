@@ -1291,7 +1291,9 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 .site-footer__in { position: relative; }
 .site-footer__contact { grid-area: contact; display: grid; gap: var(--s-1); }
-.site-footer__button  { grid-area: button; }
+/* Przyciski: „zapytaj AI” + „kontakt”. Telefon - obok siebie po połowie, od 768 px w linii. */
+.site-footer__actions { grid-area: button; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+@media (min-width: 768px) { .site-footer__actions { display: flex; } }
 .site-footer__copy    { grid-area: copy; display: flex; align-items: center; gap: var(--s-1); }
 
 @media (min-width: 768px) {
@@ -1440,6 +1442,110 @@ html:has(.sheet:target) { overflow: hidden; }
 .bb__rules ul { display: grid; gap: var(--s-1); margin-top: var(--s-2); }
 .bb__rules li::before { content: "+"; display: inline-block; width: 1.4em; color: var(--ink-3); }
 .bb__no li::before { content: "-"; }
+
+/* ==========================================================================
+   Asystent AI - przycisk w stopce i czat w panelu #agent.
+   Jedyny kolor marki osobistej: tęczowa poświata (decyzja właściciela, patrz brandbook).
+   Gradient obraca się przez transform (kompozytor, bez przemalowywania); bez ruchu w systemie stoi.
+   ========================================================================== */
+:root { --rainbow: conic-gradient(#FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D); }
+@keyframes agent-spin { to { transform: rotate(1turn); } }
+
+.agent-button { position: relative; isolation: isolate; border-color: transparent; white-space: nowrap; }
+.agent-button__halo,
+.agent-button__ring { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.agent-button__halo { inset: -2px; filter: blur(10px); opacity: .75; }
+.agent-button__halo::before,
+.agent-button__ring::before,
+.agent-dot::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 400px;
+  height: 400px;
+  margin: -200px 0 0 -200px;
+  background: var(--rainbow);
+  animation: agent-spin 6s linear infinite;
+}
+/* Wypełnienie 1 px w głąb - z gradientu zostaje cienka tęczowa ramka */
+.agent-button::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: var(--paper);
+  transition: background-color var(--t-line) var(--ease);
+}
+.agent-button:hover,
+.agent-button:focus-visible { background: transparent; color: var(--paper); }
+.agent-button:hover::after,
+.agent-button:focus-visible::after { background: var(--ink); }
+
+/* Znak asystenta w pasku panelu: kółko jak znak osobisty, wypełnione tęczą */
+.agent-dot { position: relative; flex: none; width: 12px; height: 12px; border-radius: 50%; overflow: hidden; }
+.agent-dot::before { width: 24px; height: 24px; margin: -12px 0 0 -12px; }
+
+/* Panel: telefon - jak inne panele; od 768 px wąska kolumna w prawym dolnym rogu */
+.sheet--agent .sheet__body { display: flex; flex-direction: column; overflow: hidden; padding-block: var(--s-1) var(--s-3); }
+@media (min-width: 768px) {
+  .sheet--agent .sheet__panel {
+    inset: auto var(--margin) var(--s-3) auto;
+    width: min(440px, calc(100vw - 2 * var(--margin)));
+    height: min(680px, calc(100dvh - var(--sheet-top) - var(--s-3)));
+    border: var(--hairline) solid var(--hair);
+    transform: translateY(calc(100% + var(--s-3)));
+  }
+  .sheet--agent .wrap { padding-inline: var(--s-3); }
+}
+
+.agent { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--s-2); }
+.agent__log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.agent__msg { max-width: 88%; line-height: var(--lh-text); overflow-wrap: anywhere; }
+.agent__msg--bot { align-self: flex-start; }
+.agent__msg--user { align-self: flex-end; padding: var(--s-1) var(--s-2); background: var(--ink); color: var(--paper); }
+.agent__msg ul { display: grid; gap: 2px; margin-top: var(--s-1); }
+.agent__msg ul li { padding-left: 1.2em; text-indent: -1.2em; }
+.agent__msg ul li::before { content: "-"; display: inline-block; width: 1.2em; text-indent: 0; color: var(--ink-3); }
+.agent__links { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-3); margin-top: var(--s-1); }
+.agent__offline { display: block; margin-bottom: 4px; color: var(--ink-3); }
+/* „pisze…”: trzy kropki */
+.agent__typing { display: flex; gap: 4px; padding-block: var(--s-1); }
+.agent__typing i { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-2); animation: agent-typing 1.2s var(--ease) infinite; }
+.agent__typing i:nth-child(3) { animation-delay: .2s; }
+.agent__typing i:nth-child(4) { animation-delay: .4s; }
+@keyframes agent-typing { 0%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+.agent__chips, .agent__form { display: none; }
+.js .agent__chips { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.js .agent__form { display: flex; gap: var(--s-1); }
+.js .agent__nojs, .agent.has-chat .agent__chips { display: none; }
+.agent__chips .button { text-align: left; }
+.agent__form input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding-inline: var(--s-2);
+  border: var(--hairline) solid var(--ink);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;                  /* poniżej 16 px iOS powiększa stronę przy pisaniu */
+}
+.agent__form input::placeholder { color: var(--ink-3); }
+.agent__form input:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--ink); }   /* fokus = ramka 2 px */
+.agent__note { display: none; color: var(--ink-3); }
+.js .agent__note { display: block; }
+@media (max-height: 500px) { .js .agent__note { display: none; } }
 
 /* Stopka = kontakt jako odwrócony blok — czarny w trybie jasnym, jasny w ciemnym.
    Wyraźny koniec strony i jedyne miejsce z wezwaniem do działania. */

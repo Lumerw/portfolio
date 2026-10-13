@@ -27,7 +27,7 @@ const num = i => String(i + 1).padStart(2, '0');
 const isReal = v => !String(v).includes('[');
 // Placeholdery: fragmenty w [nawiasach] nie trafiają na stronę ani do PDF. Pusty wynik = element znika.
 // (Lista rzeczy do uzupełnienia: npm run build.)
-const clean = v => String(v ?? '')
+export const clean = v => String(v ?? '')
   .replace(/\[[^\]]*\]/g, '')
   .replace(/\s{2,}/g, ' ')
   .replace(/^[\s\-·,.]+|[\s\-·,]+$/g, '')
@@ -407,7 +407,7 @@ function brandbook(c, t) {
   const symbols = sec(S.symbols, `
           <ul class="bb__symbols">${['personal', ...c.projects.map(p => p.symbol)].map(n => `
             <li>${symbol(n, { cls: 'bb__sym' })}</li>`).join('')}${c.icons.slice(0, 6).map(src => `
-            <li><img class="bb__icon${mono(src)}" src="${esc(src)}" width="40" height="40" alt="" loading="lazy"></li>`).join('')}
+            <li><img class="bb__icon${mono(src)}" src="${esc(src)}" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>`).join('')}
           </ul>
           <p class="t-text t-muted">${esc(b.symbols)}</p>`);
 
@@ -463,7 +463,10 @@ function footer(c, t) {
       <li><a href="${esc(l.href)}" rel="me noopener" target="_blank">${esc(l.label)}</a></li>`).join('')}
     </ul>` : ''}
   </div>
-  <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${esc(t.ui.contactButton)}</a>
+  <div class="site-footer__actions">
+    <a class="button agent-button" href="#agent"><span class="agent-button__halo" aria-hidden="true"></span><span class="agent-button__ring" aria-hidden="true"></span>${esc(t.agent.button)}</a>
+    <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${esc(t.ui.contactButton)}</a>
+  </div>
   <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - ${esc(c.siteUrl)}">
@@ -473,12 +476,38 @@ function footer(c, t) {
 </footer>`;
 }
 
+// Asystent AI: czat w panelu #agent. Bez JS panel pokazuje powitanie i mail (formularz ukryty).
+// Rozmową steruje main.js, odpowiedzi daje agent.js (AI przez shared.agent.endpoint albo tryb lokalny).
+function agent(c, t) {
+  const g = t.agent;
+  const bar = `
+      <span class="agent-dot" aria-hidden="true"></span>
+      <h2 id="agent-title" class="t-project">${esc(g.title)}</h2>`;
+  const body = `
+      <div class="agent" data-agent>
+        <ol class="agent__log" role="log" aria-live="polite" aria-label="${esc(g.log)}">
+          <li class="agent__msg agent__msg--bot">${esc(g.hello)}</li>
+        </ol>
+        <p class="agent__nojs t-text">${esc(g.nojs)} <a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
+        <ul class="agent__chips">${g.suggestions.map(q => `
+          <li><button class="button button--small" type="button" data-ask="${esc(q)}">${esc(q)}</button></li>`).join('')}
+        </ul>
+        <form class="agent__form" data-agent-form>
+          <label class="visually-hidden" for="agent-q">${esc(g.label)}</label>
+          <input id="agent-q" name="q" type="text" autocomplete="off" maxlength="500" placeholder="${esc(g.placeholder)}" required>
+          <button class="button" type="submit">${esc(g.send)}</button>
+        </form>
+        <p class="agent__note t-meta">${esc(g.note)}</p>
+      </div>`;
+  return sheet({ id: 'agent', cls: 'sheet--agent', bar, body, t });
+}
+
 export function render(content, lang) {
   const c = content.shared, t = content[lang];
   return `${header(c, t)}
 <main id="tresc">${hero(c, t)}
 </main>${footer(c, t)}
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${about(c, t)}${brandbook(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${about(c, t)}${brandbook(c, t)}${agent(c, t)}
 </div>
 `;
 }

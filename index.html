@@ -166,7 +166,10 @@
     </p>
     
   </div>
-  <a class="button site-footer__button" href="mailto:wojciechlumer@gmail.com">kontakt</a>
+  <div class="site-footer__actions">
+    <a class="button agent-button" href="#agent"><span class="agent-button__halo" aria-hidden="true"></span><span class="agent-button__ring" aria-hidden="true"></span>zapytaj AI</a>
+    <a class="button site-footer__button" href="mailto:wojciechlumer@gmail.com">kontakt</a>
+  </div>
   <p class="site-footer__copy t-meta">© 2026 Wojciech Lumer</p>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - https://lumerw.github.io/portfolio">
@@ -495,12 +498,12 @@
             <li><svg class="symbol symbol--teraz bb__sym" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/></svg></li>
             <li><svg class="symbol symbol--loom bb__sym" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="stroke" style="--i:0" d="M14 8V21.5M14 26.5V40" pathLength="1"/><path class="stroke" style="--i:1" d="M24 8V11.5M24 16.5V31.5M24 36.5V40" pathLength="1"/><path class="stroke" style="--i:2" d="M34 8V21.5M34 26.5V40" pathLength="1"/><path class="stroke" style="--i:3" d="M8 14H11.5M16.5 14H31.5M36.5 14H40" pathLength="1"/><path class="stroke" style="--i:4" d="M8 24H21.5M26.5 24H40" pathLength="1"/><path class="stroke" style="--i:5" d="M8 34H11.5M16.5 34H31.5M36.5 34H40" pathLength="1"/></svg></li>
             <li><svg class="symbol symbol--rehab bb__sym" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect class="stroke" style="--i:0" x="8" y="8" width="32" height="32" pathLength="1"/><path class="stroke" style="--i:1" d="M24 16V32" pathLength="1"/><path class="stroke" style="--i:2" d="M16 24H32" pathLength="1"/></svg></li>
-            <li><img class="bb__icon mono" src="assets/icons/01.svg" width="40" height="40" alt="" loading="lazy"></li>
-            <li><img class="bb__icon mono" src="assets/icons/02.svg" width="40" height="40" alt="" loading="lazy"></li>
-            <li><img class="bb__icon mono" src="assets/icons/03.svg" width="40" height="40" alt="" loading="lazy"></li>
-            <li><img class="bb__icon mono" src="assets/icons/04.svg" width="40" height="40" alt="" loading="lazy"></li>
-            <li><img class="bb__icon mono" src="assets/icons/05.svg" width="40" height="40" alt="" loading="lazy"></li>
-            <li><img class="bb__icon mono" src="assets/icons/06.svg" width="40" height="40" alt="" loading="lazy"></li>
+            <li><img class="bb__icon mono" src="assets/icons/01.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
+            <li><img class="bb__icon mono" src="assets/icons/02.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
+            <li><img class="bb__icon mono" src="assets/icons/03.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
+            <li><img class="bb__icon mono" src="assets/icons/04.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
+            <li><img class="bb__icon mono" src="assets/icons/05.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
+            <li><img class="bb__icon mono" src="assets/icons/06.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
           </ul>
           <p class="t-text t-muted">Każdy projekt ma własny symbol geometryczny rysowany kreską 1 px, bez wypełnień. Ikony interfejsu w tym samym stylu.</p>
         </div>
@@ -533,9 +536,38 @@
             <div><p class="t-meta">Tak</p><ul><li>dużo pustej przestrzeni</li><li>podziały wyłącznie liniami 1 px</li><li>jeden kolor: tusz albo papier</li><li>małe stopnie pisma, dwie grubości</li></ul></div>
             <div><p class="t-meta">Nie</p><ul class="bb__no"><li>kolory akcentu w mojej marce</li><li>cienie, gradienty i zaokrąglenia</li><li>wersaliki i pogrubienia w zdaniu</li><li>ozdobne ikony i emoji</li></ul></div>
           </div>
-          <p class="t-text t-muted bb__note">Kolory i gradienty mają tylko marki projektów (np. teraz) - wewnątrz ich ramek.</p>
+          <p class="t-text t-muted bb__note">Kolory i gradienty mają tylko marki projektów (np. teraz) - wewnątrz ich ramek. Jedyny wyjątek: tęczowa poświata asystenta AI.</p>
         </div>
       </section>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="agent" class="sheet sheet--agent" role="dialog" aria-modal="true" aria-labelledby="agent-title">
+  <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
+  <div class="sheet__panel">
+    <div class="sheet__bar wrap">
+      <span class="agent-dot" aria-hidden="true"></span>
+      <h2 id="agent-title" class="t-project">Zapytaj o mnie</h2>
+      <a class="sheet__close" href="#start" data-close aria-label="zamknij"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
+    </div>
+    <div class="sheet__body wrap">
+      <div class="agent" data-agent>
+        <ol class="agent__log" role="log" aria-live="polite" aria-label="Rozmowa z asystentem">
+          <li class="agent__msg agent__msg--bot">Cześć! Jestem asystentem AI tego portfolio. Zapytaj o projekty, doświadczenie, narzędzia albo o to, jak się skontaktować z Wojciechem.</li>
+        </ol>
+        <p class="agent__nojs t-text">Czat działa z włączonym JavaScriptem. Napisz maila: <a class="link-u" href="mailto:wojciechlumer@gmail.com">wojciechlumer@gmail.com</a></p>
+        <ul class="agent__chips">
+          <li><button class="button button--small" type="button" data-ask="Jakie projekty zrobił Wojciech?">Jakie projekty zrobił Wojciech?</button></li>
+          <li><button class="button button--small" type="button" data-ask="Jakich narzędzi używa?">Jakich narzędzi używa?</button></li>
+          <li><button class="button button--small" type="button" data-ask="Jak umówić rozmowę?">Jak umówić rozmowę?</button></li>
+        </ul>
+        <form class="agent__form" data-agent-form>
+          <label class="visually-hidden" for="agent-q">Twoje pytanie</label>
+          <input id="agent-q" name="q" type="text" autocomplete="off" maxlength="500" placeholder="Zadaj pytanie…" required>
+          <button class="button" type="submit">wyślij</button>
+        </form>
+        <p class="agent__note t-meta">Odpowiedzi powstają z treści tego portfolio i mogą być niepełne. W ważnych sprawach napisz maila.</p>
       </div>
     </div>
   </div>
