@@ -17,7 +17,8 @@
     "audit": "node tools/audit.mjs",
     "check-reel": "node tools/reel-check.mjs",
     "check-agent": "node tools/agent-check.mjs",
-    "deck": "node tools/build-deck.mjs"
+    "deck": "node tools/build-deck.mjs",
+    "covers": "node tools/build-covers.mjs"
   },
   "devDependencies": {
     "lighthouse": "^13.5.0",

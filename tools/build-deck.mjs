@@ -1,7 +1,8 @@
 // PDF 1080 × 1080 px - karuzela na LinkedIn / Instagram, z klikalnymi linkami.
 //   npm run deck  →  portfolio-lumer-1080-pl.pdf, portfolio-lumer-1080-en.pdf
 // Slajdy: start (hasło + spis) · dla każdego projektu: plansza marki + szczegóły · kontakt.
-// Teksty: content.js (pl/en.deck, projekty), zrzuty: shared.projects[].deck, style: tools/deck.css.
+// Teksty: content.js (pl/en.deck, projekty), zrzuty: shared.projects[].deck, style: tools/deck.css,
+// plansze marek: tools/covers.mjs + covers.css (te same co na stronie).
 // Spis i „spis” na każdym slajdzie to linki wewnątrz PDF; strony projektów, mail i www - linki zewnętrzne.
 // Fonty: Helvetica Neue (macOS), Open Sans (teraz, OFL, lokalnie). Haus (loom.studio) tylko jako logo w krzywych.
 import { chromium } from 'playwright';
@@ -11,7 +12,8 @@ import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
 import { buildQr } from './build-qr.mjs';
 import { content } from '../content.js';
-import { clean, RP } from '../render.js';
+import { clean } from '../render.js';
+import { covers } from './covers.mjs';
 import { symbol } from '../symbols.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -21,38 +23,6 @@ const MAX_BYTES = 10 * 1024 * 1024;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isReal = v => !!v && !String(v).includes('[');
 const ext = (href, label, cls = 'link-u') => `<a class="${cls}" href="${esc(href)}">${esc(label)}</a>`;
-
-/* ---------- Plansze marek: każda w języku wizualnym projektu ---------- */
-const covers = {
-  // teraz: czerń z aurorą z teraz.eu, logo, hasło z falką (Open Sans 700 - krój teraz)
-  teraz(p, tp) {
-    const [a, b, c, d] = p.brand.aurora;
-    return `
-      <div class="cover cover--teraz" style="--a:${a};--b:${b};--c:${c};--d:${d}">
-        <img class="cover__logo" src="${esc(p.logo.src)}" alt="teraz">
-        <p class="cover__claim">${esc(tp.reel.claimA)} <span class="cover__key">${esc(tp.reel.claimKey)}<svg viewBox="0 0 240 32" preserveAspectRatio="none" aria-hidden="true"><path d="${RP.falka}"/></svg></span></p>
-      </div>`;
-  },
-  // loom.studio: oś - czerń z mgławicą po lewej, papier z trzema figurami Bauhausu po prawej, logo na osi
-  loom() {
-    return `
-      <div class="cover cover--loom">
-        <div class="cover__night"></div>
-        <img class="cover__logo cover__logo--l" src="assets/deck/loom-logo-paper.svg" alt="">
-        <img class="cover__logo cover__logo--r" src="assets/deck/loom-logo-ink.svg" alt="loom.studio">
-        <img class="cover__figures" src="assets/deck/loom-symbol.svg" alt="">
-      </div>`;
-  },
-  // reh.ab: głęboka czerwień, hasło Helvetica Bold z wygaszonym „toget”, pasek gradientu „her”
-  rehab() {
-    return `
-      <div class="cover cover--rehab">
-        <p class="cover__word">reh.ab</p>
-        <p class="cover__claim">Make an <span class="cover__soft">impact</span> <span class="cover__dim">toget</span>her.</p>
-        <div class="cover__her"></div>
-      </div>`;
-  },
-};
 
 /* ---------- Slajdy ---------- */
 function deck(lang) {
@@ -134,6 +104,7 @@ function deck(lang) {
 <meta charset="utf-8">
 <base href="http://localhost:${PORT}/">
 <title>${esc(c.name)} - ${esc(D.label)}</title>
+<link rel="stylesheet" href="tools/covers.css">
 <link rel="stylesheet" href="tools/deck.css">
 </head>
 <body>${start}${slides}${contact}

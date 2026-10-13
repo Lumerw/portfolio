@@ -164,12 +164,16 @@ function hero(c, t) {
   // Reel na stronie głównej jest dekoracyjny - tekst niesie podpis pod ramką. Logo w reelu stoi
   // w tym samym miejscu co zwykłe logo (50% szerokości, środek), więc LCP się nie zmienia.
   const logos = c.projects.map((p, i) => {
+    // Plansza statyczna (cover 4:5) - grafika w stylu marki, pełna ramka; dekoracyjna jak reel.
+    const cover = !p.reel && p.cover?.['4x5'];
     const inner = p.reel
       ? reel(p, t.projects[p.id], '4x5', { eager: i === 0, decorative: true })
-      : `<img class="${mono(p.logo).trim()}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
-    const brand = !p.reel && p.brand;
+      : cover
+        ? `<img src="${esc(cover)}" width="1080" height="1350" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`
+        : `<img class="${mono(p.logo).trim()}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
+    const brand = !p.reel && !cover && p.brand;
     return `
-        <div class="preview__logo${p.reel ? ' preview__logo--reel' : brand ? ' brand' : ''}${i === 0 ? ' is-active' : ''}" data-project="${p.id}"${brand ? ` style="${brandStyle(p.brand)}"` : ''}>
+        <div class="preview__logo${p.reel ? ' preview__logo--reel' : cover ? ' preview__logo--cover' : brand ? ' brand' : ''}${i === 0 ? ' is-active' : ''}" data-project="${p.id}"${brand ? ` style="${brandStyle(p.brand)}"` : ''}>
           ${inner}
         </div>`;
   }).join('');
@@ -258,7 +262,7 @@ function sheet({ id, cls, bar, body, t }) {
 }
 
 // Wideo promocyjne w pętli: 16:9 (desktop, ekran poziomy), 4:5 (tablet pionowo) i 9:16 (telefon pionowo) - CSS wybiera jedno.
-// Kolejność: prawdziwe wideo (src) > plansza animowana (reel) > plansza marki (brand) > poster-placeholder.
+// Kolejność: prawdziwe wideo (src) > plansza animowana (reel) > plansza statyczna (cover) > plansza marki (brand) > poster-placeholder.
 // Odtwarzaniem wideo steruje main.js; reel ma obok przycisk pauzy (rodzeństwo role=img, nie w środku).
 // Pod ramką podpis (nazwa - opis) - widoczny tylko na telefonie pionowo.
 function promo(p, tp, t) {
@@ -272,13 +276,16 @@ function promo(p, tp, t) {
         <button class="reel__toggle" type="button" aria-pressed="false" aria-label="${esc(t.ui.reelPause)}">${svgi(RP.pause, 'reel__ico-pause')}${svgi(RP.play, 'reel__ico-play')}</button>
       </figure>`;
     }
-    // Bez wideo, ale z marką: plansza w stylu projektu (aurora + logo) zamiast placeholdera.
+    // Bez wideo: plansza statyczna w formacie ramki (cover), potem plansza z aurorą (brand), potem placeholder.
+    const cover = p.cover?.[fmt];
     const brandPoster = p.brand
       ? `<div class="brand" style="${brandStyle(p.brand)}" role="img" aria-label="${esc(tp.alt.video)}"><img class="brand__logo${mono(p.logo)}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt=""></div>`
       : null;
     const media = real
       ? `<video src="${esc(v.src)}" poster="${esc(v.poster)}" width="${v.w}" height="${v.h}" muted loop playsinline preload="none" aria-label="${esc(tp.alt.video)}"></video>`
-      : brandPoster || `<img class="${mono(v.poster).trim()}" src="${esc(v.poster)}" width="${v.w}" height="${v.h}" alt="${esc(tp.alt.video)}" loading="lazy" decoding="async">`;
+      : cover
+        ? `<img src="${esc(cover)}" width="${v.w}" height="${v.h}" alt="${esc(clean(tp.alt.video))}" loading="lazy" decoding="async">`
+        : brandPoster || `<img class="${mono(v.poster).trim()}" src="${esc(v.poster)}" width="${v.w}" height="${v.h}" alt="${esc(tp.alt.video)}" loading="lazy" decoding="async">`;
     return `
       <figure class="sheet__video sheet__video--${fmt} media" style="${ratio}">
         ${media}

@@ -73,7 +73,7 @@ export const shared = {
   //           src = plik mp4 (bez dźwięku), poster = kadr
   //  reel   - true: zamiast postera animowana plansza marki (8 s, render.js → reel()) - w panelu i w podglądzie.
   //           Kolejność: prawdziwe wideo (src) > reel > plansza marki (brand) > poster
-  //  images - main 16:10, a i b 4:5 - tylko w PDF
+  //  images - main 16:10, a i b 4:5 - tylko w PDF (npm run covers: zrzut desktop, plansza marki, zrzut telefonu)
 
   // Kolejność = kolejność na stronie. Numer nadawany automatycznie: 01, 02, 03.
   projects: [
@@ -104,9 +104,9 @@ export const shared = {
       reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” (dopóki nie ma src)
       href: 'https://teraz.eu',      // testowo
       images: {
-        main:    { src: 'assets/teraz/01.svg',      w: 1600, h: 1000 },
-        a:       { src: 'assets/teraz/02.svg',      w: 1200, h: 1500 },
-        b:       { src: 'assets/teraz/03.svg',      w: 1200, h: 1500 },
+        main:    { src: 'assets/teraz/01.jpg',      w: 1600, h: 1000 },
+        a:       { src: 'assets/teraz/02.jpg',      w: 1200, h: 1500 },
+        b:       { src: 'assets/teraz/03.jpg',      w: 1200, h: 1500 },
       },
       // PDF 1080 × 1080 (npm run deck): zrzuty prawdziwej strony projektu, desktop 16:10 i telefon.
       deck: { desktop: 'assets/deck/teraz-desktop.jpg', phone: 'assets/deck/teraz-phone.jpg' },
@@ -117,8 +117,11 @@ export const shared = {
       type: 'studio',
       year: '2026',                  // [potwierdź] - tylko w PDF
       symbol: 'loom',
-      logo:   { src: 'assets/loom/logo.svg', w: 480, h: 120 },
-      sygnet: { src: 'assets/loom/sygnet.svg' },
+      // Logo (Haus w krzywych) i sygnet - trzy figury Bauhausu - z brand kitu loom.studio (repozytorium loomstudio)
+      logo:   { src: 'assets/loom/logo.svg', w: 453, h: 70 },
+      sygnet: { src: 'assets/loom/sygnet.svg', mono: false },
+      // Plansza marki (statyczna, zanim powstanie wideo): podgląd na stronie głównej i panel. npm run covers
+      cover: { '4x5': 'assets/loom/cover-4x5.webp', '16x9': 'assets/loom/cover-16x9.webp', '9x16': 'assets/loom/cover-9x16.webp' },
       video: {
         '16x9': { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/loom/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
@@ -126,9 +129,9 @@ export const shared = {
       },
       href: '[https://loom.studio]', // [podaj właściwy adres - loom.studio wygląda na domenę zaparkowaną]
       images: {
-        main:    { src: 'assets/loom/01.svg',      w: 1600, h: 1000 },
-        a:       { src: 'assets/loom/02.svg',      w: 1200, h: 1500 },
-        b:       { src: 'assets/loom/03.svg',      w: 1200, h: 1500 },
+        main:    { src: 'assets/loom/01.jpg',      w: 1600, h: 1000 },
+        a:       { src: 'assets/loom/02.jpg',      w: 1200, h: 1500 },
+        b:       { src: 'assets/loom/03.jpg',      w: 1200, h: 1500 },
       },
       // PDF 1080 × 1080 (npm run deck): zrzuty prawdziwej strony projektu, desktop 16:10 i telefon.
       deck: { desktop: 'assets/deck/loom-desktop.jpg', phone: 'assets/deck/loom-phone.jpg' },
@@ -140,7 +143,9 @@ export const shared = {
       year: '2026',                  // [potwierdź] - tylko w PDF
       symbol: 'rehab',
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
-      sygnet: { src: 'assets/rehab/sygnet.svg' },
+      sygnet: { src: 'assets/rehab/sygnet.png', mono: false },   // favicon reh.ab: „her” na czerwieni
+      // Plansza marki (statyczna, zanim powstanie wideo): podgląd na stronie głównej i panel. npm run covers
+      cover: { '4x5': 'assets/rehab/cover-4x5.webp', '16x9': 'assets/rehab/cover-16x9.webp', '9x16': 'assets/rehab/cover-9x16.webp' },
       video: {
         '16x9': { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/rehab/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
@@ -148,9 +153,9 @@ export const shared = {
       },
       href: 'https://lumerw.github.io/reh.ab/',
       images: {
-        main:    { src: 'assets/rehab/01.svg',      w: 1600, h: 1000 },
-        a:       { src: 'assets/rehab/02.svg',      w: 1200, h: 1500 },
-        b:       { src: 'assets/rehab/03.svg',      w: 1200, h: 1500 },
+        main:    { src: 'assets/rehab/01.jpg',      w: 1600, h: 1000 },
+        a:       { src: 'assets/rehab/02.jpg',      w: 1200, h: 1500 },
+        b:       { src: 'assets/rehab/03.jpg',      w: 1200, h: 1500 },
       },
       // PDF 1080 × 1080 (npm run deck): zrzuty prawdziwej strony projektu, desktop 16:10 i telefon.
       deck: { desktop: 'assets/deck/rehab-desktop.jpg', phone: 'assets/deck/rehab-phone.jpg' },
@@ -234,9 +239,9 @@ export const pl = {
       alt: {
         video: 'teraz - [opis wideo promocyjnego]',
         logo: 'teraz - logo',
-        main: 'teraz - [opis obrazu głównego]',
-        a: 'teraz - [opis obrazu]',
-        b: 'teraz - [opis obrazu]',
+        main: 'teraz - strona główna teraz.eu na desktopie',
+        a: 'teraz - plansza marki: logo i hasło porozmawiajmy tu i teraz',
+        b: 'teraz - strona teraz.eu na telefonie',
       },
     },
     loom: {
@@ -247,11 +252,11 @@ export const pl = {
       solution: 'Styl inspirowany Bauhausem, font Haus, wersje PL/EN, subskrypcje i panel klienta na Stripe. [Dopisz 1-2 zdania.]',
       result: '[Efekt: 1-2 zdania lub liczby.]',
       alt: {
-        video: 'loom.studio - [opis wideo promocyjnego]',
+        video: 'loom.studio - plansza marki: logo na osi czerni i papieru, trzy figury Bauhausu',
         logo: 'loom.studio - logo',
-        main: 'loom.studio - [opis obrazu głównego]',
-        a: 'loom.studio - [opis obrazu]',
-        b: 'loom.studio - [opis obrazu]',
+        main: 'loom.studio - strona główna na desktopie',
+        a: 'loom.studio - plansza marki: logo na osi czerni i papieru, trzy figury Bauhausu',
+        b: 'loom.studio - strona na telefonie',
       },
     },
     rehab: {
@@ -262,11 +267,11 @@ export const pl = {
       solution: 'Prezentacja inwestorska w formie strony www, bez ciasteczek i zbierania danych. [Dopisz 1-2 zdania.]',
       result: '[Efekt: 1-2 zdania lub liczby.]',
       alt: {
-        video: 'reh.ab - [opis wideo promocyjnego]',
+        video: 'reh.ab - plansza marki: hasło Make an impact together na czerwonym tle',
         logo: 'reh.ab - logo',
-        main: 'reh.ab - [opis obrazu głównego]',
-        a: 'reh.ab - [opis obrazu]',
-        b: 'reh.ab - [opis obrazu]',
+        main: 'reh.ab - makieta czatu na serwerze z dyżurem specjalisty',
+        a: 'reh.ab - plansza marki: hasło Make an impact together na czerwonym tle',
+        b: 'reh.ab - strona na telefonie',
       },
     },
   },
@@ -454,9 +459,9 @@ export const en = {
       alt: {
         video: 'teraz - [promo video description]',
         logo: 'teraz - logo',
-        main: 'teraz - [main image description]',
-        a: 'teraz - [image description]',
-        b: 'teraz - [image description]',
+        main: 'teraz - the teraz.eu home page on desktop',
+        a: 'teraz - brand board: logo and the line let’s talk here and now',
+        b: 'teraz - teraz.eu on a phone',
       },
     },
     loom: {
@@ -467,11 +472,11 @@ export const en = {
       solution: 'Bauhaus-inspired style, the Haus typeface, PL/EN versions, subscriptions and a client panel on Stripe. [Add 1-2 sentences.]',
       result: '[Result: 1-2 sentences or numbers.]',
       alt: {
-        video: 'loom.studio - [promo video description]',
+        video: 'loom.studio - brand board: logo on the black and paper axis, three Bauhaus figures',
         logo: 'loom.studio - logo',
-        main: 'loom.studio - [main image description]',
-        a: 'loom.studio - [image description]',
-        b: 'loom.studio - [image description]',
+        main: 'loom.studio - home page on desktop',
+        a: 'loom.studio - brand board: logo on the black and paper axis, three Bauhaus figures',
+        b: 'loom.studio - the site on a phone',
       },
     },
     rehab: {
@@ -482,11 +487,11 @@ export const en = {
       solution: 'An investor presentation built as a website, with no cookies and no data collection. [Add 1-2 sentences.]',
       result: '[Result: 1-2 sentences or numbers.]',
       alt: {
-        video: 'reh.ab - [promo video description]',
+        video: 'reh.ab - brand board: the line Make an impact together on red',
         logo: 'reh.ab - logo',
-        main: 'reh.ab - [main image description]',
-        a: 'reh.ab - [image description]',
-        b: 'reh.ab - [image description]',
+        main: 'reh.ab - chat mockup of a server with a specialist on duty',
+        a: 'reh.ab - brand board: the line Make an impact together on red',
+        b: 'reh.ab - the site on a phone',
       },
     },
   },

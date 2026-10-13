@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="#111111" stroke-width="2">
-<style>.hanko{fill:#111111;stroke:none}</style>
-<path class="stroke" style="--i:0" d="M14 8V40" pathLength="1"/><path class="stroke" style="--i:1" d="M24 8V40" pathLength="1"/><path class="stroke" style="--i:2" d="M34 8V40" pathLength="1"/><path class="stroke" style="--i:3" d="M8 14H40" pathLength="1"/><path class="stroke" style="--i:4" d="M8 24H40" pathLength="1"/><path class="stroke" style="--i:5" d="M8 34H40" pathLength="1"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 179 138" width="179" height="138" role="img" aria-label="loom.studio"><title>loom.studio</title><path fill="#F0CA42" d="M135.5 62 179 138H92Z"/><circle fill="#4F59DB" cx="85.5" cy="85.5" r="39.5"/><rect fill="#ED3434" x="0" y="0" width="77" height="77"/></svg>

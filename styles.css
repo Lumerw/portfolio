@@ -587,6 +587,9 @@ a.index__icon:hover { color: var(--ink); }
 .media .brand img,
 .brand .brand__logo { width: 56%; max-width: 420px; height: auto; object-fit: contain; }
 .preview__logo.brand { padding: 0; }
+/* Plansza statyczna marki (projects[].cover): cała ramka 4:5, bez marginesu */
+.preview__logo--cover { padding: 0; }
+.preview__logo--cover img { width: 100%; height: 100%; max-height: none; object-fit: cover; }
 .preview__logo.brand img { width: 50%; }   /* podgląd na stronie głównej — o 20% mniejsze niż w panelu */
 
 @keyframes index-progress {

@@ -16,6 +16,7 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 | `npm run build` | wpisuje polską treść z `content.js` do `index.html` (strona działa bez JS, szybciej się ładuje). **Przed wdrożeniem.** |
 | `npm run images` | AVIF/WebP/JPG 640/1280/1920 z obrazów `.jpg`/`.png` wpisanych w `content.js`; portret od razu w duotonie |
 | `npm run pdf` | `portfolio-lumer-pl.pdf` i `-en.pdf` + QR; sprawdza 6 stron i rozmiar < 8 MB |
+| `npm run covers` | plansze marek na stronę (`cover-4x5/16x9/9x16.webp` dla projektów z polem `cover`) i obrazy case study do PDF A4 (`01-03.jpg` ze zrzutów i planszy); potem `npm run images` |
 | `npm run deck` | `portfolio-lumer-1080-pl.pdf` i `-en.pdf`: karuzela 1080 × 1080 na LinkedIn / Instagram (8 slajdów, klikalny spis i linki); sprawdza liczbę stron, kadr i linki |
 | `npm run og` | `assets/og.jpg` 1200×630 (obraz do linków w mailu / na LinkedInie) |
 | `npm run assets` | symbole, favicony i wektorowe placeholdery |
@@ -51,7 +52,8 @@ Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = mi
 | `shared.clients` | karuzela firm: `name` (tekst alternatywny), `logo` (najlepiej SVG, jeden kolor) |
 | `projects[].logo`, `.sygnet` | logo na środku podglądu; sygnet / favicon przy zakresie prac i w panelu. `mono: false` = kolorowy asset marki (bez odwracania w trybie ciemnym) |
 | `projects[].brand` | opcjonalnie: plansza w stylu marki — `bg` (tło), `aurora` (4 kolory rozmytych gradientów), `speed` (czas animacji). Używana w podglądzie i w panelu, dopóki nie ma wideo. Przykład: teraz (assety z teraz.eu) |
-| `projects[].video['16x9']`, `['4x5']`, `['9x16']` | wideo w panelu, zawsze w całości (patrz tabela formatów niżej): `src` mp4 bez dźwięku, `poster` kadr. Kolejność: prawdziwe wideo (`src`) > `reel` > plansza marki (`brand`) > poster |
+| `projects[].video['16x9']`, `['4x5']`, `['9x16']` | wideo w panelu, zawsze w całości (patrz tabela formatów niżej): `src` mp4 bez dźwięku, `poster` kadr. Kolejność: prawdziwe wideo (`src`) > `reel` > plansza statyczna (`cover`) > plansza marki (`brand`) > poster |
+| `projects[].cover` | plansza statyczna w stylu marki (loom.studio, reh.ab): podgląd 4:5 na stronie głównej i panel w trzech formatach, zanim powstanie wideo. Generuje `npm run covers` z `tools/covers.mjs` - te same plansze co w PDF 1080 × 1080 |
 | `projects[].reel` | `true` = plansza animowana zamiast postera, w panelu i w podglądzie na stronie głównej (teraz). Teksty w `pl/en.projects.<id>.reel` (te same klucze w obu językach; limity znaków i brak długich myślników sprawdza `npm run build`), etykieta pauzy w `ui.reelPause` |
 | `projects[].images` | `main` 16:10, `a`, `b` 4:5 — tylko w PDF |
 | `pl/en.projects.*` | zakres prac, opis, problem / rozwiązanie / efekt (PDF; limit 120 słów sprawdza build) |
@@ -124,7 +126,7 @@ Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokł
 2. dla każdego projektu dwa slajdy: **plansza marki** w ramce, jak podgląd na stronie, i **szczegóły** - lead, zrzut desktop + telefon, zakres i 4 fakty;
 3. kontakt - odwrócony blok jak stopka: mail, www, QR.
 
-Plansze są zbudowane z komunikacji wizualnej projektów:
+Plansze (`tools/covers.mjs` + `covers.css`, wspólne ze stroną - `npm run covers`) są zbudowane z komunikacji wizualnej projektów:
 - **teraz** - aurora i logo z teraz.eu, hasło w Open Sans z falką;
 - **loom.studio** - oś czerń / papier, logo na osi i trzy figury Bauhausu, wszystko z brand kitu w repozytorium `loomstudio`;
 - **reh.ab** - głęboka czerwień, hasło Helvetica Bold i gradient „her” z CSS projektu.

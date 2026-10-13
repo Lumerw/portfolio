@@ -127,11 +127,11 @@
     </div>
   </div></div>
         </div>
-        <div class="preview__logo" data-project="loom">
-          <img class="mono" src="assets/loom/logo.svg" width="480" height="120" alt="" loading="lazy">
+        <div class="preview__logo preview__logo--cover" data-project="loom">
+          <img src="assets/loom/cover-4x5.webp" width="1080" height="1350" alt="" loading="lazy" decoding="async">
         </div>
-        <div class="preview__logo" data-project="rehab">
-          <img class="mono" src="assets/rehab/logo.svg" width="480" height="120" alt="" loading="lazy">
+        <div class="preview__logo preview__logo--cover" data-project="rehab">
+          <img src="assets/rehab/cover-4x5.webp" width="1080" height="1350" alt="" loading="lazy" decoding="async">
         </div>
       </div>
       <div class="preview__captions">
@@ -141,12 +141,12 @@
           <a class="link-u t-meta" href="https://teraz.eu" target="_blank" rel="noopener">zobacz projekt ↗</a>
         </div>
         <div class="preview__caption" data-project="loom">
-          <img class="sygnet mono" src="assets/loom/sygnet.svg" width="20" height="20" alt="">
+          <img class="sygnet" src="assets/loom/sygnet.svg" width="20" height="20" alt="">
           <span class="t-meta preview__text">loom.studio - studio projektowe w modelu subskrypcji</span>
           
         </div>
         <div class="preview__caption" data-project="rehab">
-          <img class="sygnet mono" src="assets/rehab/sygnet.svg" width="20" height="20" alt="">
+          <img class="sygnet" src="assets/rehab/sygnet.png" width="20" height="20" alt="">
           <span class="t-meta preview__text">reh.ab - pitch deck platformy łączącej gaming ze zdrowiem psychicznym</span>
           <a class="link-u t-meta" href="https://lumerw.github.io/reh.ab/" target="_blank" rel="noopener">zobacz projekt ↗</a>
         </div>
@@ -294,10 +294,22 @@
             </dl>
           </div>
           <div class="case__media">
-            <figure class="media media--16x10"><img class="mono" src="assets/teraz/01.svg" alt="teraz" width="1600" height="1000" loading="lazy" decoding="async"></figure>
+            <figure class="media media--16x10"><picture>
+          <source type="image/avif" srcset="assets/teraz/01-640.avif 640w, assets/teraz/01-1280.avif 1280w" sizes="50vw">
+          <source type="image/webp" srcset="assets/teraz/01-640.webp 640w, assets/teraz/01-1280.webp 1280w" sizes="50vw">
+          <img src="assets/teraz/01-1280.jpg" srcset="assets/teraz/01-640.jpg 640w, assets/teraz/01-1280.jpg 1280w" sizes="50vw" alt="teraz - strona główna teraz.eu na desktopie" width="1600" height="1000" loading="lazy" decoding="async">
+        </picture></figure>
             <div class="case__pair">
-              <figure class="media media--4x5"><img class="mono" src="assets/teraz/02.svg" alt="teraz" width="1200" height="1500" loading="lazy" decoding="async"></figure>
-              <figure class="media media--4x5"><img class="mono" src="assets/teraz/03.svg" alt="teraz" width="1200" height="1500" loading="lazy" decoding="async"></figure>
+              <figure class="media media--4x5"><picture>
+          <source type="image/avif" srcset="assets/teraz/02-640.avif 640w" sizes="15vw">
+          <source type="image/webp" srcset="assets/teraz/02-640.webp 640w" sizes="15vw">
+          <img src="assets/teraz/02-640.jpg" srcset="assets/teraz/02-640.jpg 640w" sizes="15vw" alt="teraz - plansza marki: logo i hasło porozmawiajmy tu i teraz" width="1200" height="1500" loading="lazy" decoding="async">
+        </picture></figure>
+              <figure class="media media--4x5"><picture>
+          <source type="image/avif" srcset="assets/teraz/03-640.avif 640w" sizes="15vw">
+          <source type="image/webp" srcset="assets/teraz/03-640.webp 640w" sizes="15vw">
+          <img src="assets/teraz/03-640.jpg" srcset="assets/teraz/03-640.jpg 640w" sizes="15vw" alt="teraz - strona teraz.eu na telefonie" width="1200" height="1500" loading="lazy" decoding="async">
+        </picture></figure>
             </div>
           </div>
         </div>
@@ -309,7 +321,7 @@
   <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
   <div class="sheet__panel">
     <div class="sheet__bar wrap">
-      <img class="sygnet sheet__sygnet mono" src="assets/loom/sygnet.svg" width="20" height="20" alt="">
+      <img class="sygnet sheet__sygnet" src="assets/loom/sygnet.svg" width="20" height="20" alt="">
       <span class="t-meta sheet__no">02</span>
       <h2 id="loom-title" class="t-project">loom.studio</h2>
       <span class="t-meta sheet__year">studio</span>
@@ -318,13 +330,13 @@
     </div>
     <div class="sheet__body wrap">
       <figure class="sheet__video sheet__video--16x9 media" style="--ratio:1920 / 1080; --ar:1.7778">
-        <img class="mono" src="assets/loom/video-16x9.svg" width="1920" height="1080" alt="loom.studio - [opis wideo promocyjnego]" loading="lazy" decoding="async">
+        <img src="assets/loom/cover-16x9.webp" width="1920" height="1080" alt="loom.studio - plansza marki: logo na osi czerni i papieru, trzy figury Bauhausu" loading="lazy" decoding="async">
       </figure>
       <figure class="sheet__video sheet__video--4x5 media" style="--ratio:1080 / 1350; --ar:0.8000">
-        <img class="mono" src="assets/loom/video-4x5.svg" width="1080" height="1350" alt="loom.studio - [opis wideo promocyjnego]" loading="lazy" decoding="async">
+        <img src="assets/loom/cover-4x5.webp" width="1080" height="1350" alt="loom.studio - plansza marki: logo na osi czerni i papieru, trzy figury Bauhausu" loading="lazy" decoding="async">
       </figure>
       <figure class="sheet__video sheet__video--9x16 media" style="--ratio:1080 / 1920; --ar:0.5625">
-        <img class="mono" src="assets/loom/video-9x16.svg" width="1080" height="1920" alt="loom.studio - [opis wideo promocyjnego]" loading="lazy" decoding="async">
+        <img src="assets/loom/cover-9x16.webp" width="1080" height="1920" alt="loom.studio - plansza marki: logo na osi czerni i papieru, trzy figury Bauhausu" loading="lazy" decoding="async">
       </figure>
       <p class="sheet__caption t-meta"><span>loom.studio - studio projektowe w modelu subskrypcji</span></p>
       <div class="case print-only">
@@ -340,10 +352,22 @@
             </dl>
           </div>
           <div class="case__media">
-            <figure class="media media--16x10"><img class="mono" src="assets/loom/01.svg" alt="loom.studio" width="1600" height="1000" loading="lazy" decoding="async"></figure>
+            <figure class="media media--16x10"><picture>
+          <source type="image/avif" srcset="assets/loom/01-640.avif 640w, assets/loom/01-1280.avif 1280w" sizes="50vw">
+          <source type="image/webp" srcset="assets/loom/01-640.webp 640w, assets/loom/01-1280.webp 1280w" sizes="50vw">
+          <img src="assets/loom/01-1280.jpg" srcset="assets/loom/01-640.jpg 640w, assets/loom/01-1280.jpg 1280w" sizes="50vw" alt="loom.studio - strona główna na desktopie" width="1600" height="1000" loading="lazy" decoding="async">
+        </picture></figure>
             <div class="case__pair">
-              <figure class="media media--4x5"><img class="mono" src="assets/loom/02.svg" alt="loom.studio" width="1200" height="1500" loading="lazy" decoding="async"></figure>
-              <figure class="media media--4x5"><img class="mono" src="assets/loom/03.svg" alt="loom.studio" width="1200" height="1500" loading="lazy" decoding="async"></figure>
+              <figure class="media media--4x5"><picture>
+          <source type="image/avif" srcset="assets/loom/02-640.avif 640w" sizes="15vw">
+          <source type="image/webp" srcset="assets/loom/02-640.webp 640w" sizes="15vw">
+          <img src="assets/loom/02-640.jpg" srcset="assets/loom/02-640.jpg 640w" sizes="15vw" alt="loom.studio - plansza marki: logo na osi czerni i papieru, trzy figury Bauhausu" width="1200" height="1500" loading="lazy" decoding="async">
+        </picture></figure>
+              <figure class="media media--4x5"><picture>
+          <source type="image/avif" srcset="assets/loom/03-640.avif 640w" sizes="15vw">
+          <source type="image/webp" srcset="assets/loom/03-640.webp 640w" sizes="15vw">
+          <img src="assets/loom/03-640.jpg" srcset="assets/loom/03-640.jpg 640w" sizes="15vw" alt="loom.studio - strona na telefonie" width="1200" height="1500" loading="lazy" decoding="async">
+        </picture></figure>
             </div>
           </div>
         </div>
@@ -355,7 +379,7 @@
   <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
   <div class="sheet__panel">
     <div class="sheet__bar wrap">
-      <img class="sygnet sheet__sygnet mono" src="assets/rehab/sygnet.svg" width="20" height="20" alt="">
+      <img class="sygnet sheet__sygnet" src="assets/rehab/sygnet.png" width="20" height="20" alt="">
       <span class="t-meta sheet__no">03</span>
       <h2 id="rehab-title" class="t-project">reh.ab</h2>
       <span class="t-meta sheet__year">pitch deck</span>
@@ -364,13 +388,13 @@
     </div>
     <div class="sheet__body wrap">
       <figure class="sheet__video sheet__video--16x9 media" style="--ratio:1920 / 1080; --ar:1.7778">
-        <img class="mono" src="assets/rehab/video-16x9.svg" width="1920" height="1080" alt="reh.ab - [opis wideo promocyjnego]" loading="lazy" decoding="async">
+        <img src="assets/rehab/cover-16x9.webp" width="1920" height="1080" alt="reh.ab - plansza marki: hasło Make an impact together na czerwonym tle" loading="lazy" decoding="async">
       </figure>
       <figure class="sheet__video sheet__video--4x5 media" style="--ratio:1080 / 1350; --ar:0.8000">
-        <img class="mono" src="assets/rehab/video-4x5.svg" width="1080" height="1350" alt="reh.ab - [opis wideo promocyjnego]" loading="lazy" decoding="async">
+        <img src="assets/rehab/cover-4x5.webp" width="1080" height="1350" alt="reh.ab - plansza marki: hasło Make an impact together na czerwonym tle" loading="lazy" decoding="async">
       </figure>
       <figure class="sheet__video sheet__video--9x16 media" style="--ratio:1080 / 1920; --ar:0.5625">
-        <img class="mono" src="assets/rehab/video-9x16.svg" width="1080" height="1920" alt="reh.ab - [opis wideo promocyjnego]" loading="lazy" decoding="async">
+        <img src="assets/rehab/cover-9x16.webp" width="1080" height="1920" alt="reh.ab - plansza marki: hasło Make an impact together na czerwonym tle" loading="lazy" decoding="async">
       </figure>
       <p class="sheet__caption t-meta"><span>reh.ab - pitch deck platformy łączącej gaming ze zdrowiem psychicznym</span></p>
       <div class="case print-only">
@@ -386,10 +410,22 @@
             </dl>
           </div>
           <div class="case__media">
-            <figure class="media media--16x10"><img class="mono" src="assets/rehab/01.svg" alt="reh.ab" width="1600" height="1000" loading="lazy" decoding="async"></figure>
+            <figure class="media media--16x10"><picture>
+          <source type="image/avif" srcset="assets/rehab/01-640.avif 640w, assets/rehab/01-1280.avif 1280w" sizes="50vw">
+          <source type="image/webp" srcset="assets/rehab/01-640.webp 640w, assets/rehab/01-1280.webp 1280w" sizes="50vw">
+          <img src="assets/rehab/01-1280.jpg" srcset="assets/rehab/01-640.jpg 640w, assets/rehab/01-1280.jpg 1280w" sizes="50vw" alt="reh.ab - makieta czatu na serwerze z dyżurem specjalisty" width="1600" height="1000" loading="lazy" decoding="async">
+        </picture></figure>
             <div class="case__pair">
-              <figure class="media media--4x5"><img class="mono" src="assets/rehab/02.svg" alt="reh.ab" width="1200" height="1500" loading="lazy" decoding="async"></figure>
-              <figure class="media media--4x5"><img class="mono" src="assets/rehab/03.svg" alt="reh.ab" width="1200" height="1500" loading="lazy" decoding="async"></figure>
+              <figure class="media media--4x5"><picture>
+          <source type="image/avif" srcset="assets/rehab/02-640.avif 640w" sizes="15vw">
+          <source type="image/webp" srcset="assets/rehab/02-640.webp 640w" sizes="15vw">
+          <img src="assets/rehab/02-640.jpg" srcset="assets/rehab/02-640.jpg 640w" sizes="15vw" alt="reh.ab - plansza marki: hasło Make an impact together na czerwonym tle" width="1200" height="1500" loading="lazy" decoding="async">
+        </picture></figure>
+              <figure class="media media--4x5"><picture>
+          <source type="image/avif" srcset="assets/rehab/03-640.avif 640w" sizes="15vw">
+          <source type="image/webp" srcset="assets/rehab/03-640.webp 640w" sizes="15vw">
+          <img src="assets/rehab/03-640.jpg" srcset="assets/rehab/03-640.jpg 640w" sizes="15vw" alt="reh.ab - strona na telefonie" width="1200" height="1500" loading="lazy" decoding="async">
+        </picture></figure>
             </div>
           </div>
         </div>
