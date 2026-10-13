@@ -15,12 +15,13 @@ export const shared = {
   email: 'wojciechlumer@gmail.com',
   // Przycisk „kontakt” - link do kalendarza spotkań. [Wpisz swój link Calendly]
   calendly: '[https://calendly.com/…]',  // dopóki to placeholder, przycisk „kontakt” otwiera maila
+  // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
-    { label: 'Behance', href: '[https://behance.net/…]' },
-    { label: 'LinkedIn', href: '[https://linkedin.com/in/…]' },
-    { label: 'Facebook', href: '[https://facebook.com/…]' },
-    { label: 'Instagram', href: '[https://instagram.com/…]' },
-    { label: 'GitHub', href: '[https://github.com/…]' },
+    { label: 'Instagram', href: 'https://www.instagram.com/wojciechlumer/' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/wojciechlumer/' },
+    { label: 'Facebook', href: 'https://www.facebook.com/wojtek.lumer/' },
+    { label: 'GitHub', href: 'https://github.com/Lumerw' },
+    { label: 'Behance', href: 'https://www.behance.net/wojteklumer' },
   ],
   // duotone: true → `npm run images` zamienia zdjęcie na tusz + papier (identycznie na stronie i w PDF).
   portrait: { src: 'assets/me/portrait.svg', w: 1200, h: 1500, duotone: true },
@@ -120,7 +121,9 @@ export const shared = {
       // Logo (Haus w krzywych) i sygnet - trzy figury Bauhausu - z brand kitu loom.studio (repozytorium loomstudio)
       logo:   { src: 'assets/loom/logo.svg', w: 453, h: 70 },
       sygnet: { src: 'assets/loom/sygnet.svg', mono: false },
-      // Plansza marki (statyczna, zanim powstanie wideo): podgląd na stronie głównej i panel. npm run covers
+      // Grafika interaktywna (live.js): gradient z hero loom.studio + pływające figury, bez logo i napisów.
+      live: true,
+      // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
       cover: { '4x5': 'assets/loom/cover-4x5.webp', '16x9': 'assets/loom/cover-16x9.webp', '9x16': 'assets/loom/cover-9x16.webp' },
       video: {
         '16x9': { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
@@ -144,7 +147,19 @@ export const shared = {
       symbol: 'rehab',
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/rehab/sygnet.png', mono: false },   // favicon reh.ab: „her” na czerwieni
-      // Plansza marki (statyczna, zanim powstanie wideo): podgląd na stronie głównej i panel. npm run covers
+      // Grafika interaktywna (live.js): hero reh.ab 1:1 w pętli. Tekst marki - po angielsku w obu wersjach.
+      live: {
+        title: ['Make an', 'impact', 'toget', 'her', '.'],   // „impact” i „toget” przygasają, za „her” poświata
+        lede: [
+          ['An estimated 40% of the world\'s population plays games online.', '1'],
+          ['In Europe, more than half of people aged 6-64 play video games.', '2'],
+          ['Gaming is one of the biggest social spaces on earth - and one of the least supported.'],
+        ],
+        ticker: ['data.', 'vision.', 'tools - put to use.'],
+        quotes: ['this is more helpful than you think', 'we made the safe space you needed', 'someone who gets it is usually online', 'you\'re not alone in this lobby'],
+        avatars: ['assets/rehab/live/p1.svg', 'assets/rehab/live/p2.svg', 'assets/rehab/live/p3.svg'],
+      },
+      // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
       cover: { '4x5': 'assets/rehab/cover-4x5.webp', '16x9': 'assets/rehab/cover-16x9.webp', '9x16': 'assets/rehab/cover-9x16.webp' },
       video: {
         '16x9': { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy

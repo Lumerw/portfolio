@@ -37,7 +37,7 @@ const browser = await chromium.launch();
   const bad = [];
   for (const w of [320, 375, 768, 1024, 1440]) {
     const p = await browser.newPage({ viewport: { width: w, height: 800 } });
-    for (const hash of ['', '#teraz', '#o-mnie']) {
+    for (const hash of ['', '#teraz', '#loom', '#agent']) {
       await p.goto(URL + hash);
       if (await p.evaluate(() => document.documentElement.scrollWidth > innerWidth)) bad.push(`${w}${hash}`);
     }

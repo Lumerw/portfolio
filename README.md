@@ -46,18 +46,19 @@ Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = mi
 | `shared.name` + `pl/en.hero.role` | podpis nad hasłem („Wojciech Lumer — projektant”) |
 | `pl/en.hero.title`, `.line` | hasło (h1: „Design is how it works.” / „Design to to, jak coś działa.”) i akapit pod nim; też okładka PDF i `og.jpg` |
 | `shared.calendly` | przycisk „kontakt” — **wpisz swój link Calendly**; do tego czasu przycisk otwiera maila |
-| `shared.email`, `shared.links` | stopka, przycisk „kontakt”, ikonka LinkedIn przy „o mnie” |
+| `shared.email`, `shared.links` | stopka (profile: Instagram, LinkedIn, Facebook, GitHub, Behance), przycisk „kontakt”, dane dla Google, asystent, PDF; LinkedIn = wiersz „o mnie” w indeksie |
 | `shared.siteUrl` | QR w PDF, adresy Open Graph, `canonical`, dane strukturalne, `sitemap.xml` i `robots.txt` — **zmień po podpięciu domeny** |
 | `shared.icons` | trzy miejsca obok znaku i sześć w brandbooku: każde zmienia się we własnym, losowym rytmie 0,5-1,1 s (`ICON_MS` w `main.js`) i nigdy nie pokazuje tej samej ikony co sąsiad |
 | `shared.clients` | karuzela firm: `name` (tekst alternatywny), `logo` (najlepiej SVG, jeden kolor) |
 | `projects[].logo`, `.sygnet` | logo na środku podglądu; sygnet / favicon przy zakresie prac i w panelu. `mono: false` = kolorowy asset marki (bez odwracania w trybie ciemnym) |
 | `projects[].brand` | opcjonalnie: plansza w stylu marki — `bg` (tło), `aurora` (4 kolory rozmytych gradientów), `speed` (czas animacji). Używana w podglądzie i w panelu, dopóki nie ma wideo. Przykład: teraz (assety z teraz.eu) |
 | `projects[].video['16x9']`, `['4x5']`, `['9x16']` | wideo w panelu, zawsze w całości (patrz tabela formatów niżej): `src` mp4 bez dźwięku, `poster` kadr. Kolejność: prawdziwe wideo (`src`) > `reel` > plansza statyczna (`cover`) > plansza marki (`brand`) > poster |
+| `projects[].live` | grafika interaktywna zamiast wideo (`live.js`): loom.studio - płynny gradient WebGL z hero loom.studio (reaguje na kursor) i trzy figury Bauhausu pływające na sprężynach; reh.ab - hero reh.ab w pętli 21 s ze wszystkimi mikroanimacjami (teksty w `live` przy projekcie). Wstawiana tylko w aktywnym podglądzie i otwartym panelu, z pauzą w panelu |
 | `projects[].cover` | plansza statyczna w stylu marki (loom.studio, reh.ab): podgląd 4:5 na stronie głównej i panel w trzech formatach, zanim powstanie wideo. Generuje `npm run covers` z `tools/covers.mjs` - te same plansze co w PDF 1080 × 1080 |
 | `projects[].reel` | `true` = plansza animowana zamiast postera, w panelu i w podglądzie na stronie głównej (teraz). Teksty w `pl/en.projects.<id>.reel` (te same klucze w obu językach; limity znaków i brak długich myślników sprawdza `npm run build`), etykieta pauzy w `ui.reelPause` |
 | `projects[].images` | `main` 16:10, `a`, `b` 4:5 — tylko w PDF |
 | `pl/en.projects.*` | zakres prac, opis, problem / rozwiązanie / efekt (PDF; limit 120 słów sprawdza build) |
-| `pl/en.about` | panel „o mnie” i strona 2 PDF |
+| `pl/en.about` | strona 2 PDF (panel „o mnie” jest na razie wyłączony na stronie - wiersz „o mnie” prowadzi na LinkedIn) |
 
 ### Obrazy
 
@@ -179,7 +180,8 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 | `render.js` | szablony HTML — wspólne dla przeglądarki i buildu |
 | `styles.css` | tokeny na górze, potem reset, siatka, typografia, komponenty, ruch |
 | `print.css` | PDF: A4 poziomo, 6 stron |
-| `main.js` | PL/EN, indeks ↔ podgląd, panele, ikony, wideo, kopiowanie maila, czat asystenta |
+| `main.js` | PL/EN, indeks ↔ podgląd, panele, ikony, wideo, kopiowanie maila, czat asystenta, wstawianie grafik interaktywnych |
+| `live.js` | grafiki interaktywne loom.studio i reh.ab (znaczniki + gradient WebGL i fizyka figur) |
 | `agent.js` | silnik asystenta AI: odpowiedzi lokalne, wiedza i instrukcja dla modelu, zapytanie do Workera |
 | `agent/` | Cloudflare Worker (pośrednik do Claude API) i jego konfiguracja |
 | `symbols.js` | geometria symboli — jedno źródło dla strony i plików SVG |
@@ -193,6 +195,8 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 - **Symbole bez `vector-effect: non-scaling-stroke`.** W Chrome ta właściwość psuje `pathLength` (symbol > 48 px rysował się w części). Grubość 1 px trzyma `stroke-width` liczony z `--size`.
 - **Animowane linie symboli** mają klasę `.stroke`, a CSS nie wybiera ich przez `[pathLength]` — Chrome nie przeliczał stylu po takim selektorze i animacja nie ruszała.
 - **Portret w duotonie** robi `npm run images` (sharp), nie filtr CSS — wygląda tak samo na stronie i w PDF.
+- **Grafiki interaktywne loom.studio i reh.ab zamiast wideo** (decyzja właściciela, 13.10.2026). Przeniesione z kodu projektów: shader `flow-gl.ts` i fizyka `hero-physics.ts` z loom.studio, hero reh.ab z `css/style.css` i `js/main.js` (pisanie, taśma i cytaty w czystym CSS). Bez logo i napisów w loom. Żeby strona startowała lekko (DOM ≤ 800, Lighthouse), grafika jest wstawiana dopiero w aktywnym podglądzie / otwartym panelu nad statyczną planszą (`cover`), która jest jej pierwszą klatką - bez JS i przy ograniczonym ruchu zostaje plansza. W panelu przycisk pauzy (WCAG 2.2.2). Tekst reh.ab po angielsku w obu wersjach (to tekst marki), długie myślniki zamienione na „-”.
+- **„O mnie” → LinkedIn** (decyzja właściciela, 13.10.2026): panel „o mnie” wyłączony na ekranie (`.sheet--about` tylko w druku), w indeksie wiersz z ikoną LinkedIn.
 - **Tęczowa poświata asystenta AI** (decyzja właściciela, 13.10.2026) - jedyny kolor marki osobistej, zapisany jako wyjątek w brandbooku. Gradient obraca się przez `transform` (bez przemalowywania), przy ograniczonym ruchu stoi. Przycisk w stopce obok „kontakt”, nie pływający w rogu: strona główna to jeden ekran, a pływający przycisk zasłaniałby podgląd na desktopie i panele na telefonie.
 - **Marka czarno-biała:** bez koloru akcentu (zamiast czerwonej/niebieskiej kropki z briefu). Kropka w znaku osobistym ma kolor tuszu; aktywny wiersz indeksu oznacza tylko podkreślenie. Kolory mają wyłącznie marki projektów (np. teraz).
 - **PDF:** strona drukowana ma margines 0, a 14 mm to wewnętrzny odstęp (inaczej Chrome zostawia białe marginesy zamiast papieru). Kolejność stron ustawia `order` w `print.css`.

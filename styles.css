@@ -402,19 +402,6 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 
 .index { margin-top: var(--s-6); }
 
-/* Wiersz „o mnie” z ikonką LinkedIn po prawej (osobny link obok wiersza) */
-.index__item--icon { position: relative; }
-.index__icon {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  padding: var(--s-1) 0 var(--s-1) var(--s-1);
-  color: var(--ink-2);
-  transition: color var(--t-line) var(--ease);
-}
-a.index__icon:hover { color: var(--ink); }
 
 /* ==========================================================================
    Karuzela firm — powolna pętla, pauza po najechaniu, bez ruchu przy reduced-motion
@@ -1152,6 +1139,9 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 }
 .sheet:target .sheet__panel { transform: none; }
 
+/* Panel „o mnie” na razie tylko w PDF (strona 2) - na ekranie wiersz „o mnie” prowadzi na LinkedIn */
+@media screen { .sheet--about { display: none; } }
+
 /* Strona pod spodem się nie przewija */
 html:has(.sheet:target) { overflow: hidden; }
 
@@ -1357,6 +1347,20 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 .contact__links a { color: var(--ink); border-bottom: var(--hairline) solid var(--hair); transition: border-color var(--t-line) var(--ease); }
 .contact__links a:hover { border-color: var(--ink); }
+
+/* 768-1279 px: pięć profili, mail i dwa przyciski w jednej linii - bez ©, ciaśniej, mail bez łamania.
+   (Stopka nie może urosnąć: przy 1024 × 768 strona mieści się na jednym ekranie.) */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .site-footer__copy { display: none; }
+  .site-footer__in { grid-template-areas: "contact button"; grid-template-columns: 1fr auto; column-gap: var(--s-3); }
+  .site-footer__contact { gap: var(--s-3); }
+  .site-footer .mail { font-size: 18px; white-space: nowrap; }
+}
+/* 768-1023 px (tablet): profile pod mailem */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .site-footer__contact { flex-wrap: wrap; row-gap: var(--s-1); }
+  .site-footer__contact .contact__links { order: 1; }
+}
 
 /* Przycisk: włosowa ramka, bez zaokrągleń; po najechaniu wypełnienie tuszem */
 .button {

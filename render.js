@@ -18,7 +18,7 @@ export const RP = {
   falka: 'M2.7 21.4 C14.9 21.7, 48.2 23.1, 76.1 22.9 C104.1 22.7, 146.3 22.4, 170.7 20.2 C195 18, 212.1 12.2, 222.4 9.7 C232.8 7.1, 232.9 5, 232.8 4.8 C232.8 4.6, 224.1 7.9, 222.4 8.5',
   pause: 'M6 4h4v16H6zM14 4h4v16h-4z', play: 'M7 4l13 8-13 8z',
 };
-const svgi = (d, cls = '', vb = '0 0 24 24', eo = false) =>
+export const svgi = (d, cls = '', vb = '0 0 24 24', eo = false) =>
   `<svg${cls ? ` class="${cls}"` : ''} viewBox="${vb}" aria-hidden="true" focusable="false"><path${eo ? ' fill-rule="evenodd"' : ''} d="${d}"/></svg>`;
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -126,10 +126,9 @@ function indexRow(p, i) {
 }
 
 // Ikonka LinkedIn kreską 1 px: ramka + „in”.
-const linkedinIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
+const linkedinIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
 
 // Ikonki w kolumnie numerów: „i” (o mnie) i pobieranie (PDF), kreska 1 px.
-const infoIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 7v4.5"/><circle cx="8" cy="4.8" r=".6" fill="currentColor" stroke="none"/></svg>`;
 const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg>`;
 
 // Karuzela firm: lista + jej kopia (aria-hidden) dla płynnej pętli.
@@ -154,11 +153,9 @@ function clients(c, t) {
 
 function hero(c, t) {
   const n = c.projects.length;
+  // „o mnie” prowadzi na LinkedIn (panel „o mnie” jest na razie tylko w PDF). Bez adresu - bez wiersza.
   const linkedin = c.links.find(l => l.label === 'LinkedIn');
-  const liHref = linkedin && url(linkedin.href);
-  const liIcon = liHref && liHref !== '#'
-    ? `<a class="index__icon" href="${esc(liHref)}" target="_blank" rel="me noopener" aria-label="${esc(t.ui.linkedin)}">${linkedinIcon}</a>`
-    : '';                                              // bez adresu - bez ikonki
+  const liHref = linkedin ? url(linkedin.href) : '#';
 
   // Logo projektu na środku podglądu: papier, plansza marki (brand) albo plansza animowana 4:5 (reel).
   // Reel na stronie głównej jest dekoracyjny - tekst niesie podpis pod ramką. Logo w reelu stoi
@@ -205,10 +202,10 @@ function hero(c, t) {
       <p class="hero__year t-meta print-only">${esc(c.year)}</p>
       <nav class="index" aria-label="${esc(t.ui.indexLabel)}">
         <ul>${c.projects.map(indexRow).join('')}
-          <li class="reveal index__item--icon" style="--n:${n + 3}">
-            <a class="index__row index__row--sub" href="#o-mnie" aria-haspopup="dialog"><span class="index__no">${infoIcon}</span><span class="index__title">${esc(t.ui.about)}</span><span class="index__year"></span></a>
-            ${liIcon}
-          </li>
+${liHref !== '#' ? `
+          <li ${reveal(n + 3)}>
+            <a class="index__row index__row--sub" href="${esc(liHref)}" target="_blank" rel="me noopener"><span class="index__no">${linkedinIcon}</span><span class="index__title">${esc(t.ui.about)}</span><span class="index__year t-meta">LinkedIn ↗</span></a>
+          </li>` : ''}
           <li ${reveal(n + 4)}>
             <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year t-meta">${esc(t.ui.downloadType)}</span></a>
           </li>

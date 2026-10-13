@@ -1,0 +1,194 @@
+/* ==========================================================================
+   Interaktywne plansze (projects[].live, live.js): loom.studio i reh.ab.
+   Osobny plik: live.js wczytuje go przy pierwszej grafice - nie blokuje pierwszego wyświetlenia strony.
+   Wstawiane przez main.js nad statyczną planszą (cover) tylko w aktywnym podglądzie / otwartym panelu.
+   Grają, gdy widać je w aktywnym podglądzie albo otwartym panelu (--live-play), pauza: .is-paused.
+   Wymiary w cq - ta sama grafika w 4:5, 16:9 i 9:16. .live--static = stan końcowy bez ruchu (cover).
+   ========================================================================== */
+.live {
+  --live-play: paused;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  container-type: size;
+  animation: live-in 400ms var(--ease) both;
+}
+@keyframes live-in { from { opacity: 0; } }
+.preview__logo.is-active .live,
+.sheet:target .live { --live-play: running; }
+.sheet:target .live.is-paused { --live-play: paused; }
+.live *, .live *::before, .live *::after { animation-play-state: var(--live-play) !important; }
+.live--static, .live--static *, .live--static *::before, .live--static *::after { animation: none !important; }
+.live--static .og-grain { display: none; }   /* ziarno (6%) niewidoczne w planszy, a mocno ją powiększa */
+
+/* ---- loom.studio: gradient (lewa połowa) + figury Bauhausu (prawa) ---- */
+.live--loom { background: #E8E6DF; }
+.lv-flow { position: absolute; inset: 0 50% 0 0; overflow: hidden; }
+.og {
+  --a: 9%;
+  --b0: .92;
+  --b1: 1.12;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  contain: paint;
+  background: #000;
+}
+.og-blob {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: calc(var(--s) * 1cqmax);
+  aspect-ratio: 1;
+  margin: calc(var(--s) * -.5cqmax) 0 0 calc(var(--s) * -.5cqmax);
+  background: radial-gradient(62% 44% at 50% 50%, var(--c) 0%, transparent 70%);
+  animation:
+    og-drift var(--d1) ease-in-out var(--p) infinite,
+    og-breath var(--d2) ease-in-out var(--p) infinite alternate,
+    og-turn var(--d3) linear var(--p) infinite;
+}
+@keyframes og-drift {
+  0%, 100% { translate: 0 0; }
+  25% { translate: calc(var(--a) * 1) calc(var(--a) * -.7); }
+  50% { translate: calc(var(--a) * -.5) calc(var(--a) * .9); }
+  75% { translate: calc(var(--a) * -.9) calc(var(--a) * -.3); }
+}
+@keyframes og-breath { from { scale: var(--b0); } to { scale: var(--b1); } }
+@keyframes og-turn { to { rotate: 360deg; } }
+.og-grain { position: absolute; inset: 0; background: url("assets/loom/grain.png") repeat; background-size: 128px; opacity: .06; pointer-events: none; }
+/* Warstwa WebGL nad gradientem CSS; gdy gra, gradient CSS chowa się po jej pojawieniu */
+.lv-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 400ms cubic-bezier(.2, .8, .2, 1); }
+.lv-canvas[data-live] { opacity: 1; }
+.lv-flow:has(> .lv-canvas[data-live]) > .og { visibility: hidden; transition: visibility 0s linear 450ms; }
+
+.lv-paper { position: absolute; inset: 0 0 0 50%; container-type: size; }
+/* Kompozycja 179 × 138 z loom.studio, skalowana do ramki; ciała w % jej boków */
+.bauhaus {
+  --snappy: linear(0, .2 6%, .62 14%, .98 24%, 1.08 31%, 1.06 40%, 1 52%, .99 66%, 1);
+  --soft: linear(0, .1 8%, .38 18%, .72 30%, .95 44%, 1.03 56%, 1.01 72%, 1);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(56cqw, 36cqh);
+  aspect-ratio: 179 / 138;
+  translate: -50% -50%;
+}
+.bh-body { position: absolute; will-change: transform; }
+.bh-body--square   { z-index: 3; left: 0;      top: 0;      width: 43.02%; height: 55.8%; }
+.bh-body--circle   { z-index: 2; left: 25.7%;  top: 33.33%; width: 44.13%; height: 57.25%; }
+.bh-body--triangle { z-index: 1; left: 51.4%;  top: 44.93%; width: 48.6%;  height: 55.07%; }
+.bh-fx { position: absolute; inset: 0; pointer-events: none; }
+.bh-tile { position: absolute; width: calc(25% + 1px); height: calc(25% + 1px); background: #ED3434; transition: transform 700ms var(--soft); }
+.bh-square { position: absolute; inset: 0; z-index: 2; }
+.bauhaus:has(.bh-square:hover) .bh-tile { transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--sc)); transition: transform 420ms var(--snappy); }
+.bh-circle { position: absolute; inset: 0; border-radius: 50%; background: #4F59DB; transition: border-radius 250ms cubic-bezier(.7, 0, .3, 1); }
+.bh-circle:hover { border-radius: 50% 50% 50% 0; }   /* koło → kropla */
+.bh-tri { position: absolute; inset: 0; color: #F0CA42; clip-path: polygon(50% 0, 100% 100%, 0 100%); transition: clip-path 0s linear 350ms; }
+.bh-tri svg { display: block; width: 100%; height: 100%; fill: currentColor; transition: transform 350ms cubic-bezier(.7, 0, .3, 1); }
+.bh-tri:hover { clip-path: inset(-20%); transition: none; }
+.bh-tri:hover svg { transform: rotate(90deg); }          /* trójkąt → ▶ */
+
+/* ---- reh.ab: hero w pętli 21 s (pisanie, przygaszenie, poświata; taśma 6,3 s; pasek 7 s) ---- */
+.live--rehab {
+  --rh-loop: 21s;
+  --rh-ease: cubic-bezier(.4, 0, .2, 1);
+  display: flex;
+  flex-direction: column;
+  background: #CA002A;
+  color: #fff;
+  font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.rh-copy { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 7cqw; }
+.rh-h { font-size: min(9.5cqw, 7.4cqh); font-weight: 700; line-height: 1.02; letter-spacing: -.025em; }
+.rh-h .w { display: inline-block; }
+.rh-h .ch { display: inline-block; font-style: normal; position: relative; z-index: 1; animation: rh-ch var(--rh-loop) linear calc(var(--i) * 26ms) infinite both; }
+@keyframes rh-ch { 0% { opacity: 0; } 1.14% { opacity: 1; } 96% { opacity: 1; } 97.2%, 100% { opacity: 0; } }
+.rh-h .d1 { opacity: .66; animation: rh-d1 var(--rh-loop) var(--rh-ease) infinite both; }
+.rh-h .d2 { opacity: .3;  animation: rh-d2 var(--rh-loop) var(--rh-ease) infinite both; }
+@keyframes rh-d1 { 0%, 4.1% { opacity: 1; } 11.7%, 100% { opacity: .66; } }
+@keyframes rh-d2 { 0%, 4.1% { opacity: 1; } 11.7%, 100% { opacity: .3; } }
+.rh-h .her { position: relative; }
+.her-light { position: absolute; inset: 0; animation: rh-light var(--rh-loop) var(--rh-ease) infinite both; }
+@keyframes rh-light { 0% { opacity: 0; } 3%, 95% { opacity: 1; } 98%, 100% { opacity: 0; } }
+.her-glow {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 165%;
+  height: 150%;
+  translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0) 74%);
+  filter: blur(.17em);
+  opacity: .6;
+  animation: rh-glow 5s var(--rh-ease) infinite;
+}
+@keyframes rh-glow { 0%, 100% { opacity: .4; scale: 1; } 50% { opacity: .92; scale: 1.09; } }
+.rh-lede { margin-top: min(4.4cqw, 4cqh); font-size: min(4cqw, 2.6cqh); line-height: 1.55; max-width: 62ch; }
+.rh-lede sup { font-size: .62em; line-height: 0; }
+.rh-ticker {
+  --line: min(5.6cqw, 4.2cqh);
+  height: calc(var(--line) * 3.1);
+  margin-top: min(6.4cqw, 5.4cqh);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 27%, rgba(0, 0, 0, .5) 54%, rgba(0, 0, 0, .19) 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0, #000 27%, rgba(0, 0, 0, .5) 54%, rgba(0, 0, 0, .19) 78%, transparent 100%);
+}
+.rh-track { animation: rh-tick 6.3s infinite; }
+.rh-track span { height: var(--line); display: flex; align-items: center; white-space: nowrap; font-size: min(3.4cqw, 2.4cqh); font-weight: 700; letter-spacing: -.02em; }
+/* jedno słowo w górę: 1,4 s postoju + 0,7 s przewijania; po trzecim skok do identycznej klatki */
+@keyframes rh-tick {
+  0%, 22.22% { translate: 0 0; animation-timing-function: var(--rh-ease); }
+  33.33%, 55.56% { translate: 0 calc(var(--line) * -1); animation-timing-function: var(--rh-ease); }
+  66.67%, 88.89% { translate: 0 calc(var(--line) * -2); animation-timing-function: var(--rh-ease); }
+  100% { translate: 0 calc(var(--line) * -3); }
+}
+/* Pasek: dryfujący gradient „her”, awatary, cytat na ciemnej pigułce, ładowanie 7 s */
+.rh-band {
+  position: relative;
+  flex: none;
+  height: 21%;
+  padding: min(3.2cqh, 4cqw) 7cqw 0;
+  background-image: linear-gradient(120deg, #E3297D 0%, #72527B 25%, #9AA5C3 50%, #8D998D 75%, #FCC59C 100%);
+  background-size: 220% 220%;
+  animation: rh-drift 24s var(--rh-ease) infinite;
+}
+.rh-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(302deg, #FCC59C 0%, #8D998D 25%, #9AA5C3 50%, #72527B 75%, #E3297D 100%);
+  background-size: 250% 250%;
+  opacity: .35;
+  animation: rh-drift 34.8s var(--rh-ease) infinite reverse, rh-breathe 20.4s var(--rh-ease) infinite;
+}
+.rh-band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(238, 36, 59, 0) 30%, #EE243B 100%); }
+@keyframes rh-drift { 0%, 100% { background-position: 0% 50%; } 25% { background-position: 55% 18%; } 50% { background-position: 100% 50%; } 75% { background-position: 45% 82%; } }
+@keyframes rh-breathe { 0%, 100% { opacity: .24; } 50% { opacity: .6; } }
+.rh-row { position: relative; z-index: 2; display: flex; align-items: center; gap: min(2.6cqw, 3cqh); height: min(5.2cqh, 7cqw); font-size: min(3.4cqw, 2.4cqh); }
+.rh-avatars { display: flex; flex: none; animation: rh-swap 7s var(--rh-ease) infinite; }
+.rh-avatars img { width: min(7cqw, 5cqh); height: auto; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .9); margin-right: max(-11px, -2.3cqw); background: rgba(255, 255, 255, .25); }
+@keyframes rh-swap { 0%, 5.43% { opacity: 0; } 10.86%, 100% { opacity: 1; } }
+.rh-quotes { display: grid; min-width: 0; }
+.rh-quotes span {
+  grid-area: 1 / 1;
+  justify-self: start;
+  max-width: 100%;
+  padding: .3em .8em;
+  border-radius: 99px;
+  background: rgba(0, 0, 0, .55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  animation: rh-quote calc(var(--n) * 7s) var(--rh-ease) calc(var(--q) * 7s) infinite both;
+}
+.rh-quotes span:first-child { opacity: 1; }
+@keyframes rh-quote { 0%, 1.36% { opacity: 0; } 2.71%, 25% { opacity: 1; } 26.36%, 100% { opacity: 0; } }
+.rh-bar { flex: 0 0 min(19cqw, 190px); margin-left: auto; height: 9px; padding: 1.5px; border: 1.5px solid rgba(255, 255, 255, .85); border-radius: 99px; overflow: hidden; }
+.rh-bar span { display: block; height: 100%; border-radius: 99px; background: rgba(255, 255, 255, .95); transform-origin: left center; transform: scaleX(.72); animation: rh-bar 7s linear infinite; }
+@keyframes rh-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@container (aspect-ratio < .7) { .rh-bar { display: none; } }   /* telefon pionowo: miejsce na cytat */
+@container (max-height: 360px) { .rh-lede { display: none; } .rh-ticker { margin-top: 3cqh; } }

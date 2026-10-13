@@ -97,6 +97,7 @@ function activate(id) {
     el.classList.toggle('is-active', el.dataset.project === id);
   }
   restartReel(app.querySelector(`.preview__logo[data-project="${id}"]`)); // plansza zawsze od początku pętli
+  showLive(app.querySelector(`.preview__logo[data-project="${id}"]`), id);
   if (interacting()) holdAtSeam(); else releaseHold();
 }
 
@@ -105,6 +106,33 @@ function activate(id) {
 function restartReel(scope) {
   for (const el of scope?.querySelectorAll('.reel') ?? []) for (const a of el.getAnimations({ subtree: true })) a.currentTime = 0;
 }
+/* Interaktywne plansze (projects[].live: loom.studio, reh.ab). live.js ładuje się przy pierwszej potrzebie
+   i wstawia grafikę nad statyczną planszą (cover): w aktywnym podglądzie i w widocznej ramce otwartego panelu.
+   Ponowne pokazanie = pętla od początku. Bez JS i przy ograniczonym ruchu zostaje cover (pierwsza klatka). */
+const liveIds = new Set(content.shared.projects.filter(p => p.live).map(p => p.id));
+let liveMod = null;
+async function showLive(host, id) {
+  if (!host || !liveIds.has(id) || reduceMotion.matches || host.offsetParent === null) return;
+  const old = host.querySelector('.live');
+  if (old) { for (const a of old.getAnimations({ subtree: true })) a.currentTime = 0; return; }
+  liveMod ??= import('./live.js');
+  const { liveMarkup, startLive, loadCss, toggleMarkup } = await liveMod;
+  await loadCss();
+  const img = host.querySelector(':scope > img');
+  if (!img || host.querySelector('.live') || !host.isConnected) return;
+  img.insertAdjacentHTML('afterend', liveMarkup(content.shared.projects.find(p => p.id === id)));
+  const el = img.nextElementSibling;
+  // Panel: przycisk pauzy; stan wspólny dla formatów (obrót ekranu nie wznawia ruchu)
+  const sheet = host.closest('.sheet');
+  if (sheet) {
+    const paused = !!sheet.querySelector('.reel__toggle[aria-pressed="true"]');
+    host.insertAdjacentHTML('beforeend', toggleMarkup(content[root.lang].ui.reelPause, paused));
+    el.classList.toggle('is-paused', paused);
+  }
+  startLive(el);
+}
+const visibleFigure = sheet => [...sheet.querySelectorAll('.sheet__video')].find(f => f.offsetParent !== null);
+
 // Faza pętli (ms) w podglądzie projektu - odczyt z animacji-zegara reel-clock.
 function reelPhase(id) {
   const a = app.querySelector(`.preview__logo[data-project="${id}"] .reel`)?.getAnimations().find(x => x.animationName === 'reel-clock');
@@ -164,6 +192,7 @@ function syncSheet() {
   for (const v of app.querySelectorAll('.sheet video')) if (v.closest('.sheet') !== sheet) v.pause();
   playVisible(sheet);
   if (sheet) restartReel(sheet);                                              // panel: plansza od zera
+  if (sheet) showLive(visibleFigure(sheet), sheet.id);
   else if (sheetWasOpen) restartReel(app.querySelector('.preview__logo.is-active')); // powrót na stronę główną
   sheetWasOpen = !!sheet;
   if (sheet) {
@@ -196,6 +225,7 @@ function playVisible(sheet) {
 const onFormatChange = () => {
   const sheet = openSheet();
   playVisible(sheet);
+  if (sheet) showLive(visibleFigure(sheet), sheet.id);
   const f = document.activeElement;
   if (sheet && f?.matches('.reel__toggle') && f.offsetParent === null) {
     [...sheet.querySelectorAll('.reel__toggle')].find(t => t.offsetParent !== null)?.focus({ preventScroll: true });
@@ -212,7 +242,7 @@ app.addEventListener('click', e => {
   if (!b) return;
   const paused = b.getAttribute('aria-pressed') !== 'true';
   for (const f of b.closest('.sheet')?.querySelectorAll('.sheet__video') ?? [b.parentElement]) {
-    f.querySelector('.reel')?.classList.toggle('is-paused', paused);
+    f.querySelector('.reel, .live')?.classList.toggle('is-paused', paused);
     f.querySelector('.reel__toggle')?.setAttribute('aria-pressed', String(paused));
   }
 });
