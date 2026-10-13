@@ -31,20 +31,20 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 - **Panele wysuwane od dołu:** kliknięcie projektu otwiera `#teraz` / `#loom` / `#rehab` z wideo w pętli (albo planszą animowaną); „o mnie” otwiera `#o-mnie`. Ramka ma zawsze pełny kadr, bez przycinania: 16:9 na desktopie i każdym ekranie poziomym, 4:5 na tablecie pionowo, 9:16 na telefonie pionowo. Na telefonie pionowo panel ma pełną wysokość ekranu (z paskami Safari), a kadr 9:16 wypełnia ją bez przewijania, z jednowierszowym podpisem pod spodem; na niskim ekranie poziomym (≤ 500 px wysokości) pasek panelu jest cieńszy, a odstęp od góry mniejszy. Działają przez CSS `:target`, więc także bez JS, a każdy projekt ma własny link (np. `…/#loom`). Przycisk „wstecz” zamyka panel. `main.js` dokłada focus w panelu, Esc, nieaktywne tło (`inert`), powrót focusu i sterowanie wideo.
 - **Auto-przewijanie (desktop):** kreska pod aktywnym projektem wypełnia się przez 3 s (`--t-auto` w `styles.css`, `AUTO_MS` w `main.js`), potem podgląd przechodzi do następnego projektu. Projekt z planszą animowaną (`reel`) trwa jedną pełną pętlę - 8 s (`REEL_MS` w `render.js` → `data-dwell` wiersza), a kreska jest zsynchronizowana z pętlą także po wznowieniu (zjechanie kursorem, powrót karty). Pauza po najechaniu kursorem na listę lub podgląd, przy otwartym panelu i przy ograniczonym ruchu w systemie. W czasie pauzy (i bez auto-przewijania, np. na ekranie dotykowym) plansza w podglądzie kończy bieżącą pętlę i staje na plakacie (`.is-held`, WCAG 2.2.2); rusza znów przy zmianie projektu albo wznowieniu.
 - **Plansza animowana teraz („Dwie role, jedna rozmowa”):** 8 s w pętli, sam CSS (sekcja „Reel” w `styles.css`, szablon `reel()` w `render.js`). Plakat (znak + „porozmawiajmy tu i teraz” z falką) → słuchacz (róż, „?”, trzy potrzeby) → ekspert (błękit, „!”) → rozmowa wideo 1:1 → plakat; ostatnia klatka = pierwsza. Gra tylko aktywny podgląd albo otwarty panel; w panelu jest przycisk pauzy. Na telefonie (ramka 16:9 węższa niż 480 px) wersja kompaktowa: jeden blok roli naraz, bez logo w nagłówku. Przy ograniczonym ruchu - stała klatka (oba kafelki, tytuł rozmowy, hasło). Kolory i logo z `projects[].brand` / `.logo`, więc synchronizacja marki działa także tu; w trybie ciemnym plansza wygląda tak samo.
-- **Brandbook:** klik w znak z ikonami otwiera panel `#brandbook` — na razie pusty, treść dodasz w `render.js` (funkcja `brandbook`). Nie trafia do PDF.
+- **Brandbook:** klik w znak z ikonami otwiera panel `#brandbook` z zasadami marki osobistej: znak (jasny / ciemny, rozmiary), kolory z kontrastem, typografia, symbole i ikony, siatka, ruch, zasady tak / nie. Wartości kolorów w `shared.brandbook.colors`, teksty w `pl/en.brandbook`, szablon `brandbook()` w `render.js`. Nie trafia do PDF.
 - **PDF** ma pełne case study (tekst + obrazy) — na stronie te treści są ukryte (`.print-only`).
 
 ## Jak podmienić treść
 
-Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = miejsca do uzupełnienia; linki z nawiasami nie są klikalne, dopóki nie wpiszesz prawdziwego adresu.
+Wszystko jest w **`content.js`** — layout nie zawiera tekstu. `[nawiasy]` = miejsca do uzupełnienia. **Strona i PDF ich nie pokazują:** pusty wiersz doświadczenia, link profilu, karuzela firm czy ikonka LinkedIn znikają, dopóki nie wpiszesz prawdziwej wartości, a w zdaniu z nawiasem zostaje tylko reszta tekstu. `npm run build` wypisuje pełną listę rzeczy do uzupełnienia.
 
 | Pole | Gdzie się pokazuje |
 |---|---|
 | `shared.name` + `pl/en.hero.role` | podpis nad hasłem („Wojciech Lumer — projektant”) |
 | `pl/en.hero.title`, `.line` | hasło (h1: „Design is how it works.” / „Design to to, jak coś działa.”) i akapit pod nim; też okładka PDF i `og.jpg` |
-| `shared.calendly` | przycisk „kontakt” — **wpisz swój link Calendly** |
+| `shared.calendly` | przycisk „kontakt” — **wpisz swój link Calendly**; do tego czasu przycisk otwiera maila |
 | `shared.email`, `shared.links` | stopka, przycisk „kontakt”, ikonka LinkedIn przy „o mnie” |
-| `shared.siteUrl` | QR w PDF, adresy Open Graph i `canonical` — **wpisz po ustaleniu domeny** |
+| `shared.siteUrl` | QR w PDF, adresy Open Graph, `canonical`, dane strukturalne, `sitemap.xml` i `robots.txt` — **zmień po podpięciu domeny** |
 | `shared.icons` | trzy miejsca obok znaku (zmiana co 450 ms — `ICON_MS` w `main.js`) |
 | `shared.clients` | karuzela firm: `name` (tekst alternatywny), `logo` (najlepiej SVG, jeden kolor) |
 | `projects[].logo`, `.sygnet` | logo na środku podglądu; sygnet / favicon przy zakresie prac i w panelu. `mono: false` = kolorowy asset marki (bez odwracania w trybie ciemnym) |
@@ -113,6 +113,19 @@ Bez `brand.json` synchronizowany jest tylko sygnet (z favicony SVG strony).
 6. Wpisz domenę w `shared.siteUrl`, potem `npm run build && npm run pdf` (QR i Open Graph wskażą właściwy adres) i wypchnij zmiany.
 
 Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokładnie tak, jak są.
+
+## Wyszukiwarki
+
+`npm run build` dopisuje do `<head>` dane strukturalne schema.org `Person` (imię, rola, opis, mail, adres strony, `sameAs` tylko z prawdziwych linków profili) i tworzy `sitemap.xml` + `robots.txt` z `shared.siteUrl`. Na adresie `lumerw.github.io/portfolio` roboty czytają `robots.txt` tylko z głównej domeny, więc mapę strony zgłoś ręcznie w Google Search Console; po podpięciu własnej domeny zadziała sama.
+
+## Testy na GitHubie
+
+`.github/workflows/checks.yml` uruchamia się przy każdym pushu na `main` i przy pull requeście (runner macOS - ma Helveticę, więc układ jest jak na Macu):
+
+1. `npm run build` i sprawdzenie, czy `index.html`, `sitemap.xml` i `robots.txt` w repozytorium są aktualne - jeśli nie, uruchom lokalnie `npm run build` i wypchnij zmiany;
+2. `tools/reel-check.mjs` - te same testy co `npm run check-reel`. Przy błędzie zrzuty ekranu są do pobrania w zakładce Actions (artefakt `reel-qa`).
+
+Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś nie przejdzie.
 
 ## Gdzie co jest
 

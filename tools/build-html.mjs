@@ -76,4 +76,25 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
   await writeFile(file, html);
   console.log('index.html ← content.js (pl)');
+
+  // sitemap.xml + robots.txt z adresu strony (shared.siteUrl).
+  const site = content.shared.siteUrl.replace(/\/$/, '');
+  if (!site.includes('[')) {
+    await writeFile(join(root, 'sitemap.xml'),
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+      `  <url><loc>${site}/</loc></url>\n</urlset>\n`);
+    await writeFile(join(root, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${site}/sitemap.xml\n`);
+  }
+
+  // Lista rzeczy do uzupełnienia: wszystko w [nawiasach] (strona ukrywa je, dopóki ich nie wpiszesz).
+  const todo = [];
+  const find = (v, path) => {
+    if (typeof v === 'string') { if (/\[[^\]]*\]/.test(v)) todo.push(`${path}: ${v.length > 70 ? v.slice(0, 67) + '…' : v}`); }
+    else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) find(x, `${path}.${k}`);
+  };
+  for (const k of ['shared', 'pl', 'en']) find(content[k], k);
+  if (todo.length) {
+    console.log(`\nDo uzupełnienia w content.js (${todo.length}) - na stronie na razie ukryte:`);
+    for (const t of todo) console.log(`  · ${t}`);
+  }
 }

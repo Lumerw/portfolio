@@ -101,7 +101,7 @@ const browser = await chromium.launch();
   const a = await icons();
   await p.waitForTimeout(1200);
   const still = a === await icons();
-  const marquee = await p.evaluate(() => getComputedStyle(document.querySelector('.clients__track')).animationName === 'none');
+  const marquee = await p.evaluate(() => { const t = document.querySelector('.clients__track'); return !t || getComputedStyle(t).animationName === 'none'; });   // bez firm karuzeli nie ma
   const text = await p.evaluate(() => getComputedStyle(document.querySelector('h1 .reveal')).opacity === '1');
   check('prefers-reduced-motion wyłącza ruch', still && marquee && text, `ikony stoją: ${still}, karuzela stoi: ${marquee}, tekst od razu: ${text}`);
   await ctx.close();

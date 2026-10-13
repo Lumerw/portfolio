@@ -25,6 +25,13 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const num = i => String(i + 1).padStart(2, '0');
 // Placeholdery typu „[https://…]” nie trafiają do href.
 const isReal = v => !String(v).includes('[');
+// Placeholdery: fragmenty w [nawiasach] nie trafiają na stronę ani do PDF. Pusty wynik = element znika.
+// (Lista rzeczy do uzupełnienia: npm run build.)
+const clean = v => String(v ?? '')
+  .replace(/\[[^\]]*\]/g, '')
+  .replace(/\s{2,}/g, ' ')
+  .replace(/^[\s\-·,.]+|[\s\-·,]+$/g, '')
+  .trim();
 const url = h => (/^(https?:|mailto:)/.test(h) && isReal(h) ? h : '#');
 
 // Szerokości wariantów obrazu (wspólne z tools/optimize-images.mjs).
@@ -127,7 +134,9 @@ const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hi
 
 // Karuzela firm: lista + jej kopia (aria-hidden) dla płynnej pętli.
 function clients(c, t) {
-  const items = hidden => c.clients.map(k => `
+  const real = c.clients.filter(k => clean(k.name));
+  if (!real.length) return '';                       // same placeholdery - karuzela się nie pokazuje
+  const items = hidden => real.map(k => `
           <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" alt="${hidden ? '' : esc(k.name)}" loading="lazy" decoding="async"></li>`).join('');
   return `
       <section class="clients" aria-labelledby="clients-title">
@@ -149,7 +158,7 @@ function hero(c, t) {
   const liHref = linkedin && url(linkedin.href);
   const liIcon = liHref && liHref !== '#'
     ? `<a class="index__icon" href="${esc(liHref)}" target="_blank" rel="me noopener" aria-label="${esc(t.ui.linkedin)}">${linkedinIcon}</a>`
-    : `<span class="index__icon" title="${esc(t.ui.linkedin)}">${linkedinIcon}</span>`;
+    : '';                                              // bez adresu - bez ikonki
 
   // Logo projektu na środku podglądu: papier, plansza marki (brand) albo plansza animowana 4:5 (reel).
   // Reel na stronie głównej jest dekoracyjny - tekst niesie podpis pod ramką. Logo w reelu stoi
@@ -213,6 +222,7 @@ function hero(c, t) {
 
 /* Obrazy: SVG (placeholder) jako zwykły <img>; raster jako <picture> z AVIF/WebP/JPG w kilku szerokościach. */
 function image(img, alt, sizes, { eager = false, widths = [] } = {}) {
+  alt = clean(alt);
   const dims = `width="${img.w}" height="${img.h}"`;
   const load = eager ? '' : ' loading="lazy" decoding="async"';
   if (img.src.endsWith('.svg') || !widths.length) {
@@ -285,11 +295,11 @@ function project(p, i, c, t) {
   const link = url(p.href) !== '#'
     ? `<a class="sheet__link link-u t-meta" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a>`
     : '';
-  const fact = key => `
+  const fact = key => clean(tp[key]) ? `
             <div class="case__fact">
               <dt class="t-meta">${esc(t.ui[key])}</dt>
-              <dd class="t-text">${esc(tp[key])}</dd>
-            </div>`;
+              <dd class="t-text">${esc(clean(tp[key]))}</dd>
+            </div>` : '';
 
   const bar = `
       <img class="sygnet sheet__sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
@@ -323,17 +333,19 @@ function project(p, i, c, t) {
 // O mnie (brief 5.3) — w panelu.
 function about(c, t) {
   const a = t.about;
-  const rows = a.experience.map(e => `
+  const rows = a.experience.filter(e => clean(e.place)).map(e => `
             <li class="row">
-              <span class="row__year t-meta">${esc(e.year)}</span>
-              <span class="row__place">${esc(e.place)}</span>
-              <span class="row__role t-muted">${esc(e.role)}</span>
+              <span class="row__year t-meta">${esc(clean(e.year))}</span>
+              <span class="row__place">${esc(clean(e.place))}</span>
+              <span class="row__role t-muted">${esc(clean(e.role))}</span>
             </li>`).join('');
-  const detail = (label, value) => `
+  const detail = (label, value) => clean(value) ? `
             <div class="detail">
               <dt class="t-meta">${esc(label)}</dt>
-              <dd>${esc(value)}</dd>
-            </div>`;
+              <dd>${esc(clean(value))}</dd>
+            </div>` : '';
+  const tools = a.tools.map(clean).filter(Boolean).join(' · ');
+  const details = detail(t.ui.education, a.education) + detail(t.ui.languages, a.languages) + detail(t.ui.tools, tools);
 
   const bar = `
       ${symbol('personal', { cls: 'sheet__symbol', small: true })}
@@ -345,24 +357,85 @@ function about(c, t) {
           ${image(c.portrait, a.portraitAlt, '(min-width: 1024px) 25vw, 66vw', { widths: c.imageWidths })}
         </figure>
         <div class="about__text">
-          <p class="t-text">${esc(a.bio)}</p>
-          <h3 class="t-meta about__label">${esc(t.ui.experience)}</h3>
+          ${clean(a.bio) ? `<p class="t-text">${esc(clean(a.bio))}</p>` : ''}
+          ${rows ? `<h3 class="t-meta about__label">${esc(t.ui.experience)}</h3>
           <ul class="rows">${rows}
-          </ul>
-          <dl class="details">${detail(t.ui.education, a.education)}${detail(t.ui.languages, a.languages)}${detail(t.ui.tools, a.tools.join(' · '))}
-          </dl>
+          </ul>` : ''}
+          ${details ? `<dl class="details">${details}
+          </dl>` : ''}
         </div>
       </div>`;
 
   return sheet({ id: 'o-mnie', cls: 'sheet--about', bar, body, t });
 }
 
-// Brandbook - panel na przyszłość, na razie pusty (otwiera go znak z ikonami w hero).
+// Brandbook - księga znaku marki osobistej (otwiera ją znak z ikonami w hero). Treść w content.js,
+// wartości kolorów w shared.brandbook. Kolory pokazane dosłownie - te same w obu motywach.
 function brandbook(c, t) {
+  const b = t.brandbook, S = b.sections;
+  const sec = (label, inner) => `
+      <section class="bb__sec grid">
+        <h3 class="bb__label t-meta">${esc(label)}</h3>
+        <div class="bb__body">${inner}
+        </div>
+      </section>`;
+
+  const mark = sec(S.mark, `
+          <div class="bb__tiles">
+            <div class="bb__tile bb__tile--paper">${symbol('personal', { cls: 'bb__mark' })}</div>
+            <div class="bb__tile bb__tile--ink">${symbol('personal', { cls: 'bb__mark' })}</div>
+          </div>
+          <p class="bb__sizes">${[16, 24, 40].map(n => symbol('personal', { cls: `bb__mark bb__mark--${n}`, small: n === 16 })).join('')}<span class="t-meta">${esc(b.markSizes)}</span></p>
+          <p class="t-text t-muted">${esc(b.mark)}</p>`);
+
+  const colors = sec(S.colors, `
+          <ul class="bb__swatches">${c.brandbook.colors.map(k => `
+            <li><span class="bb__chip" style="background:${esc(k.value)}"></span>
+              <span class="bb__name">${esc(b.colors[k.key])}</span>
+              <span class="t-meta">${esc(k.value)}${k.contrast ? ` · ${esc(b.contrast)} ${esc(k.contrast)}` : ''}</span></li>`).join('')}
+          </ul>`);
+
+  const type = sec(S.type, `
+          <p class="t-text t-muted">${esc(b.type.family)}</p>
+          <ul class="bb__type">
+            <li><span class="t-meta">${esc(b.type.title)}</span><span class="t-name">${esc(b.type.sample)}</span></li>
+            <li><span class="t-meta">${esc(b.type.project)}</span><span class="t-project">teraz · loom.studio · reh.ab</span></li>
+            <li><span class="t-meta">${esc(b.type.text)}</span><span class="t-text">${esc(t.hero.line)}</span></li>
+            <li><span class="t-meta">${esc(b.type.meta)}</span><span class="t-meta">01 · 02 · 03 · marketplace · studio · pitch deck</span></li>
+          </ul>`);
+
+  const symbols = sec(S.symbols, `
+          <ul class="bb__symbols">${['personal', ...c.projects.map(p => p.symbol)].map(n => `
+            <li>${symbol(n, { cls: 'bb__sym' })}</li>`).join('')}${c.icons.slice(0, 6).map(src => `
+            <li><img class="bb__icon${mono(src)}" src="${esc(src)}" width="40" height="40" alt="" loading="lazy"></li>`).join('')}
+          </ul>
+          <p class="t-text t-muted">${esc(b.symbols)}</p>`);
+
+  const grid = sec(S.grid, `
+          <div class="bb__grid" aria-hidden="true">${'<span></span>'.repeat(12)}</div>
+          <p class="t-text t-muted">${esc(b.grid)}</p>`);
+
+  const motion = sec(S.motion, `
+          <ul class="rows">${b.motion.map(m => `
+            <li class="row bb__row"><span class="row__place">${esc(m.name)}</span><span class="row__role t-muted">${esc(m.value)}</span></li>`).join('')}
+          </ul>
+          <p class="t-text t-muted bb__note">${esc(b.motionNote)}</p>`);
+
+  const rules = sec(S.rules, `
+          <div class="bb__rules">
+            <div><p class="t-meta">${esc(b.yes)}</p><ul>${b.rulesYes.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>
+            <div><p class="t-meta">${esc(b.no)}</p><ul class="bb__no">${b.rulesNo.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>
+          </div>
+          <p class="t-text t-muted bb__note">${esc(b.rulesNote)}</p>`);
+
   const bar = `
       ${symbol('personal', { cls: 'sheet__symbol', small: true })}
       <h2 id="brandbook-title" class="t-project">${esc(t.ui.brandbook)}</h2>`;
-  return sheet({ id: 'brandbook', cls: 'sheet--brandbook', bar, body: '', t });
+  const body = `
+      <div class="bb">
+        <p class="bb__intro t-text">${esc(b.intro)}</p>${mark}${colors}${type}${symbols}${grid}${motion}${rules}
+      </div>`;
+  return sheet({ id: 'brandbook', cls: 'sheet--brandbook', bar, body, t });
 }
 
 // Ikonka kopiowania: dwa przesunięte kwadraty, kreska 1 px — w stylu symboli.
@@ -372,23 +445,25 @@ const copyIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focus
 // W PDF ta sama stopka jest stroną 6 (tytuł, zdanie i QR tylko w druku).
 function footer(c, t) {
   const mailHref = isReal(c.email) ? `mailto:${esc(c.email)}` : '#kontakt';
-  // Przycisk „kontakt” → Calendly (shared.calendly).
+  // Przycisk „kontakt” → Calendly (shared.calendly); dopóki to placeholder - mail.
+  const cal = url(c.calendly) !== '#' && new URL(c.calendly).pathname.length > 1 ? c.calendly : '';
+  const links = c.links.filter(l => url(l.href) !== '#');
   return `
 <footer id="kontakt" class="site-footer" aria-labelledby="contact-title">
  <div class="site-footer__in wrap">
   <h2 id="contact-title" class="site-footer__title t-name print-only">${esc(t.contact.title)}</h2>
-  <p class="site-footer__line t-text t-muted print-only">${esc(t.contact.line)}</p>
+  ${clean(t.contact.line) ? `<p class="site-footer__line t-text t-muted print-only">${esc(clean(t.contact.line))}</p>` : ''}
   <div class="site-footer__contact">
     <p class="contact__mail">
       <a class="mail" href="${mailHref}">${esc(c.email)}</a>
       <button class="copy" type="button" data-copy="${esc(c.email)}" aria-label="${esc(t.ui.copy)}">${copyIcon}</button>
       <span class="copy__status t-meta" role="status" aria-live="polite" data-copied="${esc(t.ui.copied)}"></span>
     </p>
-    <ul class="contact__links t-meta" aria-label="${esc(t.ui.links)}">${c.links.map(l => `
-      <li>${url(l.href) === '#' ? `<span title="${esc(l.href)}">${esc(l.label)}</span>` : `<a href="${esc(l.href)}" rel="me noopener" target="_blank">${esc(l.label)}</a>`}</li>`).join('')}
-    </ul>
+    ${links.length ? `<ul class="contact__links t-meta" aria-label="${esc(t.ui.links)}">${links.map(l => `
+      <li><a href="${esc(l.href)}" rel="me noopener" target="_blank">${esc(l.label)}</a></li>`).join('')}
+    </ul>` : ''}
   </div>
-  <a class="button site-footer__button" href="${esc(url(c.calendly))}" target="_blank" rel="noopener">${esc(t.ui.contactButton)}</a>
+  <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${esc(t.ui.contactButton)}</a>
   <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - ${esc(c.siteUrl)}">
@@ -431,5 +506,23 @@ export function renderMeta(content, lang) {
     // Tylko desktop - na telefonie nie ma podglądu, fonty pobierają się przy otwarciu panelu.
     ...(c.projects.some(p => p.reel) ? [700, 600].map(w =>
       `<link rel="preload" href="assets/fonts/open-sans-${w}-sub.woff2" as="font" type="font/woff2" crossorigin media="(min-width: 1024px)">`) : []),
+    personLd(content, lang, site),
   ].filter(Boolean).join('\n  ');
+}
+
+// Dane strukturalne (schema.org Person) dla wyszukiwarek. sameAs tylko z prawdziwych linków.
+function personLd(content, lang, site) {
+  const c = content.shared, t = content[lang];
+  const sameAs = c.links.map(l => l.href).filter(h => url(h) !== '#');
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: clean(c.name),
+    jobTitle: clean(t.hero.role),
+    description: clean(t.hero.line),
+    email: `mailto:${c.email}`,
+    ...(site && { url: `${site}/`, image: `${site}/assets/og.jpg` }),
+    ...(sameAs.length && { sameAs }),
+  };
+  return `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
 }

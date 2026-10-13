@@ -1,0 +1,56 @@
+# Automatyczne testy przy każdym pushu i pull requeście.
+# 1) index.html, sitemap.xml i robots.txt muszą być zbudowane z aktualnego content.js (npm run build).
+# 2) Testy planszy i strony w Chromium (tools/reel-check.mjs): kadry, języki, tryb ciemny, bez JS, ruch.
+# Runner macOS - ma Helveticę, więc układ wygląda jak na Twoim Macu.
+name: Testy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Strona zbudowana z content.js?
+        run: |
+          npm run build
+          git diff --exit-code index.html sitemap.xml robots.txt || {
+            echo "::error::index.html nie zgadza się z content.js - uruchom lokalnie: npm run build i zapisz zmiany"
+            exit 1
+          }
+
+      - name: Chromium dla Playwright
+        run: npx playwright install chromium
+
+      - name: Testy planszy i strony
+        env:
+          REEL_QA_DIR: ${{ runner.temp }}/reel-qa
+        run: node tools/reel-check.mjs
+
+      - name: Zrzuty błędów
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reel-qa
+          path: ${{ runner.temp }}/reel-qa
+          if-no-files-found: ignore
