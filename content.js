@@ -227,6 +227,7 @@ export const pl = {
     contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → Calendly
     work: 'Portfolio',               // tytuł sekcji z linkami
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
+    askAgent: 'zapytaj asystenta AI', // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
     recsAll: 'wszystkie rekomendacje na LinkedInie ↗',
     prev: 'poprzednia',
@@ -390,20 +391,7 @@ export const pl = {
       rehab: { facts: ['wsparcie zdrowia psychicznego tam, gdzie są gracze', 'serwery z psychologiem lub psychiatrą, który gra', '12-tygodniowy pilotaż z 4 miarami sukcesu', 'WCAG 2.2 AA, każda liczba ze źródłem'] },
     },
   },
-  // FAQ w sekcji kontakt: krótkie odpowiedzi + przejście do asystenta AI (z tym samym pytaniem albo własnym).
-  faq: {
-    title: 'Masz pytanie?',
-    more: 'zapytaj asystenta ↗',
-    askLabel: 'Twoje pytanie do asystenta AI',
-    askPlaceholder: 'Zapytaj mojego asystenta AI…',
-    askButton: 'zapytaj',
-    items: [
-      { q: 'Czym się zajmujesz?', a: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio.' },
-      { q: 'Gdzie teraz pracujesz?', a: 'Od 05.2025 jestem AI designerem w Promotrafic, a od 11.2023 prowadzę własne studio projektowe loom.studio.' },
-      { q: 'Jakich narzędzi używasz?', a: 'Figma, Blender, Adtron i HTML/CSS, a przy wdrożeniach także JS i Next.js.' },
-      { q: 'Jak umówić rozmowę?', a: 'Wybierz termin w kalendarzu - 30 minut online - albo napisz na wojciechlumer@gmail.com.' },
-    ],
-  },
+
   // Asystent AI: panel #agent. answers = tryb lokalny (bez shared.agent.endpoint).
   agent: {
     button: 'zapytaj AI',
@@ -481,6 +469,7 @@ export const en = {
     contactButton: 'book a call',
     work: 'Portfolio',
     contactCta: 'contact',
+    askAgent: 'ask my AI assistant',
     recs: 'Recommendations',
     recsAll: 'all recommendations on LinkedIn ↗',
     prev: 'previous',
@@ -642,19 +631,7 @@ export const en = {
       rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist or psychiatrist who plays', 'a 12-week pilot with 4 success measures', 'WCAG 2.2 AA, every number sourced'] },
     },
   },
-  faq: {
-    title: 'Got a question?',
-    more: 'ask the assistant ↗',
-    askLabel: 'Your question for the AI assistant',
-    askPlaceholder: 'Ask my AI assistant…',
-    askButton: 'ask',
-    items: [
-      { q: 'What do you do?', a: 'I design identities, websites and digital products - from idea to launch. I run loom.studio.' },
-      { q: 'Where do you work now?', a: 'Since 05.2025 I have been an AI designer at Promotrafic, and since 11.2023 I have run my own design studio, loom.studio.' },
-      { q: 'Which tools do you use?', a: 'Figma, Blender, Adtron and HTML/CSS, plus JS and Next.js when building.' },
-      { q: 'How can I book a call?', a: 'Pick a slot in my calendar - 30 minutes online - or write to wojciechlumer@gmail.com.' },
-    ],
-  },
+
   agent: {
     button: 'ask AI',
     title: 'Ask about me',

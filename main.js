@@ -402,28 +402,6 @@ app.addEventListener('submit', e => {
   askAgent(form.elements.q.value);
   form.elements.q.value = '';
 });
-/* FAQ w kontakcie → asystent: „zapytaj asystenta” przy odpowiedzi albo własne pytanie z pola pod listą.
-   Otwiera panel #agent (jak klik w link) i od razu zadaje pytanie. */
-function openAgent(q) {
-  q = String(q || '').trim();
-  if (!q) return;
-  opener = document.activeElement;
-  openedHere = true;
-  location.hash = 'agent';
-  setTimeout(() => askAgent(q), 400);   // po wysunięciu panelu
-}
-app.addEventListener('click', e => {
-  const b = e.target.closest('[data-ask-agent]');
-  if (b) openAgent(b.dataset.askAgent);
-});
-app.addEventListener('submit', e => {
-  const f = e.target.closest('[data-ask-form]');
-  if (!f) return;
-  e.preventDefault();
-  openAgent(f.elements.q.value);
-  f.elements.q.value = '';
-});
-
 /* Rekomendacje: strzałki przewijają karuzelę o jedną kartę (przewijanie palcem / myszą działa samo). */
 app.addEventListener('click', e => {
   const b = e.target.closest('[data-recs]');

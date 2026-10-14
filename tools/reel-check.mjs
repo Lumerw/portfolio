@@ -305,7 +305,8 @@ function helpers() {
 
   function st(reel) {
     if (!reel) return null;
-    const all = reel.getAnimations({ subtree: true });
+    // tylko animacje CSS (bramka dotyczy ruchu planszy) - bez przejść, np. content-visibility przy zamykaniu panelu
+    const all = reel.getAnimations({ subtree: true }).filter(a => typeof CSSTransition === 'undefined' || !(a instanceof CSSTransition));
     const c = clock(reel);
     return { total: all.length, running: all.filter(a => a.playState === 'running').length, clock: c ? c.playState : null, t: c ? Number(c.currentTime) : null };
   }

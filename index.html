@@ -136,7 +136,7 @@
       <button class="copy" type="button" data-copy="wojciechlumer@gmail.com" aria-label="kopiuj adres"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="9" height="9"/><path d="M5.5 2.5h8v8"/></svg></button>
       <span class="copy__status t-meta" role="status" aria-live="polite" data-copied="skopiowano"></span>
     </p>
-    <ul class="contact__links t-meta" aria-label="Profile">
+    <ul class="contact__links t-meta print-only" aria-label="Profile">
       <li><a href="https://www.instagram.com/wojciechlumer/" rel="me noopener" target="_blank">Instagram</a></li>
       <li><a href="https://www.linkedin.com/in/wojciechlumer/" rel="me noopener" target="_blank">LinkedIn</a></li>
       <li><a href="https://www.facebook.com/wojtek.lumer/" rel="me noopener" target="_blank">Facebook</a></li>
@@ -146,51 +146,14 @@
   </div>
   <div class="site-footer__actions">
     <a class="button site-footer__button" href="https://calendly.com/wojciechlumer/30min" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>umów rozmowę</a>
+    <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>zapytaj asystenta AI</a>
   </div>
-  <section class="faq" aria-labelledby="faq-title">
-    <h3 id="faq-title" class="faq__title">Masz pytanie?</h3>
-    <div class="faq__list">
-      <details class="faq__item">
-        <summary class="faq__q"><span>Czym się zajmujesz?</span><svg class="icon faq__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10"/></svg></summary>
-        <div class="faq__a t-text">
-          <p>Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio.</p>
-          <button class="faq__more link-u t-meta" type="button" data-ask-agent="Czym się zajmujesz?">zapytaj asystenta ↗</button>
-        </div>
-      </details>
-      <details class="faq__item">
-        <summary class="faq__q"><span>Gdzie teraz pracujesz?</span><svg class="icon faq__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10"/></svg></summary>
-        <div class="faq__a t-text">
-          <p>Od 05.2025 jestem AI designerem w Promotrafic, a od 11.2023 prowadzę własne studio projektowe loom.studio.</p>
-          <button class="faq__more link-u t-meta" type="button" data-ask-agent="Gdzie teraz pracujesz?">zapytaj asystenta ↗</button>
-        </div>
-      </details>
-      <details class="faq__item">
-        <summary class="faq__q"><span>Jakich narzędzi używasz?</span><svg class="icon faq__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10"/></svg></summary>
-        <div class="faq__a t-text">
-          <p>Figma, Blender, Adtron i HTML/CSS, a przy wdrożeniach także JS i Next.js.</p>
-          <button class="faq__more link-u t-meta" type="button" data-ask-agent="Jakich narzędzi używasz?">zapytaj asystenta ↗</button>
-        </div>
-      </details>
-      <details class="faq__item">
-        <summary class="faq__q"><span>Jak umówić rozmowę?</span><svg class="icon faq__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10"/></svg></summary>
-        <div class="faq__a t-text">
-          <p>Wybierz termin w kalendarzu - 30 minut online - albo napisz na wojciechlumer@gmail.com.</p>
-          <button class="faq__more link-u t-meta" type="button" data-ask-agent="Jak umówić rozmowę?">zapytaj asystenta ↗</button>
-        </div>
-      </details>
-    </div>
-    <form class="faq__ask" data-ask-form>
-      <label class="visually-hidden" for="faq-q">Twoje pytanie do asystenta AI</label>
-      <input id="faq-q" name="q" type="text" autocomplete="off" maxlength="500" placeholder="Zapytaj mojego asystenta AI…" required>
-      <button class="button" type="submit">zapytaj</button>
-    </form>
-  </section>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - https://lumerw.github.io/portfolio">
     <figcaption class="t-meta">wersja www - lumerw.github.io/portfolio</figcaption>
   </figure>
  </div>
- <p class="site-footer__copy t-meta">© 2026 Wojciech Lumer</p>
+ <p class="site-footer__copy t-meta print-only">© 2026 Wojciech Lumer</p>
 </footer>
   <div class="home__sphere" aria-hidden="true">
     <div class="sphere" data-sphere>
@@ -245,6 +208,16 @@
     </div>
     <p class="sphere__hint t-meta">przeciągnij, żeby obrócić</p>
   </div>
+<div class="colophon">
+  <p class="colophon__copy t-meta">© 2026 Wojciech Lumer</p>
+  <ul class="colophon__links t-meta" aria-label="Profile">
+    <li><a href="https://www.instagram.com/wojciechlumer/" rel="me noopener" target="_blank">Instagram</a></li>
+    <li><a href="https://www.linkedin.com/in/wojciechlumer/" rel="me noopener" target="_blank">LinkedIn</a></li>
+    <li><a href="https://www.facebook.com/wojtek.lumer/" rel="me noopener" target="_blank">Facebook</a></li>
+    <li><a href="https://github.com/Lumerw" rel="me noopener" target="_blank">GitHub</a></li>
+    <li><a href="https://www.behance.net/wojteklumer" rel="me noopener" target="_blank">Behance</a></li>
+  </ul>
+</div>
 </div>
 <div class="sheets">
 <section id="teraz" class="sheet sheet--project" role="dialog" aria-modal="true" aria-labelledby="teraz-title">

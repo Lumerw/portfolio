@@ -487,32 +487,6 @@ const copyIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focus
 // W PDF ta sama stopka jest stroną 6 (tytuł, zdanie i QR tylko w druku).
 // Kalendarz kreską 1 px (przycisk „umów rozmowę” → Calendly)
 const calendarIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>`;
-const plusIcon = `<svg class="icon faq__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10"/></svg>`;
-
-// FAQ w kontakcie: pytania rozwijane (<details> - działa bez JS) i przejście do asystenta AI:
-// przy odpowiedzi „zapytaj asystenta” (ten sam temat w czacie), pod listą pole na własne pytanie.
-function faq(c, t) {
-  const f = t.faq;
-  if (!f?.items?.length) return '';
-  return `
-  <section class="faq" aria-labelledby="faq-title">
-    <h3 id="faq-title" class="faq__title">${esc(f.title)}</h3>
-    <div class="faq__list">${f.items.map(it => `
-      <details class="faq__item">
-        <summary class="faq__q"><span>${esc(it.q)}</span>${plusIcon}</summary>
-        <div class="faq__a t-text">
-          <p>${esc(it.a)}</p>
-          <button class="faq__more link-u t-meta" type="button" data-ask-agent="${esc(it.q)}">${esc(f.more)}</button>
-        </div>
-      </details>`).join('')}
-    </div>
-    <form class="faq__ask" data-ask-form>
-      <label class="visually-hidden" for="faq-q">${esc(f.askLabel)}</label>
-      <input id="faq-q" name="q" type="text" autocomplete="off" maxlength="500" placeholder="${esc(f.askPlaceholder)}" required>
-      <button class="button" type="submit">${esc(f.askButton)}</button>
-    </form>
-  </section>`;
-}
 
 // Rekomendacje z LinkedIna: krótkie cytaty w karuzeli (przewijanie w bok, strzałki z JS).
 // Wpisy w shared.recommendations; dopóki są placeholdery - sekcja się nie pokazuje.
@@ -555,20 +529,33 @@ function footer(c, t) {
       <button class="copy" type="button" data-copy="${esc(c.email)}" aria-label="${esc(t.ui.copy)}">${copyIcon}</button>
       <span class="copy__status t-meta" role="status" aria-live="polite" data-copied="${esc(t.ui.copied)}"></span>
     </p>
-    ${links.length ? `<ul class="contact__links t-meta" aria-label="${esc(t.ui.links)}">${links.map(l => `
+    ${links.length ? `<ul class="contact__links t-meta print-only" aria-label="${esc(t.ui.links)}">${links.map(l => `
       <li><a href="${esc(l.href)}" rel="me noopener" target="_blank">${esc(l.label)}</a></li>`).join('')}
     </ul>` : ''}
   </div>
   <div class="site-footer__actions">
     <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${cal ? calendarIcon : ''}${esc(t.ui.contactButton)}</a>
-  </div>${faq(c, t)}
+    <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>${esc(t.ui.askAgent)}</a>
+  </div>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - ${esc(c.siteUrl)}">
     <figcaption class="t-meta">${esc(t.ui.qr)} - ${esc(c.siteUrl.replace(/^https?:\/\//, ''))}</figcaption>
   </figure>
  </div>
- <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
+ <p class="site-footer__copy t-meta print-only">© ${esc(c.year)} ${esc(c.name)}</p>
 </footer>`;
+}
+
+// Pasek na samym dole strony: © po lewej, profile (Instagram, LinkedIn…) pod sferą po prawej.
+function colophon(c, t) {
+  const links = c.links.filter(l => url(l.href) !== '#');
+  return `
+<div class="colophon">
+  <p class="colophon__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
+  ${links.length ? `<ul class="colophon__links t-meta" aria-label="${esc(t.ui.links)}">${links.map(l => `
+    <li><a href="${esc(l.href)}" rel="me noopener" target="_blank">${esc(l.label)}</a></li>`).join('')}
+  </ul>` : ''}
+</div>`;
 }
 
 // Asystent AI: czat w panelu #agent. Bez JS panel pokazuje powitanie i mail (formularz ukryty).
@@ -602,7 +589,7 @@ export function render(content, lang) {
   return `${header(c, t)}
 <div class="home wrap">
 <main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${recommendations(c, t)}
-</main>${footer(c, t)}${sphere(c, t)}
+</main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>
 <div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}
 </div>
