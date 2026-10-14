@@ -149,7 +149,7 @@ function clients(c, t) {
           <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" alt="${hidden ? '' : esc(clean(k.name))}" loading="lazy" decoding="async"></li>`).join('');
   return `
       <section class="clients" aria-labelledby="clients-title">
-        <h2 id="clients-title" class="clients__label t-meta">${esc(t.ui.clients)}</h2>
+        <h2 id="clients-title" class="visually-hidden">${esc(t.ui.clients)}</h2>
         <div class="clients__marquee">
         <div class="clients__track">
           <ul class="clients__list">${items(false)}
@@ -562,6 +562,20 @@ function footer(c, t) {
 </footer>`;
 }
 
+// Nawigator przewijania (desktop): pionowa linia 1 px z numerami sekcji, aktywna z nazwą; klik przewija.
+// Zastępuje systemowy pasek przewijania strony (main.js: aktywna sekcja i postęp).
+function scrollnav(c, t) {
+  const items = [['start', t.ui.start], ['portfolio', t.ui.work],
+    ...((c.recommendations ?? []).some(r => clean(r.name)) ? [['rekomendacje', t.ui.recs]] : []), ['kontakt', t.contact.title]];
+  return `
+<nav class="scrollnav" aria-label="${esc(t.ui.sectionsLabel)}">
+  <span class="scrollnav__line" aria-hidden="true"><span class="scrollnav__fill"></span></span>
+  <ol>${items.map(([id, label], i) => `
+    <li><a href="#${id}" data-section="${id}"${i === 0 ? ' aria-current="true"' : ''}><span class="scrollnav__label">${esc(label)}</span><span class="scrollnav__no t-meta">${num(i)}</span></a></li>`).join('')}
+  </ol>
+</nav>`;
+}
+
 // Pasek na samym dole strony: profile (Instagram, LinkedIn…) po lewej, © pod sferą po prawej.
 function colophon(c, t) {
   const links = c.links.filter(l => url(l.href) !== '#');
@@ -606,7 +620,7 @@ export function render(content, lang) {
 <div class="home wrap">
 <main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
-</div>
+</div>${scrollnav(c, t)}
 <div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}${booking(c, t)}
 </div>
 `;

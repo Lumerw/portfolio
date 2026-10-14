@@ -250,7 +250,7 @@ async function openBooking(sheet) {
   if (!root) return;
   const { initBooking } = await import('./booking.js');
   if (root.__booking) { root.__booking.reload(); return; }
-  root.__booking = initBooking(root, { lang: root.closest('html')?.lang || 'pl', copy: content[root.closest('html')?.lang || 'pl'].booking, email: content.shared.email });
+  root.__booking = initBooking(root, { lang: root.closest('html')?.lang || 'pl', copy: content[root.closest('html')?.lang || 'pl'].booking, email: content.shared.email, calendly: content.shared.calendly });
 }
 
 /* Ikony (obok awatara i w brandbooku): każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
@@ -306,8 +306,39 @@ function close() {
 
 addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
+/* Nawigator sekcji (desktop): aktywna sekcja = ta, której środek jest najbliżej środka ekranu;
+   linia wypełnia się wraz z przewijaniem. Klik w sekcję (i „kontakt” w hero) przewija bez zmiany adresu. */
+function syncScrollnav() {
+  const nav = app.querySelector('.scrollnav');
+  if (!nav || !nav.getClientRects().length) return;   // ukryty (telefon) - fixed nie ma offsetParent
+  const max = document.documentElement.scrollHeight - innerHeight;
+  nav.style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : '0');
+  let best = null, dist = Infinity;
+  for (const a of nav.querySelectorAll('[data-section]')) {
+    const r = document.getElementById(a.dataset.section)?.getBoundingClientRect();
+    if (!r) continue;
+    const d = Math.abs(r.top + r.height / 2 - innerHeight / 2);
+    if (d < dist) { dist = d; best = a; }
+  }
+  for (const a of nav.querySelectorAll('[data-section]')) {
+    if (a === best) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+  }
+}
+let navRaf = 0;
+addEventListener('scroll', () => { if (!navRaf) navRaf = requestAnimationFrame(() => { navRaf = 0; syncScrollnav(); }); }, { passive: true });
+addEventListener('resize', syncScrollnav);
+app.addEventListener('click', e => {
+  const a = e.target.closest('.scrollnav [data-section], .hero__cta a[href="#kontakt"]');
+  if (!a) return;
+  const sec = document.getElementById(a.dataset.section || 'kontakt');
+  if (!sec) return;
+  e.preventDefault();
+  sec.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+});
+
 addEventListener('hashchange', syncSheet);
 syncSheet();
+syncScrollnav();
 mountSphere();
 
 // Po zmianie języka DOM jest nowy: przywróć aktywny projekt i stan panelu.
@@ -319,6 +350,7 @@ new MutationObserver(() => {
   syncThemeButton();
   restoreChat();
   mountSphere();
+  syncScrollnav();
 }).observe(app, { childList: true });
 
 /* Asystent AI (panel #agent). Rozmowa żyje w pamięci strony (przetrwa zmianę języka),

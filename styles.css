@@ -365,7 +365,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: calc(var(--header-h) * -1);   /* środek sfery = środek ekranu, także pod nagłówkiem */
+    --d: min(36vw, 62svh, 640px);             /* średnica sfery (podpis pod nią liczy się od niej) */
   }
 }
 
@@ -373,8 +373,28 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
    Hero
    ========================================================================== */
 .hero { padding-block: var(--s-12); }
+/* ==========================================================================
+   Desktop: przewijanie po sekcjach. Każda sekcja (start, Portfolio, Rekomendacje, Kontakt) = jeden ekran,
+   treść na środku - na wysokości środka sfery; scroll zatrzymuje się na każdej sekcji (scroll snap).
+   Nagłówek leży na pierwszym ekranie, pasek z profilami na ostatnim. Systemowy pasek przewijania
+   zastępuje nawigator sekcji (.scrollnav).
+   ========================================================================== */
 @media (min-width: 1024px) {
-  .hero { padding-block: var(--s-12); }
+  .site-header { position: absolute; top: 0; left: 0; right: 0; }
+  .home { position: relative; }
+  .home .hero, .home .work, .home .recs, .home .site-footer {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: var(--s-8);
+    scroll-snap-align: start;
+  }
+  html { scrollbar-width: none; }
+  html::-webkit-scrollbar { display: none; }
+}
+@media (min-width: 1024px) and (min-height: 640px) {
+  html { scroll-snap-type: y mandatory; }
 }
 
 /* Awatar + trzy szybko zmieniające się ikony kreską (jak wcześniej przy znaku).
@@ -484,10 +504,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
    ========================================================================== */
 .work { padding-block: var(--s-4) var(--s-12); }
 .work__title { margin-bottom: var(--s-4); }
-/* Odstęp między sekcjami: telefon 128 px (96 + 32), desktop 96 px */
-@media (min-width: 1024px) {
-  .work { padding-block: var(--s-4) var(--s-12); }
-}
+/* Odstęp między sekcjami na telefonie: 128 px (96 + 32); desktop - sekcje na wysokość ekranu (niżej) */
 
 .index__row {
   position: relative;
@@ -590,14 +607,13 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
   .recs__marquee { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
   .recs__card[aria-hidden] { display: none; }
 }
-@media (min-width: 1024px) { .recs { padding-block: 0 var(--s-12); } }
+
 
 /* ==========================================================================
    Sfera (desktop): siatka z okręgów kreską 1 px + karty projektów 4:5 (CSS 3D).
    --rx / --ry ustawia sphere.js (przeciąganie, powolny obrót, obrót do karty).
    ========================================================================== */
 .sphere {
-  --d: min(36vw, 62svh, 640px);     /* średnica */
   position: relative;
   width: var(--d);
   height: var(--d);
@@ -666,7 +682,8 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 }
 .sphere__mark img { display: block; width: 100%; height: 100%; }
 .sphere__tag { position: absolute; left: 0; top: calc(100% + 6px); white-space: nowrap; color: var(--ink); }
-.sphere__hint { margin-top: var(--s-4); }
+/* Podpis pod sferą poza układem - środek sfery = dokładnie środek ekranu */
+.sphere__hint { position: absolute; top: calc(50% + var(--d) / 2 + var(--s-4)); left: 0; right: 0; text-align: center; }
 
 /* Cienka ramka w kolorze linii (--hair) nad grafiką panelu — widoczna też na czarnej planszy w trybie ciemnym */
 .sheet__video::after {
@@ -1379,6 +1396,22 @@ html:has(.sheet:target) { overflow: hidden; }
 .site-footer__agent { gap: var(--s-1); }
 @media (min-width: 400px) { .site-footer .mail { white-space: nowrap; } }   /* przy 320 px adres może się złamać */
 .site-footer__button { gap: var(--s-1); }
+/* Nawigator sekcji (desktop): linia 1 px z kółkami jak znak; aktywne kółko wypełnione, obok numer i nazwa.
+   Linia wypełnia się tuszem wraz z przewijaniem (--p z main.js). */
+.scrollnav { display: none; }
+@media (min-width: 1024px) {
+  .scrollnav { display: block; position: fixed; z-index: 15; right: 24px; top: 50%; translate: 0 -50%; }
+  .scrollnav ol { position: relative; display: grid; gap: var(--s-4); }
+  .scrollnav__line { position: absolute; right: 4px; top: 4px; bottom: 4px; width: 1px; background: var(--hair); }
+  .scrollnav__fill { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--p, 0) * 100%); background: var(--ink); }
+  .scrollnav a { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: var(--s-1); padding-right: 20px; min-height: 24px; color: var(--ink-3); }
+  .scrollnav a::after { content: ""; position: absolute; right: 0; top: 50%; width: 9px; height: 9px; translate: 0 -50%; border: var(--hairline) solid var(--ink-3); border-radius: 50%; background: var(--paper); transition: background-color var(--t-line) var(--ease), border-color var(--t-line) var(--ease); }
+  .scrollnav__label { font-size: var(--fs-meta); opacity: 0; translate: 4px 0; transition: opacity var(--t-line) var(--ease), translate var(--t-line) var(--ease); white-space: nowrap; }
+  .scrollnav a:hover, .scrollnav a[aria-current="true"] { color: var(--ink); }
+  .scrollnav a:hover::after, .scrollnav a[aria-current="true"]::after { background: var(--ink); border-color: var(--ink); }
+  .scrollnav a:hover .scrollnav__label, .scrollnav a[aria-current="true"] .scrollnav__label { opacity: 1; translate: 0 0; }
+}
+
 /* Pasek na samym dole strony: profile i ©. Desktop: profile pod treścią, © pod sferą. */
 .colophon { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-2) var(--s-4); padding-block: var(--s-4) var(--s-3); }
 .colophon__links { display: flex; flex-wrap: wrap; }
@@ -1643,12 +1676,11 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 /* Desktop: kontakt = trzecia sekcja w lewej kolumnie, na wysokość ekranu; sfera stoi obok */
 @media (min-width: 1024px) {
-  /* Kontakt = ekran minus pasek na dole (--colophon-h): na końcu strony jego środek jest na wysokości
-     środka sfery, a od stopki dzieli go spokojny odstęp */
-  .site-footer { --colophon-h: 72px; grid-column: 1 / 6; min-height: calc(100svh - var(--colophon-h)); display: flex; flex-direction: column; justify-content: center; }
-  .colophon { min-height: 72px; align-items: center; padding-block: 0; }
+  .site-footer { grid-column: 1 / 6; }
+  /* Pasek z profilami i © leży na dole ostatniego ekranu (sekcji Kontakt) */
+  .colophon { position: absolute; left: var(--margin); right: var(--margin); bottom: 0; min-height: 72px; align-items: center; padding-block: 0; }
   .site-footer__in {
-    padding-block: calc(var(--s-6) + 22px) var(--s-6);   /* +22 px: środek bloku = środek sfery (pod sferą jest podpis) */
+    padding-block: 0;
     grid-template-areas: "title" "contact" "button";
     grid-template-columns: minmax(0, 1fr);
     justify-items: start;

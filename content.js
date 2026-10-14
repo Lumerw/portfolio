@@ -18,7 +18,7 @@ export const shared = {
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
   // Wpisz nazwę użytkownika z cal.com/<nazwa> i slug typu spotkania z cal.com/<nazwa>/<slug>.
   // Dopóki to placeholder, „umów rozmowę” otwiera Calendly.
-  booking: { calUsername: '[twoja-nazwa-na-cal.com]', eventSlug: '30min', minutes: 30 },
+  booking: { calUsername: 'wojciechlumer', eventSlug: '[30min - utwórz w Cal.com: Event Types]', minutes: 30 },
   // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/wojciechlumer/' },
@@ -243,6 +243,8 @@ export const pl = {
     brandbook: 'Brandbook',
     contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → Calendly
     work: 'Portfolio',               // tytuł sekcji z linkami
+    sectionsLabel: 'Sekcje strony',  // nawigator przewijania (desktop)
+    start: 'start',
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
     askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
@@ -504,6 +506,8 @@ export const en = {
     brandbook: 'Brandbook',
     contactButton: 'book a call',
     work: 'Portfolio',
+    sectionsLabel: 'Page sections',
+    start: 'start',
     contactCta: 'contact',
     askAgent: 'ask my assistant',
     recs: 'Recommendations',

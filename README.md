@@ -155,7 +155,7 @@ Włączenie (raz):
 2. W **Event Types** utwórz spotkanie 30 min (slug np. `30min`), ustaw dostępność (Availability) i miejsce spotkania (np. Google Meet / Cal Video).
 3. Wpisz w `content.js` → `shared.booking` swoją nazwę z adresu `cal.com/<nazwa>` (`calUsername`) i slug spotkania (`eventSlug`), potem `npm run build` i wypchnij zmiany.
 
-Dopóki `calUsername` to placeholder, panelu nie ma, a przycisk otwiera Calendly (`shared.calendly`).
+Wpisane: `calUsername: 'wojciechlumer'`. Dopóki `eventSlug` to placeholder (albo `calUsername`), panelu nie ma, a przycisk otwiera Calendly (`shared.calendly`). Gdy Cal.com nie odpowie, panel pokazuje mail i link do Calendly.
 
 ## Asystent AI
 
@@ -177,6 +177,10 @@ Włączenie trybu AI (raz, ok. 10 min):
 4. Po każdej zmianie `content.js` wdroż Workera ponownie (`npx wrangler deploy -c agent/wrangler.toml`) - wiedza jest w nim wbudowana.
 
 Model ustawia `MODEL` w `agent/wrangler.toml` (domyślnie `claude-opus-5-5`; taniej: `claude-sonnet-5-5`, `claude-haiku-5-5`). Własna domena: dopisz ją w `ALLOWED_ORIGINS`.
+
+## Przewijanie na desktopie
+
+Każda sekcja (start, Portfolio, Rekomendacje, Kontakt) zajmuje jeden ekran, a jej treść stoi na wysokości środka sfery; przewijanie zatrzymuje się na każdej sekcji (`scroll-snap-type: y mandatory`, tylko od 1024 px i 640 px wysokości). Systemowy pasek przewijania strony jest tam ukryty - zastępuje go nawigator sekcji po prawej (`.scrollnav`): linia 1 px wypełniająca się tuszem, kółka jak znak, aktywna sekcja z numerem i nazwą, klik przewija. Pozostałe paski (panele, czat) są cienkie i w kolorze linii. Na telefonie zwykłe przewijanie.
 
 ## Wyszukiwarki
 
