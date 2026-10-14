@@ -542,15 +542,15 @@ function footer(c, t) {
 </footer>`;
 }
 
-// Pasek na samym dole strony: © po lewej, profile (Instagram, LinkedIn…) pod sferą po prawej.
+// Pasek na samym dole strony: profile (Instagram, LinkedIn…) po lewej, © pod sferą po prawej.
 function colophon(c, t) {
   const links = c.links.filter(l => url(l.href) !== '#');
   return `
 <div class="colophon">
-  <p class="colophon__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
   ${links.length ? `<ul class="colophon__links t-meta" aria-label="${esc(t.ui.links)}">${links.map(l => `
     <li><a href="${esc(l.href)}" rel="me noopener" target="_blank">${esc(l.label)}</a></li>`).join('')}
   </ul>` : ''}
+  <p class="colophon__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
 </div>`;
 }
 

@@ -17,7 +17,7 @@ export const shared = {
   calendly: 'https://calendly.com/wojciechlumer/30min',  // przycisk „kontakt” (placeholder = mail)
   // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
-    { label: 'Instagram', href: 'https://www.instagram.com/wojciechlumer/' },
+    { label: 'Instagram', href: 'https://www.instagram.com/wojciechlumer/?hl=en' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/wojciechlumer/' },
     { label: 'Facebook', href: 'https://www.facebook.com/wojtek.lumer/' },
     { label: 'GitHub', href: 'https://github.com/Lumerw' },
