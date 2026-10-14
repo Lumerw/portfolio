@@ -143,7 +143,8 @@ async function showLive(host, id) {
   await loadCss();
   const img = host.querySelector(':scope > img');
   if (!img || host.querySelector('.live') || !host.isConnected) return;
-  img.insertAdjacentHTML('afterend', liveMarkup(content.shared.projects.find(p => p.id === id)));
+  // Karta na sferze: wersja uproszczona (lite); panel: pełna
+  img.insertAdjacentHTML('afterend', liveMarkup(content.shared.projects.find(p => p.id === id), { lite: !!host.closest('.sphere__card') }));
   const el = img.nextElementSibling;
   // Panel: przycisk pauzy; stan wspólny dla formatów (obrót ekranu nie wznawia ruchu)
   const sheet = host.closest('.sheet');
@@ -184,7 +185,7 @@ const openSheet = () => {
 
 function syncSheet() {
   const sheet = openSheet();
-  for (const el of app.querySelectorAll('.site-header, main, .site-footer, .skip')) el.inert = !!sheet;
+  for (const el of app.querySelectorAll('.site-header, main, .site-footer, .home__sphere, .skip')) el.inert = !!sheet;
   for (const v of app.querySelectorAll('.sheet video')) if (v.closest('.sheet') !== sheet) v.pause();
   playVisible(sheet);
   if (sheet) restartReel(sheet);                                              // panel: plansza od zera

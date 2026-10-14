@@ -163,7 +163,7 @@ export const shared = {
         avatars: ['assets/rehab/live/p1.svg', 'assets/rehab/live/p2.svg', 'assets/rehab/live/p3.svg'],
       },
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
-      cover: { '4x5': 'assets/rehab/cover-4x5.webp', '16x9': 'assets/rehab/cover-16x9.webp', '9x16': 'assets/rehab/cover-9x16.webp' },
+      cover: { card: 'assets/rehab/cover-card.webp', '4x5': 'assets/rehab/cover-4x5.webp', '16x9': 'assets/rehab/cover-16x9.webp', '9x16': 'assets/rehab/cover-9x16.webp' },
       video: {
         '16x9': { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/rehab/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
@@ -218,6 +218,7 @@ export const pl = {
     brandbook: 'Brandbook',
     contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → Calendly
     work: 'Portfolio',               // tytuł sekcji z linkami
+    contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
     brandbookType: 'zasady marki',
     avatar: 'Zapytaj o mnie - asystent AI',
     sphereHint: 'przeciągnij, żeby obrócić',
@@ -454,6 +455,7 @@ export const en = {
     brandbook: 'Brandbook',
     contactButton: 'book a call',
     work: 'Portfolio',
+    contactCta: 'contact',
     brandbookType: 'brand rules',
     avatar: 'Ask about me - AI assistant',
     sphereHint: 'drag to rotate',

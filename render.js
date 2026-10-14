@@ -77,12 +77,27 @@ const brandStyle = b => `--brand-bg:${esc(b.bg)};${b.aurora.map((c, i) => `--a${
    decorative: kopia na stronie głównej (tekst niesie podpis pod ramką); w panelu role=img + aria-label.
    Glify i falka ruszają się na opakowaniach <span>, nie na <svg>: Chromium nie przenosi animacji
    elementu <svg> na kompozytor i przelicza wtedy styl w każdej klatce. */
-function reel(p, tp, fmt, { eager = false, decorative = false } = {}) {
+// lite (karta na sferze): tylko tło, animacja logo i dwa kafelki słuchacz / ekspert - bez tekstów.
+function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = {}) {
   const r = tp.reel;
   const a11y = decorative ? 'aria-hidden="true"' : `role="img" aria-label="${esc(r.label)}"`;
   const img = eager ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"';
   // --lr = połowa proporcji logo (wysokość / szerokość / 2) - środek znaku w osi pionowej
   const lr = (p.logo.h / p.logo.w / 2).toFixed(5);
+  const tiles = `
+      <div class="reel__tiles">
+        <div class="reel__tile reel__tile--l"><span class="reel__avatar">${svgi(RP.headphones)}</span><span class="reel__chip">${esc(r.listener)}</span><span class="reel__ring"></span></div>
+        <div class="reel__tile reel__tile--e"><span class="reel__avatar">${svgi(RP.presentation, '', '0 0 24 24', true)}</span><span class="reel__chip">${esc(r.expert)}</span><span class="reel__ring"></span></div>
+      </div>`;
+  if (lite) {
+    return `<div class="reel reel--${fmt} reel--lite brand" style="${brandStyle(p.brand)};--t-reel:${REEL_MS}ms;--lr:${lr}" ${a11y}>
+  <span class="reel__field reel__field--l"></span><span class="reel__field reel__field--e"></span><span class="reel__field reel__field--m"></span>
+  <div class="reel__stage">
+    <img class="reel__logo" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${img}>
+    <div class="reel__call">${tiles}
+    </div>
+  </div></div>`;
+  }
   return `<div class="reel reel--${fmt} brand" style="${brandStyle(p.brand)};--t-reel:${REEL_MS}ms;--lr:${lr}" ${a11y}>
   <span class="reel__field reel__field--l"></span><span class="reel__field reel__field--e"></span><span class="reel__field reel__field--m"></span>
   <div class="reel__stage">
@@ -101,11 +116,7 @@ function reel(p, tp, fmt, { eager = false, decorative = false } = {}) {
       <span class="reel__line">${esc(r.expertLine)}</span>
       <span class="reel__short">${esc(r.expertShort)}</span>
       <span class="reel__sub">${esc(r.expertSub)}</span></p>
-    <div class="reel__call">
-      <div class="reel__tiles">
-        <div class="reel__tile reel__tile--l"><span class="reel__avatar">${svgi(RP.headphones)}</span><span class="reel__chip">${esc(r.listener)}</span><span class="reel__ring"></span></div>
-        <div class="reel__tile reel__tile--e"><span class="reel__avatar">${svgi(RP.presentation, '', '0 0 24 24', true)}</span><span class="reel__chip">${esc(r.expert)}</span><span class="reel__ring"></span></div>
-      </div>
+    <div class="reel__call">${tiles}
       <p class="reel__title">${esc(r.callTitle)}</p>
       <p class="reel__cap">${svgi(RP.video, '', '0 0 24 24', true)}<span class="reel__cap-long">${esc(r.call)}</span><span class="reel__cap-short">${esc(r.callShort)}</span></p>
     </div>
@@ -172,12 +183,13 @@ function hero(c, t) {
   return `
   <section id="start" class="hero" aria-labelledby="hero-title">
     <div class="hero__top">${avatar(c, t)}
-      <span class="hero__icons" aria-hidden="true">${icons}
-      </span>
+      <a class="hero__icons" href="#brandbook" aria-haspopup="dialog" aria-label="${esc(t.ui.brandbook)}">${icons}
+      </a>
     </div>
     <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}${liHref !== '#' ? ` <a class="hero__li" href="${esc(liHref)}" target="_blank" rel="me noopener" aria-label="${esc(t.ui.linkedin)}">${liIcon}</a>` : ''}</span></p>
     <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
     <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
+    <p class="hero__cta"><span ${reveal(3)}><a class="button" href="#kontakt">${esc(t.ui.contactCta)}</a></span></p>
     <p class="hero__year t-meta print-only">${esc(c.year)}</p>${clients(c, t)}
   </section>`;
 }
@@ -225,9 +237,9 @@ function sphere(c, t) {
   // grafiki interaktywnej (cover), nad którą main.js wstawia żywą grafikę. Gra tylko karta z przodu.
   const cards = c.projects.map((p, i) => {
     const inner = p.reel
-      ? reel(p, t.projects[p.id], '4x5', { decorative: true })
+      ? reel(p, t.projects[p.id], '4x5', { decorative: true, lite: true })
       : p.cover
-        ? `<img src="${esc(p.cover['4x5'])}" width="1080" height="1350" alt="" loading="lazy" decoding="async">`
+        ? `<img src="${esc(p.cover.card ?? p.cover['4x5'])}" width="1080" height="1350" alt="" loading="lazy" decoding="async">`
         : image(p.images.a, '', '240px', { widths: c.imageWidths });
     return `
           <a class="sphere__card${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" tabindex="-1" style="--lon:${Math.round((360 / n) * i)}deg;--lat:${CARD_LAT[i % CARD_LAT.length]}deg">
@@ -480,7 +492,7 @@ function footer(c, t) {
   const links = c.links.filter(l => url(l.href) !== '#');
   return `
 <footer id="kontakt" class="site-footer" aria-labelledby="contact-title">
- <div class="site-footer__in wrap">
+ <div class="site-footer__in">
   <h2 id="contact-title" class="site-footer__title t-name">${esc(t.contact.title)}</h2>
   ${clean(t.contact.line) ? `<p class="site-footer__line t-text t-muted print-only">${esc(clean(t.contact.line))}</p>` : ''}
   <div class="site-footer__contact">
@@ -534,12 +546,10 @@ function agent(c, t) {
 export function render(content, lang) {
   const c = content.shared, t = content[lang];
   return `${header(c, t)}
-<main id="tresc">
-  <div class="home wrap">
-    <div class="home__main">${hero(c, t)}${work(c, t)}
-    </div>${sphere(c, t)}
-  </div>
-</main>${footer(c, t)}
+<div class="home wrap">
+<main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}
+</main>${footer(c, t)}${sphere(c, t)}
+</div>
 <div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}
 </div>
 `;

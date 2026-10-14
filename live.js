@@ -175,7 +175,8 @@ gl_FragColor=vec4(c,1.);}`;
 const REACH_PX = 260;
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
 
-function startFlow(host) {
+// zone: obszar reagujący na kursor (cała grafika - na małej karcie kursor nad figurami też porusza ciecz)
+function startFlow(host, zone = host) {
   const canvas = document.createElement('canvas');
   canvas.className = 'lv-canvas';
   const gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power', preserveDrawingBuffer: false });
@@ -222,10 +223,10 @@ function startFlow(host) {
   const pointer = { x: -1e5, y: -1e5 };
   const onMove = e => { if (e.pointerType !== 'touch') { pointer.x = e.clientX; pointer.y = e.clientY; } };
   const onLeave = () => { pointer.x = pointer.y = -1e5; };
-  if (interactive) { addEventListener('pointermove', onMove, { passive: true }); host.addEventListener('pointerleave', onLeave); }
+  if (interactive) { addEventListener('pointermove', onMove, { passive: true }); zone.addEventListener('pointerleave', onLeave); }
   let mx = 0.5, my = 0.5, vx = 0, vy = 0, hover = 0;
   const follow = () => {
-    const r = host.getBoundingClientRect();
+    const r = zone.getBoundingClientRect();            // cała strefa mapowana na ciecz
     const inside = pointer.x >= r.left && pointer.x <= r.right && pointer.y >= r.top && pointer.y <= r.bottom;
     if (inside) {
       const tx = (pointer.x - r.left) / r.width, ty = 1 - (pointer.y - r.top) / r.height;
@@ -240,7 +241,9 @@ function startFlow(host) {
     gl.uniform2f(uMouse, mx, my);
     gl.uniform2f(uVel, vx, vy);
     gl.uniform1f(uHover, hover);
-    gl.uniform1f(uReach, REACH_PX / Math.max(1, r.height));
+    // Zasięg zawirowania: 260 px jak na loom.studio, ale najwyżej 0,4 wysokości - na małej karcie
+    // inaczej obracałaby się cała ciecz naraz i nie byłoby widać zawirowania wokół kursora.
+    gl.uniform1f(uReach, Math.min(0.4, REACH_PX / Math.max(1, r.height)));
   };
   gl.uniform1f(uReach, 0.3);
 
@@ -264,7 +267,7 @@ function startFlow(host) {
     stop() {
       ro.disconnect();
       removeEventListener('pointermove', onMove);
-      host.removeEventListener('pointerleave', onLeave);
+      zone.removeEventListener('pointerleave', onLeave);
       canvas.remove();
       if (!gl.isContextLost()) release();
     },
@@ -272,7 +275,7 @@ function startFlow(host) {
 }
 
 function startLoom(root) {
-  const flow = startFlow(root.querySelector('.lv-flow'));
+  const flow = startFlow(root.querySelector('.lv-flow'), root);
   const comp = root.querySelector('.bauhaus');
   const els = new Map([...root.querySelectorAll('[data-body]')].map(el => [el.dataset.body, el]));
   const world = createWorld();
@@ -299,7 +302,8 @@ function startLoom(root) {
 /* ==========================================================================
    reh.ab - hero w pętli (cały ruch w CSS, sekcja „Interaktywne plansze” w styles.css)
    ========================================================================== */
-function rehabMarkup(p) {
+// lite (karta na sferze): nagłówek, przeskakujący tekst pod nim i płynący gradient na dole - bez reszty.
+function rehabMarkup(p, { lite = false } = {}) {
   const L = p.live;
   let n = 0;
   // Nagłówek litera po literze (--i = kolejność pisania, 26 ms na znak)
@@ -314,15 +318,15 @@ function rehabMarkup(p) {
   return `
           <div class="rh-copy">
             <p class="rh-h">${h}</p>
-            <p class="rh-lede">${lede}</p>
+            ${lite ? '' : `<p class="rh-lede">${lede}</p>`}
             <div class="rh-ticker"><div class="rh-track">${ticker}</div></div>
           </div>
-          <div class="rh-band">
+          <div class="rh-band">${lite ? '' : `
             <div class="rh-row">
               <span class="rh-avatars">${avatars}</span>
               <span class="rh-quotes" style="--n:${L.quotes.length}">${quotes}</span>
               <span class="rh-bar"><span></span></span>
-            </div>
+            </div>`}
           </div>`;
 }
 
@@ -347,10 +351,11 @@ export const toggleMarkup = (label, pressed = false) =>
   `<button class="reel__toggle" type="button" aria-pressed="${pressed}" aria-label="${esc(label)}">${svgi(RP.pause, 'reel__ico-pause')}${svgi(RP.play, 'reel__ico-play')}</button>`;
 
 // HTML grafiki. static: bez ruchu (stan końcowy) - do generowania statycznej planszy (cover).
-export function liveMarkup(p, { static: still = false } = {}) {
-  const inner = MARKUP[p.id]?.(p);
+// lite: wersja uproszczona na kartę sfery (reh.ab bez akapitu i paska z cytatami).
+export function liveMarkup(p, { static: still = false, lite = false } = {}) {
+  const inner = MARKUP[p.id]?.(p, { lite });
   if (!inner) return '';
-  return `<div class="live live--${p.id}${still ? ' live--static' : ''}" aria-hidden="true">${inner}
+  return `<div class="live live--${p.id}${lite ? ' live--lite' : ''}${still ? ' live--static' : ''}" aria-hidden="true">${inner}
         </div>`;
 }
 

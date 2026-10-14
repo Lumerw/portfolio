@@ -17,7 +17,7 @@ import { liveMarkup } from '../live.js';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 8095;
 // Rozmiar pliku: podgląd 4:5 ma do ~610 px (2x), panel 16:9 do 1280 px, telefon 9:16 do ~680 px wysokości (3x).
-const FORMATS = { '4x5': [1080, 1350], '16x9': [2560, 1440], '9x16': [864, 1536] };
+const FORMATS = { card: [540, 675], '4x5': [1080, 1350], '16x9': [2560, 1440], '9x16': [864, 1536] };   // card: karta na sferze (wersja lite)
 const CASE_A = [1200, 1500];  // obraz „a” case study (4:5)
 
 const page = (inner, [w, h]) => `<!doctype html><html><head><meta charset="utf-8">
@@ -47,8 +47,9 @@ for (const p of content.shared.projects) {
   // Strona: plansze w trzech formatach (tylko projekty z polem cover - teraz ma planszę animowaną).
   // Projekt z grafiką interaktywną (live): cover = jej stan końcowy bez ruchu, ta sama kompozycja.
   if (p.cover) {
-    const coverHtml = p.live ? size => page(liveMarkup(p, { static: true }), size) : html;
     for (const [fmt, size] of Object.entries(FORMATS)) {
+      if (!p.cover[fmt]) continue;
+      const coverHtml = p.live ? sz => page(liveMarkup(p, { static: true, lite: fmt === 'card' }), sz) : html;
       const out = join(root, p.cover[fmt]);
       await sharp(await shoot(coverHtml(size), size)).webp({ quality: 80, smartSubsample: true }).toFile(out);
       console.log(`✓ ${p.cover[fmt]}`);

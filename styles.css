@@ -296,12 +296,13 @@ a { color: inherit; text-decoration: none; }
   justify-content: space-between;
 }
 
-/* Przełącznik trybu (lewy górny róg) i języka — mają sens tylko z JS */
+/* Język (lewy górny róg) i przełącznik trybu (prawy) — mają sens tylko z JS */
 .theme {
+  order: 2;
   display: none;
   width: 32px;
   height: 32px;
-  margin-left: -8px;
+  margin-right: -8px;
   align-items: center;
   justify-content: center;
   color: var(--ink);
@@ -339,6 +340,7 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
   .home__main { grid-column: 1 / 7; }
   .home__sphere {
     grid-column: 7 / -1;
+    grid-row: 1 / span 2;              /* obok hero, portfolio i kontaktu */
     position: sticky;
     top: 0;
     height: 100svh;
@@ -433,6 +435,8 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 .hero__li { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin: -8px 0 -8px 2px; vertical-align: middle; color: var(--ink-2); transition: color var(--t-line) var(--ease); }
 .hero__li:hover { color: var(--ink); }
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
+.hero__cta { margin-top: var(--s-4); }
+.hero__cta .button { display: inline-flex; }
 
 /* ==========================================================================
    Karuzela firm „Współpracowałem z” — powolna pętla, pauza po najechaniu, bez ruchu przy reduced-motion
@@ -1502,23 +1506,26 @@ html:has(.sheet:target) { overflow: hidden; }
 .js .agent__note { display: block; }
 @media (max-height: 500px) { .js .agent__note { display: none; } }
 
-/* Stopka = kontakt jako odwrócony blok — czarny w trybie jasnym, jasny w ciemnym.
-   Wyraźny koniec strony i jedyne miejsce z wezwaniem do działania. */
-.site-footer {
-  --paper:  #111111;
-  --ink:    #FAFAF7;
-  --ink-2:  #A3A39E;
-  --ink-3:  #8C8C87;
-  --hair:   rgba(250, 250, 247, .16);
-  background: var(--paper);
-  color: var(--ink);
+/* Kontakt na telefonie i tablecie: odwrócony blok na całą szerokość - czarny w trybie jasnym, jasny w ciemnym.
+   Od 1024 px kontakt jest sekcją jak hero i portfolio (sfera obok), w kolorach strony. */
+@media (max-width: 1023px) {
+  .site-footer {
+    --paper:  #111111;
+    --ink:    #FAFAF7;
+    --ink-2:  #A3A39E;
+    --ink-3:  #8C8C87;
+    --hair:   rgba(250, 250, 247, .16);
+    margin-inline: calc(var(--margin) * -1);
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .site-footer__in { padding-inline: var(--margin); }
 }
-.site-footer__in::before { display: none; }
 @media (max-width: 767px) {
   .site-footer { margin-top: var(--s-5); }
   .site-footer__in { padding-block: var(--s-6) var(--s-5); }
 }
-@media (prefers-color-scheme: dark) {
+@media (max-width: 1023px) and (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .site-footer {
     --paper:  #FAFAF7;
     --ink:    #111111;
@@ -1527,12 +1534,26 @@ html:has(.sheet:target) { overflow: hidden; }
     --hair:   rgba(17, 17, 17, .14);
   }
 }
-:root[data-theme="dark"] .site-footer {
-  --paper:  #FAFAF7;
-  --ink:    #111111;
-  --ink-2:  #6E6E6A;
-  --ink-3:  #73736E;
-  --hair:   rgba(17, 17, 17, .14);
+@media (max-width: 1023px) {
+  :root[data-theme="dark"] .site-footer {
+    --paper:  #FAFAF7;
+    --ink:    #111111;
+    --ink-2:  #6E6E6A;
+    --ink-3:  #73736E;
+    --hair:   rgba(17, 17, 17, .14);
+  }
+}
+/* Desktop: kontakt = trzecia sekcja w lewej kolumnie, na wysokość ekranu; sfera stoi obok */
+@media (min-width: 1024px) {
+  .site-footer { grid-column: 1 / 7; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
+  .site-footer__in {
+    padding-block: var(--s-8);
+    grid-template-areas: "title" "contact" "button" "copy";
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    row-gap: var(--s-4);
+  }
+  .site-footer__title { margin-bottom: calc(var(--s-3) - var(--s-4)); }
 }
 
 
