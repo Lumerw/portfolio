@@ -434,6 +434,8 @@ export const pl = {
     done: 'Gotowe - rozmowa zarezerwowana:',
     doneNote: 'Potwierdzenie i link do spotkania są już w drodze na Twój e-mail.',
     error: 'Nie udało się zarezerwować. Spróbuj jeszcze raz albo napisz:',
+    taken: 'Ten termin właśnie się zajął - wybierz inny.',
+    badEmail: 'Na ten adres nie da się wysłać potwierdzenia - sprawdź e-mail albo podaj inny.',
     nojs: 'Kalendarz działa z włączonym JavaScriptem. Napisz:',
   },
   // Asystent AI: panel #agent. answers = tryb lokalny (bez shared.agent.endpoint).
@@ -696,6 +698,8 @@ export const en = {
     done: 'Done - your call is booked:',
     doneNote: 'The confirmation and meeting link are on their way to your e-mail.',
     error: 'The booking did not go through. Try again or write to me:',
+    taken: 'This slot has just been taken - pick another one.',
+    badEmail: 'The confirmation cannot be sent to this address - check the e-mail or use another one.',
     nojs: 'The calendar needs JavaScript. Write to me:',
   },
   agent: {

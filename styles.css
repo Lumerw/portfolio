@@ -490,7 +490,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 }
 .clients__marquee:hover .clients__track { animation-play-state: paused; }
 .clients__list { display: flex; align-items: center; gap: var(--s-5); padding-right: var(--s-5); }
-.clients__list img { height: var(--h, 24px); width: auto; flex: none; }
+.clients__list img { height: var(--h, 24px); width: auto; flex: none; opacity: .5; }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
 

@@ -175,17 +175,22 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
           body: JSON.stringify(body),
         });
         const json = await res.json().catch(() => ({}));
-        if (!res.ok || json.status !== 'success') throw new Error(res.status);
+        if (!res.ok || json.status !== 'success') throw Object.assign(new Error(json.error?.message || res.status), { status: res.status });
         const done = el('div', 'book__done');
         done.append(el('p', 'book__status t-text', `${copy.done} ${fmtFull.format(new Date(slot))} (${ev.minutes} min).`), el('p', 't-text t-muted', copy.doneNote));
         ui.replaceChildren(done);
         done.setAttribute('tabindex', '-1');
         done.focus();
-      } catch {
+      } catch (er) {
+        // Powód z Cal.com: zajęty termin (409) → odśwież listę; adres, na który nie da się wysłać maila
+        // (np. domena bez skrzynek) → popraw e-mail; reszta → ogólny komunikat z mailem.
+        console.warn('Cal.com:', er.message);
+        if (er.status === 409) { load().then(() => ui.prepend(status(copy.taken))); return; }
         submit.disabled = false;
         submit.textContent = copy.submit;
         f.querySelector('.book__error')?.remove();
-        const err = status(copy.error, true);
+        const bad = /e-?mail|deliverab|domain|address/i.test(er.message);
+        const err = status(bad ? copy.badEmail : copy.error, !bad);
         err.classList.add('book__error');
         err.setAttribute('role', 'alert');
         f.append(err);
