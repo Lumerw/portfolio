@@ -199,7 +199,7 @@ function work(c, t) {
   const n = c.projects.length;
   return `
   <section id="portfolio" class="work" aria-labelledby="work-title">
-    <h2 id="work-title" class="work__title t-name">${esc(t.ui.work)}</h2>
+    <h2 id="work-title" class="work__title t-name section-title">${esc(t.ui.work)}</h2>
     <nav class="index" aria-label="${esc(t.ui.indexLabel)}">
       <ul>${c.projects.map(indexRow).join('')}
         <li ${reveal(n + 4)}>
@@ -485,6 +485,60 @@ const copyIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focus
 
 // Stopka = kontakt (brief 5.4, uproszczony): mail + kopiowanie, profile, przycisk „kontakt”.
 // W PDF ta sama stopka jest stroną 6 (tytuł, zdanie i QR tylko w druku).
+// Kalendarz kreską 1 px (przycisk „umów rozmowę” → Calendly)
+const calendarIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>`;
+const plusIcon = `<svg class="icon faq__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10"/></svg>`;
+
+// FAQ w kontakcie: pytania rozwijane (<details> - działa bez JS) i przejście do asystenta AI:
+// przy odpowiedzi „zapytaj asystenta” (ten sam temat w czacie), pod listą pole na własne pytanie.
+function faq(c, t) {
+  const f = t.faq;
+  if (!f?.items?.length) return '';
+  return `
+  <section class="faq" aria-labelledby="faq-title">
+    <h3 id="faq-title" class="faq__title">${esc(f.title)}</h3>
+    <div class="faq__list">${f.items.map(it => `
+      <details class="faq__item">
+        <summary class="faq__q"><span>${esc(it.q)}</span>${plusIcon}</summary>
+        <div class="faq__a t-text">
+          <p>${esc(it.a)}</p>
+          <button class="faq__more link-u t-meta" type="button" data-ask-agent="${esc(it.q)}">${esc(f.more)}</button>
+        </div>
+      </details>`).join('')}
+    </div>
+    <form class="faq__ask" data-ask-form>
+      <label class="visually-hidden" for="faq-q">${esc(f.askLabel)}</label>
+      <input id="faq-q" name="q" type="text" autocomplete="off" maxlength="500" placeholder="${esc(f.askPlaceholder)}" required>
+      <button class="button" type="submit">${esc(f.askButton)}</button>
+    </form>
+  </section>`;
+}
+
+// Rekomendacje z LinkedIna: krótkie cytaty w karuzeli (przewijanie w bok, strzałki z JS).
+// Wpisy w shared.recommendations; dopóki są placeholdery - sekcja się nie pokazuje.
+function recommendations(c, t) {
+  const items = (c.recommendations ?? []).filter(r => clean(r.quote) && clean(r.name));
+  if (!items.length) return '';
+  const all = c.recommendationsUrl && url(c.recommendationsUrl) !== '#' ? c.recommendationsUrl : '';
+  return `
+  <section id="rekomendacje" class="recs" aria-labelledby="recs-title">
+    <div class="recs__head">
+      <h2 id="recs-title" class="t-name section-title">${esc(t.ui.recs)}</h2>
+      <div class="recs__nav">
+        <button class="recs__btn" type="button" data-recs="-1" aria-label="${esc(t.ui.prev)}"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 3L5 8l5 5"/></svg></button>
+        <button class="recs__btn" type="button" data-recs="1" aria-label="${esc(t.ui.next)}"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <ul class="recs__track" tabindex="0" aria-label="${esc(t.ui.recs)}">${items.map(r => `
+      <li class="recs__card">
+        <blockquote class="recs__quote t-text">„${esc(clean(r.quote))}”</blockquote>
+        <p class="recs__who"><span>${esc(clean(r.name))}</span><span class="t-meta">${esc(clean(r.role))}</span></p>
+      </li>`).join('')}
+    </ul>
+    ${all ? `<p class="recs__all t-meta"><a class="link-u" href="${esc(all)}" target="_blank" rel="noopener">${esc(t.ui.recsAll)}</a></p>` : ''}
+  </section>`;
+}
+
 function footer(c, t) {
   const mailHref = isReal(c.email) ? `mailto:${esc(c.email)}` : '#kontakt';
   // Przycisk „kontakt” → Calendly (shared.calendly); dopóki to placeholder - mail.
@@ -493,7 +547,7 @@ function footer(c, t) {
   return `
 <footer id="kontakt" class="site-footer" aria-labelledby="contact-title">
  <div class="site-footer__in">
-  <h2 id="contact-title" class="site-footer__title t-name">${esc(t.contact.title)}</h2>
+  <h2 id="contact-title" class="site-footer__title t-name section-title">${esc(t.contact.title)}</h2>
   ${clean(t.contact.line) ? `<p class="site-footer__line t-text t-muted print-only">${esc(clean(t.contact.line))}</p>` : ''}
   <div class="site-footer__contact">
     <p class="contact__mail">
@@ -506,14 +560,14 @@ function footer(c, t) {
     </ul>` : ''}
   </div>
   <div class="site-footer__actions">
-    <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${esc(t.ui.contactButton)}</a>
-  </div>
-  <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
+    <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${cal ? calendarIcon : ''}${esc(t.ui.contactButton)}</a>
+  </div>${faq(c, t)}
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - ${esc(c.siteUrl)}">
     <figcaption class="t-meta">${esc(t.ui.qr)} - ${esc(c.siteUrl.replace(/^https?:\/\//, ''))}</figcaption>
   </figure>
  </div>
+ <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
 </footer>`;
 }
 
@@ -547,7 +601,7 @@ export function render(content, lang) {
   const c = content.shared, t = content[lang];
   return `${header(c, t)}
 <div class="home wrap">
-<main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}
+<main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${recommendations(c, t)}
 </main>${footer(c, t)}${sphere(c, t)}
 </div>
 <div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}

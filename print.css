@@ -54,7 +54,7 @@ html { overflow: visible !important; }
 .symbol .hanko { opacity: 1 !important; }
 
 /* Tylko ekranowe */
-.skip, .site-header, .work, .home__sphere, .hero__icons, .hero__cta, .clients, .sheet__backdrop, .sheet__close,
+.skip, .site-header, .work, .recs, .faq, .home__sphere, .hero__icons, .hero__cta, .clients, .sheet__backdrop, .sheet__close,
 .sheet__video, .sheet__caption, .reel__toggle, .copy, .copy__status, .site-footer__actions { display: none !important; }
 
 .print-only { display: block; }
@@ -141,7 +141,7 @@ main { display: flex; }
 .case__pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6mm; }
 
 /* 6 — kontakt: tytuł, zdanie, mail, profile, QR, © */
-.site-footer { margin: 0; break-before: page; background: var(--paper); color: var(--ink); height: var(--page-h); padding: var(--page-pad); }
+.site-footer { display: flex; flex-direction: column; margin: 0; break-before: page; background: var(--paper); color: var(--ink); height: var(--page-h); padding: var(--page-pad); }
 .site-footer__in {
   height: 100%;
   padding: 0;
@@ -175,3 +175,7 @@ main { display: flex; }
 .contact__qr figcaption { margin-top: 3mm; }
 
 a { text-decoration: none; }
+
+/* © na dole strony kontaktu (poza siatką kontaktu) */
+.site-footer__in { flex: 1; }
+.site-footer__copy { padding: 0; }
