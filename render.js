@@ -189,8 +189,10 @@ function hero(c, t) {
     <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}${liHref !== '#' ? ` <a class="hero__li" href="${esc(liHref)}" target="_blank" rel="me noopener" aria-label="${esc(t.ui.linkedin)}">${liIcon}</a>` : ''}</span></p>
     <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
     <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
-    <p class="hero__cta"><span ${reveal(3)}><a class="button" href="#kontakt">${esc(t.ui.contactCta)}</a></span></p>
-    <p class="hero__year t-meta print-only">${esc(c.year)}</p>${clients(c, t)}
+    <div class="hero__row">
+      <p class="hero__cta"><span ${reveal(3)}><a class="button" href="#kontakt">${esc(t.ui.contactCta)}</a></span></p>${clients(c, t)}
+    </div>
+    <p class="hero__year t-meta print-only">${esc(c.year)}</p>
   </section>`;
 }
 
@@ -509,10 +511,28 @@ function recommendations(c, t, lang) {
   </section>`;
 }
 
+// Kalendarz rezerwacji w panelu #rozmowa (Cal.com, booking.js). Tylko gdy shared.booking ma prawdziwą nazwę.
+const hasBooking = c => !!c.booking && isReal(c.booking.calUsername) && isReal(c.booking.eventSlug);
+function booking(c, t) {
+  if (!hasBooking(c)) return '';
+  const g = t.booking;
+  const bar = `
+      ${calendarIcon}
+      <h2 id="rozmowa-title" class="t-project">${esc(g.title)}</h2>`;
+  const body = `
+      <div class="book" data-booking data-user="${esc(c.booking.calUsername)}" data-event="${esc(c.booking.eventSlug)}" data-minutes="${esc(c.booking.minutes || 30)}">
+        <p class="book__intro t-text t-muted">${esc(g.intro)}</p>
+        <p class="book__nojs t-text">${esc(g.nojs)} <a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
+        <div class="book__ui" data-booking-ui></div>
+      </div>`;
+  return sheet({ id: 'rozmowa', cls: 'sheet--booking', bar, body, t });
+}
+
 function footer(c, t) {
   const mailHref = isReal(c.email) ? `mailto:${esc(c.email)}` : '#kontakt';
-  // Przycisk „kontakt” → Calendly (shared.calendly); dopóki to placeholder - mail.
+  // Przycisk „umów rozmowę”: własny kalendarz (#rozmowa, Cal.com) → Calendly (shared.calendly) → mail.
   const cal = url(c.calendly) !== '#' && new URL(c.calendly).pathname.length > 1 ? c.calendly : '';
+  const book = hasBooking(c);
   const links = c.links.filter(l => url(l.href) !== '#');
   return `
 <footer id="kontakt" class="site-footer" aria-labelledby="contact-title">
@@ -530,7 +550,7 @@ function footer(c, t) {
     </ul>` : ''}
   </div>
   <div class="site-footer__actions">
-    <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${cal ? calendarIcon : ''}${esc(t.ui.contactButton)}</a>
+    <a class="button site-footer__button" href="${book ? '#rozmowa' : cal ? esc(cal) : mailHref}"${book ? ' aria-haspopup="dialog"' : cal ? ' target="_blank" rel="noopener"' : ''}>${book || cal ? calendarIcon : ''}${esc(t.ui.contactButton)}</a>
     <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>${esc(t.ui.askAgent)}</a>
   </div>
   <figure class="contact__qr print-only">
@@ -559,7 +579,7 @@ function colophon(c, t) {
 function agent(c, t) {
   const g = t.agent;
   const bar = `
-      <span class="agent-dot" aria-hidden="true"></span>
+      <span class="agent-face" aria-hidden="true"><img src="${esc(c.avatar.drawing)}" width="256" height="256" alt=""></span>
       <h2 id="agent-title" class="t-project">${esc(g.title)}</h2>`;
   const body = `
       <div class="agent" data-agent>
@@ -587,7 +607,7 @@ export function render(content, lang) {
 <main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}${booking(c, t)}
 </div>
 `;
 }

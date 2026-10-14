@@ -19,7 +19,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preload" href="assets/fonts/open-sans-700-sub.woff2" as="font" type="font/woff2" crossorigin media="(min-width: 1024px)">
   <link rel="preload" href="assets/fonts/open-sans-600-sub.woff2" as="font" type="font/woff2" crossorigin media="(min-width: 1024px)">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Wojciech Lumer","jobTitle":"projektant","description":"Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio.","email":"mailto:wojciechlumer@gmail.com","url":"https://lumerw.github.io/portfolio/","image":"https://lumerw.github.io/portfolio/assets/og.jpg","sameAs":["https://www.instagram.com/wojciechlumer/?hl=en","https://www.linkedin.com/in/wojciechlumer/","https://www.facebook.com/wojtek.lumer/","https://github.com/Lumerw","https://www.behance.net/wojteklumer"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Wojciech Lumer","jobTitle":"projektant","description":"Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio.","email":"mailto:wojciechlumer@gmail.com","url":"https://lumerw.github.io/portfolio/","image":"https://lumerw.github.io/portfolio/assets/og.jpg","sameAs":["https://www.linkedin.com/in/wojciechlumer/","https://github.com/Lumerw","https://www.instagram.com/wojciechlumer/?hl=en","https://www.facebook.com/wojtek.lumer/","https://www.behance.net/wojteklumer"]}</script>
   <!-- meta:end -->
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#FAFAF7" media="(prefers-color-scheme: light)">
@@ -65,8 +65,8 @@
     <p class="hero__name"><span class="reveal" style="--n:0">Wojciech Lumer <a class="hero__li" href="https://www.linkedin.com/in/wojciechlumer/" target="_blank" rel="me noopener" aria-label="LinkedIn"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg></a></span></p>
     <h1 id="hero-title" class="t-name hero__title"><span class="reveal" style="--n:1">Design to to, jak coś działa.</span></h1>
     <p class="hero__line t-text t-muted"><span class="reveal" style="--n:2">Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio.</span></p>
-    <p class="hero__cta"><span class="reveal" style="--n:3"><a class="button" href="#kontakt">kontakt</a></span></p>
-    <p class="hero__year t-meta print-only">2026</p>
+    <div class="hero__row">
+      <p class="hero__cta"><span class="reveal" style="--n:3"><a class="button" href="#kontakt">kontakt</a></span></p>
       <section class="clients" aria-labelledby="clients-title">
         <h2 id="clients-title" class="clients__label t-meta">Współpracowałem z</h2>
         <div class="clients__marquee">
@@ -90,6 +90,8 @@
         </div>
         </div>
       </section>
+    </div>
+    <p class="hero__year t-meta print-only">2026</p>
   </section>
   <section id="portfolio" class="work" aria-labelledby="work-title">
     <h2 id="work-title" class="work__title t-name section-title">Portfolio</h2>
@@ -208,16 +210,16 @@
       <span class="copy__status t-meta" role="status" aria-live="polite" data-copied="skopiowano"></span>
     </p>
     <ul class="contact__links t-meta print-only" aria-label="Profile">
-      <li><a href="https://www.instagram.com/wojciechlumer/?hl=en" rel="me noopener" target="_blank">Instagram</a></li>
       <li><a href="https://www.linkedin.com/in/wojciechlumer/" rel="me noopener" target="_blank">LinkedIn</a></li>
-      <li><a href="https://www.facebook.com/wojtek.lumer/" rel="me noopener" target="_blank">Facebook</a></li>
       <li><a href="https://github.com/Lumerw" rel="me noopener" target="_blank">GitHub</a></li>
+      <li><a href="https://www.instagram.com/wojciechlumer/?hl=en" rel="me noopener" target="_blank">Instagram</a></li>
+      <li><a href="https://www.facebook.com/wojtek.lumer/" rel="me noopener" target="_blank">Facebook</a></li>
       <li><a href="https://www.behance.net/wojteklumer" rel="me noopener" target="_blank">Behance</a></li>
     </ul>
   </div>
   <div class="site-footer__actions">
     <a class="button site-footer__button" href="https://calendly.com/wojciechlumer/30min" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>umów rozmowę</a>
-    <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>zapytaj asystenta AI</a>
+    <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>zapytaj asystenta</a>
   </div>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - https://lumerw.github.io/portfolio">
@@ -281,10 +283,10 @@
   </div>
 <div class="colophon">
   <ul class="colophon__links t-meta" aria-label="Profile">
-    <li><a href="https://www.instagram.com/wojciechlumer/?hl=en" rel="me noopener" target="_blank">Instagram</a></li>
     <li><a href="https://www.linkedin.com/in/wojciechlumer/" rel="me noopener" target="_blank">LinkedIn</a></li>
-    <li><a href="https://www.facebook.com/wojtek.lumer/" rel="me noopener" target="_blank">Facebook</a></li>
     <li><a href="https://github.com/Lumerw" rel="me noopener" target="_blank">GitHub</a></li>
+    <li><a href="https://www.instagram.com/wojciechlumer/?hl=en" rel="me noopener" target="_blank">Instagram</a></li>
+    <li><a href="https://www.facebook.com/wojtek.lumer/" rel="me noopener" target="_blank">Facebook</a></li>
     <li><a href="https://www.behance.net/wojteklumer" rel="me noopener" target="_blank">Behance</a></li>
   </ul>
   <p class="colophon__copy t-meta">© 2026 Wojciech Lumer</p>
@@ -662,8 +664,8 @@
   <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
   <div class="sheet__panel">
     <div class="sheet__bar wrap">
-      <span class="agent-dot" aria-hidden="true"></span>
-      <h2 id="agent-title" class="t-project">Zapytaj o mnie</h2>
+      <span class="agent-face" aria-hidden="true"><img src="assets/me/avatar-drawing.webp" width="256" height="256" alt=""></span>
+      <h2 id="agent-title" class="t-project">Zapytaj mnie</h2>
       <a class="sheet__close" href="#start" data-close aria-label="zamknij"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
     </div>
     <div class="sheet__body wrap">

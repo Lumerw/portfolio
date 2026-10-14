@@ -195,6 +195,7 @@ function syncSheet() {
     // Po starcie animacji, żeby przeglądarka nie przewijała do panelu.
     // Czat: od razu pole pytania (na dotykowych - krzyżyk, żeby nie wyskakiwała klawiatura).
     if (sheet.id === 'agent') loadAgent();
+    if (sheet.id === 'rozmowa') openBooking(sheet);
     const first = sheet.id === 'agent' && matchMedia('(hover: hover)').matches ? sheet.querySelector('#agent-q') : null;
     requestAnimationFrame(() => (first ?? sheet.querySelector('[data-close]')).focus({ preventScroll: true }));
   } else {
@@ -241,6 +242,16 @@ app.addEventListener('click', e => {
     f.querySelector('.reel__toggle')?.setAttribute('aria-pressed', String(paused));
   }
 });
+
+/* Kalendarz rezerwacji (panel #rozmowa, Cal.com): booking.js ładuje się przy pierwszym otwarciu panelu,
+   każde otwarcie odświeża wolne terminy. */
+async function openBooking(sheet) {
+  const root = sheet.querySelector('[data-booking]');
+  if (!root) return;
+  const { initBooking } = await import('./booking.js');
+  if (root.__booking) { root.__booking.reload(); return; }
+  root.__booking = initBooking(root, { lang: root.closest('html')?.lang || 'pl', copy: content[root.closest('html')?.lang || 'pl'].booking, email: content.shared.email });
+}
 
 /* Ikony (obok awatara i w brandbooku): każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
    i nigdy nie pokazuje tej samej ikony co sąsiad. Hero: w miejscu leżą wszystkie ikony, widoczna ma .is-on.

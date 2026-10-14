@@ -143,6 +143,20 @@ Font Haus (loom) jest na licencji, więc w PDF jest tylko logo w krzywych i zrzu
 - Zrzuty: `shared.projects[].deck` → `assets/deck/` (desktop 1600 × 1000, telefon 480 × 1039, JPG).
 - Nowy zrzut: zrób go w 1440 × 900 (2x) i 390 × 844 (3x), bez banera cookies, i podmień plik.
 
+## Kalendarz rezerwacji (własny, w stylu strony)
+
+Przycisk „umów rozmowę” otwiera panel `#rozmowa` z kalendarzem: dni z wolnymi terminami, godziny w strefie odwiedzającego, formularz (imię, e-mail, notatka) i rezerwacja. Działa na **darmowym API Cal.com** prosto z przeglądarki - bez serwera i bez klucza (wolne terminy i tworzenie rezerwacji są w Cal.com publiczne, API wpuszcza zapytania z każdej strony). Cal.com sam wysyła potwierdzenie z linkiem do spotkania i wpisuje rozmowę do Twojego kalendarza. Kod: `booking.js`, teksty: `pl/en.booking`, ustawienia: `shared.booking`.
+
+Calendly tego nie umożliwia za darmo: rezerwacja przez API (`POST /invitees`) wymaga planu Standard lub wyższego, na darmowym zwraca 403.
+
+Włączenie (raz):
+
+1. Załóż darmowe konto na [cal.com](https://cal.com) i połącz swój kalendarz (Google / Outlook / iCloud), żeby zajęte terminy znikały z listy.
+2. W **Event Types** utwórz spotkanie 30 min (slug np. `30min`), ustaw dostępność (Availability) i miejsce spotkania (np. Google Meet / Cal Video).
+3. Wpisz w `content.js` → `shared.booking` swoją nazwę z adresu `cal.com/<nazwa>` (`calUsername`) i slug spotkania (`eventSlug`), potem `npm run build` i wypchnij zmiany.
+
+Dopóki `calUsername` to placeholder, panelu nie ma, a przycisk otwiera Calendly (`shared.calendly`).
+
 ## Asystent AI
 
 Awatar-moneta w hero (tęczowa poświata) otwiera panel `#agent` z czatem (telefon: pełny panel; od 768 px wąska kolumna w prawym dolnym rogu). Teksty: `pl/en.agent` w `content.js`, silnik: `agent.js`, obsługa czatu: `main.js`.

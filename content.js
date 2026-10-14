@@ -15,12 +15,16 @@ export const shared = {
   email: 'wojciechlumer@gmail.com',
   // Przycisk „kontakt” - link do kalendarza spotkań. [Wpisz swój link Calendly]
   calendly: 'https://calendly.com/wojciechlumer/30min',  // przycisk „kontakt” (placeholder = mail)
+  // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
+  // Wpisz nazwę użytkownika z cal.com/<nazwa> i slug typu spotkania z cal.com/<nazwa>/<slug>.
+  // Dopóki to placeholder, „umów rozmowę” otwiera Calendly.
+  booking: { calUsername: '[twoja-nazwa-na-cal.com]', eventSlug: '30min', minutes: 30 },
   // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
-    { label: 'Instagram', href: 'https://www.instagram.com/wojciechlumer/?hl=en' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/wojciechlumer/' },
-    { label: 'Facebook', href: 'https://www.facebook.com/wojtek.lumer/' },
     { label: 'GitHub', href: 'https://github.com/Lumerw' },
+    { label: 'Instagram', href: 'https://www.instagram.com/wojciechlumer/?hl=en' },
+    { label: 'Facebook', href: 'https://www.facebook.com/wojtek.lumer/' },
     { label: 'Behance', href: 'https://www.behance.net/wojteklumer' },
   ],
   // Awatar w hero (moneta): zdjęcie i rysunek kreską - koło, przycięte (assets/me/). Klik → asystent AI.
@@ -240,7 +244,7 @@ export const pl = {
     contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → Calendly
     work: 'Portfolio',               // tytuł sekcji z linkami
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
-    askAgent: 'zapytaj asystenta AI', // przycisk obok „umów rozmowę” → panel asystenta
+    askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
     prev: 'poprzednia',
     brandbookType: 'zasady marki',
@@ -404,10 +408,30 @@ export const pl = {
     },
   },
 
+  // Kalendarz rezerwacji (panel #rozmowa, Cal.com)
+  booking: {
+    title: 'Umów rozmowę',
+    intro: '30 minut online. Wybierz dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.',
+    loading: 'Wczytuję wolne terminy…',
+    empty: 'Brak wolnych terminów w najbliższych tygodniach. Napisz do mnie:',
+    day: 'Dzień',
+    time: 'Godzina',
+    tz: 'Twoja strefa czasowa',
+    name: 'Imię i nazwisko',
+    email: 'E-mail',
+    note: 'O czym chcesz porozmawiać? (opcjonalnie)',
+    submit: 'zarezerwuj',
+    sending: 'Rezerwuję…',
+    change: 'zmień termin',
+    done: 'Gotowe - rozmowa zarezerwowana:',
+    doneNote: 'Potwierdzenie i link do spotkania są już w drodze na Twój e-mail.',
+    error: 'Nie udało się zarezerwować. Spróbuj jeszcze raz albo napisz:',
+    nojs: 'Kalendarz działa z włączonym JavaScriptem. Napisz:',
+  },
   // Asystent AI: panel #agent. answers = tryb lokalny (bez shared.agent.endpoint).
   agent: {
     button: 'zapytaj AI',
-    title: 'Zapytaj o mnie',
+    title: 'Zapytaj mnie',
     hello: 'Cześć! Jestem asystentem AI tego portfolio. Zapytaj o projekty, doświadczenie, narzędzia albo o to, jak się skontaktować z Wojciechem.',
     suggestions: ['Jakie projekty zrobił Wojciech?', 'Jakich narzędzi używa?', 'Jak umówić rozmowę?'],
     label: 'Twoje pytanie',
@@ -481,7 +505,7 @@ export const en = {
     contactButton: 'book a call',
     work: 'Portfolio',
     contactCta: 'contact',
-    askAgent: 'ask my AI assistant',
+    askAgent: 'ask my assistant',
     recs: 'Recommendations',
     prev: 'previous',
     brandbookType: 'brand rules',
@@ -643,9 +667,28 @@ export const en = {
     },
   },
 
+  booking: {
+    title: 'Book a call',
+    intro: '30 minutes online. Pick a day and time - the confirmation and meeting link will arrive by e-mail.',
+    loading: 'Loading free slots…',
+    empty: 'No free slots in the coming weeks. Write to me:',
+    day: 'Day',
+    time: 'Time',
+    tz: 'your time zone',
+    name: 'Name',
+    email: 'E-mail',
+    note: 'What would you like to talk about? (optional)',
+    submit: 'book',
+    sending: 'Booking…',
+    change: 'change time',
+    done: 'Done - your call is booked:',
+    doneNote: 'The confirmation and meeting link are on their way to your e-mail.',
+    error: 'The booking did not go through. Try again or write to me:',
+    nojs: 'The calendar needs JavaScript. Write to me:',
+  },
   agent: {
     button: 'ask AI',
-    title: 'Ask about me',
+    title: 'Ask me',
     hello: 'Hi! I am the AI assistant of this portfolio. Ask about Wojciech\'s projects, experience, tools or how to get in touch.',
     suggestions: ['What has Wojciech worked on?', 'Which tools does Wojciech use?', 'How can I book a call?'],
     label: 'Your question',
