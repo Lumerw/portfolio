@@ -402,17 +402,6 @@ app.addEventListener('submit', e => {
   askAgent(form.elements.q.value);
   form.elements.q.value = '';
 });
-/* Rekomendacje: strzałki przewijają karuzelę o jedną kartę (przewijanie palcem / myszą działa samo). */
-app.addEventListener('click', e => {
-  const b = e.target.closest('[data-recs]');
-  if (!b) return;
-  const track = b.closest('.recs')?.querySelector('.recs__track');
-  const card = track?.querySelector('.recs__card');
-  if (!card) return;
-  const step = card.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0);
-  track.scrollBy({ left: Number(b.dataset.recs) * step, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-});
-
 app.addEventListener('click', e => {
   const b = e.target.closest('[data-ask]');
   if (!b) return;

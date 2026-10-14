@@ -40,18 +40,25 @@ export const shared = {
     'assets/icons/04.svg', 'assets/icons/05.svg', 'assets/icons/06.svg',
   ],
 
-  // Rekomendacje z LinkedIna (sekcja z karuzelą po Portfolio): krótki cytat, osoba, rola.
-  // Dosłowne fragmenty rekomendacji (skrócone), w języku oryginału. Placeholdery = sekcja ukryta.
-  recommendationsUrl: 'https://www.linkedin.com/in/wojciechlumer/details/recommendations/',
+  // Rekomendacje z LinkedIna (karuzela w pętli po Portfolio): skrócony fragment w PL i EN (tłumaczenie),
+  // osoba i rola. Awatar = inicjały. Placeholdery = sekcja ukryta.
   recommendations: [
-    { quote: 'Working with Wojciech Lumer on the loom.studio website project was an outstanding experience. Wojciech brought a clear vision, excellent communication skills, and a collaborative spirit.', name: 'Patryk Kurek', role: 'Software Engineer · projekt loom.studio, 2025' },
-    { quote: 'He delivers work that’s not just pretty but effective every time.', name: 'Brendon Zegarlicki', role: 'Co-Founder, Interchainly' },
-    { quote: 'His designs strike the perfect balance between aesthetics and functionality, resulting in visually appealing and user-friendly interfaces.', name: 'Kacper Ślusarczyk', role: 'Developer, IBM' },
-    { quote: 'He is a real pleasure to work with - he is very cooperative and always willing to help ensure that our projects are completed on time and within budget.', name: 'Damian Badowski', role: 'Co-Owner, WeedWeek' },
-    { quote: 'His designs effectively blend aesthetics with functionality, showcasing a solid understanding of design principles.', name: 'Kaja Kaja', role: 'Owner, Kaja Kaja Młode Studio' },
-    { quote: 'He consistently delivers creative and effective design solutions that demonstrate a deep understanding of user needs.', name: 'Maciej Szczerba', role: 'Co-Founder, adGen' },
-    { quote: 'His greatest strength lies in his abstract concepts, and on that basis, we created many wonderful projects.', name: 'Kamil Korzec', role: 'Content Team Manager' },
-    { quote: 'Potrafił zawsze dostosować się do dynamicznej sytuacji i dostarczyć mi dokładnie to o co prosiłem, a niekiedy nawet wyjść swoimi pomysłami ponad moje oczekiwania.', name: 'Mateusz Dworzyński', role: 'UX, tworzenie stron www' },
+    { name: 'Patryk Kurek', role: { pl: 'Software Engineer · projekt loom.studio, 2025', en: 'Software Engineer · loom.studio project, 2025' },
+      quote: { pl: 'Współpraca z Wojciechem przy stronie loom.studio była wyjątkowym doświadczeniem…', en: 'Working with Wojciech on the loom.studio website project was an outstanding experience…' } },
+    { name: 'Brendon Zegarlicki', role: { pl: 'Co-Founder, Interchainly', en: 'Co-Founder, Interchainly' },
+      quote: { pl: 'Dostarcza pracę, która jest nie tylko ładna, ale i skuteczna…', en: 'He delivers work that’s not just pretty but effective…' } },
+    { name: 'Kacper Ślusarczyk', role: { pl: 'Developer, IBM', en: 'Developer, IBM' },
+      quote: { pl: 'Jego projekty idealnie łączą estetykę z funkcjonalnością…', en: 'His designs strike the perfect balance between aesthetics and functionality…' } },
+    { name: 'Damian Badowski', role: { pl: 'Co-Owner, WeedWeek', en: 'Co-Owner, WeedWeek' },
+      quote: { pl: 'Praca z nim to prawdziwa przyjemność…', en: 'He is a real pleasure to work with…' } },
+    { name: 'Kaja Kaja', role: { pl: 'Owner, Kaja Kaja Młode Studio', en: 'Owner, Kaja Kaja Młode Studio' },
+      quote: { pl: 'Wojciech ma silny zmysł artystyczny i dbałość o szczegóły…', en: 'Wojciech displays a strong artistic flair and attention to detail…' } },
+    { name: 'Maciej Szczerba', role: { pl: 'Co-Founder, adGen', en: 'Co-Founder, adGen' },
+      quote: { pl: 'Konsekwentnie dostarcza kreatywne i skuteczne rozwiązania…', en: 'He consistently delivers creative and effective design solutions…' } },
+    { name: 'Kamil Korzec', role: { pl: 'Content Team Manager', en: 'Content Team Manager' },
+      quote: { pl: 'Jego największą siłą są abstrakcyjne koncepcje…', en: 'His greatest strength lies in his abstract concepts…' } },
+    { name: 'Mateusz Dworzyński', role: { pl: 'UX, tworzenie stron www', en: 'UX, websites' },
+      quote: { pl: 'Wojtek to bardzo bystry i kontaktowy człowiek…', en: 'Wojtek is a very sharp and approachable person…' } },
   ],
 
   // Asystent AI („zapytaj AI” obok przycisku kontakt). endpoint = adres Workera z agent/worker.js
@@ -235,7 +242,6 @@ export const pl = {
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
     askAgent: 'zapytaj asystenta AI', // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
-    recsAll: 'wszystkie rekomendacje na LinkedInie ↗',
     prev: 'poprzednia',
     brandbookType: 'zasady marki',
     avatar: 'Zapytaj o mnie - asystent AI',
@@ -477,7 +483,6 @@ export const en = {
     contactCta: 'contact',
     askAgent: 'ask my AI assistant',
     recs: 'Recommendations',
-    recsAll: 'all recommendations on LinkedIn ↗',
     prev: 'previous',
     brandbookType: 'brand rules',
     avatar: 'Ask about me - AI assistant',

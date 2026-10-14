@@ -488,28 +488,24 @@ const copyIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focus
 // Kalendarz kreską 1 px (przycisk „umów rozmowę” → Calendly)
 const calendarIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>`;
 
-// Rekomendacje z LinkedIna: krótkie cytaty w karuzeli (przewijanie w bok, strzałki z JS).
-// Wpisy w shared.recommendations; dopóki są placeholdery - sekcja się nie pokazuje.
-function recommendations(c, t) {
-  const items = (c.recommendations ?? []).filter(r => clean(r.quote) && clean(r.name));
+// Rekomendacje z LinkedIna: karuzela w pętli (lista + kopia aria-hidden, jak karuzela logo), karty bez linków.
+// Fragment i rola w języku strony; awatar = inicjały w kole kreską 1 px. Placeholdery - sekcja ukryta.
+function recommendations(c, t, lang) {
+  const items = (c.recommendations ?? []).filter(r => clean(r.name) && clean(r.quote?.[lang]));
   if (!items.length) return '';
-  const all = c.recommendationsUrl && url(c.recommendationsUrl) !== '#' ? c.recommendationsUrl : '';
+  const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join('');
+  const cards = hidden => items.map(r => `
+          <li class="recs__card"${hidden ? ' aria-hidden="true"' : ''}>
+            <blockquote class="recs__quote">${lang === 'pl' ? '„' : '“'}${esc(clean(r.quote[lang]))}”</blockquote>
+            <p class="recs__who"><span class="recs__avatar" aria-hidden="true">${esc(initials(r.name))}</span><span><span class="recs__name">${esc(r.name)}</span><span class="recs__role t-meta">${esc(clean(r.role?.[lang]))}</span></span></p>
+          </li>`).join('');
   return `
   <section id="rekomendacje" class="recs" aria-labelledby="recs-title">
-    <div class="recs__head">
-      <h2 id="recs-title" class="t-name section-title">${esc(t.ui.recs)}</h2>
-      <div class="recs__nav">
-        <button class="recs__btn" type="button" data-recs="-1" aria-label="${esc(t.ui.prev)}"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 3L5 8l5 5"/></svg></button>
-        <button class="recs__btn" type="button" data-recs="1" aria-label="${esc(t.ui.next)}"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 3l5 5-5 5"/></svg></button>
-      </div>
+    <h2 id="recs-title" class="t-name section-title recs__title">${esc(t.ui.recs)}</h2>
+    <div class="recs__marquee">
+      <ul class="recs__track">${cards(false)}${cards(true)}
+      </ul>
     </div>
-    <ul class="recs__track" tabindex="0" aria-label="${esc(t.ui.recs)}">${items.map(r => `
-      <li class="recs__card">
-        <blockquote class="recs__quote t-text">„${esc(clean(r.quote))}”</blockquote>
-        <p class="recs__who"><span>${esc(clean(r.name))}</span><span class="t-meta">${esc(clean(r.role))}</span></p>
-      </li>`).join('')}
-    </ul>
-    ${all ? `<p class="recs__all t-meta"><a class="link-u" href="${esc(all)}" target="_blank" rel="noopener">${esc(t.ui.recsAll)}</a></p>` : ''}
   </section>`;
 }
 
@@ -588,7 +584,7 @@ export function render(content, lang) {
   const c = content.shared, t = content[lang];
   return `${header(c, t)}
 <div class="home wrap">
-<main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${recommendations(c, t)}
+<main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>
 <div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}
