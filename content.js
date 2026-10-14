@@ -41,11 +41,17 @@ export const shared = {
   ],
 
   // Rekomendacje z LinkedIna (sekcja z karuzelą po Portfolio): krótki cytat, osoba, rola.
-  // Dopóki są placeholdery - sekcja się nie pokazuje. Cytat w języku oryginału.
+  // Dosłowne fragmenty rekomendacji (skrócone), w języku oryginału. Placeholdery = sekcja ukryta.
   recommendationsUrl: 'https://www.linkedin.com/in/wojciechlumer/details/recommendations/',
   recommendations: [
-    { quote: '[krótki cytat z rekomendacji]', name: '[imię i nazwisko]', role: '[stanowisko, firma]' },
-    { quote: '[krótki cytat z rekomendacji]', name: '[imię i nazwisko]', role: '[stanowisko, firma]' },
+    { quote: 'Working with Wojciech Lumer on the loom.studio website project was an outstanding experience. Wojciech brought a clear vision, excellent communication skills, and a collaborative spirit.', name: 'Patryk Kurek', role: 'Software Engineer · projekt loom.studio, 2025' },
+    { quote: 'He delivers work that’s not just pretty but effective every time.', name: 'Brendon Zegarlicki', role: 'Co-Founder, Interchainly' },
+    { quote: 'His designs strike the perfect balance between aesthetics and functionality, resulting in visually appealing and user-friendly interfaces.', name: 'Kacper Ślusarczyk', role: 'Developer, IBM' },
+    { quote: 'He is a real pleasure to work with - he is very cooperative and always willing to help ensure that our projects are completed on time and within budget.', name: 'Damian Badowski', role: 'Co-Owner, WeedWeek' },
+    { quote: 'His designs effectively blend aesthetics with functionality, showcasing a solid understanding of design principles.', name: 'Kaja Kaja', role: 'Owner, Kaja Kaja Młode Studio' },
+    { quote: 'He consistently delivers creative and effective design solutions that demonstrate a deep understanding of user needs.', name: 'Maciej Szczerba', role: 'Co-Founder, adGen' },
+    { quote: 'His greatest strength lies in his abstract concepts, and on that basis, we created many wonderful projects.', name: 'Kamil Korzec', role: 'Content Team Manager' },
+    { quote: 'Potrafił zawsze dostosować się do dynamicznej sytuacji i dostarczyć mi dokładnie to o co prosiłem, a niekiedy nawet wyjść swoimi pomysłami ponad moje oczekiwania.', name: 'Mateusz Dworzyński', role: 'UX, tworzenie stron www' },
   ],
 
   // Asystent AI („zapytaj AI” obok przycisku kontakt). endpoint = adres Workera z agent/worker.js
