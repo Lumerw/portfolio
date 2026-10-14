@@ -505,7 +505,9 @@ function recommendations(c, t, lang) {
   const cards = hidden => items.map(r => `
           <li class="recs__card"${hidden ? ' aria-hidden="true"' : ''}>
             <blockquote class="recs__quote">${lang === 'pl' ? '„' : '“'}${esc(clean(r.quote[lang]))}”</blockquote>
-            <p class="recs__who"><span class="recs__avatar" aria-hidden="true">${esc(initials(r.name))}</span><span><span class="recs__name">${esc(r.name)}</span><span class="recs__role t-meta">${esc(clean(r.role?.[lang]))}</span></span></p>
+            <p class="recs__who">${r.photo
+              ? `<img class="recs__avatar" src="${esc(r.photo)}" width="36" height="36" alt="" loading="lazy" decoding="async">`
+              : `<span class="recs__avatar" aria-hidden="true">${esc(initials(r.name))}</span>`}<span><span class="recs__name">${esc(r.name)}</span><span class="recs__role t-meta">${esc(clean(r.role?.[lang]))}</span></span></p>
           </li>`).join('');
   return `
   <section id="rekomendacje" class="recs" aria-labelledby="recs-title">

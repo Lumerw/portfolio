@@ -48,23 +48,24 @@ export const shared = {
   ],
 
   // Rekomendacje z LinkedIna (karuzela w pętli po Portfolio): skrócony fragment w PL i EN (tłumaczenie),
-  // osoba i rola. Awatar = inicjały. Placeholdery = sekcja ukryta.
+  // osoba i rola. Placeholdery = sekcja ukryta.
+  // photo: zdjęcie z LinkedIna (96 × 96 webp, za zgodą osób); bez zdjęcia - kółko z inicjałami.
   recommendations: [
-    { name: 'Patryk Kurek', role: { pl: 'Software Engineer · projekt loom.studio, 2025', en: 'Software Engineer · loom.studio project, 2025' },
+    { name: 'Patryk Kurek', photo: 'assets/recs/patryk-kurek.webp', role: { pl: 'Software Engineer · projekt loom.studio, 2025', en: 'Software Engineer · loom.studio project, 2025' },
       quote: { pl: 'Współpraca z Wojciechem przy stronie loom.studio była wyjątkowym doświadczeniem…', en: 'Working with Wojciech on the loom.studio website project was an outstanding experience…' } },
-    { name: 'Brendon Zegarlicki', role: { pl: 'Co-Founder, Interchainly', en: 'Co-Founder, Interchainly' },
+    { name: 'Brendon Zegarlicki', photo: 'assets/recs/brendon-zegarlicki.webp', role: { pl: 'Co-Founder, Interchainly', en: 'Co-Founder, Interchainly' },
       quote: { pl: 'Dostarcza pracę, która jest nie tylko ładna, ale i skuteczna…', en: 'He delivers work that’s not just pretty but effective…' } },
-    { name: 'Kacper Ślusarczyk', role: { pl: 'Developer, IBM', en: 'Developer, IBM' },
+    { name: 'Kacper Ślusarczyk', photo: 'assets/recs/kacper-slusarczyk.webp', role: { pl: 'Developer, IBM', en: 'Developer, IBM' },
       quote: { pl: 'Jego projekty idealnie łączą estetykę z funkcjonalnością…', en: 'His designs strike the perfect balance between aesthetics and functionality…' } },
-    { name: 'Damian Badowski', role: { pl: 'Co-Owner, WeedWeek', en: 'Co-Owner, WeedWeek' },
+    { name: 'Damian Badowski', photo: 'assets/recs/damian-badowski.webp', role: { pl: 'Co-Owner, WeedWeek', en: 'Co-Owner, WeedWeek' },
       quote: { pl: 'Praca z nim to prawdziwa przyjemność…', en: 'He is a real pleasure to work with…' } },
-    { name: 'Kaja Kaja', role: { pl: 'Owner, Kaja Kaja Młode Studio', en: 'Owner, Kaja Kaja Młode Studio' },
+    { name: 'Kaja Kaja', photo: 'assets/recs/kaja-kaja.webp', role: { pl: 'Owner, Kaja Kaja Młode Studio', en: 'Owner, Kaja Kaja Młode Studio' },
       quote: { pl: 'Wojciech ma silny zmysł artystyczny i dbałość o szczegóły…', en: 'Wojciech displays a strong artistic flair and attention to detail…' } },
-    { name: 'Maciej Szczerba', role: { pl: 'Co-Founder, adGen', en: 'Co-Founder, adGen' },
+    { name: 'Maciej Szczerba', photo: 'assets/recs/maciej-szczerba.webp', role: { pl: 'Co-Founder, adGen', en: 'Co-Founder, adGen' },
       quote: { pl: 'Konsekwentnie dostarcza kreatywne i skuteczne rozwiązania…', en: 'He consistently delivers creative and effective design solutions…' } },
-    { name: 'Kamil Korzec', role: { pl: 'Content Team Manager', en: 'Content Team Manager' },
+    { name: 'Kamil Korzec', photo: 'assets/recs/kamil-korzec.webp', role: { pl: 'Content Team Manager', en: 'Content Team Manager' },
       quote: { pl: 'Jego największą siłą są abstrakcyjne koncepcje…', en: 'His greatest strength lies in his abstract concepts…' } },
-    { name: 'Mateusz Dworzyński', role: { pl: 'UX, tworzenie stron www', en: 'UX, websites' },
+    { name: 'Mateusz Dworzyński', photo: 'assets/recs/mateusz-dworzynski.webp', role: { pl: 'UX, tworzenie stron www', en: 'UX, websites' },
       quote: { pl: 'Wojtek to bardzo bystry i kontaktowy człowiek…', en: 'Wojtek is a very sharp and approachable person…' } },
   ],
 
