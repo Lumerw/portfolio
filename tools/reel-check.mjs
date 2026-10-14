@@ -1,8 +1,8 @@
 // Testy akceptacyjne planszy animowanej teraz („Dwie role, jedna rozmowa”) - specyfikacja, sekcja 10.
 //   npm run check-reel                                   wszystko (ok. 2 min)
 //   npm run check-reel -- --only=visual,gate --lang=pl   wybrane grupy / język
-//   npm run check-reel -- --only=visual --frames=sheet-375x667,home-1440x900
-// Grupy: visual (klatki, szew, pętla, formaty, rozmiary), gate, dwell, lang, toggle, reduced, flash,
+//   npm run check-reel -- --only=visual --frames=sheet-375x667,sheet-1440x900
+// Grupy: visual (klatki, szew, pętla, formaty, rozmiary), gate, lang, toggle, reduced, flash,
 //        budget, network, nojs, dark, layout.
 // Własny serwer (port 8601, dev: index.html renderowany na żywo z content.js) i Chromium z Playwright.
 // Przewijanie czasu: wszystkie animacje stoją; ścieżki reela dostają currentTime = t,
@@ -34,10 +34,6 @@ const run = key => !ONLY || ONLY.includes(key);
 // Czasy klatek (ms) i kadry ze specyfikacji: [szer. okna, wys. okna] → oczekiwany rozmiar reela.
 const TIMES = [0, 500, 1000, 1500, 2200, 3000, 3800, 4500, 5000, 5600, 6300, 7000, 7300, 7900];
 const FRAMES = [
-  { id: 'home-1440x900', vw: 1440, vh: 900, kind: 'home', fmt: '4x5', size: [487, 609] },
-  { id: 'home-1024x768', vw: 1024, vh: 768, kind: 'home', fmt: '4x5', size: [423, 529] },   // niski desktop (max-height 780px)
-  { id: 'home-1366x768', vw: 1366, vh: 768, kind: 'home', fmt: '4x5', size: [423, 529] },
-  { id: 'home-1280x800', vw: 1280, vh: 800, kind: 'home', fmt: '4x5', size: [455, 569] },  // niski desktop (max-height 840px)
   { id: 'sheet-768x1024', vw: 768, vh: 1024, kind: 'sheet', fmt: '4x5', size: [676, 845] },
   { id: 'sheet-1024x1366', vw: 1024, vh: 1366, kind: 'sheet', fmt: '4x5', size: [901, 1126] },
   { id: 'sheet-1440x900', vw: 1440, vh: 900, kind: 'sheet', fmt: '16x9', size: [1243, 699] },
@@ -643,32 +639,15 @@ async function gateGroup(browser) {
     await go(page, '', 'home');
     const gate = () => page.evaluate(async () => { await window.__reel.frames(2); return window.__reel.gate(); });
     let s = await gate();
-    if (!s.preview) bad1.push('brak .reel w podglądzie teraz');
-    else {
-      if (s.preview.clock !== 'running' || !s.preview.running) bad1.push(`aktywny podgląd: reel-clock ${s.preview.clock}, gra ${s.preview.running}/${s.preview.total}`);
-      else notes1.push(`aktywny gra (${s.preview.running}/${s.preview.total})`);
-    }
     const closed = [...s.visible, ...s.hidden].filter(x => x.running);
     if (closed.length) bad1.push(`zamknięty panel gra (${closed.map(x => `${x.fmt} ${x.running}`).join(', ')})`);
     else notes1.push('zamknięty panel stoi');
-
-    await page.evaluate(() => {
-      const other = [...document.querySelectorAll('.index__row[data-project]')].find(r => r.dataset.project !== 'teraz');
-      window.__reel.activate(other?.dataset.project);
-    });
-    s = await gate();
-    if (s.preview && s.preview.running) bad1.push(`nieaktywny podgląd gra (${s.preview.running}/${s.preview.total})`);
-    else if (s.preview) notes1.push('nieaktywny stoi');
-    await page.evaluate(() => window.__reel.activate('teraz'));
-    s = await gate();
-    if (s.preview && s.preview.clock !== 'running') bad1.push(`po powrocie: reel-clock ${s.preview.clock}`);
 
     // Otwarcie #teraz kliknięciem w wiersz.
     await page.evaluate(() => window.__reel.hookOpen());
     await page.click('.index__row[data-project="teraz"]');
     const open1 = await page.evaluate(() => window.__reelOpen);
     s = await gate();
-    if (s.preview && s.preview.running) bad2.push(`podgląd gra pod panelem (${s.preview.running})`);
     if (s.visible.length !== 1) bad2.push(`widoczne formaty: ${s.visible.length}`);
     for (const v of s.visible) {
       if (v.clock !== 'running' || !v.running) bad2.push(`panel ${v.fmt}: reel-clock ${v.clock}, gra ${v.running}/${v.total}`);
@@ -678,7 +657,6 @@ async function gateGroup(browser) {
       if (h.running) bad2.push(`ukryty ${h.fmt} gra (${h.running})`);
       else notes2.push(`ukryty ${h.fmt}: ${h.total} animacji`);
     }
-    if (s.preview && !s.preview.running) notes2.push('podgląd stoi');
 
     // Zamknięcie (Esc) po 1.5 s i ponowne otwarcie - zegar znów od zera.
     await page.waitForTimeout(1500);
@@ -698,85 +676,9 @@ async function gateGroup(browser) {
   } finally {
     await ctx.close();
   }
-  check('Bramka: aktywny podgląd gra, nieaktywny i zamknięty panel stoją', !bad1.length, list(bad1.length ? bad1 : notes1));
-  check('Bramka: otwarty #teraz - podgląd stoi, widoczny panel gra, ukryty format stoi', !bad1.some(b => b.startsWith('błąd')) && !bad2.length && notes2.length > 0, list(bad2.length ? bad2 : notes2));
+  check('Bramka: zamknięty panel stoi', !bad1.length, list(bad1.length ? bad1 : notes1));
+  check('Bramka: otwarty #teraz - widoczny panel gra, ukryty format stoi', !bad1.some(b => b.startsWith('błąd')) && !bad2.length && notes2.length > 0, list(bad2.length ? bad2 : notes2));
   check('Otwarcie panelu zeruje zegar (< 100 ms po 2 klatkach)', !bad3.length && notes3.length > 0, list(bad3.length ? bad3 : notes3));
-}
-
-/* ---------- Auto-przewijanie: teraz = jedna pętla 8 s, kreska zsynchronizowana z fazą ---------- */
-async function dwellGroup(browser) {
-  const ctx = await newCtx(browser, { lang: LANGS[0] });
-  const page = await newPage(ctx, { vw: 1440, vh: 900 }, 'dwell');
-  const bad = [], notes = [], bad2 = [], notes2 = [];
-  try {
-    await page.goto(BASE, { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready);
-    await page.waitForTimeout(300);
-    const ids = await page.evaluate(() => [...document.querySelectorAll('.index__row[data-project]')].map(r => r.dataset.project));
-    const i = ids.indexOf('teraz');
-    if (i < 0) throw new Error('brak wiersza teraz');
-    const prev = ids[(i - 1 + ids.length) % ids.length];
-    const attr = await page.getAttribute('.index__row[data-project="teraz"]', 'data-dwell');
-    if (attr !== String(REEL_MS)) bad.push(`data-dwell="${attr}"`);
-    else notes.push('data-dwell="8000"');
-    await page.evaluate(() => window.__reel.watchRows());
-
-    // Kursor na poprzednim projekcie, potem poza listę → jego 3 s → teraz → 8 s → następny.
-    await page.hover(`.index__row[data-project="${prev}"]`);
-    await page.waitForTimeout(300);
-    await page.mouse.move(720, 4);
-    const handle = await page.waitForFunction(() => {
-      const l = window.__reelRows || [];
-      const k = l.findIndex(e => e.ev === 'play' && e.id === 'teraz');
-      return k >= 0 && l.slice(k).some(e => e.ev === 'leave' && e.id === 'teraz') ? l : null;
-    }, null, { timeout: 16000, polling: 100 });
-    const log = await handle.jsonValue();
-    const pPlay = log.find(e => e.ev === 'play' && e.id === prev);
-    const tPlay = log.find(e => e.ev === 'play' && e.id === 'teraz' && (!pPlay || e.t > pPlay.t));
-    const tLeave = log.find(e => e.ev === 'leave' && e.id === 'teraz' && e.t > tPlay.t);
-    const dwell = tLeave.t - tPlay.t;
-    if (Math.abs(dwell - REEL_MS) > 150) bad.push(`teraz: ${Math.round(dwell)} ms`);
-    else notes.push(`teraz: ${Math.round(dwell)} ms`);
-    if (pPlay) {
-      const d = tPlay.t - pPlay.t;
-      if (Math.abs(d - 3000) > 150) bad.push(`${prev}: ${Math.round(d)} ms (ma być 3000)`);
-      else notes.push(`${prev}: ${Math.round(d)} ms`);
-    }
-    if (tLeave.phase == null) bad.push('brak reel-clock w podglądzie');
-    else {
-      const ph = tLeave.phase % REEL_MS;
-      const off = Math.min(ph, REEL_MS - ph);
-      if (off > 150) bad.push(`wyjście w fazie ${Math.round(ph)} ms pętli`);
-      else notes.push(`wyjście na granicy pętli (± ${Math.round(off)} ms)`);
-    }
-
-    // Kursor na teraz przez 2.5 s, potem poza listę: kreska zaczyna od fazy pętli.
-    await page.hover('.index__row[data-project="teraz"]');
-    await page.waitForTimeout(2500);
-    await page.mouse.move(720, 4);
-    const r = await page.evaluate(() => {
-      const row = document.querySelector('.index__row[data-project="teraz"]');
-      const c = window.__reel.clock(document.querySelector('.preview__logo[data-project="teraz"] .reel'));
-      return {
-        v: row.style.getPropertyValue('--auto-delay').trim(),
-        playing: row.classList.contains('is-playing'),
-        phase: c ? Number(c.currentTime) % 8000 : null,
-        after: getComputedStyle(row, '::after').animationDelay,
-      };
-    });
-    const delay = parseMs(r.v);
-    if (!r.playing) bad2.push('kreska nie wystartowała');
-    if (delay == null || r.phase == null) bad2.push(`--auto-delay „${r.v}”, faza ${r.phase}`);
-    else if (Math.abs(-delay - r.phase) > 100) bad2.push(`opóźnienie ${Math.round(delay)} ms, faza ${Math.round(r.phase)} ms`);
-    else notes2.push(`opóźnienie ${Math.round(delay)} ms, faza ${Math.round(r.phase)} ms, ::after ${r.after}`);
-    if (delay != null && parseMs(r.after) != null && Math.abs(parseMs(r.after) - delay) > 1) bad2.push(`::after animation-delay ${r.after} ≠ ${r.v}`);
-  } catch (e) {
-    bad.push(`błąd: ${e.message.split('\n')[0]}`);
-  } finally {
-    await ctx.close();
-  }
-  check('Auto-przewijanie: teraz 8000 ± 150 ms, granica pętli; pozostałe 3 s', !bad.length, list(bad.length ? bad : notes));
-  check('Kreska po zjechaniu kursorem = -faza pętli (± 100 ms)', !bad2.length && notes2.length > 0 && !bad.some(b => b.startsWith('błąd')), list(bad2.length ? bad2 : notes2));
 }
 
 /* ---------- PL ↔ EN: tekst reela, restart od zera ---------- */
@@ -794,7 +696,6 @@ async function langGroup(browser, content) {
       const sheet = [...document.querySelectorAll('#teraz .reel')];
       return {
         lang: document.documentElement.lang,
-        preview: norm(document.querySelector('.preview__logo[data-project="teraz"] .reel')?.textContent),
         sheet: sheet.map(r => norm(r.textContent)),
         label: sheet[0]?.getAttribute('aria-label') ?? null,
       };
@@ -802,17 +703,15 @@ async function langGroup(browser, content) {
     const flip = () => page.evaluate(async () => {
       document.querySelector('[data-lang-switch]').click();
       await window.__reel.frames(2);
-      const c = window.__reel.clock(document.querySelector('.preview__logo[data-project="teraz"] .reel'));
-      return c ? Number(c.currentTime) : null;
     });
     const norm = s => String(s).replace(/\s+/g, ' ').trim();
     const expect = (state, lang) => {
       const r = content?.[lang]?.projects?.teraz?.reel;
       if (state.lang !== lang) bad.push(`html lang="${state.lang}", ma być ${lang}`);
-      if (!state.preview || !state.sheet.length) { bad.push(`${lang}: brak .reel`); return; }
+      if (!state.sheet.length) { bad.push(`${lang}: brak .reel`); return; }
       if (!r) { notes.push(`${lang}: brak content.${lang}.projects.teraz.reel - porównuję tylko zmianę`); return; }
       const want = Object.entries(r).filter(([k]) => k !== 'label').map(([, v]) => norm(v));
-      for (const [where, txt] of [['podgląd', state.preview], ...state.sheet.map((t, i) => [`panel ${i + 1}`, t])]) {
+      for (const [where, txt] of state.sheet.map((t, i) => [`panel ${i + 1}`, t])) {
         const miss = want.filter(v => !txt.includes(v));
         if (miss.length) bad.push(`${lang} ${where}: brak „${miss.slice(0, 3).join('”, „')}”${miss.length > 3 ? ` +${miss.length - 3}` : ''}`);
       }
@@ -820,19 +719,16 @@ async function langGroup(browser, content) {
     };
     const pl = await read();
     expect(pl, 'pl');
-    const t1 = await flip();
+    await flip();
     const en = await read();
     expect(en, 'en');
-    if (en.preview && en.preview === pl.preview) bad.push('tekst podglądu się nie zmienił');
-    const t2 = await flip();
+    if (en.sheet.join('|') === pl.sheet.join('|')) bad.push('tekst panelu się nie zmienił');
+    else notes.push('PL→EN: tekst panelu po angielsku');
+    await flip();
     const back = await read();
     expect(back, 'pl');
-    if (back.preview !== pl.preview || back.sheet.join('|') !== pl.sheet.join('|')) bad.push('po powrocie do PL tekst inny niż na starcie');
-    for (const [label, t] of [['PL→EN', t1], ['EN→PL', t2]]) {
-      if (t == null) bad.push(`${label}: brak reel-clock`);
-      else if (t >= 150) bad.push(`${label}: zegar ${Math.round(t)} ms (ma ruszyć od 0)`);
-      else notes.push(`${label}: zegar ${Math.round(t)} ms`);
-    }
+    if (back.sheet.join('|') !== pl.sheet.join('|')) bad.push('po powrocie do PL tekst inny niż na starcie');
+    else notes.push('EN→PL: tekst jak na starcie');
     if (errs.length) bad.push(`konsola: ${list(errs, 3)}`);
     else notes.push('konsola czysta');
     if (bad.length) await shot(page, 'lang');
@@ -841,7 +737,7 @@ async function langGroup(browser, content) {
   } finally {
     await ctx.close();
   }
-  check('Zmiana języka PL → EN → PL: tekst reela, restart od 0, bez błędów w konsoli', !bad.length, list(bad.length ? bad : notes));
+  check('Zmiana języka PL → EN → PL: tekst reela w panelu, bez błędów w konsoli', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- Przełącznik pauzy ---------- */
@@ -906,7 +802,7 @@ async function reducedGroup(browser) {
   const ctx = await newCtx(browser, { lang: LANGS[0], reducedMotion: 'reduce' });
   const bad = [], notes = [];
   await mkdir(SNAP, { recursive: true });
-  for (const id of ['home-1440x900', 'sheet-1440x900', 'sheet-768x1024', 'sheet-375x667']) {
+  for (const id of ['sheet-1440x900', 'sheet-768x1024', 'sheet-375x667']) {
     const f = frame(id);
     const page = await newPage(ctx, f, `reduced ${id}`);
     try {
@@ -947,7 +843,7 @@ async function flashGroup(browser) {
   const ctx = await newCtx(browser, { lang: LANGS[0] });
   const bad = [], notes = [];
   const STEP = 40;
-  for (const id of ['home-1440x900', 'sheet-1440x900', 'sheet-375x667']) {
+  for (const id of ['sheet-1440x900', 'sheet-375x667']) {
     const f = frame(id);
     progress(`błyski ${id}`);
     const page = await newPage(ctx, f, `flash ${id}`);
@@ -1051,13 +947,11 @@ async function nojsGroup(browser) {
     const read = () => page.evaluate(() => {
       const vis = el => !!el && el.checkVisibility({ visibilityProperty: true });
       const clk = r => r?.getAnimations().find(a => a.animationName === 'reel-clock') ?? null;
-      const prev = document.querySelector('.preview__logo.is-active .reel');
       const figs = [...document.querySelectorAll('#teraz .sheet__video')];
       const vf = figs.find(vis);
       const sc = clk(vf?.querySelector('.reel'));
       return {
         js: document.documentElement.classList.contains('js'),
-        prev: prev ? clk(prev)?.playState ?? 'brak zegara' : null,
         toggles: [...document.querySelectorAll('.reel__toggle')].map(t => getComputedStyle(t).display),
         sheetT: [...document.querySelectorAll('#teraz .reel')].map(r => { const c = clk(r); return c ? Number(c.currentTime) : null; }),
         open: sc ? { state: sc.playState, t: Number(sc.currentTime) } : null,
@@ -1066,14 +960,15 @@ async function nojsGroup(browser) {
     });
     const a = await read();
     if (a.js) bad.push('klasa .js bez JS');
-    if (a.prev !== 'running') bad.push(`podgląd teraz: ${a.prev ?? 'brak .reel'}`);
-    else notes.push('podgląd gra (is-active z buildu)');
     if (!a.toggles.length) bad.push('brak .reel__toggle w HTML');
     else if (a.toggles.some(d => d !== 'none')) bad.push(`przełącznik widoczny (${a.toggles.join(', ')})`);
     else notes.push('przełącznik ukryty');
     const closedT = a.sheetT.filter(t => t != null); // ukryty format (display: none) nie ma animacji
     if (!closedT.length || closedT.some(t => t > 100)) bad.push(`zamknięty panel: zegar ${a.sheetT.map(t => (t == null ? '-' : Math.round(t))).join('/')} ms`);
-    await page.click('.index__row[data-project="teraz"]');
+    // Wiersz jest pod pierwszym ekranem; przewinięcie bez płynnej animacji, potem klik (jak użytkownik)
+    // (bez JS kontrola „stabilności” Playwrighta nie kończy się przy płynnym przewijaniu - klik bez niej)
+    await page.evaluate(() => document.querySelector('.index__row[data-project="teraz"]').scrollIntoView({ behavior: 'instant', block: 'center' }));
+    await page.click('.index__row[data-project="teraz"]', { force: true });
     await page.waitForTimeout(150);
     const b = await read();
     if (!b.open || b.open.state !== 'running' || b.open.t > 1000) bad.push(`#teraz: ${b.open ? `${b.open.state} ${Math.round(b.open.t)} ms` : 'brak widocznego reela'}`);
@@ -1090,7 +985,7 @@ async function nojsGroup(browser) {
   } finally {
     await ctx.close();
   }
-  check('Bez JS: podgląd gra, #teraz od 0, przełącznik ukryty, format z CSS', !bad.length, list(bad.length ? bad : notes));
+  check('Bez JS: #teraz od 0, przełącznik ukryty, format z CSS', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- Tryb ciemny: reel identyczny w obu motywach ---------- */
@@ -1098,7 +993,7 @@ async function darkGroup(browser) {
   const ctx = await newCtx(browser, { lang: LANGS[0] });
   const bad = [];
   let max = 0, n = 0;
-  for (const id of ['home-1440x900', 'sheet-1440x900', 'sheet-375x667']) {
+  for (const id of ['sheet-1440x900', 'sheet-375x667']) {
     const f = frame(id);
     const page = await newPage(ctx, f, `dark ${id}`);
     try {
@@ -1131,28 +1026,54 @@ async function darkGroup(browser) {
   check('Tryb ciemny: reel identyczny w obu motywach (< 0.5% pikseli)', !bad.length && n > 0, bad.length ? list(bad) : `porównania: ${n}, maks. ${(max * 100).toFixed(3)}%`);
 }
 
-/* ---------- Jeden ekran na desktopie ---------- */
+/* ---------- Układ: strona się przewija, sfera stoi obok portfolio, telefon bez przepełnienia ---------- */
 async function layoutGroup(browser) {
   const bad = [], notes = [];
   for (const lang of LANGS) {
     const ctx = await newCtx(browser, { lang });
-    for (const [vw, vh] of [[1440, 900], [1536, 864]]) {
-      const page = await newPage(ctx, { vw, vh }, `layout ${lang}`);
-      try {
-        await go(page, '', 'home');
-        await page.evaluate(() => window.__reel.seek(0));
-        const r = await page.evaluate(() => ({ sh: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth, ih: innerHeight, iw: innerWidth }));
-        if (r.sh > r.ih + 1 || r.sw > r.iw) bad.push(`${lang} ${vw}x${vh}: ${r.sw}x${r.sh}`);
-        else notes.push(`${lang} ${vw}x${vh}`);
-      } catch (e) {
-        bad.push(`${lang} ${vw}x${vh}: błąd: ${e.message.split('\n')[0]}`);
-      } finally {
-        await page.close();
-      }
+    const page = await newPage(ctx, { vw: 1440, vh: 900 }, `layout ${lang}`);
+    try {
+      await go(page, '', 'home');
+      const read = () => page.evaluate(() => {
+        const r = document.querySelector('.sphere')?.getBoundingClientRect();
+        return {
+          sh: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth, ih: innerHeight, iw: innerWidth,
+          sphere: r ? Math.round(r.top) : null,
+          cards: document.querySelectorAll('.sphere__card').length,
+          avatar: !!document.querySelector('.avatar img'),
+        };
+      });
+      const top = await read();
+      await page.evaluate(() => document.querySelector('.work__title').scrollIntoView({ block: 'start' }));
+      await page.waitForTimeout(200);
+      const mid = await read();
+      if (top.sh <= top.ih) bad.push(`${lang}: strona się nie przewija (${top.sh})`);
+      if (top.sw > top.iw) bad.push(`${lang}: przepełnienie w poziomie ${top.sw}`);
+      if (top.sphere == null || top.cards !== (content?.shared?.projects?.length ?? 3)) bad.push(`${lang}: sfera ${top.sphere == null ? 'brak' : `${top.cards} kart`}`);
+      else if (Math.abs(mid.sphere - top.sphere) > 2) bad.push(`${lang}: sfera przesunęła się przy przewijaniu do portfolio (${top.sphere} → ${mid.sphere})`);
+      else notes.push(`${lang}: sfera stoi (${top.sphere} px), ${top.cards} karty`);
+      if (!top.avatar) bad.push(`${lang}: brak awatara`);
+    } catch (e) {
+      bad.push(`${lang}: błąd: ${e.message.split('\n')[0]}`);
+    } finally {
+      await ctx.close();
     }
+  }
+  const ctx = await newCtx(browser, { lang: 'pl' });
+  const page = await newPage(ctx, { vw: 390, vh: 844 }, 'layout 390');
+  try {
+    await go(page, '', 'home');
+    const m = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, sphere: document.querySelector('.home__sphere')?.offsetParent !== null, clients: !!document.querySelector('.clients') }));
+    if (m.sw > 390) bad.push(`390: przepełnienie w poziomie ${m.sw}`);
+    if (m.sphere) bad.push('390: sfera widoczna na telefonie');
+    if (!m.clients) bad.push('390: brak karuzeli');
+    if (m.sw <= 390 && !m.sphere && m.clients) notes.push('390: bez przepełnienia, karuzela, bez sfery');
+  } catch (e) {
+    bad.push(`390: błąd: ${e.message.split('\n')[0]}`);
+  } finally {
     await ctx.close();
   }
-  check('Jeden ekran na desktopie: bez przewijania (1440x900, 1536x864)', !bad.length, list(bad.length ? bad : notes));
+  check('Układ: strona się przewija, sfera stoi obok portfolio, telefon bez przepełnienia', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- Start ---------- */
@@ -1182,7 +1103,6 @@ try {
     const groups = [
       ['visual', () => visualGroup(browser)],
       ['gate', () => gateGroup(browser)],
-      ['dwell', () => dwellGroup(browser)],
       ['lang', () => langGroup(browser, content)],
       ['toggle', () => toggleGroup(browser)],
       ['reduced', () => reducedGroup(browser)],

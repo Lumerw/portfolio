@@ -54,7 +54,8 @@ const browser = await chromium.launch();
   await p.waitForTimeout(2000);
   const rows = await p.locator('.index__row').count();
   const h1 = await p.locator('h1').isVisible();
-  await p.click('.index__row[data-project="loom"]');
+  await p.evaluate(() => document.querySelector('.index__row[data-project="loom"]').scrollIntoView({ behavior: 'instant', block: 'center' }));
+  await p.click('.index__row[data-project="loom"]', { force: true });
   await p.waitForTimeout(1000);
   const sheet = await p.locator('#loom').isVisible();
   check('Działa bez JS', rows >= 5 && h1 && sheet, `${rows} wierszy indeksu, panel z kotwicy: ${sheet ? 'tak' : 'nie'}`);
@@ -92,18 +93,20 @@ const browser = await chromium.launch();
   await p.close();
 }
 
-// prefers-reduced-motion: ikony stoją, karuzela stoi, tekst widoczny od razu.
+// prefers-reduced-motion: awatar (moneta) i sfera stoją, karuzela stoi, tekst widoczny od razu.
 {
-  const ctx = await browser.newContext({ reducedMotion: 'reduce' });
+  const ctx = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
   const p = await ctx.newPage();
   await p.goto(URL);
-  const icons = () => p.evaluate(() => [...document.querySelectorAll('.hero__icon.is-on')].map(i => i.src).join());
-  const a = await icons();
+  await p.waitForTimeout(600);
+  const pose = () => p.evaluate(() => [getComputedStyle(document.querySelector('.avatar__coin')).animationName,
+    getComputedStyle(document.querySelector('.sphere__world')).getPropertyValue('--ry')].join('|'));
+  const a = await pose();
   await p.waitForTimeout(1200);
-  const still = a === await icons();
+  const still = a === await pose() && a.startsWith('none');
   const marquee = await p.evaluate(() => { const t = document.querySelector('.clients__track'); return !t || getComputedStyle(t).animationName === 'none'; });   // bez firm karuzeli nie ma
   const text = await p.evaluate(() => getComputedStyle(document.querySelector('h1 .reveal')).opacity === '1');
-  check('prefers-reduced-motion wyłącza ruch', still && marquee && text, `ikony stoją: ${still}, karuzela stoi: ${marquee}, tekst od razu: ${text}`);
+  check('prefers-reduced-motion wyłącza ruch', still && marquee && text, `awatar i sfera stoją: ${still}, karuzela stoi: ${marquee}, tekst od razu: ${text}`);
   await ctx.close();
 }
 
@@ -115,7 +118,8 @@ const browser = await chromium.launch();
   const external = new Set();
   p.on('request', r => { if (!r.url().startsWith(`http://localhost:${PORT}`)) external.add(new URL(r.url()).host); });
   await p.goto(URL, { waitUntil: 'networkidle' });
-  await p.click('.index__row[data-project="loom"]');
+  await p.evaluate(() => document.querySelector('.index__row[data-project="loom"]').scrollIntoView({ behavior: 'instant', block: 'center' }));
+  await p.click('.index__row[data-project="loom"]', { force: true });
   await p.waitForTimeout(1200);
   await p.evaluate(() => { location.hash = 'teraz'; });
   await p.waitForTimeout(1200);

@@ -105,7 +105,7 @@ for (const [i, src] of shared.icons.entries()) {
 }
 
 for (const c of shared.clients) {
-  if (c.logo.endsWith('.svg')) await out(c.logo, clientFile(c.name, c.w, c.h));
+  if (c.logo.endsWith('.svg')) await out(c.logo, clientFile(c.name.includes('[') ? 'logo' : c.name, c.w, c.h));   // placeholder: neutralne „logo”
 }
 
 if (shared.portrait.src.endsWith('.svg')) {

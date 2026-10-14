@@ -112,12 +112,11 @@ function reel(p, tp, fmt, { eager = false, decorative = false } = {}) {
   </div></div>`;
 }
 
-// Projekt z planszą animowaną: wiersz trwa jedną pełną pętlę (data-dwell → main.js, --t-auto → kreska postępu).
+// Wiersz projektu: otwiera panel; najechanie / focus obraca sferę do karty projektu (main.js).
 function indexRow(p, i) {
-  const dwell = p.reel ? ` data-dwell="${REEL_MS}" style="--t-auto:${REEL_MS}ms"` : '';
   return `
         <li ${reveal(i + 3)}>
-          <a class="index__row${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" aria-haspopup="dialog"${dwell}>
+          <a class="index__row${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" aria-haspopup="dialog">
             <span class="index__no t-meta">${num(i)}</span>
             <span class="index__title">${esc(p.title)}</span>
             <span class="index__year t-meta">${esc(p.type)}</span>
@@ -131,15 +130,15 @@ const linkedinIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hi
 // Ikonki w kolumnie numerów: „i” (o mnie) i pobieranie (PDF), kreska 1 px.
 const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg>`;
 
-// Karuzela firm: lista + jej kopia (aria-hidden) dla płynnej pętli.
+// Karuzela firm „Współpracowałem z”: lista + jej kopia (aria-hidden) dla płynnej pętli.
+// Logo-placeholdery też się pokazują (tekst alternatywny dopiero z prawdziwą nazwą) - podmienisz je w content.js.
 function clients(c, t) {
-  const real = c.clients.filter(k => clean(k.name));
-  if (!real.length) return '';                       // same placeholdery - karuzela się nie pokazuje
-  const items = hidden => real.map(k => `
-          <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" alt="${hidden ? '' : esc(k.name)}" loading="lazy" decoding="async"></li>`).join('');
+  if (!c.clients.length) return '';
+  const items = hidden => c.clients.map(k => `
+          <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" alt="${hidden ? '' : esc(clean(k.name))}" loading="lazy" decoding="async"></li>`).join('');
   return `
       <section class="clients" aria-labelledby="clients-title">
-        <h2 id="clients-title" class="visually-hidden">${esc(t.ui.clients)}</h2>
+        <h2 id="clients-title" class="clients__label t-meta">${esc(t.ui.clients)}</h2>
         <div class="clients__marquee">
         <div class="clients__track">
           <ul class="clients__list">${items(false)}
@@ -151,74 +150,88 @@ function clients(c, t) {
       </section>`;
 }
 
+// Awatar-moneta: zdjęcie, co kilka sekund obraca się na drugą stronę - rysunek kreską.
+// Tęczowa poświata jak dawny przycisk „zapytaj AI”; klik otwiera panel asystenta (#agent).
+function avatar(c, t) {
+  const face = (src, cls) => `<img class="avatar__face ${cls}" src="${esc(src)}" width="256" height="256" alt="" decoding="async">`;
+  return `
+      <a class="avatar" href="#agent" aria-haspopup="dialog" aria-label="${esc(t.ui.avatar)}">
+        <span class="avatar__halo" aria-hidden="true"></span>
+        <span class="avatar__coin">${face(c.avatar.photo, 'avatar__face--photo')}${face(c.avatar.drawing, 'avatar__face--drawing')}</span>
+      </a>`;
+}
+
 function hero(c, t) {
+  return `
+  <section id="start" class="hero" aria-labelledby="hero-title">
+    ${avatar(c, t)}
+    <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}</span></p>
+    <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
+    <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
+    <p class="hero__year t-meta print-only">${esc(c.year)}</p>${clients(c, t)}
+  </section>`;
+}
+
+// Sekcja „Portfolio”: projekty (panele), o mnie (LinkedIn), brandbook (panel), PDF.
+function work(c, t) {
   const n = c.projects.length;
-  // „o mnie” prowadzi na LinkedIn (panel „o mnie” jest na razie tylko w PDF). Bez adresu - bez wiersza.
+  // „o mnie” prowadzi na LinkedIn (panel „o mnie” na razie wyłączony). Bez adresu - bez wiersza.
   const linkedin = c.links.find(l => l.label === 'LinkedIn');
   const liHref = linkedin ? url(linkedin.href) : '#';
-
-  // Logo projektu na środku podglądu: papier, plansza marki (brand) albo plansza animowana 4:5 (reel).
-  // Reel na stronie głównej jest dekoracyjny - tekst niesie podpis pod ramką. Logo w reelu stoi
-  // w tym samym miejscu co zwykłe logo (50% szerokości, środek), więc LCP się nie zmienia.
-  const logos = c.projects.map((p, i) => {
-    // Plansza statyczna (cover 4:5) - grafika w stylu marki, pełna ramka; dekoracyjna jak reel.
-    const cover = !p.reel && p.cover?.['4x5'];
-    const inner = p.reel
-      ? reel(p, t.projects[p.id], '4x5', { eager: i === 0, decorative: true })
-      : cover
-        ? `<img src="${esc(cover)}" width="1080" height="1350" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`
-        : `<img class="${mono(p.logo).trim()}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`;
-    const brand = !p.reel && !cover && p.brand;
-    return `
-        <div class="preview__logo${p.reel ? ' preview__logo--reel' : cover ? ' preview__logo--cover' : brand ? ' brand' : ''}${i === 0 ? ' is-active' : ''}" data-project="${p.id}"${brand ? ` style="${brandStyle(p.brand)}"` : ''}>
-          ${inner}
-        </div>`;
-  }).join('');
-  const captions = c.projects.map((p, i) => `
-        <div class="preview__caption${i === 0 ? ' is-active' : ''}" data-project="${p.id}">
-          <img class="sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
-          <span class="t-meta preview__text">${esc(p.title)} - ${esc(t.projects[p.id].tagline)}</span>
-          ${url(p.href) !== '#' ? `<a class="link-u t-meta" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a>` : ''}
-        </div>`).join('');
-
-  // Trzy miejsca na ikony obok znaku. Każde ma wszystkie ikony (ładowane raz); widoczna jest jedna.
-  // Każde kolejne miejsce pokazuje ikonę, która przed chwilą była po lewej (ślad),
-  // dlatego start: 0, ostatnia, przedostatnia. Dalej przełącza je main.js.
-  const L = c.icons.length;
-  const icons = [0, 1, 2].map(slot => `
-          <span class="hero__slot">${c.icons.map((src, k) => `<img class="hero__icon${mono(src)}${k === (L - slot) % L ? ' is-on' : ''}" src="${esc(src)}" width="40" height="40" alt="">`).join('')}</span>`).join('');
-
   return `
-  <section id="start" class="hero wrap grid" aria-labelledby="hero-title">
-    <div class="hero__intro">
-      <a class="hero__top" href="#brandbook" aria-haspopup="dialog" aria-label="${esc(t.ui.brandbook)}">
-        <span class="hero__mark is-drawing">${symbol('personal')}</span>
-        <span class="hero__icons" aria-hidden="true">${icons}
-        </span>
-      </a>
-      <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}</span></p>
-      <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
-      <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
-      <p class="hero__year t-meta print-only">${esc(c.year)}</p>
-      <nav class="index" aria-label="${esc(t.ui.indexLabel)}">
-        <ul>${c.projects.map(indexRow).join('')}
+  <section id="portfolio" class="work" aria-labelledby="work-title">
+    <h2 id="work-title" class="work__title t-name">${esc(t.ui.work)}</h2>
+    <nav class="index" aria-label="${esc(t.ui.indexLabel)}">
+      <ul>${c.projects.map(indexRow).join('')}
 ${liHref !== '#' ? `
-          <li ${reveal(n + 3)}>
-            <a class="index__row index__row--sub" href="${esc(liHref)}" target="_blank" rel="me noopener"><span class="index__no">${linkedinIcon}</span><span class="index__title">${esc(t.ui.about)}</span><span class="index__year t-meta">LinkedIn ↗</span></a>
-          </li>` : ''}
-          <li ${reveal(n + 4)}>
-            <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year t-meta">${esc(t.ui.downloadType)}</span></a>
-          </li>
-        </ul>
-      </nav>${clients(c, t)}
-    </div>
-    <div class="hero__preview">
-      <div class="preview media media--4x5">${logos}
-      </div>
-      <div class="preview__captions">${captions}
-      </div>
-    </div>
+        <li ${reveal(n + 3)}>
+          <a class="index__row index__row--sub" href="${esc(liHref)}" target="_blank" rel="me noopener"><span class="index__no">${linkedinIcon}</span><span class="index__title">${esc(t.ui.about)}</span><span class="index__year t-meta">LinkedIn ↗</span></a>
+        </li>` : ''}
+        <li ${reveal(n + 4)}>
+          <a class="index__row index__row--sub" href="#brandbook" aria-haspopup="dialog"><span class="index__no">${symbol('personal', { cls: 'index__glyph index__mark' })}</span><span class="index__title">${esc(t.ui.brandbook)}</span><span class="index__year t-meta">${esc(t.ui.brandbookType)}</span></a>
+        </li>
+        <li ${reveal(n + 5)}>
+          <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year t-meta">${esc(t.ui.downloadType)}</span></a>
+        </li>
+      </ul>
+    </nav>
   </section>`;
+}
+
+// Sfera (desktop): siatka z okręgów kreską 1 px (6 południków, 5 równoleżników) i karty projektów 4:5
+// (plansze marek - images.a) rozłożone na powierzchni. Ruch: sphere.js. Duplikat linków z indeksu,
+// więc dla czytników ekranu ukryta, karty poza kolejnością tabulacji.
+const CARD_LAT = [10, -14, 6, -8, 14, -4];
+const SPHERE_MARKS = [[60, 4], [180, -2], [300, -6], [36, 42], [84, -40], [156, 44], [204, -46], [276, 40], [324, -38], [0, 64], [120, 58], [240, -62]];
+function sphere(c, t) {
+  const n = c.projects.length;
+  const meridians = [0, 30, 60, 90, 120, 150].map(d => `
+          <span class="sphere__ring" style="--t:rotateY(${d}deg)"></span>`).join('');
+  const parallels = [-60, -30, 0, 30, 60].map(lat => {
+    const r = Math.cos((lat * Math.PI) / 180), y = -Math.sin((lat * Math.PI) / 180);
+    return `
+          <span class="sphere__ring sphere__ring--lat${lat === 0 ? ' sphere__ring--eq' : ''}" style="--r:${r.toFixed(4)};--y:${y.toFixed(4)}"></span>`;
+  }).join('');
+  // Znaki kreską z brandbooka (shared.icons) rozsiane między kartami - sfera „z moich linii”
+  const marks = SPHERE_MARKS.map(([lon, lat], i) => {
+    const src = c.icons[i % c.icons.length];
+    return `
+          <span class="sphere__mark" style="--lon:${lon}deg;--lat:${lat}deg"><img class="${mono(src).trim()}" src="${esc(src)}" width="40" height="40" alt=""></span>`;
+  }).join('');
+  const cards = c.projects.map((p, i) => `
+          <a class="sphere__card${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" tabindex="-1" style="--lon:${Math.round((360 / n) * i)}deg;--lat:${CARD_LAT[i % CARD_LAT.length]}deg">
+            ${image(p.images.a, '', '240px', { widths: c.imageWidths })}
+            <span class="sphere__tag t-meta">${esc(p.title)}</span>
+          </a>`).join('');
+  return `
+  <div class="home__sphere" aria-hidden="true">
+    <div class="sphere" data-sphere>
+      <div class="sphere__world" style="--rx:-12deg;--ry:0deg">${meridians}${parallels}
+          <span class="sphere__dot"></span>${marks}${cards}
+      </div>
+    </div>
+    <p class="sphere__hint t-meta">${esc(t.ui.sphereHint)}</p>
+  </div>`;
 }
 
 /* Obrazy: SVG (placeholder) jako zwykły <img>; raster jako <picture> z AVIF/WebP/JPG w kilku szerokościach. */
@@ -456,7 +469,7 @@ function footer(c, t) {
   return `
 <footer id="kontakt" class="site-footer" aria-labelledby="contact-title">
  <div class="site-footer__in wrap">
-  <h2 id="contact-title" class="site-footer__title t-name print-only">${esc(t.contact.title)}</h2>
+  <h2 id="contact-title" class="site-footer__title t-name">${esc(t.contact.title)}</h2>
   ${clean(t.contact.line) ? `<p class="site-footer__line t-text t-muted print-only">${esc(clean(t.contact.line))}</p>` : ''}
   <div class="site-footer__contact">
     <p class="contact__mail">
@@ -469,7 +482,6 @@ function footer(c, t) {
     </ul>` : ''}
   </div>
   <div class="site-footer__actions">
-    <a class="button agent-button" href="#agent"><span class="agent-button__halo" aria-hidden="true"></span><span class="agent-button__ring" aria-hidden="true"></span>${esc(t.agent.button)}</a>
     <a class="button site-footer__button" href="${cal ? esc(cal) : mailHref}"${cal ? ' target="_blank" rel="noopener"' : ''}>${esc(t.ui.contactButton)}</a>
   </div>
   <p class="site-footer__copy t-meta">© ${esc(c.year)} ${esc(c.name)}</p>
@@ -510,7 +522,11 @@ function agent(c, t) {
 export function render(content, lang) {
   const c = content.shared, t = content[lang];
   return `${header(c, t)}
-<main id="tresc">${hero(c, t)}
+<main id="tresc">
+  <div class="home wrap">
+    <div class="home__main">${hero(c, t)}${work(c, t)}
+    </div>${sphere(c, t)}
+  </div>
 </main>${footer(c, t)}
 <div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}
 </div>

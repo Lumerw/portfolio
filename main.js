@@ -1,7 +1,7 @@
 // Zachowanie strony: PL/EN, indeks ↔ podgląd, panele, kopiowanie maila.
 // Treść i szablony: content.js, render.js. Bez JS strona działa na kotwicach i :target.
 import { content } from './content.js';
-import { render, REEL_MS } from './render.js';
+import { render } from './render.js';
 
 const root = document.documentElement;
 const app = document.getElementById('app');
@@ -87,27 +87,46 @@ app.addEventListener('click', async e => {
   copyTimer = setTimeout(() => status.classList.remove('is-on'), 2000);
 });
 
-/* Indeks → podgląd (desktop). Najechanie albo focus z klawiatury zmienia aktywny projekt. */
+/* Indeks → sfera (desktop). Najechanie albo focus z klawiatury na projekcie obraca sferę do jego karty;
+   po wyjściu z indeksu sfera znów się powoli kręci. */
 let active = content.shared.projects[0].id;
 
 function activate(id) {
   if (id === active) return;
   active = id;
-  for (const el of app.querySelectorAll('.index__row[data-project], .preview__logo, .preview__caption')) {
+  for (const el of app.querySelectorAll('.index__row[data-project], .sphere__card')) {
     el.classList.toggle('is-active', el.dataset.project === id);
   }
-  restartReel(app.querySelector(`.preview__logo[data-project="${id}"]`)); // plansza zawsze od początku pętli
-  showLive(app.querySelector(`.preview__logo[data-project="${id}"]`), id);
-  if (interacting()) holdAtSeam(); else releaseHold();
+  sphereApi?.focus(id);
 }
 
-/* Plansza animowana (reel): cały ruch to CSS; tu tylko start od zera i odczyt fazy pętli.
-   Granie / pauzę ustawia CSS (--reel-play): aktywny podgląd albo otwarty panel. */
+/* Sfera z projektami (desktop, sphere.js - ładowany tylko tam, gdzie sfera jest widoczna). */
+let sphereApi = null;
+const desktop = matchMedia('(min-width: 1024px)');
+async function mountSphere() {
+  sphereApi?.stop();
+  sphereApi = null;
+  const el = app.querySelector('[data-sphere]');
+  if (!el || !desktop.matches) return;
+  const { initSphere } = await import('./sphere.js');
+  if (!el.isConnected) return;
+  sphereApi = initSphere(el, { reduce: reduceMotion.matches });
+}
+desktop.addEventListener('change', mountSphere);
+app.addEventListener('pointerout', e => {
+  if (e.target.closest?.('.index') && !e.relatedTarget?.closest?.('.index')) sphereApi?.release();
+});
+app.addEventListener('focusout', e => {
+  if (e.target.closest?.('.index') && !e.relatedTarget?.closest?.('.index')) sphereApi?.release();
+});
+
+/* Plansza animowana (reel) w panelu: cały ruch to CSS; tu tylko start od zera.
+   Granie / pauzę ustawia CSS (--reel-play): otwarty panel. */
 function restartReel(scope) {
   for (const el of scope?.querySelectorAll('.reel') ?? []) for (const a of el.getAnimations({ subtree: true })) a.currentTime = 0;
 }
 /* Interaktywne plansze (projects[].live: loom.studio, reh.ab). live.js ładuje się przy pierwszej potrzebie
-   i wstawia grafikę nad statyczną planszą (cover): w aktywnym podglądzie i w widocznej ramce otwartego panelu.
+   i wstawia grafikę nad statyczną planszą (cover) w widocznej ramce otwartego panelu.
    Ponowne pokazanie = pętla od początku. Bez JS i przy ograniczonym ruchu zostaje cover (pierwsza klatka). */
 const liveIds = new Set(content.shared.projects.filter(p => p.live).map(p => p.id));
 let liveMod = null;
@@ -133,32 +152,6 @@ async function showLive(host, id) {
 }
 const visibleFigure = sheet => [...sheet.querySelectorAll('.sheet__video')].find(f => f.offsetParent !== null);
 
-// Faza pętli (ms) w podglądzie projektu - odczyt z animacji-zegara reel-clock.
-function reelPhase(id) {
-  const a = app.querySelector(`.preview__logo[data-project="${id}"] .reel`)?.getAnimations().find(x => x.animationName === 'reel-clock');
-  return a ? Number(a.currentTime) || 0 : 0;
-}
-
-/* WCAG 2.2.2: gdy użytkownik jest przy liście / podglądzie (auto-przewijanie stoi), plansza w podglądzie
-   kończy bieżącą pętlę i staje na szwie (klatka 0 = 8000 = plakat). Rusza znów przy zmianie projektu
-   albo wznowieniu auto-przewijania. Najwyżej jedna pętla ruchu po rozpoczęciu interakcji. */
-let holdTimer;
-const interacting = () => {
-  const f = document.activeElement;
-  return hovering || !!(f?.closest?.('.index') && f.matches(':focus-visible'));
-};
-function releaseHold() {
-  clearTimeout(holdTimer);
-  for (const el of app.querySelectorAll('.preview .reel.is-held')) el.classList.remove('is-held');
-}
-function holdAtSeam() {
-  const el = app.querySelector(`.preview__logo[data-project="${active}"] .reel`);
-  if (el?.classList.contains('is-held')) return; // już stoi na plakacie
-  releaseHold();
-  if (!el) return;
-  holdTimer = setTimeout(() => el.classList.add('is-held'), REEL_MS - (reelPhase(active) % REEL_MS));
-}
-
 // Symbol rysuje się na nowo.
 function redraw(el) {
   if (!el) return;
@@ -178,7 +171,6 @@ app.addEventListener('focusin', onIndex);
    Tu: tło nieaktywne, focus w panelu, Esc, powrót focusu, pauza wideo. */
 let opener = null;      // element, który otworzył panel — wraca do niego focus
 let openedHere = false; // panel otwarty kliknięciem na stronie → zamknięcie = krok wstecz w historii
-let sheetWasOpen = false; // poprzedni stan - plansza w podglądzie rusza od zera dopiero po zamknięciu panelu
 
 const openSheet = () => {
   const id = decodeURIComponent(location.hash.slice(1));
@@ -193,8 +185,6 @@ function syncSheet() {
   playVisible(sheet);
   if (sheet) restartReel(sheet);                                              // panel: plansza od zera
   if (sheet) showLive(visibleFigure(sheet), sheet.id);
-  else if (sheetWasOpen) restartReel(app.querySelector('.preview__logo.is-active')); // powrót na stronę główną
-  sheetWasOpen = !!sheet;
   if (sheet) {
     redraw(sheet.querySelector('.sheet__bar'));
     // Po starcie animacji, żeby przeglądarka nie przewijała do panelu.
@@ -247,18 +237,11 @@ app.addEventListener('click', e => {
   }
 });
 
-/* Ikony (hero i brandbook): każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
-   i nigdy nie pokazuje tej samej ikony co sąsiad - bez mechanicznego przesuwania całego rzędu.
-   Hero: w miejscu leżą wszystkie ikony, widoczna ma .is-on. Brandbook: jedno <img> na miejsce,
-   zmienia się src (pliki są już w pamięci po hero). Każdy zestaw rusza tylko, gdy go widać. */
+/* Ikony w brandbooku: każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
+   i nigdy nie pokazuje tej samej ikony co sąsiad. Jedno <img> na miejsce, zmienia się src.
+   Rusza tylko przy otwartym panelu. */
 const ICON_MS = [500, 1100];
 const ICON_SETS = [
-  {
-    sel: '.hero__slot',
-    live: () => !openSheet(),
-    get: slot => slot.querySelector('.is-on')?.getAttribute('src'),
-    set: (slot, src) => { for (const img of slot.children) img.classList.toggle('is-on', img.getAttribute('src') === src); },
-  },
   {
     sel: '[data-bb-icon]',
     live: () => openSheet()?.id === 'brandbook',
@@ -301,59 +284,9 @@ function close() {
 
 addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
-/* Auto-przewijanie projektów (desktop): kreska pod aktywnym wierszem wypełnia się przez AUTO_MS,
-   potem podgląd przechodzi do następnego projektu. Pauza: kursor na liście lub podglądzie,
-   focus z klawiatury w liście, otwarty panel, karta w tle. Bez ruchu w systemie — wyłączone. */
-const AUTO_MS = 3000; // = --t-auto (projekty bez planszy animowanej); wiersz z planszą ma data-dwell = REEL_MS
-const autoMedia = matchMedia('(min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference)');
-const projectIds = content.shared.projects.map(p => p.id);
-let autoTimer = null;
-let hovering = false;
-
-function stopAuto() {
-  clearTimeout(autoTimer);
-  autoTimer = null;
-  for (const row of app.querySelectorAll('.index__row.is-playing')) row.classList.remove('is-playing');
-}
-
-// resume = true: wznowienie (kursor wyszedł, karta wróciła…) - plansza w podglądzie grała dalej,
-// więc kreska i czas do przejścia liczą się od bieżącej fazy pętli, a nie od zera.
-function startAuto(resume = false) {
-  stopAuto();
-  if (openSheet() || document.hidden) return;
-  // Bez auto-przewijania (interakcja, ekran dotykowy) plansza w podglądzie kończy pętlę i staje.
-  if (!autoMedia.matches || interacting()) { holdAtSeam(); return; }
-  const row = app.querySelector(`.index__row[data-project="${active}"]`);
-  if (!row) return;
-  releaseHold();
-  const ms = Number(row.dataset.dwell) || AUTO_MS;
-  let done = resume ? reelPhase(active) % ms : 0;
-  if (ms - done < 1000) done = 0; // za mało do końca - pełny czas zamiast mignięcia
-  row.style.setProperty('--auto-delay', `${-done}ms`); // kreska zaczyna w miejscu fazy
-  void row.offsetWidth; // animacja kreski zawsze od nowa
-  row.classList.add('is-playing');
-  autoTimer = setTimeout(() => {
-    activate(projectIds[(projectIds.indexOf(active) + 1) % projectIds.length]);
-    startAuto();
-  }, ms - done);
-}
-
-const inAutoZone = el => !!el?.closest?.('.index, .hero__preview');
-app.addEventListener('pointerover', e => {
-  if (!hovering && inAutoZone(e.target)) { hovering = true; stopAuto(); holdAtSeam(); }
-});
-app.addEventListener('pointerout', e => {
-  if (hovering && inAutoZone(e.target) && !inAutoZone(e.relatedTarget)) { hovering = false; startAuto(true); }
-});
-app.addEventListener('focusin', e => { if (e.target.closest('.index') && e.target.matches(':focus-visible')) { stopAuto(); holdAtSeam(); } });
-app.addEventListener('focusout', e => { if (e.target.closest('.index') && !inAutoZone(e.relatedTarget)) startAuto(true); });
-document.addEventListener('visibilitychange', () => (document.hidden ? stopAuto() : startAuto(true)));
-autoMedia.addEventListener('change', () => startAuto(true));
-
 addEventListener('hashchange', syncSheet);
-addEventListener('hashchange', () => (openSheet() ? stopAuto() : startAuto()));
 syncSheet();
-startAuto(true);
+mountSphere();
 
 // Po zmianie języka DOM jest nowy: przywróć aktywny projekt i stan panelu.
 new MutationObserver(() => {
@@ -363,7 +296,7 @@ new MutationObserver(() => {
   syncSheet();
   syncThemeButton();
   restoreChat();
-  if (!openSheet()) startAuto();
+  mountSphere();
 }).observe(app, { childList: true });
 
 /* Asystent AI (panel #agent). Rozmowa żyje w pamięci strony (przetrwa zmianę języka),

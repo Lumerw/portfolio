@@ -23,6 +23,9 @@ export const shared = {
     { label: 'GitHub', href: 'https://github.com/Lumerw' },
     { label: 'Behance', href: 'https://www.behance.net/wojteklumer' },
   ],
+  // Awatar w hero (moneta): zdjęcie i rysunek kreską - koło, przycięte (assets/me/). Klik → asystent AI.
+  avatar: { photo: 'assets/me/avatar-photo.webp', drawing: 'assets/me/avatar-drawing.webp' },
+
   // duotone: true → `npm run images` zamienia zdjęcie na tusz + papier (identycznie na stronie i w PDF).
   portrait: { src: 'assets/me/portrait.svg', w: 1200, h: 1500, duotone: true },
 
@@ -203,7 +206,7 @@ export const pl = {
     contact: 'Kontakt',
     copy: 'kopiuj adres',
     copied: 'skopiowano',
-    clients: 'Pracowałem z',
+    clients: 'Współpracowałem z',   // podpis nad karuzelą logo
     themeDark: 'Włącz tryb ciemny',
     themeLight: 'Włącz tryb jasny',
     linkedin: 'LinkedIn',
@@ -213,7 +216,11 @@ export const pl = {
     links: 'Profile',
     close: 'zamknij',
     brandbook: 'Brandbook',
-    contactButton: 'kontakt',
+    contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → Calendly
+    work: 'Portfolio',               // tytuł sekcji z linkami
+    brandbookType: 'zasady marki',
+    avatar: 'Zapytaj o mnie - asystent AI',
+    sphereHint: 'przeciągnij, żeby obrócić',
     qr: 'wersja www',
     reelPause: 'zatrzymaj animację', // przycisk pauzy planszy w panelu (stan: aria-pressed)
   },
@@ -435,7 +442,7 @@ export const en = {
     contact: 'Contact',
     copy: 'copy address',
     copied: 'copied',
-    clients: 'Worked with',
+    clients: 'I have worked with',
     themeDark: 'Switch to dark mode',
     themeLight: 'Switch to light mode',
     linkedin: 'LinkedIn',
@@ -445,7 +452,11 @@ export const en = {
     links: 'Profiles',
     close: 'close',
     brandbook: 'Brandbook',
-    contactButton: 'contact',
+    contactButton: 'book a call',
+    work: 'Portfolio',
+    brandbookType: 'brand rules',
+    avatar: 'Ask about me - AI assistant',
+    sphereHint: 'drag to rotate',
     qr: 'website',
     reelPause: 'pause animation',
   },

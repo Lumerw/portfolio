@@ -54,8 +54,6 @@
   --t-line: 400ms;
   --t-swap: 500ms;
   --t-sheet: 700ms;                 /* wysuwanie panelu */
-  --t-auto: 3s;                     /* auto-przewijanie projektów (desktop) — to samo co AUTO_MS w main.js;
-                                       wiersz z planszą animowaną nadpisuje je na REEL_MS (render.js) */
   --rise: 8px;
 }
 
@@ -331,81 +329,102 @@ html[lang="pl"] .lang [data-lang="pl"],
 html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 
 /* ==========================================================================
-   Strona główna: jeden ekran — nagłówek, hero z indeksem, stopka
+   Strona główna: hero (awatar, imię, hasło, akapit, karuzela) → Portfolio (linki) → Kontakt.
+   Strona przewija się normalnie. Desktop: po prawej sfera z projektami - przyklejona (sticky)
+   na czas hero i portfolio, kontakt pod spodem na całą szerokość.
    ========================================================================== */
-#app {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-}
-#app > main { flex: 1; }
-
-/* Niskie ekrany desktopowe (np. 1280×800): niższe wiersze indeksu, żeby strona mieściła się bez przewijania */
-@media (min-width: 1024px) and (max-height: 840px) {
-  .index .index__row { min-height: 48px; padding-block: 12px; }
-}
-@media (min-width: 1024px) and (max-height: 780px) {   /* 1366×768, 1024×768 */
-  .hero .hero__top { margin-bottom: var(--s-3); }
-  .hero .index { margin-top: var(--s-4); }
-  .hero .clients { padding-top: var(--s-3); }
-  .hero .hero__intro:not(:has(.clients))::after { padding-top: var(--s-3); }
-  .hero .preview__caption { gap: var(--s-1); }          /* węższy podgląd (423 px): pełne podpisy PL bez wielokropka */
-}
-
-/* Desktop: hero w optycznym środku wolnego miejsca między nagłówkiem a stopką —
-   wolna przestrzeń dzielona 40:60 (trochę powyżej środka geometrycznego), minimum 16 / 24 px. */
+.home { display: grid; grid-template-columns: minmax(0, 1fr); }
+.home__main { min-width: 0; }
+.home__sphere { display: none; }
 @media (min-width: 1024px) {
-  #app > main {
-    display: grid;
-    grid-template-rows: minmax(var(--s-2), 2fr) auto minmax(var(--s-3), 3fr);   /* minima w proporcji 2:3 */
+  .home { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); column-gap: var(--gutter); }
+  .home__main { grid-column: 1 / 7; }
+  .home__sphere {
+    grid-column: 7 / -1;
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: calc(var(--header-h) * -1);   /* środek sfery = środek ekranu, także pod nagłówkiem */
   }
-  #app > main > .hero { grid-row: 2; padding-top: 0; padding-bottom: 0; }
 }
 
 /* ==========================================================================
-   Hero + indeks (brief 5.1)
+   Hero
    ========================================================================== */
-.hero {
-  padding-top: clamp(var(--s-4), 5vh, var(--s-12));
-  row-gap: var(--s-8);
+.hero { padding-block: clamp(var(--s-4), 6vh, var(--s-8)) var(--s-8); }
+@media (min-width: 1024px) {
+  .hero {
+    min-height: calc(100svh - var(--header-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: var(--s-6) var(--s-8);
+  }
 }
 
-/* Znak (później zdjęcie) + trzy szybko zmieniające się ikony.
-   Maska wygasza pasek ikon w prawo: 100% → 0% krycia. */
-.hero__top {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  width: max-content;               /* klikalny tylko znak z ikonami → panel „Brandbook” */
+/* Awatar-moneta: zdjęcie ↔ rysunek kreską, obrót co ~4,5 s. Tęczowy pierścień i poświata
+   (wyjątek kolorystyczny marki - asystent AI); klik → panel asystenta. Bez ruchu w systemie stoi zdjęcie. */
+.avatar {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 72px;
   margin-bottom: var(--s-4);
-  color: var(--ink);
+  border-radius: 50%;
+  isolation: isolate;
+  perspective: 480px;
+  transition: scale var(--t-line) var(--ease);
 }
-.hero__mark .symbol { --size: 40; }
-.hero__icons {
-  display: flex;
-  gap: var(--s-2);
-  -webkit-mask-image: linear-gradient(to right, #000 0%, transparent 100%);
-  mask-image: linear-gradient(to right, #000 0%, transparent 100%);
+.avatar:hover, .avatar:focus-visible { scale: 1.06; }
+.avatar:focus-visible { outline-offset: 6px; outline-color: var(--ink); }
+.avatar::before,
+.avatar__halo {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--rainbow);
+  animation: agent-spin 6s linear infinite;   /* obrót koła - kształt się nie zmienia, kolory płyną */
 }
-/* Ikony o 20% mniejsze od znaku (zdjęcia): 32 px */
-.hero__slot { position: relative; width: 32px; height: 32px; }
-.hero__icon { position: absolute; inset: 0; width: 32px; height: 32px; visibility: hidden; }
-.hero__icon.is-on { visibility: visible; }
+.avatar::before { inset: -2px; }
+.avatar__halo { inset: -3px; filter: blur(10px); opacity: .75; }
+.avatar__coin {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: coin 9s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+.avatar__face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #FFFFFF;
+  backface-visibility: hidden;
+}
+.avatar__face--drawing { transform: rotateY(180deg); }
+@keyframes coin {
+  0%, 40% { transform: rotateY(0deg); }
+  50%, 90% { transform: rotateY(180deg); }
+  100% { transform: rotateY(360deg); }
+}
 
 /* Hasło: główny komunikat — 28 px także na telefonie */
 .hero__title { font-size: 28px; text-wrap: balance; }
-
-/* Imię jako podpis nad hasłem */
 .hero__name { font-weight: var(--fw-medium); margin-bottom: var(--s-1); }
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
 
-.index { margin-top: var(--s-6); }
-
-
 /* ==========================================================================
-   Karuzela firm — powolna pętla, pauza po najechaniu, bez ruchu przy reduced-motion
+   Karuzela firm „Współpracowałem z” — powolna pętla, pauza po najechaniu, bez ruchu przy reduced-motion
    ========================================================================== */
-.clients { margin-top: var(--s-12); }
+.clients { margin-top: var(--s-6); max-width: 34em; }
+.clients__label { margin-bottom: var(--s-2); }
 .clients__marquee {
   overflow: hidden;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
@@ -417,19 +436,6 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
   animation: marquee 40s linear infinite;
 }
 .clients__marquee:hover .clients__track { animation-play-state: paused; }
-/* Desktop: karuzela na dole kolumny, wyrównana do dolnej krawędzi ramki podglądu
-   (pod ramką jest jeszcze podpis: 16 px odstępu + 24 px wysokości). */
-@media (min-width: 1024px) {
-  .hero__intro {
-    align-self: stretch;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: calc(var(--s-2) + var(--s-3));
-  }
-  .clients { margin-top: auto; padding-top: var(--s-5); }
-  /* Bez firm (same placeholdery) zostaje puste miejsce po karuzeli - podgląd ma ten sam rozmiar */
-  .hero__intro:not(:has(.clients))::after { content: ""; margin-top: auto; padding-top: var(--s-5); height: 32px; box-sizing: content-box; }
-}
 .clients__list { display: flex; align-items: center; gap: var(--s-5); padding-right: var(--s-5); }
 .clients__list img { height: 32px; width: auto; }
 
@@ -438,6 +444,16 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .clients__marquee { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
   .clients__list[aria-hidden] { display: none; }
+}
+
+/* ==========================================================================
+   Portfolio: projekty, o mnie (LinkedIn), brandbook, PDF
+   ========================================================================== */
+.work { padding-block: var(--s-4) var(--s-12); }
+.work__title { margin-bottom: var(--s-3); }
+/* Desktop: sekcja na wysokość ekranu - sfera stoi obok przez cały czas, aż wjedzie kontakt */
+@media (min-width: 1024px) {
+  .work { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-block: var(--s-8); }
 }
 
 .index__row {
@@ -470,54 +486,91 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 
 .index__row:hover::after,
 .index__row:focus-visible::after { transform: scaleX(1); }
+/* Desktop: aktywny projekt (= karta z przodu sfery) ma linię na stałe */
+@media (min-width: 1024px) { .index__row.is-active::after { transform: scaleX(1); } }
 
 .index__year { text-align: right; }
 
-/* Ikonki „i” i pobierania w kolumnie numerów */
+/* Ikonki w kolumnie numerów: LinkedIn, znak (brandbook), pobieranie */
 .index__no { display: flex; align-self: center; }
 .index__glyph { width: 14px; height: 14px; color: var(--ink-3); }
+.index__mark { --size: 14; }
 
-/* Telefon i tablet: sam stos linków, bez podglądu */
-.hero__preview { display: none; }
-
-@media (min-width: 768px) {
-  .hero__intro { grid-column: 1 / 9; }
+/* ==========================================================================
+   Sfera (desktop): siatka z okręgów kreską 1 px + karty projektów 4:5 (CSS 3D).
+   --rx / --ry ustawia sphere.js (przeciąganie, powolny obrót, obrót do karty).
+   ========================================================================== */
+.sphere {
+  --d: min(36vw, 62svh, 640px);     /* średnica */
+  position: relative;
+  width: var(--d);
+  height: var(--d);
+  perspective: calc(var(--d) * 2.6);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
-
-/* Desktop: indeks po lewej, podgląd po prawej */
-@media (min-width: 1024px) {
-  .hero { align-items: start; padding-bottom: var(--s-4); }
-  .hero__intro { grid-column: 1 / 6; }
-  .hero__preview {
-    display: block;
-    grid-column: 7 / -1;
-  }
-
-  .index__row.is-active::after { transform: scaleX(1); }
-
-  /* Auto-przewijanie: kreska pod aktywnym wierszem wypełnia się przez --t-auto, potem następny projekt.
-     --auto-delay (ujemne, z main.js) = wznowienie w miejscu fazy planszy animowanej */
-  .index__row.is-playing::after { animation: index-progress var(--t-auto) linear var(--auto-delay, 0s) forwards; }
-
+.sphere.is-dragging { cursor: grabbing; }
+.sphere__world {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
 }
-
-/* Podgląd: wysokość = wysokość lewej kolumny (góra przy znaku, dół przy karuzeli),
-   proporcja 4:5, najwyżej szerokość kolumny. Kolumna jest kontenerem (cq*),
-   więc ramka i podpis liczą tę samą szerokość: --pw. */
-.hero__preview {
-  align-self: stretch;
-  container-type: size;
+.sphere__ring {
+  --s: calc(var(--d) * var(--r, 1));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  border: var(--hairline) solid var(--ink);
+  border-radius: 50%;
+  opacity: .2;
+  transform: var(--t);
+  pointer-events: none;
 }
-.preview,
-.preview__captions {
-  --pw: min(100cqw, (100cqh - var(--s-2) - var(--s-3)) * 4 / 5);
-  width: var(--pw);
-  margin-left: auto;
+.sphere__ring--lat { transform: translateY(calc(var(--d) / 2 * var(--y))) rotateX(90deg); }
+.sphere__ring--eq { opacity: .4; }
+.sphere__dot { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ink); }
+.sphere__card {
+  --cw: calc(var(--d) * .3);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--cw);
+  aspect-ratio: 4 / 5;
+  margin: calc(var(--cw) * -.625) 0 0 calc(var(--cw) / -2);
+  transform: rotateY(var(--lon)) rotateX(var(--lat)) translateZ(calc(var(--d) / 2 + 2px));
+  backface-visibility: hidden;
+  background: var(--paper);
+  outline: var(--hairline) solid var(--hair);
+  opacity: .6;
+  transition: opacity var(--t-swap) var(--ease);
+  -webkit-user-drag: none;
 }
-.preview { aspect-ratio: 4 / 5; }
+.sphere__card.is-active, .sphere__card:hover { opacity: 1; }
+.sphere__card picture, .sphere__card img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.sphere__mark {
+  --mw: calc(var(--d) * .07);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--mw);
+  height: var(--mw);
+  margin: calc(var(--mw) / -2) 0 0 calc(var(--mw) / -2);
+  transform: rotateY(var(--lon)) rotateX(var(--lat)) translateZ(calc(var(--d) / 2 + 1px));
+  backface-visibility: hidden;
+  opacity: .5;
+  pointer-events: none;
+}
+.sphere__mark img { display: block; width: 100%; height: 100%; }
+.sphere__tag { position: absolute; left: 0; top: calc(100% + 6px); white-space: nowrap; color: var(--ink); }
+.sphere__hint { margin-top: var(--s-4); }
 
-/* Cienka ramka w kolorze linii (--hair) — rysowana nad grafiką, widoczna też na czarnej planszy w trybie ciemnym */
-.preview::after,
+/* Cienka ramka w kolorze linii (--hair) nad grafiką panelu — widoczna też na czarnej planszy w trybie ciemnym */
 .sheet__video::after {
   content: "";
   position: absolute;
@@ -526,19 +579,6 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
   border: var(--hairline) solid var(--hair);
   pointer-events: none;
 }
-
-/* Logo projektu na środku podglądu */
-.preview__logo {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15%;
-  opacity: 0;
-  transition: opacity var(--t-swap) var(--ease);
-}
-.preview__logo.is-active { opacity: 1; }
 
 /* ==========================================================================
    Plansza w stylu marki projektu (projects[].brand): tło + animowana aurora
@@ -572,16 +612,6 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 /* Logo na planszy marki: zawsze w całości, niezależnie od reguł dla wideo/obrazów w ramce */
 .media .brand img,
 .brand .brand__logo { width: 56%; max-width: 420px; height: auto; object-fit: contain; }
-.preview__logo.brand { padding: 0; }
-/* Plansza statyczna marki (projects[].cover): cała ramka 4:5, bez marginesu */
-.preview__logo--cover { padding: 0; }
-.preview__logo--cover img { width: 100%; height: 100%; max-height: none; object-fit: cover; }
-.preview__logo.brand img { width: 50%; }   /* podgląd na stronie głównej — o 20% mniejsze niż w panelu */
-
-@keyframes index-progress {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
 
 @keyframes aurora {
   0%   { transform: translate(0) rotate(0) scale(1); }
@@ -589,7 +619,6 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
   66%  { transform: translate(-5%, 6%) rotate(-5deg) scale(1.04); }
   100% { transform: translate(3%, -4%) rotate(4deg) scale(1.1); }
 }
-.preview__logo img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
 
 /* ==========================================================================
    Reel — plansza animowana teraz „Dwie role, jedna rozmowa” (projects[].reel)
@@ -600,7 +629,6 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
    Jednostki cq tylko na potomkach .reel: zmienne formatu na .reel--*, zmienne progów na .reel__stage.
    Kolory wyłącznie marki — bez --paper / --ink, więc tryb ciemny niczego nie zmienia.
    ========================================================================== */
-.preview__logo--reel { padding: 0; }
 /* Open Sans - krój marki teraz, tylko w animacji teraz. Okrojony do znaków PL/EN
    (tools/subset-fonts.py), hostowany lokalnie, licencja SIL OFL 1.1 (assets/fonts/OFL.txt).
    Wagi jak w teraz: 400 opisy, 600 pigułki / chipy / legenda / podpisy, 700 nagłówki i hasło.
@@ -644,18 +672,13 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 }
 @keyframes reel-clock { from, to { opacity: 1; } }
 
-/* Gra tylko aktywny podgląd i otwarty panel; przy otwartym panelu podgląd stoi */
-.preview__logo.is-active .reel,
+/* Gra tylko w otwartym panelu */
 .sheet:target .reel { --reel-play: running; }
-/* Zamknięty panel nie renderuje planszy, więc fonty teraz pobierają się dopiero przy otwarciu (telefony
-   nie mają podglądu na stronie głównej). Opóźnienie trzyma planszę widoczną, gdy panel zjeżdża. */
+/* Zamknięty panel nie renderuje planszy, więc fonty teraz pobierają się dopiero przy otwarciu. Opóźnienie trzyma planszę widoczną, gdy panel zjeżdża. */
 .sheet .reel { content-visibility: hidden; transition: content-visibility 0s linear var(--t-sheet) allow-discrete; }
 .sheet:target .reel { content-visibility: visible; transition-delay: 0s; }
-html:has(.sheet:target) .preview .reel,
-.preview .reel.is-held,
 .sheet:target .reel.is-paused { --reel-play: paused; }
-/* .is-held (main.js): po najechaniu / focusie podgląd staje na szwie pętli (klatka 0 = plakat).
-   Bez JS: trzy pętle (24 s) i stop na plakacie - 0% = 100%, więc forwards zostawia ten sam kadr */
+/* Bez JS: trzy pętle (24 s) i stop na plakacie - 0% = 100%, więc forwards zostawia ten sam kadr */
 html:not(.js) .reel,
 html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-mode: forwards !important; }
 .reel, .reel::before, .reel::after,
@@ -1071,30 +1094,6 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
   }
 }
 
-.preview__captions {
-  position: relative;
-  margin-top: var(--s-2);
-  min-height: var(--s-3);
-}
-
-.preview__caption {
-  position: absolute;
-  inset: 0 0 auto 0;
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  opacity: 0;
-  visibility: hidden;               /* ukryty podpis nie łapie focusu ani kliknięć */
-  /* stary podpis znika szybciej, nowy wchodzi po nim — tekst się nie nakłada */
-  transition: opacity calc(var(--t-swap) * .4) var(--ease), visibility 0s linear calc(var(--t-swap) * .4);
-}
-.preview__caption.is-active {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity calc(var(--t-swap) * .6) var(--ease) calc(var(--t-swap) * .4), visibility 0s;
-}
-.preview__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.preview__caption .link-u { margin-left: auto; }
 .sygnet { width: 20px; height: 20px; flex: none; object-fit: contain; }
 
 /* ==========================================================================
@@ -1259,44 +1258,30 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 
 /* ==========================================================================
-   Stopka = kontakt (minimalna)
-   Telefon: mail, profile, pełnej szerokości przycisk, ©.  Desktop: jedna linia.
+   Kontakt (stopka) - czarna sekcja na końcu strony: tytuł, mail, profile, „umów rozmowę” (Calendly), ©.
+   Telefon: jedno pod drugim. Od 768 px: mail z profilami po lewej, przycisk po prawej.
    ========================================================================== */
-.site-footer { margin-top: var(--s-8); }
 .site-footer__in {
   display: grid;
-  grid-template-areas: "contact" "button" "copy";
+  grid-template-areas: "title" "contact" "button" "copy";
   gap: var(--s-3);
-  padding-block: var(--s-3);
 }
-/* Linia tylko na szerokość treści, jak w indeksie */
-.site-footer__in::before {
-  content: "";
-  position: absolute;
-  left: var(--margin);
-  right: var(--margin);
-  top: 0;
-  border-top: var(--hairline) solid var(--hair);
-}
-.site-footer__in { position: relative; }
-.site-footer__contact { grid-area: contact; display: grid; gap: var(--s-1); }
-/* Przyciski: „zapytaj AI” + „kontakt”. Telefon - obok siebie po połowie, od 768 px w linii. */
-.site-footer__actions { grid-area: button; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
-@media (min-width: 768px) { .site-footer__actions { display: flex; } }
+.site-footer__title { grid-area: title; }
+.site-footer__contact { grid-area: contact; display: grid; gap: var(--s-2); }
+.site-footer__actions { grid-area: button; display: grid; }
 .site-footer__copy    { grid-area: copy; display: flex; align-items: center; gap: var(--s-1); }
+.site-footer .mail { white-space: nowrap; }
 
 @media (min-width: 768px) {
-  .site-footer { margin-top: 0; }
   .site-footer__in {
-    padding-block: var(--s-2);
-    grid-template-areas: "copy contact button";
-    grid-template-columns: 1fr auto auto;
+    padding-block: var(--s-8) var(--s-5);
+    grid-template-areas: "title title" "contact button" "copy copy";
+    grid-template-columns: 1fr auto;
     align-items: center;
-    column-gap: var(--s-6);
+    row-gap: var(--s-4);
   }
-  /* Profile po lewej, mail tuż obok przycisku „kontakt” */
-  .site-footer__contact { display: flex; align-items: center; gap: var(--s-5); }
-  .site-footer__contact .contact__links { order: -1; }
+  .site-footer__contact { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-5); }
+  .site-footer__copy { margin-top: var(--s-1); }
 }
 
 .contact__mail {
@@ -1344,19 +1329,6 @@ html:has(.sheet:target) { overflow: hidden; }
 .contact__links a { color: var(--ink); border-bottom: var(--hairline) solid var(--hair); transition: border-color var(--t-line) var(--ease); }
 .contact__links a:hover { border-color: var(--ink); }
 
-/* 768-1279 px: pięć profili, mail i dwa przyciski w jednej linii - bez ©, ciaśniej, mail bez łamania.
-   (Stopka nie może urosnąć: przy 1024 × 768 strona mieści się na jednym ekranie.) */
-@media (min-width: 768px) and (max-width: 1279px) {
-  .site-footer__copy { display: none; }
-  .site-footer__in { grid-template-areas: "contact button"; grid-template-columns: 1fr auto; column-gap: var(--s-3); }
-  .site-footer__contact { gap: var(--s-3); }
-  .site-footer .mail { font-size: 18px; white-space: nowrap; }
-}
-/* 768-1023 px (tablet): profile pod mailem */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .site-footer__contact { flex-wrap: wrap; row-gap: var(--s-1); }
-  .site-footer__contact .contact__links { order: 1; }
-}
 
 /* Przycisk: włosowa ramka, bez zaokrągleń; po najechaniu wypełnienie tuszem */
 .button {
@@ -1447,47 +1419,15 @@ html:has(.sheet:target) { overflow: hidden; }
 .bb__no li::before { content: "-"; }
 
 /* ==========================================================================
-   Asystent AI - przycisk w stopce i czat w panelu #agent.
+   Asystent AI - czat w panelu #agent (otwiera go awatar w hero).
    Jedyny kolor marki osobistej: tęczowa poświata (decyzja właściciela, patrz brandbook).
    Gradient obraca się przez transform (kompozytor, bez przemalowywania); bez ruchu w systemie stoi.
    ========================================================================== */
 :root { --rainbow: conic-gradient(#FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D); }
 @keyframes agent-spin { to { transform: rotate(1turn); } }
 
-.agent-button { position: relative; isolation: isolate; border-color: transparent; white-space: nowrap; }
-.agent-button__halo,
-.agent-button__ring { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.agent-button__halo { inset: -2px; filter: blur(10px); opacity: .75; }
-.agent-button__halo::before,
-.agent-button__ring::before,
-.agent-dot::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 400px;
-  height: 400px;
-  margin: -200px 0 0 -200px;
-  background: var(--rainbow);
-  animation: agent-spin 6s linear infinite;
-}
-/* Wypełnienie 1 px w głąb - z gradientu zostaje cienka tęczowa ramka */
-.agent-button::after {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  z-index: -1;
-  background: var(--paper);
-  transition: background-color var(--t-line) var(--ease);
-}
-.agent-button:hover,
-.agent-button:focus-visible { background: transparent; color: var(--paper); }
-.agent-button:hover::after,
-.agent-button:focus-visible::after { background: var(--ink); }
-
-/* Znak asystenta w pasku panelu: kółko jak znak osobisty, wypełnione tęczą */
-.agent-dot { position: relative; flex: none; width: 12px; height: 12px; border-radius: 50%; overflow: hidden; }
-.agent-dot::before { width: 24px; height: 24px; margin: -12px 0 0 -12px; }
+/* Znak asystenta w pasku panelu: kółko wypełnione tęczą, kolory płyną (obrót koła) */
+.agent-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--rainbow); animation: agent-spin 6s linear infinite; }
 
 /* Panel: telefon - jak inne panele; od 768 px wąska kolumna w prawym dolnym rogu */
 .sheet--agent .sheet__body { display: flex; flex-direction: column; overflow: hidden; padding-block: var(--s-1) var(--s-3); }
@@ -1590,14 +1530,12 @@ html:has(.sheet:target) { overflow: hidden; }
 .reveal {
   display: inline-block;
   animation: rise var(--t-fade) var(--ease) both;
-  /* tekst rusza przy ~60% rysowania znaku, nie na samym końcu — mniej czekania */
-  animation-delay: calc(var(--t-draw) * .6 + var(--n, 0) * var(--t-stagger));
+  /* tekst rusza od razu, kolejne linie co --t-stagger */
+  animation-delay: calc(150ms + var(--n, 0) * var(--t-stagger));
 }
 li.reveal { display: list-item; }
 
 .no-intro .reveal { animation: none; }
-.no-intro .hero__mark.is-drawing .symbol .stroke { animation: none; stroke-dashoffset: 0; }
-.no-intro .hero__mark.is-drawing .symbol .hanko { animation: none; opacity: 1; }
 
 @keyframes rise {
   from { opacity: 0; transform: translateY(var(--rise)); }
