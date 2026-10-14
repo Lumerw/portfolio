@@ -54,7 +54,7 @@ html { overflow: visible !important; }
 .symbol .hanko { opacity: 1 !important; }
 
 /* Tylko ekranowe */
-.skip, .site-header, .work, .home__sphere, .clients, .sheet__backdrop, .sheet__close,
+.skip, .site-header, .work, .home__sphere, .hero__icons, .clients, .sheet__backdrop, .sheet__close,
 .sheet__video, .sheet__caption, .reel__toggle, .copy, .copy__status, .site-footer__actions { display: none !important; }
 
 .print-only { display: block; }

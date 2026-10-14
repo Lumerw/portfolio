@@ -162,9 +162,17 @@ function avatar(c, t) {
 }
 
 function hero(c, t) {
+  // Trzy miejsca na ikony obok awatara. Każde ma wszystkie ikony (ładowane raz); widoczna jest jedna.
+  // Start: 0, ostatnia, przedostatnia; dalej każde miejsce zmienia się we własnym rytmie (main.js).
+  const L = c.icons.length;
+  const icons = [0, 1, 2].map(slot => `
+          <span class="hero__slot">${c.icons.map((src, k) => `<img class="hero__icon${mono(src)}${k === (L - slot) % L ? ' is-on' : ''}" src="${esc(src)}" width="40" height="40" alt="">`).join('')}</span>`).join('');
   return `
   <section id="start" class="hero" aria-labelledby="hero-title">
-    ${avatar(c, t)}
+    <div class="hero__top">${avatar(c, t)}
+      <span class="hero__icons" aria-hidden="true">${icons}
+      </span>
+    </div>
     <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}</span></p>
     <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
     <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>

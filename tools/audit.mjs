@@ -100,13 +100,14 @@ const browser = await chromium.launch();
   await p.goto(URL);
   await p.waitForTimeout(600);
   const pose = () => p.evaluate(() => [getComputedStyle(document.querySelector('.avatar__coin')).animationName,
-    getComputedStyle(document.querySelector('.sphere__world')).getPropertyValue('--ry')].join('|'));
+    getComputedStyle(document.querySelector('.sphere__world')).getPropertyValue('--ry'),
+    ...[...document.querySelectorAll('.hero__icon.is-on')].map(i => i.src)].join('|'));
   const a = await pose();
   await p.waitForTimeout(1200);
   const still = a === await pose() && a.startsWith('none');
   const marquee = await p.evaluate(() => { const t = document.querySelector('.clients__track'); return !t || getComputedStyle(t).animationName === 'none'; });   // bez firm karuzeli nie ma
   const text = await p.evaluate(() => getComputedStyle(document.querySelector('h1 .reveal')).opacity === '1');
-  check('prefers-reduced-motion wyłącza ruch', still && marquee && text, `awatar i sfera stoją: ${still}, karuzela stoi: ${marquee}, tekst od razu: ${text}`);
+  check('prefers-reduced-motion wyłącza ruch', still && marquee && text, `awatar, ikony i sfera stoją: ${still}, karuzela stoi: ${marquee}, tekst od razu: ${text}`);
   await ctx.close();
 }
 

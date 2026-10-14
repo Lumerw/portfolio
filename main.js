@@ -237,11 +237,17 @@ app.addEventListener('click', e => {
   }
 });
 
-/* Ikony w brandbooku: każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
-   i nigdy nie pokazuje tej samej ikony co sąsiad. Jedno <img> na miejsce, zmienia się src.
-   Rusza tylko przy otwartym panelu. */
+/* Ikony (obok awatara i w brandbooku): każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
+   i nigdy nie pokazuje tej samej ikony co sąsiad. Hero: w miejscu leżą wszystkie ikony, widoczna ma .is-on.
+   Brandbook: jedno <img> na miejsce, zmienia się src. Każdy zestaw rusza tylko, gdy go widać. */
 const ICON_MS = [500, 1100];
 const ICON_SETS = [
+  {
+    sel: '.hero__slot',
+    live: () => !openSheet(),
+    get: slot => slot.querySelector('.is-on')?.getAttribute('src'),
+    set: (slot, src) => { for (const img of slot.children) img.classList.toggle('is-on', img.getAttribute('src') === src); },
+  },
   {
     sel: '[data-bb-icon]',
     live: () => openSheet()?.id === 'brandbook',
