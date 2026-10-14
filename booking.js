@@ -1,12 +1,14 @@
 // Kalendarz rezerwacji w panelu #rozmowa - darmowe API Cal.com (v2), prosto z przeglądarki:
-// bez serwera i bez klucza (wolne terminy i tworzenie rezerwacji są publiczne, CORS dla każdej strony).
-//   GET  /v2/slots     (cal-api-version 2024-09-04)  - wolne terminy na 3 tygodnie, w strefie odwiedzającego
+// bez serwera i bez klucza API (wolne terminy i tworzenie rezerwacji są publiczne, CORS dla każdej strony).
+//   GET  /v2/slots     (cal-api-version 2024-09-04)  - wolne terminy na 4 tygodnie, w strefie odwiedzającego
 //   POST /v2/bookings  (cal-api-version 2024-08-13)  - rezerwacja: imię, e-mail, strefa, opcjonalna notatka
-// Cal.com sam wysyła potwierdzenie z linkiem do spotkania i wpisuje je do Twojego kalendarza.
+// Cal.com sam wysyła potwierdzenie z linkiem do spotkania i wpisuje je do kalendarza właściciela.
+// Kroki: długość rozmowy → dzień (siatka tygodni pn-nd) → godzina → formularz → potwierdzenie.
 // main.js ładuje ten moduł przy pierwszym otwarciu panelu. Teksty: pl/en.booking w content.js.
 
 const API = 'https://api.cal.com/v2';
-const DAYS = 21;
+const WEEKS = 4;
+const DAY = 864e5;
 
 const el = (tag, cls, text) => {
   const n = document.createElement(tag);
@@ -15,17 +17,34 @@ const el = (tag, cls, text) => {
   return n;
 };
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const button = (cls, text, pressed, onClick) => {
+  const b = el('button', cls, text);
+  b.type = 'button';
+  if (pressed != null) b.setAttribute('aria-pressed', String(pressed));
+  b.addEventListener('click', onClick);
+  return b;
+};
+const group = (cls, label) => {
+  const g = el('div', cls);
+  g.setAttribute('role', 'group');
+  g.setAttribute('aria-label', label);
+  return g;
+};
 
 export function initBooking(root, { lang, copy, email, calendly = '' }) {
   const ui = root.querySelector('[data-booking-ui]');
-  const { user, event, minutes } = root.dataset;
+  const user = root.dataset.user;
+  // „30min:30,15min:15” → [{ slug, minutes }], pierwszy domyślny
+  const events = (root.dataset.events || '').split(',').filter(Boolean)
+    .map(x => { const [slug, m] = x.split(':'); return { slug, minutes: Number(m) || 30 }; });
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Warsaw';
   const locale = lang === 'pl' ? 'pl-PL' : 'en-GB';
-  const fmtDay = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' });
   const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
+  const fmtDate = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' });
   const fmtFull = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
-  let slots = {};       // „2026-10-20” → [ISO start, …]
-  let day = null, slot = null;
+  const fmtMonth = new Intl.DateTimeFormat(locale, { month: 'long' });
+  const fmtWeekday = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+  let ev = events[0], slots = {}, day = null, slot = null, seq = 0;
 
   const mailLink = () => Object.assign(el('a', 'link-u', email), { href: `mailto:${email}` });
   const status = (text, withMail = false) => {
@@ -35,13 +54,21 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
     return p;
   };
 
+  // Siatka zaczyna się w poniedziałek bieżącego tygodnia (południe - bez kłopotów ze zmianą czasu)
+  const gridStart = new Date();
+  gridStart.setHours(12, 0, 0, 0);
+  gridStart.setDate(gridStart.getDate() - ((gridStart.getDay() + 6) % 7));
+  const at = i => new Date(gridStart.getTime() + i * DAY);
+
   async function load() {
-    ui.replaceChildren(status(copy.loading));
-    const start = new Date(), end = new Date(Date.now() + DAYS * 864e5);
-    const q = new URLSearchParams({ username: user, eventTypeSlug: event, start: ymd(start), end: ymd(end), timeZone: tz });
+    const my = ++seq;
+    slots = {}; day = null; slot = null;
+    render(copy.loading);
+    const q = new URLSearchParams({ username: user, eventTypeSlug: ev.slug, start: ymd(new Date()), end: ymd(at(WEEKS * 7 - 1)), timeZone: tz });
     try {
       const res = await fetch(`${API}/slots?${q}`, { headers: { 'cal-api-version': '2024-09-04' } });
       const json = await res.json();
+      if (my !== seq) return;                       // w międzyczasie zmieniono długość rozmowy
       if (!res.ok || json.status !== 'success') throw new Error(res.status);
       slots = Object.fromEntries(Object.entries(json.data || {})
         .map(([d, list]) => [d, list.map(x => (typeof x === 'string' ? x : x.start)).filter(Boolean)])
@@ -49,6 +76,7 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
       day = Object.keys(slots).sort()[0] ?? null;
       render();
     } catch {
+      if (my !== seq) return;
       // Cal.com nie odpowiada / brak typu spotkania - zapasowo Calendly (jeśli jest) i mail
       const st = status(copy.error, true);
       if (calendly) st.append(' · ', Object.assign(el('a', 'link-u', 'Calendly ↗'), { href: calendly, target: '_blank', rel: 'noopener' }));
@@ -56,40 +84,58 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
     }
   }
 
-  function render() {
-    const dates = Object.keys(slots).sort();
-    if (!dates.length) { ui.replaceChildren(status(copy.empty, true)); return; }
-    const wrap = el('div', 'book__pick');
-    // Dni z wolnymi terminami
-    const days = el('div', 'book__days');
-    days.setAttribute('role', 'group');
-    days.setAttribute('aria-label', copy.day);
-    for (const d of dates) {
-      const b = el('button', 'book__day', fmtDay.format(new Date(`${d}T12:00:00`)));
-      b.type = 'button';
-      b.setAttribute('aria-pressed', String(d === day));
-      b.addEventListener('click', () => { day = d; slot = null; render(); });
-      days.append(b);
+  function render(loading) {
+    const parts = [];
+    // 1. Długość rozmowy (gdy jest więcej niż jeden typ spotkania)
+    if (events.length > 1) {
+      const lens = group('book__lens', copy.length);
+      for (const e of events) lens.append(button('book__len', `${e.minutes} min`, e === ev, () => { if (e !== ev) { ev = e; load(); } }));
+      parts.push(el('p', 'book__label t-meta', copy.length), lens);
     }
-    // Godziny wybranego dnia
-    const times = el('div', 'book__times');
-    times.setAttribute('role', 'group');
-    times.setAttribute('aria-label', copy.time);
+    if (loading) { ui.replaceChildren(...parts, status(loading)); return; }
+    if (!Object.keys(slots).length) { ui.replaceChildren(...parts, status(copy.empty, true)); return; }
+
+    // 2. Dzień: siatka 4 tygodni pn-nd, aktywne tylko dni z wolnymi terminami
+    const cal = group('book__cal', copy.day);
+    for (let i = 0; i < 7; i++) cal.append(el('span', 'book__wd t-meta', fmtWeekday.format(at(i)).replace('.', '')));
+    const today = ymd(new Date());
+    for (let i = 0; i < WEEKS * 7; i++) {
+      const d = at(i), key = ymd(d);
+      if (slots[key]) {
+        const b = button('book__date', String(d.getDate()), key === day, () => { day = key; slot = null; render(); });
+        b.setAttribute('aria-label', fmtDate.format(d));
+        cal.append(b);
+      } else {
+        const off = el('span', `book__date is-off${key === today ? ' is-today' : ''}`, String(d.getDate()));
+        off.setAttribute('aria-hidden', 'true');
+        cal.append(off);
+      }
+    }
+    const months = [...new Set([at(0), at(WEEKS * 7 - 1)].map(d => fmtMonth.format(d)))].join(' / ');
+    const left = el('div', 'book__col');
+    left.append(el('p', 'book__label t-meta', `${copy.day} · ${months}`), cal);
+
+    // 3. Godzina wybranego dnia
+    const times = group('book__times', copy.time);
     for (const iso of slots[day] || []) {
-      const b = el('button', 'book__time', fmtTime.format(new Date(iso)));
-      b.type = 'button';
-      b.setAttribute('aria-pressed', String(iso === slot));
-      b.addEventListener('click', () => { slot = iso; render(); ui.querySelector('#book-name')?.focus(); });
-      times.append(b);
+      times.append(button('book__time', fmtTime.format(new Date(iso)), iso === slot, () => {
+        slot = iso; render(); ui.querySelector('#book-name')?.focus();
+      }));
     }
-    wrap.append(el('p', 'book__label t-meta', copy.day), days, el('p', 'book__label t-meta', `${copy.time} · ${copy.tz}: ${tz}`), times);
-    ui.replaceChildren(wrap);
+    const right = el('div', 'book__col');
+    right.append(el('p', 'book__label t-meta', `${copy.time} · ${copy.tz}: ${tz}`), times);
+    // Od 768 px: kalendarz po lewej, godziny po prawej
+    const pick = el('div', 'book__pick');
+    pick.append(left, right);
+    parts.push(pick);
+
+    ui.replaceChildren(...parts);
     if (slot) ui.append(form());
   }
 
   function form() {
     const f = el('form', 'book__form');
-    f.append(el('p', 'book__when t-text', `${fmtFull.format(new Date(slot))} · ${minutes} min`));
+    f.append(el('p', 'book__when t-text', `${fmtFull.format(new Date(slot))} · ${ev.minutes} min`));
     const field = (id, label, type, required) => {
       const l = el('label', 'book__field');
       l.append(el('span', 't-meta', label));
@@ -117,7 +163,7 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
       const note = f.elements['book-note'].value.trim();
       const body = {
         start: new Date(slot).toISOString(),
-        eventTypeSlug: event,
+        eventTypeSlug: ev.slug,
         username: user,
         attendee: { name: f.elements['book-name'].value.trim(), email: f.elements['book-email'].value.trim(), timeZone: tz, language: lang },
         ...(note && { bookingFieldsResponses: { notes: note } }),
@@ -131,7 +177,7 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
         const json = await res.json().catch(() => ({}));
         if (!res.ok || json.status !== 'success') throw new Error(res.status);
         const done = el('div', 'book__done');
-        done.append(el('p', 'book__status t-text', `${copy.done} ${fmtFull.format(new Date(slot))}.`), el('p', 't-text t-muted', copy.doneNote));
+        done.append(el('p', 'book__status t-text', `${copy.done} ${fmtFull.format(new Date(slot))} (${ev.minutes} min).`), el('p', 't-text t-muted', copy.doneNote));
         ui.replaceChildren(done);
         done.setAttribute('tabindex', '-1');
         done.focus();

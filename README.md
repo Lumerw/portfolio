@@ -145,17 +145,13 @@ Font Haus (loom) jest na licencji, więc w PDF jest tylko logo w krzywych i zrzu
 
 ## Kalendarz rezerwacji (własny, w stylu strony)
 
-Przycisk „umów rozmowę” otwiera panel `#rozmowa` z kalendarzem: dni z wolnymi terminami, godziny w strefie odwiedzającego, formularz (imię, e-mail, notatka) i rezerwacja. Działa na **darmowym API Cal.com** prosto z przeglądarki - bez serwera i bez klucza (wolne terminy i tworzenie rezerwacji są w Cal.com publiczne, API wpuszcza zapytania z każdej strony). Cal.com sam wysyła potwierdzenie z linkiem do spotkania i wpisuje rozmowę do Twojego kalendarza. Kod: `booking.js`, teksty: `pl/en.booking`, ustawienia: `shared.booking`.
+Przycisk „umów rozmowę” otwiera panel `#rozmowa` z kalendarzem: wybór długości (30 / 15 min), siatka 4 tygodni (pn-nd, aktywne tylko dni z wolnymi terminami), godziny w strefie odwiedzającego, formularz (imię, e-mail, notatka) i rezerwacja. Działa na **darmowym API Cal.com** prosto z przeglądarki - bez serwera i **bez klucza API** (wolne terminy i tworzenie rezerwacji są w Cal.com publiczne, API wpuszcza zapytania z każdej strony). Cal.com sam wysyła potwierdzenie z linkiem do spotkania i wpisuje rozmowę do Twojego kalendarza. Kod: `booking.js`, teksty: `pl/en.booking`, ustawienia: `shared.booking`.
 
 Calendly tego nie umożliwia za darmo: rezerwacja przez API (`POST /invitees`) wymaga planu Standard lub wyższego, na darmowym zwraca 403.
 
-Włączenie (raz):
+Ustawienia: `shared.booking = { calUsername: 'wojciech-lumer-sxkqby', events: [{ slug: '30min', minutes: 30 }, { slug: '15min', minutes: 15 }] }` (adresy `cal.com/<calUsername>/<slug>`, pierwszy typ jest domyślny). Dostępność, przerwy i miejsce spotkania ustawiasz w Cal.com (Availability / Event Types) - strona pokazuje to, co zwraca API. Gdy Cal.com nie odpowie, panel pokazuje mail i link do Calendly (`shared.calendly`).
 
-1. Załóż darmowe konto na [cal.com](https://cal.com) i połącz swój kalendarz (Google / Outlook / iCloud), żeby zajęte terminy znikały z listy.
-2. W **Event Types** utwórz spotkanie 30 min (slug np. `30min`), ustaw dostępność (Availability) i miejsce spotkania (np. Google Meet / Cal Video).
-3. Wpisz w `content.js` → `shared.booking` swoją nazwę z adresu `cal.com/<nazwa>` (`calUsername`) i slug spotkania (`eventSlug`), potem `npm run build` i wypchnij zmiany.
-
-Wpisane: `calUsername: 'wojciechlumer'`. Dopóki `eventSlug` to placeholder (albo `calUsername`), panelu nie ma, a przycisk otwiera Calendly (`shared.calendly`). Gdy Cal.com nie odpowie, panel pokazuje mail i link do Calendly.
+**Klucz API Cal.com nie trafia na stronę** - wszystko w przeglądarce jest publiczne. Do tego kalendarza nie jest potrzebny; gdyby kiedyś był (np. odwoływanie rezerwacji), trzymaj go tylko jako sekret Workera (`npx wrangler secret put CAL_API_KEY`).
 
 ## Asystent AI
 

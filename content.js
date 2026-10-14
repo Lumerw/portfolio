@@ -16,9 +16,9 @@ export const shared = {
   // Przycisk „kontakt” - link do kalendarza spotkań. [Wpisz swój link Calendly]
   calendly: 'https://calendly.com/wojciechlumer/30min',  // przycisk „kontakt” (placeholder = mail)
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
-  // Wpisz nazwę użytkownika z cal.com/<nazwa> i slug typu spotkania z cal.com/<nazwa>/<slug>.
-  // Dopóki to placeholder, „umów rozmowę” otwiera Calendly.
-  booking: { calUsername: 'wojciechlumer', eventSlug: '[30min - utwórz w Cal.com: Event Types]', minutes: 30 },
+  // calUsername = <nazwa> z cal.com/<nazwa>, events = typy spotkań z cal.com/<nazwa>/<slug> (pierwszy domyślny).
+  // Klucz API NIE jest potrzebny (i nie może trafić na stronę - byłby publiczny).
+  booking: { calUsername: 'wojciech-lumer-sxkqby', events: [{ slug: '30min', minutes: 30 }, { slug: '15min', minutes: 15 }] },
   // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/wojciechlumer/' },
@@ -413,7 +413,8 @@ export const pl = {
   // Kalendarz rezerwacji (panel #rozmowa, Cal.com)
   booking: {
     title: 'Umów rozmowę',
-    intro: '30 minut online. Wybierz dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.',
+    intro: 'Rozmowa online. Wybierz długość, dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.',
+    length: 'Długość rozmowy',
     loading: 'Wczytuję wolne terminy…',
     empty: 'Brak wolnych terminów w najbliższych tygodniach. Napisz do mnie:',
     day: 'Dzień',
@@ -673,7 +674,8 @@ export const en = {
 
   booking: {
     title: 'Book a call',
-    intro: '30 minutes online. Pick a day and time - the confirmation and meeting link will arrive by e-mail.',
+    intro: 'An online call. Pick the length, day and time - the confirmation and meeting link will arrive by e-mail.',
+    length: 'Call length',
     loading: 'Loading free slots…',
     empty: 'No free slots in the coming weeks. Write to me:',
     day: 'Day',

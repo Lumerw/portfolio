@@ -555,16 +555,27 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .book__nojs { display: block; }
 .js .book__nojs { display: none; }
 .book__label { margin: var(--s-3) 0 var(--s-1); }
-.book__days, .book__times { display: flex; flex-wrap: wrap; gap: var(--s-1); }
-.book__day, .book__time {
+.book__lens, .book__times { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+/* Siatka tygodni pn-nd: aktywne tylko dni z wolnymi terminami */
+.book__cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; max-width: 420px; }
+.book__wd { text-align: center; padding-block: 4px; text-transform: lowercase; }
+.book__date { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; font-variant-numeric: tabular-nums; }
+.book__date.is-off { color: var(--ink-4); }
+.book__date.is-today { text-decoration: underline; text-underline-offset: 3px; }
+.book__len, .book__date:not(.is-off), .book__time {
   min-height: 40px;
   padding-inline: var(--s-2);
   border: var(--hairline) solid var(--hair);
   color: var(--ink);
   transition: border-color var(--t-line) var(--ease), background-color var(--t-line) var(--ease), color var(--t-line) var(--ease);
 }
-.book__day:hover, .book__time:hover { border-color: var(--ink); }
-.book__day[aria-pressed="true"], .book__time[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.book__len:hover, .book__date:not(.is-off):hover, .book__time:hover { border-color: var(--ink); }
+.book__len[aria-pressed="true"], .book__date[aria-pressed="true"], .book__time[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.book__date:not(.is-off) { min-height: 0; padding: 0; }
+@media (min-width: 768px) {
+  .book__pick { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: var(--s-5); align-items: start; }
+  .book__pick .book__times { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+}
 .book__form { display: grid; gap: var(--s-2); margin-top: var(--s-4); padding-top: var(--s-3); border-top: var(--hairline) solid var(--hair); }
 .book__when { font-weight: var(--fw-medium); }
 .book__field { display: grid; gap: 4px; }

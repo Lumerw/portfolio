@@ -512,7 +512,7 @@ function recommendations(c, t, lang) {
 }
 
 // Kalendarz rezerwacji w panelu #rozmowa (Cal.com, booking.js). Tylko gdy shared.booking ma prawdziwą nazwę.
-const hasBooking = c => !!c.booking && isReal(c.booking.calUsername) && isReal(c.booking.eventSlug);
+const hasBooking = c => !!c.booking && isReal(c.booking.calUsername) && (c.booking.events ?? []).some(e => isReal(e.slug));
 function booking(c, t) {
   if (!hasBooking(c)) return '';
   const g = t.booking;
@@ -520,7 +520,7 @@ function booking(c, t) {
       ${calendarIcon}
       <h2 id="rozmowa-title" class="t-project">${esc(g.title)}</h2>`;
   const body = `
-      <div class="book" data-booking data-user="${esc(c.booking.calUsername)}" data-event="${esc(c.booking.eventSlug)}" data-minutes="${esc(c.booking.minutes || 30)}">
+      <div class="book" data-booking data-user="${esc(c.booking.calUsername)}" data-events="${esc(c.booking.events.filter(e => isReal(e.slug)).map(e => `${e.slug}:${e.minutes}`).join(','))}">
         <p class="book__intro t-text t-muted">${esc(g.intro)}</p>
         <p class="book__nojs t-text">${esc(g.nojs)} <a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
         <div class="book__ui" data-booking-ui></div>

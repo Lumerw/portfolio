@@ -218,7 +218,7 @@
     </ul>
   </div>
   <div class="site-footer__actions">
-    <a class="button site-footer__button" href="https://calendly.com/wojciechlumer/30min" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>umów rozmowę</a>
+    <a class="button site-footer__button" href="#rozmowa" aria-haspopup="dialog"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>umów rozmowę</a>
     <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>zapytaj asystenta</a>
   </div>
   <figure class="contact__qr print-only">
@@ -694,6 +694,23 @@
           <button class="button" type="submit">wyślij</button>
         </form>
         <p class="agent__note t-meta">Odpowiedzi powstają z treści tego portfolio i mogą być niepełne. W ważnych sprawach napisz maila.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="rozmowa" class="sheet sheet--booking" role="dialog" aria-modal="true" aria-labelledby="rozmowa-title">
+  <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
+  <div class="sheet__panel">
+    <div class="sheet__bar wrap">
+      <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>
+      <h2 id="rozmowa-title" class="t-project">Umów rozmowę</h2>
+      <a class="sheet__close" href="#start" data-close aria-label="zamknij"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
+    </div>
+    <div class="sheet__body wrap">
+      <div class="book" data-booking data-user="wojciech-lumer-sxkqby" data-events="30min:30,15min:15">
+        <p class="book__intro t-text t-muted">Rozmowa online. Wybierz długość, dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.</p>
+        <p class="book__nojs t-text">Kalendarz działa z włączonym JavaScriptem. Napisz: <a class="link-u" href="mailto:wojciechlumer@gmail.com">wojciechlumer@gmail.com</a></p>
+        <div class="book__ui" data-booking-ui></div>
       </div>
     </div>
   </div>

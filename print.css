@@ -58,7 +58,7 @@ html { overflow: visible !important; }
 .sheet__video, .sheet__caption, .reel__toggle, .copy, .copy__status, .site-footer__actions { display: none !important; }
 
 .print-only { display: block; }
-.sheet--brandbook, .sheet--agent { display: none !important; }   /* brandbook i czat nie trafiają do PDF */
+.sheet--brandbook, .sheet--agent, .sheet--booking { display: none !important; }   /* brandbook, czat i kalendarz nie trafiają do PDF */
 
 .wrap { max-width: none; padding-inline: 0; }
 .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
