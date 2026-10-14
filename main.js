@@ -339,6 +339,20 @@ app.addEventListener('pointerdown', e => {
   addEventListener('pointercancel', up);
 });
 
+/* Pasek na dole (desktop): prawa krawędź © = prawa krawędź podpisu pod sferą (oba w kolumnie sfery, podpis
+   wyśrodkowany - wystarczy jego szerokość). Bez JS © stoi wyśrodkowane. */
+const hint = app.querySelector('.sphere__hint'), copy = app.querySelector('.colophon__copy');
+function alignCopy() {
+  const r = document.createRange();
+  r.selectNodeContents(hint);
+  const w = r.getBoundingClientRect().width;
+  if (w) copy.style.setProperty('--hint-w', `${w.toFixed(1)}px`);
+}
+if (hint && copy) {
+  document.fonts.ready.then(alignCopy);
+  addEventListener('resize', alignCopy, { passive: true });   // np. z telefonu (sfera ukryta) do desktopu
+}
+
 /* Nawigator sekcji (desktop): aktywna sekcja = ta, której środek jest najbliżej środka ekranu;
    linia wypełnia się wraz z przewijaniem. Klik w sekcję (i „kontakt” w hero) przewija bez zmiany adresu. */
 function syncScrollnav() {

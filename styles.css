@@ -464,8 +464,10 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .section-title { font-size: 28px; }
 .hero__name { font-weight: var(--fw-regular); margin-bottom: var(--s-1); }
 /* LinkedIn przy imieniu: ikonka kreską, pole kliknięcia 32 × 32 */
-.hero__li { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin: -8px 0 -8px 2px; vertical-align: middle; color: var(--ink-2); transition: color var(--t-line) var(--ease); }
-.hero__li:hover { color: var(--ink); }
+/* Imię + ikona LinkedIn = jeden link do profilu (całe pole klikalne, ikona ciemnieje po najechaniu) */
+.hero__li { display: inline-flex; align-items: center; gap: 12px; min-height: 32px; margin-block: -4px; color: var(--ink); }
+.hero__li .icon { width: 16px; height: 16px; color: var(--ink-2); transition: color var(--t-line) var(--ease); }
+.hero__li:hover .icon, .hero__li:focus-visible .icon { color: var(--ink); }
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
 /* „kontakt” i karuzela logo w jednej linii; karuzela wypełnia resztę z wygaszonymi bokami */
 .hero__row { display: flex; align-items: center; gap: var(--s-4); margin-top: var(--s-4); }
@@ -1440,6 +1442,8 @@ html:has(.sheet:target) { overflow: hidden; }
   .colophon { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); column-gap: var(--gutter); align-items: baseline; }
   .colophon__links { grid-column: 1 / 6; }
   .colophon__copy { grid-column: 7 / -1; text-align: center; }
+  /* © kończy się tam, gdzie podpis „przeciągnij, żeby obrócić” (szerokość podpisu mierzy main.js) */
+  .colophon__copy[style*="--hint-w"] { text-align: right; padding-right: calc(50% - var(--hint-w) / 2); }
 }
 
 @media (min-width: 768px) {
@@ -1706,7 +1710,7 @@ html:has(.sheet:target) { overflow: hidden; }
 @media (min-width: 1024px) {
   .site-footer { grid-column: 1 / 6; }
   /* Pasek z profilami i © leży na dole ostatniego ekranu (sekcji Kontakt) */
-  .colophon { position: absolute; left: var(--margin); right: var(--margin); bottom: 0; min-height: 72px; align-items: center; padding-block: 0; }
+  .colophon { position: absolute; left: 0; right: 0; bottom: 0; min-height: 72px; align-items: center; padding-block: 0; }
   .site-footer__in {
     padding-block: 0;
     grid-template-areas: "title" "contact" "button";

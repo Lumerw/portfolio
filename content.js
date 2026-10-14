@@ -89,6 +89,7 @@ export const shared = {
   // odwracane), przycięte do krawędzi znaku. h = wysokość w px dobrana na oko, żeby znaki ważyły podobnie
   // (napisy niżej, sygnety wyżej); w = h × proporcje pliku.
   clients: [
+    { name: 'promotraffic', logo: 'assets/clients/promotrafic.svg', w: 96, h: 28 },
     { name: 'loom.studio', logo: 'assets/clients/loom-studio.svg', w: 133, h: 20 },
     { name: 'forkflow', logo: 'assets/clients/forkflow.svg', w: 133, h: 21 },
     { name: '[firma - gwiazdka]', logo: 'assets/clients/asterisk.svg', w: 29, h: 28 },
@@ -516,10 +517,10 @@ export const en = {
     work: 'Portfolio',
     sectionsLabel: 'Page sections',
     start: 'start',
-    nav: { start: 'intro', portfolio: 'portfolio', rekomendacje: 'recommendations', kontakt: 'contact' },
+    nav: { start: 'intro', portfolio: 'portfolio', rekomendacje: 'kind words', kontakt: 'contact' },
     contactCta: 'contact',
     askAgent: 'ask my assistant',
-    recs: 'Recommendations',
+    recs: 'Kind words',
     prev: 'previous',
     brandbookType: 'brand rules',
     avatar: 'Ask about me - AI assistant',

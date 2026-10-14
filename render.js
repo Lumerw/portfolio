@@ -189,7 +189,9 @@ function hero(c, t) {
       <a class="hero__icons" href="#brandbook" aria-haspopup="dialog" aria-label="${esc(t.ui.brandbook)}">${icons}
       </a>
     </div>
-    <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}${liHref !== '#' ? ` <a class="hero__li" href="${esc(liHref)}" target="_blank" rel="me noopener" aria-label="${esc(t.ui.linkedin)}">${liIcon}</a>` : ''}</span></p>
+    <p class="hero__name"><span ${reveal(0)}>${liHref !== '#'
+      ? `<a class="hero__li" href="${esc(liHref)}" target="_blank" rel="me noopener">${esc(c.name)} ${liIcon}<span class="visually-hidden"> - ${esc(t.ui.linkedin)}</span></a>`
+      : esc(c.name)}</span></p>
     <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
     <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
     <div class="hero__row">
