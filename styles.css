@@ -1419,7 +1419,8 @@ html:has(.sheet:target) { overflow: hidden; }
 @media (min-width: 1024px) {
   .scrollnav { display: block; position: fixed; z-index: 15; right: 24px; top: 50%; translate: 0 -50%; }
   .scrollnav ol { position: relative; display: grid; gap: var(--s-4); }
-  .scrollnav__line { position: absolute; right: 4px; top: 4px; bottom: 4px; width: 1px; background: var(--hair); }
+  /* linia od środka pierwszego do środka ostatniego kółka (wiersz ma 24 px) - bez wystających końców */
+  .scrollnav__line { position: absolute; right: 4px; top: 12px; bottom: 12px; width: 1px; background: var(--hair); }
   .scrollnav__fill { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--p, 0) * 100%); background: var(--ink); }
   .scrollnav a { position: relative; display: flex; align-items: center; justify-content: flex-end; padding-right: 20px; min-height: 24px; color: var(--ink-3); transition: color var(--t-line) var(--ease); }
   .scrollnav a::after { content: ""; position: absolute; right: 0; top: 50%; width: 9px; height: 9px; translate: 0 -50%; border: var(--hairline) solid var(--ink-3); border-radius: 50%; background: var(--paper); transition: background-color var(--t-line) var(--ease), border-color var(--t-line) var(--ease); }
