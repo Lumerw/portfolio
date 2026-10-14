@@ -382,7 +382,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 @media (min-width: 1024px) {
   .site-header { position: absolute; top: 0; left: 0; right: 0; }
   .home { position: relative; }
-  .home .hero, .home .work, .home .recs, .home .site-footer {
+  .home .hero, .home .work, .home .process, .home .recs, .home .site-footer {
     min-height: 100svh;
     display: flex;
     flex-direction: column;
@@ -596,6 +596,37 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .book__actions { display: flex; gap: var(--s-2); }
 .book__status { max-width: 34em; }
 .book__done { display: grid; gap: var(--s-1); outline: none; }
+
+/* ==========================================================================
+   Jak pracuję: 4 kroki na pionowej linii 1 px z kółkami (jak nawigator sekcji po prawej).
+   Kółka i linia zapełniają się tuszem w miarę przewijania (main.js: .is-on, --p); bez JS - puste.
+   ========================================================================== */
+.process { padding-block: var(--s-4) var(--s-12); }
+.process__title { margin-bottom: var(--s-4); }
+.process__steps { position: relative; max-width: 34em; }
+.process__steps ol { display: grid; gap: var(--s-4); }
+.process__step { position: relative; display: grid; gap: 4px; padding-left: var(--s-5); }
+/* kółko na linii, na wysokości nazwy kroku */
+.process__step::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--lh-text, 1.5) * 0.5em - 4.5px);
+  width: 9px;
+  height: 9px;
+  border: var(--hairline) solid var(--ink-3);
+  border-radius: 50%;
+  background: var(--paper);
+  transition: background-color var(--t-line) var(--ease), border-color var(--t-line) var(--ease);
+}
+.process__step.is-on::before { background: var(--ink); border-color: var(--ink); }
+/* linia od środka pierwszego do środka ostatniego kółka (main.js ustawia --top / --bottom) */
+.process__line { position: absolute; left: 4px; top: var(--top, 12px); bottom: var(--bottom, 12px); width: 1px; background: var(--hair); }
+.process__fill { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--p, 0) * 100%); background: var(--ink); }
+.process__head { display: flex; align-items: baseline; gap: var(--s-1); }
+.process__name { font-weight: var(--fw-medium); }
+.process__text { max-width: 30em; }
+.process__result span { color: var(--ink); }
 
 /* ==========================================================================
    Rekomendacje z LinkedIna: karty z krótkim cytatem, przewijane w bok
@@ -1521,6 +1552,10 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 .button:hover,
 .button:focus-visible { background: var(--ink); color: var(--paper); }
+/* Przyciski główne („kontakt”, „umów rozmowę”): pełne tuszem; po najechaniu - sama ramka */
+.button--primary { background: var(--ink); color: var(--paper); }
+.button--primary:hover,
+.button--primary:focus-visible { background: transparent; color: var(--ink); }
 .button--small { min-height: 32px; padding-inline: var(--s-2); font-size: var(--fs-meta); }
 
 /* Elementy tylko do PDF (rok na okładce, tekst case study, QR) */

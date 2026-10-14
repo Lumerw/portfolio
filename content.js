@@ -251,7 +251,7 @@ export const pl = {
     work: 'Portfolio',               // tytuł sekcji z linkami
     sectionsLabel: 'Sekcje strony',  // nawigator przewijania (desktop)
     start: 'start',
-    nav: { start: 'intro', portfolio: 'portfolio', rekomendacje: 'rekomendacje', kontakt: 'kontakt' },   // nawigator przewijania
+    nav: { start: 'intro', portfolio: 'portfolio', proces: 'proces', rekomendacje: 'rekomendacje', kontakt: 'kontakt' },   // nawigator przewijania
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
     askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
@@ -418,6 +418,17 @@ export const pl = {
   },
 
   // Kalendarz rezerwacji (panel #rozmowa, Cal.com)
+  // Sekcja „Jak pracuję” (między Portfolio a Rekomendacjami): 4 kroki - nazwa, jedno zdanie, co dostaje klient.
+  process: {
+    title: 'Jak pracuję',
+    get: 'Dostajesz:',
+    steps: [
+      { title: 'Rozmowa', text: '15 lub 30 minut online. Poznaję cel, budżet i termin.', result: 'wycenę i plan' },
+      { title: 'Kierunek', text: 'Research i odniesienia, potem 2-3 kierunki do wyboru. AI pomaga mi szybko sprawdzić więcej wariantów.', result: 'decyzję, zanim powstanie projekt' },
+      { title: 'Projekt', text: 'Identyfikacja, strona albo produkt - na prawdziwych treściach, z rundami poprawek.', result: 'gotowe pliki i system' },
+      { title: 'Wdrożenie', text: 'Kod, uruchomienie i przekazanie - z instrukcją, jak to dalej rozwijać.', result: 'działającą rzecz, nie tylko makiety' },
+    ],
+  },
   booking: {
     title: 'Umów rozmowę',
     intro: 'Rozmowa online. Wybierz długość, dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.',
@@ -459,6 +470,7 @@ export const pl = {
       thanks: 'Proszę bardzo. Jeśli chcesz porozmawiać o współpracy, napisz do Wojciecha.',
       about: 'Ze strony:',
       projects: 'Projekty w portfolio:',
+      process: 'Współpraca wygląda tak - 4 kroki:',
       open: 'otwórz projekt',
       site: 'strona projektu ↗',
       contact: 'Najszybciej mailem:',
@@ -518,7 +530,7 @@ export const en = {
     work: 'Portfolio',
     sectionsLabel: 'Page sections',
     start: 'start',
-    nav: { start: 'intro', portfolio: 'portfolio', rekomendacje: 'kind words', kontakt: 'contact' },
+    nav: { start: 'intro', portfolio: 'portfolio', proces: 'process', rekomendacje: 'kind words', kontakt: 'contact' },
     contactCta: 'contact',
     askAgent: 'ask my assistant',
     recs: 'Kind words',
@@ -682,6 +694,16 @@ export const en = {
     },
   },
 
+  process: {
+    title: 'How I work',
+    get: 'You get:',
+    steps: [
+      { title: 'Call', text: '15 or 30 minutes online. I learn the goal, budget and deadline.', result: 'a quote and a plan' },
+      { title: 'Direction', text: 'Research and references, then 2-3 directions to choose from. AI helps me test more options, faster.', result: 'a decision before the design starts' },
+      { title: 'Design', text: 'Identity, website or product - on real content, with rounds of feedback.', result: 'final files and a system' },
+      { title: 'Launch', text: 'Code, launch and handover - with notes on how to grow it further.', result: 'a working thing, not just mockups' },
+    ],
+  },
   booking: {
     title: 'Book a call',
     intro: 'An online call. Pick the length, day and time - the confirmation and meeting link will arrive by e-mail.',
@@ -722,6 +744,7 @@ export const en = {
       thanks: 'You are welcome. If you would like to talk about working together, write to Wojciech.',
       about: 'From the site:',
       projects: 'Projects in the portfolio:',
+      process: 'Working together looks like this - 4 steps:',
       open: 'open project',
       site: 'project site ↗',
       contact: 'Email is the fastest:',

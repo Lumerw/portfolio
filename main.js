@@ -339,6 +339,30 @@ app.addEventListener('pointerdown', e => {
   addEventListener('pointercancel', up);
 });
 
+/* Jak pracuję: linia biegnie od środka pierwszego do środka ostatniego kółka; kółka i linia zapełniają się
+   tuszem, gdy krok mija 75% wysokości ekranu (przewijanie w obie strony; sekcja na środku = wszystkie). */
+const steps = [...app.querySelectorAll('.process__step')];
+const pLine = app.querySelector('.process__line');
+if (steps.length && pLine) {
+  const box = pLine.parentElement;
+  const dot = el => { const r = el.getBoundingClientRect(); return r.top + parseFloat(getComputedStyle(el, '::before').top) + 4.5; };
+  let queued = false;
+  const sync = () => {
+    queued = false;
+    const b = box.getBoundingClientRect(), ys = steps.map(dot), first = ys[0], last = ys.at(-1);
+    pLine.style.setProperty('--top', `${first - b.top}px`);
+    pLine.style.setProperty('--bottom', `${b.bottom - last}px`);
+    const mark = innerHeight * 0.75;
+    pLine.style.setProperty('--p', Math.min(1, Math.max(0, (mark - first) / (last - first || 1))).toFixed(3));
+    steps.forEach((st, i) => st.classList.toggle('is-on', ys[i] <= mark));
+  };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(sync); } };
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue, { passive: true });
+  document.fonts.ready.then(queue);
+  queue();
+}
+
 /* Pasek na dole (desktop): prawa krawędź © = prawa krawędź podpisu pod sferą (oba w kolumnie sfery, podpis
    wyśrodkowany - wystarczy jego szerokość). Bez JS © stoi wyśrodkowane. */
 const hint = app.querySelector('.sphere__hint'), copy = app.querySelector('.colophon__copy');

@@ -195,7 +195,7 @@ function hero(c, t) {
     <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
     <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
     <div class="hero__row">
-      <p class="hero__cta"><span ${reveal(3)}><a class="button" href="#kontakt">${esc(t.ui.contactCta)}</a></span></p>${clients(c, t)}
+      <p class="hero__cta"><span ${reveal(3)}><a class="button button--primary" href="#kontakt">${esc(t.ui.contactCta)}</a></span></p>${clients(c, t)}
     </div>
     <p class="hero__year t-meta print-only">${esc(c.year)}</p>
   </section>`;
@@ -519,6 +519,27 @@ function recommendations(c, t, lang) {
   </section>`;
 }
 
+// „Jak pracuję”: kroki na pionowej linii 1 px z kółkami (jak nawigator sekcji). main.js zapełnia kółka
+// i linię tuszem w miarę przewijania (.is-on); bez JS wszystkie kółka puste, treść ta sama.
+function process(t) {
+  const P = t.process;
+  if (!P?.steps?.length) return '';
+  return `
+  <section id="proces" class="process" aria-labelledby="process-title">
+    <h2 id="process-title" class="t-name section-title process__title">${esc(P.title)}</h2>
+    <div class="process__steps">
+      <span class="process__line" aria-hidden="true"><span class="process__fill"></span></span>
+      <ol>${P.steps.map((st, i) => `
+      <li class="process__step">
+        <p class="process__head"><span class="process__no t-meta">${num(i)}</span><span class="process__name">${esc(st.title)}</span></p>
+        <p class="process__text t-text t-muted">${esc(st.text)}</p>
+        <p class="process__result t-meta">${esc(P.get)} <span>${esc(st.result)}</span></p>
+      </li>`).join('')}
+      </ol>
+    </div>
+  </section>`;
+}
+
 // Kalendarz rezerwacji w panelu #rozmowa (Cal.com, booking.js). Tylko gdy shared.booking ma prawdziwą nazwę.
 const hasBooking = c => !!c.booking && isReal(c.booking.calUsername) && (c.booking.events ?? []).some(e => isReal(e.slug));
 function booking(c, t) {
@@ -558,7 +579,7 @@ function footer(c, t) {
     </ul>` : ''}
   </div>
   <div class="site-footer__actions">
-    <a class="button site-footer__button" href="${book ? '#rozmowa' : cal ? esc(cal) : mailHref}"${book ? ' aria-haspopup="dialog"' : cal ? ' target="_blank" rel="noopener"' : ''}>${book || cal ? calendarIcon : ''}${esc(t.ui.contactButton)}</a>
+    <a class="button button--primary site-footer__button" href="${book ? '#rozmowa' : cal ? esc(cal) : mailHref}"${book ? ' aria-haspopup="dialog"' : cal ? ' target="_blank" rel="noopener"' : ''}>${book || cal ? calendarIcon : ''}${esc(t.ui.contactButton)}</a>
     <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>${esc(t.ui.askAgent)}</a>
   </div>
   <figure class="contact__qr print-only">
@@ -574,7 +595,7 @@ function footer(c, t) {
 // gdy obok sfery brakuje miejsca - same numery. Klik przewija. Zastępuje systemowy pasek przewijania
 // strony (main.js: aktywna sekcja i postęp).
 function scrollnav(c, t) {
-  const ids = ['start', 'portfolio', ...((c.recommendations ?? []).some(r => clean(r.name)) ? ['rekomendacje'] : []), 'kontakt'];
+  const ids = ['start', 'portfolio', ...(t.process?.steps?.length ? ['proces'] : []), ...((c.recommendations ?? []).some(r => clean(r.name)) ? ['rekomendacje'] : []), 'kontakt'];
   const items = ids.map(id => [id, t.ui.nav[id]]);
   return `
 <nav class="scrollnav" aria-label="${esc(t.ui.sectionsLabel)}">
@@ -627,7 +648,7 @@ export function render(content, lang) {
   const c = content.shared, t = content[lang];
   return `${header(c, t)}
 <div class="home wrap">
-<main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${recommendations(c, t, lang)}
+<main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${process(t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>${scrollnav(c, t)}
 <div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}${booking(c, t)}

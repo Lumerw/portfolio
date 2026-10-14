@@ -14,6 +14,7 @@ const norm = s => String(s).toLowerCase().replace(/ł/g, 'l').normalize('NFD').r
 // Tematy pytań (PL + EN, po norm()). Kolejność = pierwszeństwo.
 const TOPICS = [
   ['thanks', /\b(dzieki|dziekuj\w*|thanks|thank you|thx)\b/],
+  ['process', /proces|etap|\bkrok|przebieg|jak wyglada|jak pracuj|jak dzial|\bprocess|\bsteps?\b|workflow|how do you work|how does it work|what happens/],
   ['contact', /kontakt|mail|napis|spotkan|rozmow|umow|zadzwon|telefon|wspolprac|zatrudn|zlecen|wycen|koszt|\bcen[aey]?\b|stawk|budzet|dostepn|contact|reach|\bcall\b|meet|hire|\bbook\b|collab|work with|quote|price|cost|\brates?\b|budget|availab/],
   ['experience', /doswiadcz|kariera|\bcv\b|zyciorys|experience|career|background|resume/],
   ['pdf', /\bpdf\b|pobier|download/],
@@ -61,6 +62,12 @@ export function localAnswer(content, lang, question) {
       const items = t.about.experience.filter(e => clean(e.place))
         .map(e => [clean(e.year), [clean(e.place), clean(e.role)].filter(Boolean).join(', ')].filter(Boolean).join(' - '));
       return { text: A.experience, items, links: [{ label: A.pdfLink, href: t.ui.pdfFile, download: true }] };
+    }
+    case 'process': {
+      const P = t.process;
+      if (!P?.steps?.length) return unknown();
+      const links = realUrl(c.calendly) ? [{ label: A.call, href: c.calendly, ext: true }] : [mailLink(c)];
+      return { text: A.process, items: P.steps.map(st => `${st.title} - ${st.text} ${P.get} ${st.result}.`), links };
     }
     case 'pdf': return { text: A.pdf, links: [{ label: A.pdfLink, href: t.ui.pdfFile, download: true }] };
     case 'tools': {
@@ -117,6 +124,7 @@ export function knowledge(content, lang) {
       ].filter(Boolean).join('\n');
     }),
     '',
+    ...(t.process?.steps?.length ? ['HOW WORKING TOGETHER LOOKS', ...t.process.steps.map((st, i) => `${i + 1}. ${st.title}: ${st.text} ${t.process.get} ${st.result}.`), ''] : []),
     'EXPERIENCE',
     ...t.about.experience.filter(e => clean(e.place)).map(e => `- ${clean(e.year)} ${clean(e.place)}, ${clean(e.role)}`),
     line('Education', t.about.education),
