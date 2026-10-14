@@ -431,6 +431,9 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 /* Hasło: główny komunikat — 28 px także na telefonie */
 .hero__title { font-size: 28px; text-wrap: balance; }
 .hero__name { font-weight: var(--fw-regular); margin-bottom: var(--s-1); }
+/* LinkedIn przy imieniu: ikonka kreską, pole kliknięcia 32 × 32 */
+.hero__li { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin: -8px 0 -8px 2px; vertical-align: middle; color: var(--ink-2); transition: color var(--t-line) var(--ease); }
+.hero__li:hover { color: var(--ink); }
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
 
 /* ==========================================================================
@@ -560,11 +563,13 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
   backface-visibility: hidden;
   background: var(--paper);
   outline: var(--hairline) solid var(--hair);
-  opacity: .6;
-  transition: opacity var(--t-swap) var(--ease);
   -webkit-user-drag: none;
 }
-.sphere__card.is-active, .sphere__card:hover { opacity: 1; }
+/* Treść karty (plansza / grafika) przycięta do ramki; nieaktywne przygaszone welonem papieru - karta jest
+   pełna, nic nie prześwituje. Gra tylko karta z przodu (.is-active, main.js). */
+.sphere__media { position: absolute; inset: 0; overflow: hidden; }
+.sphere__media::after { content: ""; position: absolute; inset: 0; z-index: 3; background: var(--paper); opacity: .45; transition: opacity var(--t-swap) var(--ease); pointer-events: none; }
+.sphere__card.is-active .sphere__media::after, .sphere__card:hover .sphere__media::after { opacity: 0; }
 .sphere__card picture, .sphere__card img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .sphere__mark {
   --mw: calc(var(--d) * .07);
@@ -685,8 +690,14 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 }
 @keyframes reel-clock { from, to { opacity: 1; } }
 
-/* Gra tylko w otwartym panelu */
-.sheet:target .reel { --reel-play: running; }
+/* Ramki zamkniętych paneli się nie renderują - plansze (obrazy) pobierają się dopiero przy otwarciu,
+   nie przy starcie strony. Opóźnienie trzyma ramkę widoczną, gdy panel zjeżdża. */
+.sheet .sheet__video { content-visibility: hidden; transition: content-visibility 0s linear var(--t-sheet) allow-discrete; }
+.sheet:target .sheet__video { content-visibility: visible; transition-delay: 0s; }
+
+/* Gra tylko w otwartym panelu i na karcie z przodu sfery */
+.sheet:target .reel,
+.sphere__card.is-active .reel { --reel-play: running; }
 /* Zamknięty panel nie renderuje planszy, więc fonty teraz pobierają się dopiero przy otwarciu. Opóźnienie trzyma planszę widoczną, gdy panel zjeżdża. */
 .sheet .reel { content-visibility: hidden; transition: content-visibility 0s linear var(--t-sheet) allow-discrete; }
 .sheet:target .reel { content-visibility: visible; transition-delay: 0s; }

@@ -892,9 +892,10 @@ async function budgetGroup(browser) {
       const b = await page.evaluate(() => window.__reel.budget());
       if (!b.per.length) bad.push(`${lang}: brak .reel`);
       for (const r of b.per) if (r.n > 60) bad.push(`${lang} ${r.where}: ${r.n} elementów`);
-      if (b.total > 800) bad.push(`${lang}: DOM ${b.total} elementów`);
+      // 1000: strona + sfera (siatka, znaki, 3 karty z planszą teraz); Lighthouse ostrzega od 1400
+      if (b.total > 1000) bad.push(`${lang}: DOM ${b.total} elementów`);
       const bytes = b.per.reduce((s, r) => s + r.bytes, 0);
-      if (bytes > 20 * 1024) bad.push(`${lang}: HTML reeli ${(bytes / 1024).toFixed(1)} KB`);   // 4 kopie: podgląd + 16:9, 4:5, 9:16
+      if (bytes > 20 * 1024) bad.push(`${lang}: HTML reeli ${(bytes / 1024).toFixed(1)} KB`);   // 4 kopie: karta na sferze + 16:9, 4:5, 9:16
       notes.push(`${lang}: reel ${[...new Set(b.per.map(r => r.n))].join('/')} el. × ${b.per.length}, DOM ${b.total}, HTML ${(bytes / 1024).toFixed(1)} KB`);
     } catch (e) {
       bad.push(`${lang}: błąd: ${e.message.split('\n')[0]}`);
@@ -902,7 +903,7 @@ async function budgetGroup(browser) {
       await ctx.close();
     }
   }
-  check('Budżet: <= 60 elementów na .reel, DOM <= 800, HTML reeli <= 20 KB', !bad.length, list(bad.length ? bad : notes));
+  check('Budżet: <= 60 elementów na .reel, DOM <= 1000, HTML reeli <= 20 KB', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- Sieć: zero zewnętrznych requestów i ciasteczek ---------- */

@@ -354,9 +354,9 @@ export function liveMarkup(p, { static: still = false } = {}) {
         </div>`;
 }
 
-// Grafika gra, gdy jest widoczna: w aktywnym podglądzie albo w otwartym panelu, bez pauzy.
+// Grafika gra, gdy jest widoczna: na karcie z przodu sfery albo w otwartym panelu, bez pauzy.
 const isOn = el => el.isConnected && el.offsetParent !== null && !el.classList.contains('is-paused') && !document.hidden
-  && !!(el.closest('.preview__logo.is-active') || el.closest('.sheet:target'));
+  && !!(el.closest('.sphere__card.is-active') || el.closest('.sheet:target'));
 
 // Zachowanie w JS (loom: gradient WebGL + fizyka; reh.ab: sam CSS). Jedna pętla rAF na grafikę,
 // zatrzymana, gdy grafiki nie widać; co 250 ms sprawdza, czy ruszyć.

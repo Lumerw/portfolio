@@ -98,6 +98,10 @@ function activate(id) {
     el.classList.toggle('is-active', el.dataset.project === id);
   }
   sphereApi?.focus(id);
+  // Karta z przodu gra od początku: plansza teraz albo grafika interaktywna (loom.studio, reh.ab)
+  const media = app.querySelector(`.sphere__card[data-project="${id}"] .sphere__media`);
+  restartReel(media);
+  showLive(media, id);
 }
 
 /* Sfera z projektami (desktop, sphere.js - ładowany tylko tam, gdzie sfera jest widoczna). */
@@ -126,7 +130,7 @@ function restartReel(scope) {
   for (const el of scope?.querySelectorAll('.reel') ?? []) for (const a of el.getAnimations({ subtree: true })) a.currentTime = 0;
 }
 /* Interaktywne plansze (projects[].live: loom.studio, reh.ab). live.js ładuje się przy pierwszej potrzebie
-   i wstawia grafikę nad statyczną planszą (cover) w widocznej ramce otwartego panelu.
+   i wstawia grafikę nad statyczną planszą (cover): na karcie z przodu sfery i w widocznej ramce otwartego panelu.
    Ponowne pokazanie = pętla od początku. Bez JS i przy ograniczonym ruchu zostaje cover (pierwsza klatka). */
 const liveIds = new Set(content.shared.projects.filter(p => p.live).map(p => p.id));
 let liveMod = null;

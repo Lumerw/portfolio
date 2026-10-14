@@ -124,8 +124,8 @@ function indexRow(p, i) {
         </li>`;
 }
 
-// Ikonka LinkedIn kreską 1 px: ramka + „in”.
-const linkedinIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
+// Ikonka LinkedIn kreską 1 px: ramka + „in” (przy imieniu w hero).
+const liIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
 
 // Ikonki w kolumnie numerów: „i” (o mnie) i pobieranie (PDF), kreska 1 px.
 const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg>`;
@@ -162,6 +162,8 @@ function avatar(c, t) {
 }
 
 function hero(c, t) {
+  const linkedin = c.links.find(l => l.label === 'LinkedIn');
+  const liHref = linkedin ? url(linkedin.href) : '#';
   // Trzy miejsca na ikony obok awatara. Każde ma wszystkie ikony (ładowane raz); widoczna jest jedna.
   // Start: 0, ostatnia, przedostatnia; dalej każde miejsce zmienia się we własnym rytmie (main.js).
   const L = c.icons.length;
@@ -173,28 +175,21 @@ function hero(c, t) {
       <span class="hero__icons" aria-hidden="true">${icons}
       </span>
     </div>
-    <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}</span></p>
+    <p class="hero__name"><span ${reveal(0)}>${esc(c.name)}${liHref !== '#' ? ` <a class="hero__li" href="${esc(liHref)}" target="_blank" rel="me noopener" aria-label="${esc(t.ui.linkedin)}">${liIcon}</a>` : ''}</span></p>
     <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
     <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
     <p class="hero__year t-meta print-only">${esc(c.year)}</p>${clients(c, t)}
   </section>`;
 }
 
-// Sekcja „Portfolio”: projekty (panele), o mnie (LinkedIn), brandbook (panel), PDF.
+// Sekcja „Portfolio”: projekty (panele), brandbook (panel), PDF. LinkedIn jest przy imieniu w hero.
 function work(c, t) {
   const n = c.projects.length;
-  // „o mnie” prowadzi na LinkedIn (panel „o mnie” na razie wyłączony). Bez adresu - bez wiersza.
-  const linkedin = c.links.find(l => l.label === 'LinkedIn');
-  const liHref = linkedin ? url(linkedin.href) : '#';
   return `
   <section id="portfolio" class="work" aria-labelledby="work-title">
     <h2 id="work-title" class="work__title t-name">${esc(t.ui.work)}</h2>
     <nav class="index" aria-label="${esc(t.ui.indexLabel)}">
       <ul>${c.projects.map(indexRow).join('')}
-${liHref !== '#' ? `
-        <li ${reveal(n + 3)}>
-          <a class="index__row index__row--sub" href="${esc(liHref)}" target="_blank" rel="me noopener"><span class="index__no">${linkedinIcon}</span><span class="index__title">${esc(t.ui.about)}</span><span class="index__year t-meta">LinkedIn ↗</span></a>
-        </li>` : ''}
         <li ${reveal(n + 4)}>
           <a class="index__row index__row--sub" href="#brandbook" aria-haspopup="dialog"><span class="index__no">${symbol('personal', { cls: 'index__glyph index__mark' })}</span><span class="index__title">${esc(t.ui.brandbook)}</span><span class="index__year t-meta">${esc(t.ui.brandbookType)}</span></a>
         </li>
@@ -226,11 +221,20 @@ function sphere(c, t) {
     return `
           <span class="sphere__mark" style="--lon:${lon}deg;--lat:${lat}deg"><img class="${mono(src).trim()}" src="${esc(src)}" width="40" height="40" alt=""></span>`;
   }).join('');
-  const cards = c.projects.map((p, i) => `
+  // Karty jak dawny podgląd: teraz - plansza animowana (reel 4:5), loom.studio / reh.ab - pierwsza klatka
+  // grafiki interaktywnej (cover), nad którą main.js wstawia żywą grafikę. Gra tylko karta z przodu.
+  const cards = c.projects.map((p, i) => {
+    const inner = p.reel
+      ? reel(p, t.projects[p.id], '4x5', { decorative: true })
+      : p.cover
+        ? `<img src="${esc(p.cover['4x5'])}" width="1080" height="1350" alt="" loading="lazy" decoding="async">`
+        : image(p.images.a, '', '240px', { widths: c.imageWidths });
+    return `
           <a class="sphere__card${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" tabindex="-1" style="--lon:${Math.round((360 / n) * i)}deg;--lat:${CARD_LAT[i % CARD_LAT.length]}deg">
-            ${image(p.images.a, '', '240px', { widths: c.imageWidths })}
+            <span class="sphere__media">${inner}</span>
             <span class="sphere__tag t-meta">${esc(p.title)}</span>
-          </a>`).join('');
+          </a>`;
+  }).join('');
   return `
   <div class="home__sphere" aria-hidden="true">
     <div class="sphere" data-sphere>

@@ -1,7 +1,7 @@
 /* ==========================================================================
    Interaktywne plansze (projects[].live, live.js): loom.studio i reh.ab.
    Osobny plik: live.js wczytuje go przy pierwszej grafice - nie blokuje pierwszego wyświetlenia strony.
-   Wstawiane przez main.js nad statyczną planszą (cover) tylko w aktywnym podglądzie / otwartym panelu.
+   Wstawiane przez main.js nad statyczną planszą (cover): na karcie z przodu sfery i w otwartym panelu.
    Grają, gdy widać je w aktywnym podglądzie albo otwartym panelu (--live-play), pauza: .is-paused.
    Wymiary w cq - ta sama grafika w 4:5, 16:9 i 9:16. .live--static = stan końcowy bez ruchu (cover).
    ========================================================================== */
@@ -15,7 +15,7 @@
   animation: live-in 400ms var(--ease) both;
 }
 @keyframes live-in { from { opacity: 0; } }
-.preview__logo.is-active .live,
+.sphere__card.is-active .live,
 .sheet:target .live { --live-play: running; }
 .sheet:target .live.is-paused { --live-play: paused; }
 .live *, .live *::before, .live *::after { animation-play-state: var(--live-play) !important; }
