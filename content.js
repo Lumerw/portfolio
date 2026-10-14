@@ -38,10 +38,13 @@ export const shared = {
   imageWidths: [640, 1280, 1920],
 
   // Ikony obok znaku w hero - zmieniają się szybko, każda kolejna w prawo bardziej przezroczysta.
-  // Dowolna liczba plików (SVG/PNG, kwadrat). Na razie placeholdery.
+  // Dowolna liczba plików (SVG/PNG, kwadrat). 01-06: znaki kreską 1 px.
   icons: [
     'assets/icons/01.svg', 'assets/icons/02.svg', 'assets/icons/03.svg',
     'assets/icons/04.svg', 'assets/icons/05.svg', 'assets/icons/06.svg',
+    // znaki pełne (paczka z października 2026) - tylko obok awatara i w brandbooku, sfera bierze 01-06
+    'assets/icons/07.svg', 'assets/icons/08.svg', 'assets/icons/09.svg', 'assets/icons/10.svg', 'assets/icons/11.svg',
+    'assets/icons/12.svg', 'assets/icons/13.svg', 'assets/icons/14.svg', 'assets/icons/15.svg', 'assets/icons/16.svg',
   ],
 
   // Rekomendacje z LinkedIna (karuzela w pętli po Portfolio): skrócony fragment w PL i EN (tłumaczenie),
@@ -82,14 +85,15 @@ export const shared = {
     ],
   },
 
-  // Firmy, z którymi pracowałem - karuzela pod indeksem. Logo najlepiej SVG, jednokolorowe.
+  // Firmy, z którymi pracowałem - karuzela obok „kontakt”. Logo SVG w jednym kolorze (#111, w trybie ciemnym
+  // odwracane), przycięte do krawędzi znaku. h = wysokość w px dobrana na oko, żeby znaki ważyły podobnie
+  // (napisy niżej, sygnety wyżej); w = h × proporcje pliku.
   clients: [
-    { name: '[firma 1]', logo: 'assets/clients/01.svg', w: 160, h: 48 },
-    { name: '[firma 2]', logo: 'assets/clients/02.svg', w: 160, h: 48 },
-    { name: '[firma 3]', logo: 'assets/clients/03.svg', w: 160, h: 48 },
-    { name: '[firma 4]', logo: 'assets/clients/04.svg', w: 160, h: 48 },
-    { name: '[firma 5]', logo: 'assets/clients/05.svg', w: 160, h: 48 },
-    { name: '[firma 6]', logo: 'assets/clients/06.svg', w: 160, h: 48 },
+    { name: 'loom.studio', logo: 'assets/clients/loom-studio.svg', w: 133, h: 20 },
+    { name: 'forkflow', logo: 'assets/clients/forkflow.svg', w: 133, h: 21 },
+    { name: '[firma - gwiazdka]', logo: 'assets/clients/asterisk.svg', w: 29, h: 28 },
+    { name: 'freshly', logo: 'assets/clients/freshly.svg', w: 92, h: 28 },
+    { name: '[firma - trzepaczka]', logo: 'assets/clients/whisk.svg', w: 28, h: 30 },
   ],
 
   // Projekt:
@@ -245,6 +249,7 @@ export const pl = {
     work: 'Portfolio',               // tytuł sekcji z linkami
     sectionsLabel: 'Sekcje strony',  // nawigator przewijania (desktop)
     start: 'start',
+    nav: { start: 'intro', portfolio: 'portfolio', rekomendacje: 'rekomendacje', kontakt: 'kontakt' },   // nawigator przewijania
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
     askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
@@ -509,6 +514,7 @@ export const en = {
     work: 'Portfolio',
     sectionsLabel: 'Page sections',
     start: 'start',
+    nav: { start: 'intro', portfolio: 'portfolio', rekomendacje: 'recommendations', kontakt: 'contact' },
     contactCta: 'contact',
     askAgent: 'ask my assistant',
     recs: 'Recommendations',

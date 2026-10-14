@@ -146,7 +146,7 @@ const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hi
 function clients(c, t) {
   if (!c.clients.length) return '';
   const items = hidden => c.clients.map(k => `
-          <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" alt="${hidden ? '' : esc(clean(k.name))}" loading="lazy" decoding="async"></li>`).join('');
+          <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" style="--h:${k.h}px" alt="${hidden ? '' : esc(clean(k.name))}" loading="lazy" decoding="async"></li>`).join('');
   return `
       <section class="clients" aria-labelledby="clients-title">
         <h2 id="clients-title" class="visually-hidden">${esc(t.ui.clients)}</h2>
@@ -175,11 +175,14 @@ function avatar(c, t) {
 function hero(c, t) {
   const linkedin = c.links.find(l => l.label === 'LinkedIn');
   const liHref = linkedin ? url(linkedin.href) : '#';
-  // Trzy miejsca na ikony obok awatara. Każde ma wszystkie ikony (ładowane raz); widoczna jest jedna.
-  // Start: 0, ostatnia, przedostatnia; dalej każde miejsce zmienia się we własnym rytmie (main.js).
+  // Trzy miejsca na ikony obok awatara. W HTML tylko ikona startowa (0, ostatnia, przedostatnia);
+  // kolejne main.js dokłada do miejsca, gdy się wczytają - każde miejsce zmienia się we własnym rytmie.
   const L = c.icons.length;
-  const icons = [0, 1, 2].map(slot => `
-          <span class="hero__slot">${c.icons.map((src, k) => `<img class="hero__icon${mono(src)}${k === (L - slot) % L ? ' is-on' : ''}" src="${esc(src)}" width="40" height="40" alt="">`).join('')}</span>`).join('');
+  const icons = [0, 1, 2].map(slot => {
+    const src = c.icons[(L - slot) % L];
+    return `
+          <span class="hero__slot"><img class="hero__icon${mono(src)} is-on" src="${esc(src)}" width="40" height="40" alt=""></span>`;
+  }).join('');
   return `
   <section id="start" class="hero" aria-labelledby="hero-title">
     <div class="hero__top">${avatar(c, t)}
@@ -231,7 +234,7 @@ function sphere(c, t) {
   }).join('');
   // Znaki kreską z brandbooka (shared.icons) rozsiane między kartami - sfera „z moich linii”
   const marks = SPHERE_MARKS.map(([lon, lat], i) => {
-    const src = c.icons[i % c.icons.length];
+    const src = c.icons[i % Math.min(6, c.icons.length)];   // tylko znaki kreską 01-06
     return `
           <span class="sphere__mark" style="--lon:${lon}deg;--lat:${lat}deg"><img class="${mono(src).trim()}" src="${esc(src)}" width="40" height="40" alt=""></span>`;
   }).join('');
@@ -288,6 +291,7 @@ function sheet({ id, cls, bar, body, t }) {
 <section id="${id}" class="sheet ${cls}" role="dialog" aria-modal="true" aria-labelledby="${id}-title">
   <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
   <div class="sheet__panel">
+    <span class="sheet__grab" aria-hidden="true"></span>
     <div class="sheet__bar wrap">${bar}
       <a class="sheet__close" href="#start" data-close aria-label="${esc(t.ui.close)}"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
     </div>
@@ -562,11 +566,12 @@ function footer(c, t) {
 </footer>`;
 }
 
-// Nawigator przewijania (desktop): pionowa linia 1 px z numerami sekcji, aktywna z nazwą; klik przewija.
-// Zastępuje systemowy pasek przewijania strony (main.js: aktywna sekcja i postęp).
+// Nawigator przewijania (desktop): pionowa linia 1 px z kółkami i nazwami sekcji (intro, portfolio…);
+// gdy obok sfery brakuje miejsca - same numery. Klik przewija. Zastępuje systemowy pasek przewijania
+// strony (main.js: aktywna sekcja i postęp).
 function scrollnav(c, t) {
-  const items = [['start', t.ui.start], ['portfolio', t.ui.work],
-    ...((c.recommendations ?? []).some(r => clean(r.name)) ? [['rekomendacje', t.ui.recs]] : []), ['kontakt', t.contact.title]];
+  const ids = ['start', 'portfolio', ...((c.recommendations ?? []).some(r => clean(r.name)) ? ['rekomendacje'] : []), 'kontakt'];
+  const items = ids.map(id => [id, t.ui.nav[id]]);
   return `
 <nav class="scrollnav" aria-label="${esc(t.ui.sectionsLabel)}">
   <span class="scrollnav__line" aria-hidden="true"><span class="scrollnav__fill"></span></span>

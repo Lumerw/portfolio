@@ -254,7 +254,8 @@ async function openBooking(sheet) {
 }
 
 /* Ikony (obok awatara i w brandbooku): każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
-   i nigdy nie pokazuje tej samej ikony co sąsiad. Hero: w miejscu leżą wszystkie ikony, widoczna ma .is-on.
+   i nigdy nie pokazuje tej samej ikony co sąsiad. Hero: w miejscu zbierają się ikony (dokładane przy pierwszym
+   użyciu, pokazywane dopiero po wczytaniu - bez mignięcia), widoczna ma .is-on.
    Brandbook: jedno <img> na miejsce, zmienia się src. Każdy zestaw rusza tylko, gdy go widać. */
 const ICON_MS = [500, 1100];
 const ICON_SETS = [
@@ -262,7 +263,15 @@ const ICON_SETS = [
     sel: '.hero__slot',
     live: () => !openSheet(),
     get: slot => slot.querySelector('.is-on')?.getAttribute('src'),
-    set: (slot, src) => { for (const img of slot.children) img.classList.toggle('is-on', img.getAttribute('src') === src); },
+    set: (slot, src) => {
+      let next = [...slot.children].find(img => img.getAttribute('src') === src);
+      if (!next) {
+        next = Object.assign(new Image(40, 40), { className: `hero__icon${src.endsWith('.svg') ? ' mono' : ''}`, src, alt: '' });
+        slot.append(next);
+      }
+      const show = () => { for (const img of slot.children) img.classList.toggle('is-on', img === next); };
+      if (next.complete) show(); else next.addEventListener('load', show, { once: true });
+    },
   },
   {
     sel: '[data-bb-icon]',
@@ -305,6 +314,30 @@ function close() {
 }
 
 addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+/* Telefon: panel asystenta zsuwa się palcem - za kreskę u góry albo pasek z tytułem.
+   Ponad 80 px albo szybki ruch w dół zamyka; krócej - panel wraca na miejsce. */
+app.addEventListener('pointerdown', e => {
+  const handle = e.target.closest('.sheet--agent .sheet__grab, .sheet--agent .sheet__bar');
+  if (!handle || e.pointerType === 'mouse' || e.target.closest('a, button') || innerWidth >= 768) return;
+  const panel = handle.closest('.sheet__panel');
+  const y0 = e.clientY, t0 = performance.now();
+  let dy = 0;
+  panel.style.transition = 'none';
+  const move = ev => { dy = Math.max(0, ev.clientY - y0); panel.style.transform = `translateY(${dy}px)`; };
+  const up = () => {
+    removeEventListener('pointermove', move);
+    removeEventListener('pointerup', up);
+    removeEventListener('pointercancel', up);
+    panel.style.transition = '';
+    const shut = dy > 80 || dy / (performance.now() - t0) > 0.6;
+    panel.style.transform = shut ? 'translateY(100%)' : '';
+    if (shut) { close(); setTimeout(() => { panel.style.transform = ''; }, 600); }
+  };
+  addEventListener('pointermove', move);
+  addEventListener('pointerup', up);
+  addEventListener('pointercancel', up);
+});
 
 /* Nawigator sekcji (desktop): aktywna sekcja = ta, której środek jest najbliżej środka ekranu;
    linia wypełnia się wraz z przewijaniem. Klik w sekcję (i „kontakt” w hero) przewija bez zmiany adresu. */

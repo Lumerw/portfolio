@@ -490,7 +490,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 }
 .clients__marquee:hover .clients__track { animation-play-state: paused; }
 .clients__list { display: flex; align-items: center; gap: var(--s-5); padding-right: var(--s-5); }
-.clients__list img { height: 32px; width: auto; }
+.clients__list img { height: var(--h, 24px); width: auto; flex: none; }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
 
@@ -1403,11 +1403,15 @@ html:has(.sheet:target) { overflow: hidden; }
 .site-footer__contact { grid-area: contact; display: grid; gap: var(--s-2); }
 /* „umów rozmowę” + „zapytaj asystenta AI”: telefon - jeden pod drugim, od 768 px obok siebie */
 .site-footer__actions { grid-area: button; display: grid; gap: var(--s-2); }
-@media (min-width: 768px) { .site-footer__actions { display: flex; flex-wrap: wrap; } }
+@media (min-width: 768px) {
+  .site-footer__actions { display: flex; flex-wrap: wrap; }
+  .site-footer__actions > * { flex: none; width: 15em; }   /* oba przyciski tej samej szerokości, obok siebie lub jeden pod drugim */
+}
 .site-footer__agent { gap: var(--s-1); }
 @media (min-width: 400px) { .site-footer .mail { white-space: nowrap; } }   /* przy 320 px adres może się złamać */
 .site-footer__button { gap: var(--s-1); }
-/* Nawigator sekcji (desktop): linia 1 px z kółkami jak znak; aktywne kółko wypełnione, obok numer i nazwa.
+/* Nawigator sekcji (desktop): linia 1 px z kółkami jak znak; aktywne kółko wypełnione, aktywna nazwa tuszem.
+   Szeroko: nazwy sekcji (intro, portfolio…). Węziej (nazwy weszłyby na sferę): same numery 01-04.
    Linia wypełnia się tuszem wraz z przewijaniem (--p z main.js). */
 .scrollnav { display: none; }
 @media (min-width: 1024px) {
@@ -1415,12 +1419,15 @@ html:has(.sheet:target) { overflow: hidden; }
   .scrollnav ol { position: relative; display: grid; gap: var(--s-4); }
   .scrollnav__line { position: absolute; right: 4px; top: 4px; bottom: 4px; width: 1px; background: var(--hair); }
   .scrollnav__fill { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--p, 0) * 100%); background: var(--ink); }
-  .scrollnav a { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: var(--s-1); padding-right: 20px; min-height: 24px; color: var(--ink-3); }
+  .scrollnav a { position: relative; display: flex; align-items: center; justify-content: flex-end; padding-right: 20px; min-height: 24px; color: var(--ink-3); transition: color var(--t-line) var(--ease); }
   .scrollnav a::after { content: ""; position: absolute; right: 0; top: 50%; width: 9px; height: 9px; translate: 0 -50%; border: var(--hairline) solid var(--ink-3); border-radius: 50%; background: var(--paper); transition: background-color var(--t-line) var(--ease), border-color var(--t-line) var(--ease); }
-  .scrollnav__label { font-size: var(--fs-meta); opacity: 0; translate: 4px 0; transition: opacity var(--t-line) var(--ease), translate var(--t-line) var(--ease); white-space: nowrap; }
+  .scrollnav__label { display: none; font-size: var(--fs-meta); white-space: nowrap; }
   .scrollnav a:hover, .scrollnav a[aria-current="true"] { color: var(--ink); }
   .scrollnav a:hover::after, .scrollnav a[aria-current="true"]::after { background: var(--ink); border-color: var(--ink); }
-  .scrollnav a:hover .scrollnav__label, .scrollnav a[aria-current="true"] .scrollnav__label { opacity: 1; translate: 0 0; }
+}
+@media (min-width: 1600px) {   /* od tej szerokości nazwy mieszczą się obok sfery (PL i EN, odstęp ≥ 60 px) */
+  .scrollnav__label { display: inline; }
+  .scrollnav__no { display: none; }
 }
 
 /* Pasek na samym dole strony: profile i ©. Desktop: profile pod treścią, © pod sferą. */
@@ -1595,6 +1602,16 @@ html:has(.sheet:target) { overflow: hidden; }
 .agent-face { position: relative; isolation: isolate; flex: none; width: 32px; height: 32px; border-radius: 50%; }
 .agent-face::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: 50%; background: var(--rainbow); filter: blur(6px); opacity: .8; animation: agent-spin 6s linear infinite; }
 .agent-face img { display: block; width: 100%; height: 100%; border-radius: 50%; background: #FFFFFF; }
+
+/* Telefon: nad asystentem więcej przyciemnienia (klik w nie zamyka), u góry panelu kreska-uchwyt -
+   panel można zsunąć palcem (main.js). Pozostałe panele bez uchwytu. */
+.sheet__grab { display: none; }
+@media (max-width: 767px) {
+  .sheet--agent { --sheet-top: 22svh; }
+  .sheet--agent .sheet__grab { display: block; position: absolute; z-index: 1; inset: 0 0 auto; height: var(--s-3); touch-action: none; }
+  .sheet--agent .sheet__grab::before { content: ""; position: absolute; left: 50%; top: 10px; width: 40px; height: 3px; translate: -50% 0; background: var(--ink-4); }
+  .sheet--agent .sheet__bar { touch-action: none; padding-top: var(--s-3); }
+}
 
 /* Panel: jak wszystkie panele - wysuwa się od dołu na całą szerokość; czat w kolumnie do czytania */
 .sheet--agent .sheet__body { display: flex; flex-direction: column; overflow: hidden; padding-block: var(--s-1) var(--s-3); }
