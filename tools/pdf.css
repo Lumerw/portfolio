@@ -1,0 +1,130 @@
+/* PDF portfolio (tools/build-pdf.mjs): 16:9 (1920 × 1080, desktop) i 9:16 (1080 × 1920, telefon),
+   motyw jasny i ciemny - te same tokeny co strona. Strony: okładka, projekty (kadr 4:5 + opis jak panel
+   projektu na stronie), kontakt (jak sekcja Kontakt, sfera przycięta krawędzią). */
+:root {
+  --paper: #FAFAF7;
+  --ink: #111111;
+  --ink-2: #6E6E6A;
+  --ink-3: #73736E;
+  --hair: rgba(17, 17, 17, .14);
+  --line: rgba(17, 17, 17, .22);
+  --rainbow: conic-gradient(#FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D);
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+:root[data-theme="dark"] {
+  --paper: #000000;
+  --ink: #EDEDE8;
+  --ink-2: #A3A39E;
+  --ink-3: #8C8C87;
+  --hair: rgba(237, 237, 232, .16);
+  --line: rgba(237, 237, 232, .26);
+}
+:root[data-fmt="16x9"] { --W: 1920px; --H: 1080px; --m: 96px; }
+:root[data-fmt="9x16"] { --W: 1080px; --H: 1920px; --m: 72px; }
+/* @page { size } wstawia build-pdf.mjs (zmienne nie działają w @page) */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--paper); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+img { display: block; }
+.link-u { border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+.meta { color: var(--ink-3); }
+.muted { color: var(--ink-2); }
+
+.page {
+  position: relative;
+  width: var(--W);
+  height: var(--H);
+  padding: var(--m);
+  overflow: hidden;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { break-after: auto; }
+
+/* Sfera: kreska 1 px, przycięta krawędzią strony */
+.sphere { position: absolute; pointer-events: none; color: var(--ink); }
+.sphere path, .sphere circle { fill: none; stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.sphere .ring { opacity: .12; }
+.sphere .ring--eq { opacity: .22; }
+.sphere .rim { opacity: .2; }
+
+/* Przyciski: główny pełny tuszem, drugi z ramką */
+.buttons { display: flex; flex-wrap: wrap; gap: 20px; }
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-width: 340px;
+  height: 84px;
+  padding-inline: 40px;
+  border: 1.5px solid var(--ink);
+  font-size: 28px;
+}
+.button--primary { background: var(--ink); color: var(--paper); }
+.button svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+.dot { width: 22px; height: 22px; border-radius: 50%; background: var(--rainbow); flex: none; }
+
+/* ---------- Okładka ---------- */
+.cover__avatar { position: relative; isolation: isolate; width: 200px; height: 200px; border-radius: 50%; }
+.cover__avatar::before,
+.cover__avatar::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; background: var(--rainbow); }
+.cover__avatar::before { inset: -4px; }
+.cover__avatar::after { inset: -6px; filter: blur(22px); opacity: .7; }
+.cover__avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff; }
+.cover__text { margin-top: auto; max-width: 1100px; }
+.cover__name { display: flex; align-items: center; gap: 16px; font-size: 32px; }
+.cover__name svg { width: 30px; height: 30px; fill: none; stroke: var(--ink-2); stroke-width: 1; }
+.cover__title { margin-top: 28px; font-size: 84px; line-height: 1.05; font-weight: 500; letter-spacing: -.02em; }
+.cover__line { margin-top: 32px; font-size: 32px; line-height: 1.5; color: var(--ink-2); max-width: 28em; }
+.cover .buttons { margin-top: 56px; }
+.cover__foot { margin-top: 64px; display: flex; gap: 40px; font-size: 22px; color: var(--ink-3); }
+
+/* ---------- Projekt: kadr 4:5 + opis (jak panel projektu na stronie) ---------- */
+.bar { display: flex; align-items: center; gap: 18px; font-size: 22px; color: var(--ink-3); height: 40px; flex: none; }
+.bar img { width: 32px; height: 32px; object-fit: contain; }
+.bar__right { margin-left: auto; }
+.pj { flex: 1; min-height: 0; display: grid; margin-top: 40px; }
+.pj__media { position: relative; }
+.pj__media img { width: 100%; height: 100%; object-fit: cover; }
+.pj__media::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px var(--hair); }
+.pj__title { font-size: 64px; line-height: 1.05; font-weight: 500; letter-spacing: -.02em; }
+.pj__tagline { margin-top: 20px; font-size: 28px; line-height: 1.4; }
+.pj__lead { margin-top: 16px; font-size: 24px; line-height: 1.55; color: var(--ink-2); }
+.pj__rows { margin-top: 40px; border-top: 1px solid var(--hair); }
+.pj__row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding-block: 20px; border-bottom: 1px solid var(--hair); font-size: 22px; line-height: 1.5; }
+.pj__row dt { color: var(--ink-3); font-size: 18px; padding-top: 3px; }
+.dash li { padding-left: 1.1em; text-indent: -1.1em; }
+.dash li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
+.pj__link { margin-top: 36px; font-size: 24px; }
+
+/* 16:9: kadr po lewej na całą wysokość, opis obok */
+:root[data-fmt="16x9"] .pj { grid-template-columns: auto minmax(0, 1fr); gap: 96px; align-items: center; }
+:root[data-fmt="16x9"] .pj__media { height: calc(var(--H) - 2 * var(--m) - 80px); aspect-ratio: 4 / 5; }
+:root[data-fmt="16x9"] .pj__info { max-width: 900px; }
+/* 9:16: kadr na całą szerokość, opis pod spodem */
+:root[data-fmt="9x16"] .pj { grid-template-rows: auto minmax(0, 1fr); gap: 32px; align-content: start; margin-top: 28px; }
+:root[data-fmt="9x16"] .pj__media { width: 100%; aspect-ratio: 4 / 5; }
+:root[data-fmt="9x16"] .pj__title { font-size: 52px; }
+:root[data-fmt="9x16"] .pj__tagline { font-size: 26px; margin-top: 14px; }
+:root[data-fmt="9x16"] .pj__lead { font-size: 22px; margin-top: 10px; }
+:root[data-fmt="9x16"] .pj__rows { margin-top: 24px; }
+:root[data-fmt="9x16"] .pj__row { grid-template-columns: 170px minmax(0, 1fr); padding-block: 10px; font-size: 20px; }
+:root[data-fmt="9x16"] .pj__link { margin-top: 18px; }
+
+/* ---------- Kontakt (jak sekcja Kontakt na stronie) ---------- */
+.contact { margin-block: auto; position: relative; z-index: 1; }
+.contact__title { font-size: 72px; font-weight: 500; letter-spacing: -.02em; }
+.contact__mail { margin-top: 48px; font-size: 36px; }
+.contact .buttons { margin-top: 56px; }
+.contact__foot { position: relative; z-index: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 32px; font-size: 22px; }
+.contact__links { display: flex; flex-wrap: wrap; }
+.contact__links li + li::before { content: "·"; padding-inline: 14px; color: var(--ink-3); }
+.contact__links a { border-bottom: 1px solid var(--hair); }
+.contact__copy { color: var(--ink-3); }
+:root[data-fmt="9x16"] .contact .buttons { flex-direction: column; align-items: flex-start; }
+:root[data-fmt="9x16"] .contact .button { min-width: 520px; }
+:root[data-fmt="9x16"] .contact__foot { flex-direction: column; align-items: flex-start; gap: 20px; }

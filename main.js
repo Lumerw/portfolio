@@ -372,6 +372,17 @@ if (steps.length && pLine) {
   queue();
 }
 
+/* PDF do pobrania (indeks i czat): telefon albo ekran pionowy z dotykiem → 9:16, inaczej 16:9;
+   motyw strony (jasny / ciemny) → plik z białym albo czarnym tłem. Nazwy jak w tools/build-pdf.mjs (pdfName).
+   Bez JS zostaje adres bazowy: 16:9, jasny. */
+const pdfVariant = base => base.replace(/\.pdf$/, `${matchMedia('(max-width: 767px), (orientation: portrait) and (pointer: coarse)').matches ? '-9x16' : ''}${isDark() ? '-dark' : ''}.pdf`);
+app.addEventListener('click', e => {
+  const a = e.target.closest('a[download][href$=".pdf"]');
+  if (!a) return;
+  a.dataset.pdf ??= a.getAttribute('href');
+  a.setAttribute('href', pdfVariant(a.dataset.pdf));
+}, true);
+
 /* Pasek na dole (desktop): prawa krawędź © = prawa krawędź podpisu pod sferą (oba w kolumnie sfery, podpis
    wyśrodkowany - wystarczy jego szerokość). Bez JS © stoi wyśrodkowane. */
 const hint = app.querySelector('.sphere__hint'), copy = app.querySelector('.colophon__copy');

@@ -15,7 +15,7 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 | `npm run dev` | serwer podglądu; zmiany w `content.js` widać po odświeżeniu |
 | `npm run build` | wpisuje polską treść z `content.js` do `index.html` (strona działa bez JS, szybciej się ładuje). **Przed wdrożeniem.** |
 | `npm run images` | AVIF/WebP/JPG 640/1280/1920 z obrazów `.jpg`/`.png` wpisanych w `content.js`; portret od razu w duotonie |
-| `npm run pdf` | `portfolio-lumer-pl.pdf` i `-en.pdf` + QR; sprawdza 5 stron i rozmiar < 8 MB |
+| `npm run pdf` | PDF do pobrania, po 4 na język: `portfolio-lumer-<pl|en>.pdf` (16:9, jasny), `-dark.pdf` (16:9, ciemny), `-9x16.pdf` i `-9x16-dark.pdf` (telefon); własny szablon `tools/pdf.css`, kadry projektów zrzucane z paneli strony do `private/pdf/`; sprawdza 5 stron, kadr i rozmiar < 8 MB |
 | `npm run covers` | plansze marek na stronę (`cover-4x5/16x9/9x16.webp` dla projektów z polem `cover`) i obrazy case study do PDF A4 (`01-03.jpg` ze zrzutów i planszy); potem `npm run images` |
 | `npm run cv` | CV na jedną stronę 1080 × 1080 (PL i EN) do wysyłania → `private/` (poza repozytorium); projekty, doświadczenie, kompetencje, narzędzia, kontakt z Calendly i QR |
 | `npm run deck` | `portfolio-lumer-1080-pl.pdf` i `-en.pdf`: karuzela 1080 × 1080 na LinkedIn / Instagram (8 slajdów, klikalny spis i linki); sprawdza liczbę stron, kadr i linki |
@@ -207,14 +207,14 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 | `content.js` | cała treść: `shared`, `pl`, `en` |
 | `render.js` | szablony HTML — wspólne dla przeglądarki i buildu |
 | `styles.css` | tokeny na górze, potem reset, siatka, typografia, komponenty, ruch |
-| `print.css` | PDF: A4 poziomo, 5 stron |
+| `print.css` | wydruk strony z przeglądarki (A4 poziomo); PDF do pobrania ma własny szablon `tools/pdf.css` |
 | `main.js` | PL/EN, indeks ↔ sfera, panele, ikony brandbooka, wideo, kopiowanie maila, czat asystenta, wstawianie grafik interaktywnych |
 | `sphere.js` | ruch sfery: przeciąganie, bezwładność, samoczynny obrót, obrót do karty |
 | `live.js` | grafiki interaktywne loom.studio i reh.ab (znaczniki + gradient WebGL i fizyka figur) |
 | `agent.js` | silnik asystenta AI: odpowiedzi lokalne, wiedza i instrukcja dla modelu, zapytanie do Workera |
 | `agent/` | Cloudflare Worker (pośrednik do Claude API) i jego konfiguracja |
 | `symbols.js` | geometria symboli — jedno źródło dla strony i plików SVG |
-| `tools/` | serwer, build, PDF (A4 i 1080 × 1080), QR, OG, obrazy, assety, audyt, zrzuty |
+| `tools/` | serwer, build, PDF (16:9 / 9:16, jasny / ciemny i 1080 × 1080), QR, OG, obrazy, assety, audyt, zrzuty |
 | `assets/deck/` | zrzuty stron projektów i assety marek do PDF 1080 × 1080 |
 
 ## Decyzje odbiegające od briefu
@@ -229,7 +229,8 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 - **CV poza repozytorium:** `npm run cv` zapisuje do `private/` (w `.gitignore`) - CV jest do wysyłania, nie do publikacji.
 - **Tęczowa poświata asystenta AI** (decyzja właściciela, 13.10.2026) - jedyny kolor marki osobistej, zapisany jako wyjątek w brandbooku. Gradient obraca się przez `transform` (bez przemalowywania), przy ograniczonym ruchu stoi. Od 14.10.2026 poświata jest na awatarze w hero (przycisk „zapytaj AI” usunięty).
 - **Marka czarno-biała:** bez koloru akcentu (zamiast czerwonej/niebieskiej kropki z briefu). Kropka w znaku osobistym ma kolor tuszu; aktywny wiersz indeksu oznacza tylko podkreślenie. Kolory mają wyłącznie marki projektów (np. teraz).
-- **PDF:** strona drukowana ma margines 0, a 14 mm to wewnętrzny odstęp (inaczej Chrome zostawia białe marginesy zamiast papieru). Kolejność stron ustawia `order` w `print.css`.
+- **PDF do pobrania** (decyzja właściciela, 15.10.2026): telefon albo ekran pionowy z dotykiem dostaje 9:16 (1080 × 1920), reszta 16:9 (1920 × 1080); motyw strony wybiera tło (jasne / czarne) - `pdfVariant()` w `main.js` podmienia adres przy kliknięciu, bez JS zostaje 16:9 jasny. Strony: okładka (awatar z tęczową poświatą, hasło, „kontakt” → mail, „umów rozmowę” → Cal.com, zarys sfery w rogu), 3 projekty (kadr 4:5 + opis jak panel projektu), kontakt (sfera przycięta krawędzią).
+- **Wydruk strony (print.css):** strona drukowana ma margines 0, a 14 mm to wewnętrzny odstęp (inaczej Chrome zostawia białe marginesy zamiast papieru). Kolejność stron ustawia `order` w `print.css`.
 - **Format panelu: 4:5 wszędzie** (decyzja właściciela, 15.10.2026): ten sam kadr co karta na sferze, obok opis projektu. Wcześniejsze 16:9 / 9:16 zostają tylko w danych (`video`, `cover`).
 - **Plansza teraz: Open Sans - krój marki teraz** (decyzja właściciela). Open Sans 3.003 (to samo wydanie co na teraz.eu), okrojony do znaków PL/EN (3 × ~11 KB: 400, 600, 700, `assets/fonts/`), hostowany lokalnie, licencja SIL OFL 1.1 w `assets/fonts/OFL.txt`. Wagi i odstępy jak w teraz: 700 + `tracking-tight` (-.025em) dla hasła i nagłówków, 600 + odstęp 0 dla pigułek, chipów, legendy i podpisów, 400 dla opisów. `font-display: block` + preload 700 i 600 na desktopie (`renderMeta` w `render.js`) - plansza nigdy nie pokazuje zastępczej Helvetiki. Na telefonie zamknięty panel ma `content-visibility: hidden`, więc fonty pobierają się dopiero przy otwarciu `#teraz`. Po zmianie zestawu znaków: `python3 tools/subset-fonts.py <OpenSans-Regular> <OpenSans-Bold> <OpenSans-SemiBold>` (wymaga `pip install fonttools brotli`). Reszta portfolio zostaje w Helvetice.
 - **EN: „listener”** (decyzja właściciela; teraz.eu używa „learner”). Zmiana terminu = 4 klucze w `en.projects.teraz.reel` (`listener`, `listeners`, `callTitle`, `label`) + `en.projects.teraz.lead`. PL lead: najpierw słuchacze, potem eksperci („łącząca słuchaczy z ekspertami”; brief miał odwrotnie) - ta sama kolejność w `reel.label`. EN: „Escrow” wielką literą, jak w teraz („payment via Escrow”).
