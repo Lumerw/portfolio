@@ -91,11 +91,11 @@ export const shared = {
   // (napisy niżej, sygnety wyżej); w = h × proporcje pliku.
   clients: [
     { name: 'promotraffic', logo: 'assets/clients/promotrafic.svg', w: 96, h: 28 },
-    { name: 'loom.studio', logo: 'assets/clients/loom-studio.svg', w: 133, h: 20 },
     { name: 'forkflow', logo: 'assets/clients/forkflow.svg', w: 133, h: 21 },
-    { name: '[firma - gwiazdka]', logo: 'assets/clients/asterisk.svg', w: 29, h: 28 },
-    { name: 'freshly', logo: 'assets/clients/freshly.svg', w: 92, h: 28 },
     { name: '[firma - trzepaczka]', logo: 'assets/clients/whisk.svg', w: 28, h: 30 },
+    { name: 'Youniversity', logo: 'assets/clients/youniversity.svg', w: 146, h: 22 },   // logo ze strony youniversity.be
+    { name: 'WeedWeek', logo: 'assets/clients/weedweek.svg', w: 126, h: 26 },
+    { name: 'freshly', logo: 'assets/clients/freshly.svg', w: 92, h: 28 },
   ],
 
   // Projekt:

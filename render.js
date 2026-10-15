@@ -154,7 +154,7 @@ const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hi
 function clients(c, t) {
   if (!c.clients.length) return '';
   const items = hidden => c.clients.map(k => `
-          <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" style="--h:${k.h}px" alt="${hidden ? '' : esc(clean(k.name))}" loading="lazy" decoding="async"></li>`).join('');
+          <li><img class="${mono(k.logo).trim()}" src="${esc(k.logo)}" width="${k.w}" height="${k.h}" style="--h:${k.h}px" alt="${hidden ? '' : esc(clean(k.name))}" decoding="async" fetchpriority="low"></li>`).join('');
   return `
       <section class="clients" aria-labelledby="clients-title">
         <h2 id="clients-title" class="visually-hidden">${esc(t.ui.clients)}</h2>
