@@ -165,6 +165,15 @@ function redraw(el) {
   el.classList.add('is-drawing');
 }
 
+// Tryb logo: najechanie na logo na sferze - karta w jego miejscu gra od początku
+app.addEventListener('pointerover', e => {
+  const card = e.target.closest('.home__sphere:not(.is-cards) .sphere__card');
+  if (!card || card.contains(e.relatedTarget)) return;
+  const media = card.querySelector('.sphere__media');
+  restartReel(media);
+  showLive(media, card.dataset.project);
+});
+
 const onIndex = e => {
   const row = e.target.closest('.index__row[data-project]');
   if (row) activate(row.dataset.project);
@@ -393,6 +402,13 @@ function syncScrollnav() {
   }
   for (const a of nav.querySelectorAll('[data-section]')) {
     if (a === best) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+  }
+  // Sfera: w sekcji Portfolio karty projektów, w pozostałych same logo (karta po najechaniu)
+  const cards = best?.dataset.section === 'portfolio';
+  const sph = app.querySelector('.home__sphere');
+  if (sph && sph.classList.contains('is-cards') !== cards) {
+    sph.classList.toggle('is-cards', cards);
+    if (cards) { const m = app.querySelector(`.sphere__card[data-project="${active}"] .sphere__media`); restartReel(m); showLive(m, active); }
   }
 }
 let navRaf = 0;

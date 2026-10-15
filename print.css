@@ -179,3 +179,8 @@ a { text-decoration: none; }
 /* © na dole strony kontaktu (poza siatką kontaktu) */
 .site-footer__in { flex: 1; }
 .site-footer__copy { padding: 0; }
+
+/* Panel projektu: w PDF tylko nazwa i link (opis i grafika na stronie, case study niżej) */
+.pj { display: block !important; }
+.pj__media, .pj__tagline, .pj__lead, .pj__rows { display: none !important; }
+.pj__info { display: flex; flex-direction: row; align-items: baseline; justify-content: space-between; max-width: none; }

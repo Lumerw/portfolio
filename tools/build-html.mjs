@@ -38,10 +38,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // limity znaków (dłuższy tekst wyjdzie poza kadr na telefonie). Błąd przerywa build, limit tylko ostrzega.
   const REEL_MAX = {
     listener: 12, expert: 12, listeners: 14, experts: 14,
-    listenerShort: 20, expertShort: 20, callShort: 20,
-    need1: 22, need2: 22, need3: 22,
-    expertLine: 40, listenerSub: 40, expertSub: 40,
-    callTitle: 36, call: 32, label: 320,
+    stepL: 30, stepE: 30, community: 24, subL: 54, subE: 54, communitySub: 60,
+    callTitle: 36, call: 32, label: 340,
   };
   const errors = [];
   for (const p of content.shared.projects.filter(p => p.reel)) {

@@ -125,6 +125,8 @@ export const shared = {
       // mono: false - kolorowe, nie odwracaj w trybie ciemnym.
       logo:   { src: 'assets/teraz/wordmark-white.svg', w: 575, h: 178, mono: false },
       sygnet: { src: 'assets/teraz/sygnet.svg', mono: false },
+      // Logo na sferze (strona główna, poza sekcją Portfolio): jednokolorowe, tuszem
+      sphereLogo: { src: 'assets/teraz/wordmark-ink.svg', w: 575, h: 178, size: .6 },
       // Tło podglądu w stylu marki: czerń + animowana aurora (gradienty z teraz.eu, 26 s).
       brand: {
         bg: '#000000',
@@ -137,6 +139,8 @@ export const shared = {
         '9x16': { src: '', poster: 'assets/teraz/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” (dopóki nie ma src)
+      // Narzędzia i technologie (panel projektu) - z repozytorium projektu
+      tools: ['React', 'TypeScript', 'Tailwind CSS', 'Supabase', 'Stripe', 'Daily.co', 'Cloudflare'],
       href: 'https://teraz.eu',      // testowo
       images: {
         main:    { src: 'assets/teraz/01.jpg',      w: 1600, h: 1000 },
@@ -155,8 +159,10 @@ export const shared = {
       // Logo (Haus w krzywych) i sygnet - trzy figury Bauhausu - z brand kitu loom.studio (repozytorium loomstudio)
       logo:   { src: 'assets/loom/logo.svg', w: 453, h: 70 },
       sygnet: { src: 'assets/loom/sygnet.svg', mono: false },
+      sphereLogo: { src: 'assets/loom/logo.svg', w: 453, h: 70, size: .78 },
       // Grafika interaktywna (live.js): gradient z hero loom.studio + pływające figury, bez logo i napisów.
       live: true,
+      tools: ['Figma', 'Next.js', 'TypeScript', 'Tailwind CSS', 'WebGL', 'Stripe', 'Claude API'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
       cover: { '4x5': 'assets/loom/cover-4x5.webp', '16x9': 'assets/loom/cover-16x9.webp', '9x16': 'assets/loom/cover-9x16.webp' },
       video: {
@@ -181,18 +187,19 @@ export const shared = {
       symbol: 'rehab',
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/rehab/sygnet.png', mono: false },   // favicon reh.ab: „her” na czerwieni
+      sphereLogo: { src: 'assets/rehab/logo-her.svg', w: 48, h: 48, size: .5 },   // to samo „her” (odwrócone), tuszem
       // Grafika interaktywna (live.js): hero reh.ab 1:1 w pętli. Tekst marki - po angielsku w obu wersjach.
       live: {
         title: ['Make an', 'impact', 'toget', 'her', '.'],   // „impact” i „toget” przygasają, za „her” poświata
         lede: [
-          ['An estimated 40% of the world\'s population plays games online.', '1'],
-          ['In Europe, more than half of people aged 6-64 play video games.', '2'],
+          ['40% of the world plays games online.', '1'],
           ['Gaming is one of the biggest social spaces on earth - and one of the least supported.'],
         ],
         ticker: ['data.', 'vision.', 'tools - put to use.'],
         quotes: ['this is more helpful than you think', 'we made the safe space you needed', 'someone who gets it is usually online', 'you\'re not alone in this lobby'],
         avatars: ['assets/rehab/live/p1.svg', 'assets/rehab/live/p2.svg', 'assets/rehab/live/p3.svg'],
       },
+      tools: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
       cover: { card: 'assets/rehab/cover-card.webp', '4x5': 'assets/rehab/cover-4x5.webp', '16x9': 'assets/rehab/cover-16x9.webp', '9x16': 'assets/rehab/cover-9x16.webp' },
       video: {
@@ -234,6 +241,8 @@ export const pl = {
     education: 'Edukacja',
     languages: 'Języki',
     tools: 'Narzędzia',
+    scope: 'Zakres',               // panel projektu
+    highlights: 'Najważniejsze',   // panel projektu: punkty z deck.projects.<id>.facts
     contact: 'Kontakt',
     copy: 'kopiuj adres',
     copied: 'skopiowano',
@@ -272,26 +281,24 @@ export const pl = {
       meta: ['projekt produktu', 'UX/UI', 'identyfikacja', 'development z AI'], // [potwierdź]
       tagline: 'marketplace ekspertów dla branży kreatywnej', // krótki opis pod podglądem
       lead: 'Platforma typu marketplace łącząca słuchaczy z ekspertami, z sekcją społeczności.',
-      // Plansza animowana (reel, 8 s). Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
+      // Plansza animowana (reel, 15 s): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat.
+      // Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
       reel: {
-        label: 'teraz - rozmowy wideo 1:1 słuchaczy z ekspertami branży kreatywnej. Słuchacz przychodzi po przegląd portfolio, feedback do projektu albo plan na karierę, a odpowiada mu ekspert z 5+ lat praktyki. Wideo 30 albo 60 minut. Darmowe konto, płatność przez Escrow, 0% prowizji w becie. Porozmawiajmy tu i teraz.',
+        label: 'teraz - najpierw jesteś słuchaczem: dostajesz wiedzę od najlepszych ekspertów branży kreatywnej, od razu. Potem sam stajesz się ekspertem: dzielisz się wiedzą i zarabiasz na rozmowach. Jedna społeczność słuchaczy i ekspertów, rozmowy wideo 1:1, 30 albo 60 minut. Porozmawiajmy tu i teraz.',
+        stepL: 'Najpierw jesteś słuchaczem.',
+        subL: 'Dostajesz wiedzę od najlepszych - od razu, teraz.',
+        stepE: 'Potem stajesz się ekspertem.',
+        subE: 'Dzielisz się wiedzą i zarabiasz na rozmowach.',
+        community: 'Jedna społeczność.',
+        communitySub: 'Słuchacze i eksperci - każdy może przejść na drugą stronę.',
         claimA: 'porozmawiajmy',
         claimKey: 'tu i teraz',          // z falką pod spodem
         listener: 'słuchacz',
         listeners: 'słuchacze',
-        need1: 'przegląd portfolio',
-        need2: 'feedback do projektu',
-        need3: 'plan na karierę',
-        listenerShort: 'portfolio, kariera', // telefon
-        listenerSub: 'darmowe konto, płatność przez Escrow',
         expert: 'ekspert',
         experts: 'eksperci',
-        expertLine: 'odpowiada praktyk, 5+\u00a0lat w branży', // \u00a0: „5+” nie zostaje sam na końcu linii
-        expertShort: '5+ lat praktyki',  // telefon
-        expertSub: '0% prowizji w becie',
         callTitle: 'słuchacz pyta, ekspert odpowiada',
         call: 'wideo 1:1, 30 albo 60 minut',
-        callShort: 'wideo 1:1, 30/60 min', // telefon
       },
       problem: '[Problem: 2-3 zdania.]',
       solution: '[Rozwiązanie: 2-3 zdania.]',
@@ -418,14 +425,13 @@ export const pl = {
   },
 
   // Kalendarz rezerwacji (panel #rozmowa, Cal.com)
-  // Sekcja „Jak pracuję” (między Portfolio a Rekomendacjami): 4 kroki - nazwa, jedno zdanie, co dostaje klient.
+  // Sekcja „Jak pracuję” (między Portfolio a Rekomendacjami): 3 kroki - nazwa, jedno zdanie, co dostaje klient.
   process: {
     title: 'Jak pracuję',
     get: 'Dostajesz:',
     steps: [
       { title: 'Rozmowa', text: '15 lub 30 minut online. Poznaję cel, budżet i termin.', result: 'wycenę i plan' },
-      { title: 'Kierunek', text: 'Research i odniesienia, potem 2-3 kierunki do wyboru. AI pomaga mi szybko sprawdzić więcej wariantów.', result: 'decyzję, zanim powstanie projekt' },
-      { title: 'Projekt', text: 'Identyfikacja, strona albo produkt - na prawdziwych treściach, z rundami poprawek.', result: 'gotowe pliki i system' },
+      { title: 'Projekt', text: 'Research i 2-3 kierunki do wyboru, potem projekt na prawdziwych treściach. AI pomaga mi szybko sprawdzić więcej wariantów.', result: 'gotowe pliki i system' },
       { title: 'Wdrożenie', text: 'Kod, uruchomienie i przekazanie - z instrukcją, jak to dalej rozwijać.', result: 'działającą rzecz, nie tylko makiety' },
     ],
   },
@@ -470,7 +476,7 @@ export const pl = {
       thanks: 'Proszę bardzo. Jeśli chcesz porozmawiać o współpracy, napisz do Wojciecha.',
       about: 'Ze strony:',
       projects: 'Projekty w portfolio:',
-      process: 'Współpraca wygląda tak - 4 kroki:',
+      process: 'Współpraca wygląda tak - 3 kroki:',
       open: 'otwórz projekt',
       site: 'strona projektu ↗',
       contact: 'Najszybciej mailem:',
@@ -513,6 +519,8 @@ export const en = {
     education: 'Education',
     languages: 'Languages',
     tools: 'Tools',
+    scope: 'Scope',
+    highlights: 'Highlights',
     contact: 'Contact',
     copy: 'copy address',
     copied: 'copied',
@@ -551,26 +559,23 @@ export const en = {
       meta: ['product design', 'UX/UI', 'identity', 'AI-assisted development'],
       tagline: 'marketplace of experts for the creative industry', // krótki opis pod podglądem
       lead: 'A marketplace platform connecting listeners with experts, plus a community section.',
-      // Plansza animowana (reel, 8 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
+      // Plansza animowana (reel, 15 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
-        label: 'teraz - 1:1 video calls for listeners with creative industry experts. A listener comes for a portfolio review, project feedback or a career plan, and an expert with 5+ years of practice answers. Calls last 30 or 60 minutes. Free account, payment via Escrow, 0% commission during the beta. Let’s talk here and now.',
+        label: 'teraz - first you are a listener: you get knowledge from the best creative industry experts, right away. Then you become an expert yourself: you share what you know and earn from your calls. One community of listeners and experts, 1:1 video calls, 30 or 60 minutes. Let’s talk here and now.',
+        stepL: 'First, you are a listener.',
+        subL: 'You learn from the best - right away, right now.',
+        stepE: 'Then you become an expert.',
+        subE: 'You share what you know and earn from your calls.',
+        community: 'One community.',
+        communitySub: 'Listeners and experts - anyone can switch sides.',
         claimA: 'let’s talk',            // apostrof jak u teraz („Let’s talk”)
         claimKey: 'here and now',
         listener: 'listener',
         listeners: 'listeners',
-        need1: 'portfolio review',
-        need2: 'project feedback',
-        need3: 'career plan',
-        listenerShort: 'portfolio, career',
-        listenerSub: 'free account, payment via Escrow',
         expert: 'expert',
         experts: 'experts',
-        expertLine: 'a pro answers, 5+\u00a0years in the field', // \u00a0: „5+” zostaje przy „years”
-        expertShort: '5+ yrs of practice',
-        expertSub: '0% commission during the beta',
         callTitle: 'a listener asks, an expert answers', // 1:1, jak w PL
         call: '1:1 video, 30 or 60 minutes',
-        callShort: '1:1 video, 30/60 min',
       },
       problem: '[Problem: 2-3 sentences.]',
       solution: '[Solution: 2-3 sentences.]',
@@ -699,8 +704,7 @@ export const en = {
     get: 'You get:',
     steps: [
       { title: 'Call', text: '15 or 30 minutes online. I learn the goal, budget and deadline.', result: 'a quote and a plan' },
-      { title: 'Direction', text: 'Research and references, then 2-3 directions to choose from. AI helps me test more options, faster.', result: 'a decision before the design starts' },
-      { title: 'Design', text: 'Identity, website or product - on real content, with rounds of feedback.', result: 'final files and a system' },
+      { title: 'Design', text: 'Research and 2-3 directions to choose from, then the design on real content. AI helps me test more options, faster.', result: 'final files and a system' },
       { title: 'Launch', text: 'Code, launch and handover - with notes on how to grow it further.', result: 'a working thing, not just mockups' },
     ],
   },
@@ -744,7 +748,7 @@ export const en = {
       thanks: 'You are welcome. If you would like to talk about working together, write to Wojciech.',
       about: 'From the site:',
       projects: 'Projects in the portfolio:',
-      process: 'Working together looks like this - 4 steps:',
+      process: 'Working together looks like this - 3 steps:',
       open: 'open project',
       site: 'project site ↗',
       contact: 'Email is the fastest:',

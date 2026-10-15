@@ -21,7 +21,7 @@ const PORT = Number(process.env.REEL_CHECK_PORT) || 8601;
 const BASE = `http://localhost:${PORT}/`;
 const OUT = process.env.REEL_QA_DIR || '/private/tmp/claude-501/reel-qa/check';
 const SNAP = join(OUT, 'snapshots');
-const REEL_MS = 8000;
+const REEL_MS = 15000;
 const INJECT = process.env.REEL_CHECK_INJECT || '';
 
 const args = process.argv.slice(2);
@@ -32,20 +32,20 @@ const FRAME_IDS = opt('frames')?.split(',').filter(Boolean);
 const run = key => !ONLY || ONLY.includes(key);
 
 // Czasy klatek (ms) i kadry ze specyfikacji: [szer. okna, wys. okna] → oczekiwany rozmiar reela.
-const TIMES = [0, 500, 1000, 1500, 2200, 3000, 3800, 4500, 5000, 5600, 6300, 7000, 7300, 7900];
-const FRAMES = [
+const TIMES = [0, 1000, 2200, 2800, 3500, 4500, 5900, 6600, 7600, 8800, 9600, 10800, 12200, 13200, 14000, 14600, 14900];
+const FRAMES = [   // panel projektu: zawsze kadr 4:5 (poziomo obok opisu, pionowo nad opisem)
   { id: 'sheet-768x1024', vw: 768, vh: 1024, kind: 'sheet', fmt: '4x5', size: [676, 845] },
   { id: 'sheet-1024x1366', vw: 1024, vh: 1366, kind: 'sheet', fmt: '4x5', size: [901, 1126] },
-  { id: 'sheet-1440x900', vw: 1440, vh: 900, kind: 'sheet', fmt: '16x9', size: [1243, 699] },
-  { id: 'sheet-1920x1080', vw: 1920, vh: 1080, kind: 'sheet', fmt: '16x9', size: [1280, 720] },
-  { id: 'sheet-1024x768', vw: 1024, vh: 768, kind: 'sheet', fmt: '16x9', size: [901, 507] },
-  { id: 'sheet-844x390', vw: 844, vh: 390, kind: 'sheet', fmt: '16x9', size: [564, 317], minH: 300 },
-  { id: 'sheet-667x375', vw: 667, vh: 375, kind: 'sheet', fmt: '16x9', size: [537, 302] },
-  { id: 'sheet-568x320', vw: 568, vh: 320, kind: 'sheet', fmt: '16x9', size: [439, 247], compact: true },
-  { id: 'sheet-430x932', vw: 430, vh: 932, kind: 'sheet', fmt: '9x16', size: [382, 679] },   // telefon pionowo: 9:16 na pełną wysokość panelu
-  { id: 'sheet-375x667', vw: 375, vh: 667, kind: 'sheet', fmt: '9x16', size: [276, 490] },
-  { id: 'sheet-390x664', vw: 390, vh: 664, kind: 'sheet', fmt: '9x16', size: [274, 487] },   // iPhone 14 w Safari (paski)
-  { id: 'sheet-320x568', vw: 320, vh: 568, kind: 'sheet', fmt: '9x16', size: [220, 391] },
+  { id: 'sheet-1440x900', vw: 1440, vh: 900, kind: 'sheet', fmt: '4x5', size: [559, 699] },
+  { id: 'sheet-1920x1080', vw: 1920, vh: 1080, kind: 'sheet', fmt: '4x5', size: [666, 832] },
+  { id: 'sheet-1024x768', vw: 1024, vh: 768, kind: 'sheet', fmt: '4x5', size: [454, 567] },
+  { id: 'sheet-844x390', vw: 844, vh: 390, kind: 'sheet', fmt: '4x5', size: [254, 317], minH: 300 },
+  { id: 'sheet-667x375', vw: 667, vh: 375, kind: 'sheet', fmt: '4x5', size: [242, 302] },
+  { id: 'sheet-568x320', vw: 568, vh: 320, kind: 'sheet', fmt: '4x5', size: [198, 247] },
+  { id: 'sheet-430x932', vw: 430, vh: 932, kind: 'sheet', fmt: '4x5', size: [382, 478] },
+  { id: 'sheet-375x667', vw: 375, vh: 667, kind: 'sheet', fmt: '4x5', size: [327, 409] },
+  { id: 'sheet-390x664', vw: 390, vh: 664, kind: 'sheet', fmt: '4x5', size: [342, 428] },   // iPhone 14 w Safari (paski)
+  { id: 'sheet-320x568', vw: 320, vh: 568, kind: 'sheet', fmt: '4x5', size: [272, 340] },
 ];
 const frame = id => FRAMES.find(f => f.id === id);
 
@@ -66,7 +66,7 @@ function helpers() {
   if (window.__reel) return;
   const AMB = /^(aurora|reel-drift-[ab]|reel-swell)$/;
   // Teksty ze specyfikacji, które nie mogą wejść na znaki ? i !
-  const TEXT_SEL = '.reel__pill, .reel__need, .reel__line, .reel__short, .reel__sub, .reel__claim, .reel__title, .reel__cap, .reel__legend';
+  const TEXT_SEL = '.reel__pill, .reel__head, .reel__sub, .reel__claim, .reel__title, .reel__cap, .reel__legend';
   // Elementy z własnym tłem: liczy się całe pole, nie tylko litery
   const BG_SEL = '.reel__pill, .reel__cap, .reel__legend > span, .reel__chip';
   const frames = (n = 2) => new Promise(res => { const f = () => (--n > 0 ? requestAnimationFrame(f) : res()); requestAnimationFrame(f); });
@@ -202,8 +202,8 @@ function helpers() {
     const fsi = shown.filter(i => i.fs != null);
     const minFs = fsi.length ? Math.min(...fsi.map(i => i.fs)) : null;
     for (const i of fsi) if (i.fs < 11.99) add('font', `${i.name} „${i.text}” ${i.fs.toFixed(1)} px`, i.rects);
-    // 4. Znak w nagłówku >= 72 px (4:5 i 16:9 >= 480 px, 1500-6300 ms oraz kadr stały).
-    if (!compact && (t === 'rm' || (t >= 1500 && t <= 6300)) && (!logo || logo.w < 71.5)) {
+    // 4. Znak w nagłówku >= 72 px (3200-14000 ms oraz kadr stały).
+    if (!compact && (t === 'rm' || (t >= 3200 && t <= 14000)) && (!logo || logo.w < 71.5)) {
       add('logo', `znak w nagłówku ${logo ? logo.w.toFixed(1) : 0} px`, logo ? [logo.r] : []);
     }
     // 5. Kompakt: najwyżej jeden blok roli naraz (w środku obu scen dokładnie jeden).
@@ -250,7 +250,7 @@ function helpers() {
     };
   }
 
-  // Ścieżki reela: czas 8000 ms (reel-speak 2000), opóźnienie 0, nieskończone, 0% = 100%.
+  // Ścieżki reela: czas 15000 ms (reel-speak 1500), opóźnienie 0, nieskończone, 0% = 100%.
   function loopMath(kind) {
     const reel = target(kind);
     if (!reel) return null;
@@ -271,11 +271,11 @@ function helpers() {
         if (!(tm.duration >= 14000)) issues.push(`${where}: ${tm.duration} ms (tło: min. 14 s)`);
         continue;
       }
-      const want = nm === 'reel-speak' ? 2000 : 8000;
+      const want = nm === 'reel-speak' ? 1500 : 15000;   // = REEL_MS (funkcja działa w przeglądarce)
       if (tm.duration !== want) issues.push(`${where}: czas ${tm.duration} ms, ma być ${want}`);
       if (tm.delay !== 0) issues.push(`${where}: opóźnienie ${tm.delay} ms`);
       if (tm.iterations !== Infinity) issues.push(`${where}: powtórzenia ${tm.iterations}`);
-      // reel-speak to puls 0.5 Hz (pierścień ma krycie 0 poza rozmową) - z założenia wraca skokiem; 4 pulsy = 1 pętla.
+      // reel-speak to puls (pierścień ma krycie 0 poza rozmową) - z założenia wraca skokiem; 10 pulsów = 1 pętla.
       if (nm === 'reel-speak') continue;
       const kf = eff.getKeyframes();
       const end = o => Object.assign({}, ...kf.filter(k => k.computedOffset === o));
@@ -504,8 +504,8 @@ async function visualGroup(browser) {
     overlap: 'Tekst (krycie > .5) nie nachodzi na ? i ! ani na znak teraz',
     outside: 'Widoczny tekst w całości w kadrze',
     font: 'Najmniejszy widoczny tekst >= 12 px',
-    logo: 'Znak teraz w nagłówku >= 72 px (1500-6300 ms; 4:5 i 16:9 od 480 px)',
-    roles: 'Kompakt: jeden blok roli naraz',
+    logo: 'Znak teraz w nagłówku >= 72 px (3200-14000 ms)',
+    roles: 'Kompakt: jeden blok roli naraz (nie dotyczy 4:5)',
     toggle: 'Przełącznik pauzy nie zasłania tekstu',
     overflow: 'Brak poziomego przewijania w kadrach',
   };
@@ -535,14 +535,13 @@ async function visualGroup(browser) {
             if (shown.length !== 1 || shown[0].fmt !== f.fmt) fmts.push(`${f.id}: widoczne ${shown.map(x => x.fmt).join('+') || 'nic'}, ma być ${f.fmt}`);
             else if (shown[0].reelFmt && shown[0].reelFmt !== f.fmt) fmts.push(`${f.id}: .sheet__video--${f.fmt} zawiera .reel--${shown[0].reelFmt}`);
             if (f.minH && shown[0] && shown[0].h < f.minH) fmts.push(`${f.id}: wysokość ${Math.round(shown[0].h)} px < ${f.minH}`);
+            // Telefon pionowo: panel sięga dołu ekranu, kadr 4:5 zaczyna się w nim (opis pod spodem, panel się przewija)
             const phonePortrait = f.vw < 768 && f.vh > f.vw;
             if (phonePortrait) {
-              if (!fi.caption) fmts.push(`${f.id}: brak widocznego .sheet__caption`);
               const p = fi.panel;
-              // 9:16 na pełną wysokość panelu: panel sięga dołu ekranu, kadr + podpis mieszczą się w nim bez przewijania
               if (!p || Math.abs(p.y + p.h - f.vh) > 1.5) fmts.push(`${f.id}: panel nie sięga dołu ekranu (góra ${Math.round(p?.y)}, wys. ${Math.round(p?.h)})`);
-              else if (shown[0] && shown[0].y + shown[0].h > p.y + p.h) fmts.push(`${f.id}: kadr wychodzi poza panel`);
-            } else if (fi.caption) fmts.push(`${f.id}: .sheet__caption widoczny poza telefonem w pionie`);
+              else if (shown[0] && shown[0].y > p.y + p.h) fmts.push(`${f.id}: kadr poza panelem`);
+            }
           }
         }
 
@@ -568,7 +567,7 @@ async function visualGroup(browser) {
         const record = async (t, m) => {
           if (!m.found) { missing.push(`${tag} t=${t}`); return; }
           if (m.minFs != null) minFs = Math.min(minFs, m.minFs);
-          if (!m.compact && (t === 'rm' || (t >= 1500 && t <= 6300)) && m.logoW != null) minLogo = Math.min(minLogo, m.logoW);
+          if (!m.compact && (t === 'rm' || (t >= 3200 && t <= 14000)) && m.logoW != null) minLogo = Math.min(minLogo, m.logoW);
           const seen = new Set();
           for (const is of m.issues) {
             const line = `${tag} t=${t}: ${is.msg}`;
@@ -583,11 +582,11 @@ async function visualGroup(browser) {
 
         for (const t of TIMES) await record(t, t === 0 ? m0 : await page.evaluate(([k, t]) => window.__reel.at(k, t), [f.kind, t]));
 
-        // Szew: t=0 i t=7999 (aurora i dryf zamrożone) - ten sam obraz.
+        // Szew: t=0 i t=14999 (aurora i dryf zamrożone) - ten sam obraz.
         const clip = clipOf(m0.F);
         await page.evaluate(() => window.__reel.seek(0));
         const a = await page.screenshot({ clip });
-        await page.evaluate(() => window.__reel.seek(7999));
+        await page.evaluate(t => window.__reel.seek(t), REEL_MS - 1);
         const b = await page.screenshot({ clip });
         const ratio = await diffRatio(a, b);
         seamMax = Math.max(seamMax, ratio);
@@ -595,7 +594,7 @@ async function visualGroup(browser) {
         if (ratio >= .005) {
           seam.push(`${tag}: ${(ratio * 100).toFixed(2)}%`);
           await save(a, `seam-${lang}-${f.id}-t0`);
-          await save(b, `seam-${lang}-${f.id}-t7999`);
+          await save(b, `seam-${lang}-${f.id}-t14999`);
         }
 
         // Kadr stały (prefers-reduced-motion) - te same asercje.
@@ -623,11 +622,11 @@ async function visualGroup(browser) {
   }
   check('Rozmiary kadrów zgodne ze specyfikacją (± 1%)', !sizes.length && sizeNotes.length > 0, sizes.length ? list(sizes, 13) : sizeNotes.join(', ') || 'nie zmierzono');
   if (frames.some(f => f.kind === 'sheet')) {
-    check('Formaty paneli (16:9 / 4:5, panel telefonu przy dole, podpis)', !fmts.length && fmtNotes.length > 0, fmts.length ? list(fmts, 13) : fmtNotes.join(', '));
+    check('Format panelu 4:5 we wszystkich kadrach, panel telefonu przy dole', !fmts.length && fmtNotes.length > 0, fmts.length ? list(fmts, 13) : fmtNotes.join(', '));
   }
-  check('Szew pętli: t=0 i t=7999 różnią się na < 0.5% pikseli', !seam.length && seamN > 0 && !missing.length,
+  check('Szew pętli: t=0 i t=14999 różnią się na < 0.5% pikseli', !seam.length && seamN > 0 && !missing.length,
     seam.length ? list(seam) : `porównania: ${seamN}, maks. ${(seamMax * 100).toFixed(3)}%${blind}`);
-  check('Matematyka pętli (8000 ms / reel-speak 2000 ms, opóźnienie 0, 0% = 100%)', !loop.size && loopFrames > 0,
+  check('Matematyka pętli (15000 ms / reel-speak 1500 ms, opóźnienie 0, 0% = 100%)', !loop.size && loopFrames > 0,
     loop.size ? list([...loop], 10) : `ścieżki: ${tracks} (najwięcej w kadrze), kadry: ${loopFrames}`);
 }
 
@@ -892,7 +891,7 @@ async function budgetGroup(browser) {
       await go(page, '', 'home');
       const b = await page.evaluate(() => window.__reel.budget());
       if (!b.per.length) bad.push(`${lang}: brak .reel`);
-      for (const r of b.per) if (r.n > 60) bad.push(`${lang} ${r.where}: ${r.n} elementów`);
+      for (const r of b.per) if (r.n > 80) bad.push(`${lang} ${r.where}: ${r.n} elementów`);
       // 1000: strona + sfera (siatka, znaki, 3 karty z planszą teraz); Lighthouse ostrzega od 1400
       if (b.total > 1000) bad.push(`${lang}: DOM ${b.total} elementów`);
       const bytes = b.per.reduce((s, r) => s + r.bytes, 0);
@@ -904,7 +903,7 @@ async function budgetGroup(browser) {
       await ctx.close();
     }
   }
-  check('Budżet: <= 60 elementów na .reel, DOM <= 1000, HTML reeli <= 20 KB', !bad.length, list(bad.length ? bad : notes));
+  check('Budżet: <= 80 elementów na .reel, DOM <= 1000, HTML reeli <= 20 KB', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- Sieć: zero zewnętrznych requestów i ciasteczek ---------- */
@@ -975,7 +974,7 @@ async function nojsGroup(browser) {
     const b = await read();
     if (!b.open || b.open.state !== 'running' || b.open.t > 1000) bad.push(`#teraz: ${b.open ? `${b.open.state} ${Math.round(b.open.t)} ms` : 'brak widocznego reela'}`);
     else notes.push(`#teraz gra od 0 (${Math.round(b.open.t)} ms po otwarciu)`);
-    if (b.fmts.join() !== '16x9') bad.push(`1440x900: widoczne ${b.fmts.join('+') || 'nic'}`);
+    if (b.fmts.join() !== '4x5') bad.push(`1440x900: widoczne ${b.fmts.join('+') || 'nic'}`);
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto(`${BASE}?n=1#teraz`, { waitUntil: 'load' });
     await page.waitForTimeout(300);

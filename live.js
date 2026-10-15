@@ -359,9 +359,15 @@ export function liveMarkup(p, { static: still = false, lite = false } = {}) {
         </div>`;
 }
 
-// Grafika gra, gdy jest widoczna: na karcie z przodu sfery albo w otwartym panelu, bez pauzy.
-const isOn = el => el.isConnected && el.offsetParent !== null && !el.classList.contains('is-paused') && !document.hidden
-  && !!(el.closest('.sphere__card.is-active') || el.closest('.sheet:target'));
+// Grafika gra, gdy jest widoczna, bez pauzy: w otwartym panelu albo na karcie sfery - w trybie kart
+// (sekcja Portfolio) na karcie z przodu, w trybie logo na karcie pod kursorem.
+const cardOn = card => (card.closest('.is-cards') ? card.classList.contains('is-active') : card.matches(':hover'));
+const isOn = el => {
+  if (!el.isConnected || el.offsetParent === null || el.classList.contains('is-paused') || document.hidden) return false;
+  if (el.closest('.sheet:target')) return true;
+  const card = el.closest('.sphere__card');
+  return !!card && cardOn(card);
+};
 
 // Zachowanie w JS (loom: gradient WebGL + fizyka; reh.ab: sam CSS). Jedna pętla rAF na grafikę,
 // zatrzymana, gdy grafiki nie widać; co 250 ms sprawdza, czy ruszyć.

@@ -7,7 +7,7 @@
 import { symbol } from './symbols.js';
 
 // Plansza animowana teraz (reel): jedna pętla. Trafia do --t-reel oraz do data-dwell / --t-auto wiersza indeksu.
-export const REEL_MS = 8000;
+export const REEL_MS = 15000;
 // Ścieżki wpisane w HTML (bez dodatkowych plików): glify „?” i „!” z teraz, ikony ról, falka, pauza / start.
 export const RP = {
   q: 'M66.3 152.1C49.2 105.6 94.5 85.2 94.5 47.7C94.5 36.6 89.7 18.9 68.4 14.4L41.1 55.8L0 34.5C17.7 11.1 43.5 0 83.1 0C126.3 0 158.7 15.9 158.7 49.2C158.7 100.8 80.7 106.2 80.7 152.1H66.3ZM75.3 233.4C59.1 233.4 45.3 219.3 45.3 203.1C45.3 186.9 59.1 173.1 75.3 173.1C91.5 173.1 105.6 186.9 105.6 203.1C105.6 219.3 91.5 233.4 75.3 233.4Z',
@@ -72,8 +72,7 @@ const mono = img => {
 // Tło w stylu marki projektu (projects[].brand): kolor + animowana aurora.
 const brandStyle = b => `--brand-bg:${esc(b.bg)};${b.aurora.map((c, i) => `--a${i + 1}:${esc(c)}`).join(';')};--brand-speed:${esc(b.speed || '26s')}`;
 
-/* Plansza animowana „Dwie role, jedna rozmowa” (projects[].reel): 8 s w pętli, sam CSS (styles.css → Reel).
-   fmt: '16x9' | '4x5' | '9x16'. Kolory i logo z p.brand / p.logo, więc synchronizacja marki działa także tu.
+/* Plansza animowana teraz (projects[].reel): 15 s w pętli, sam CSS (styles.css → Reel). fmt: '4x5'. Kolory i logo z p.brand / p.logo, więc synchronizacja marki działa także tu.
    decorative: kopia na stronie głównej (tekst niesie podpis pod ramką); w panelu role=img + aria-label.
    Glify i falka ruszają się na opakowaniach <span>, nie na <svg>: Chromium nie przenosi animacji
    elementu <svg> na kompozytor i przelicza wtedy styl w każdej klatce. */
@@ -98,6 +97,10 @@ function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = 
     </div>
   </div></div>`;
   }
+  // Pełna plansza 15 s (render: 4:5): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat
+  const pillL = cls => `<span class="reel__pill reel__pill--l${cls}">${svgi(RP.headphones)}${esc(r.listener)}</span>`;
+  const pillE = `<span class="reel__pill reel__pill--e">${svgi(RP.presentation, '', '0 0 24 24', true)}${esc(r.expert)}</span>`;
+  const crowd = ['l', 'e', 'l', 'l', 'e', 'l', 'e', 'l'].map((k, i) => `<i class="reel__dot reel__dot--${k}" style="--k:${i}"></i>`).join('');
   return `<div class="reel reel--${fmt} brand" style="${brandStyle(p.brand)};--t-reel:${REEL_MS}ms;--lr:${lr}" ${a11y}>
   <span class="reel__field reel__field--l"></span><span class="reel__field reel__field--e"></span><span class="reel__field reel__field--m"></span>
   <div class="reel__stage">
@@ -106,19 +109,24 @@ function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = 
     <img class="reel__logo" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${img}>
     <p class="reel__claim">${esc(r.claimA)} <span class="reel__key">${esc(r.claimKey)}<span class="reel__falka"><span class="reel__falka-in"><svg viewBox="0 0 240 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="${RP.falka}"/></svg></span></span></span></p>
     <p class="reel__legend"><span>${esc(r.listeners)}</span><span>${esc(r.experts)}</span></p>
-    <p class="reel__role reel__role--l">
-      <span class="reel__pill">${svgi(RP.headphones)}${esc(r.listener)}</span>
-      <span class="reel__needs"><span class="reel__need">${esc(r.need1)}</span><span class="reel__need">${esc(r.need2)}</span><span class="reel__need">${esc(r.need3)}</span></span>
-      <span class="reel__short">${esc(r.listenerShort)}</span>
-      <span class="reel__sub">${esc(r.listenerSub)}</span></p>
-    <p class="reel__role reel__role--e">
-      <span class="reel__pill">${svgi(RP.presentation, '', '0 0 24 24', true)}${esc(r.expert)}</span>
-      <span class="reel__line">${esc(r.expertLine)}</span>
-      <span class="reel__short">${esc(r.expertShort)}</span>
-      <span class="reel__sub">${esc(r.expertSub)}</span></p>
+    <div class="reel__scene reel__scene--l">
+      <p class="reel__row">${pillL('')}</p>
+      <p class="reel__head">${esc(r.stepL)}</p>
+      <p class="reel__sub">${esc(r.subL)}</p>
+    </div>
+    <div class="reel__scene reel__scene--e">
+      <p class="reel__row">${pillL(' reel__pill--was')}<span class="reel__arrow"></span>${pillE}</p>
+      <p class="reel__head">${esc(r.stepE)}</p>
+      <p class="reel__sub">${esc(r.subE)}</p>
+    </div>
+    <div class="reel__scene reel__scene--c">
+      <p class="reel__row reel__crowd">${crowd}</p>
+      <p class="reel__head">${esc(r.community)}</p>
+      <p class="reel__sub">${esc(r.communitySub)}</p>
+    </div>
     <div class="reel__call">${tiles}
       <p class="reel__title">${esc(r.callTitle)}</p>
-      <p class="reel__cap">${svgi(RP.video, '', '0 0 24 24', true)}<span class="reel__cap-long">${esc(r.call)}</span><span class="reel__cap-short">${esc(r.callShort)}</span></p>
+      <p class="reel__cap">${svgi(RP.video, '', '0 0 24 24', true)}<span>${esc(r.call)}</span></p>
     </div>
   </div></div>`;
 }
@@ -242,6 +250,8 @@ function sphere(c, t) {
   }).join('');
   // Karty jak dawny podgląd: teraz - plansza animowana (reel 4:5), loom.studio / reh.ab - pierwsza klatka
   // grafiki interaktywnej (cover), nad którą main.js wstawia żywą grafikę. Gra tylko karta z przodu.
+  // Na karcie leży też logo projektu (sphereLogo): poza sekcją Portfolio sfera pokazuje same logo,
+  // karta pojawia się po najechaniu (main.js: .home__sphere.is-cards w sekcji Portfolio).
   const cards = c.projects.map((p, i) => {
     const inner = p.reel
       ? reel(p, t.projects[p.id], '4x5', { decorative: true, lite: true })
@@ -250,7 +260,8 @@ function sphere(c, t) {
         : image(p.images.a, '', '240px', { widths: c.imageWidths });
     return `
           <a class="sphere__card${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" tabindex="-1" style="--lon:${Math.round((360 / n) * i)}deg;--lat:${CARD_LAT[i % CARD_LAT.length]}deg">
-            <span class="sphere__media">${inner}</span>
+            <span class="sphere__media">${inner}</span>${p.sphereLogo ? `
+            <span class="sphere__logo" style="--ls:${p.sphereLogo.size ?? .8}"><img class="mono" src="${esc(p.sphereLogo.src)}" width="${p.sphereLogo.w}" height="${p.sphereLogo.h}" alt="" loading="lazy" decoding="async"></span>` : ''}
             <span class="sphere__tag t-meta">${esc(p.title)}</span>
           </a>`;
   }).join('');
@@ -303,61 +314,74 @@ function sheet({ id, cls, bar, body, t }) {
 </section>`;
 }
 
-// Wideo promocyjne w pętli: 16:9 (desktop, ekran poziomy), 4:5 (tablet pionowo) i 9:16 (telefon pionowo) - CSS wybiera jedno.
-// Kolejność: prawdziwe wideo (src) > plansza animowana (reel) > plansza statyczna (cover) > plansza marki (brand) > poster-placeholder.
+// Kadr projektu 4:5 (desktop i telefon): prawdziwe wideo (src) > plansza animowana (reel) > grafika
+// interaktywna na statycznej planszy (cover, live.js) > plansza marki (brand) > poster-placeholder.
 // Odtwarzaniem wideo steruje main.js; reel ma obok przycisk pauzy (rodzeństwo role=img, nie w środku).
-// Pod ramką podpis (nazwa - opis) - widoczny tylko na telefonie pionowo.
+const SHEET_FMT = '4x5';
 function promo(p, tp, t) {
-  const figures = Object.entries(p.video).map(([fmt, v]) => {
-    const ratio = `--ratio:${v.w} / ${v.h}; --ar:${(v.w / v.h).toFixed(4)}`;
-    const real = v.src && isReal(v.src);
-    if (!real && p.reel) {
-      return `
-      <figure class="sheet__video sheet__video--${fmt} media" style="${ratio}">
-        ${reel(p, tp, fmt)}
-        <button class="reel__toggle" type="button" aria-pressed="false" aria-label="${esc(t.ui.reelPause)}">${svgi(RP.pause, 'reel__ico-pause')}${svgi(RP.play, 'reel__ico-play')}</button>
-      </figure>`;
-    }
-    // Bez wideo: plansza statyczna w formacie ramki (cover), potem plansza z aurorą (brand), potem placeholder.
-    const cover = p.cover?.[fmt];
-    const brandPoster = p.brand
-      ? `<div class="brand" style="${brandStyle(p.brand)}" role="img" aria-label="${esc(tp.alt.video)}"><img class="brand__logo${mono(p.logo)}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt=""></div>`
-      : null;
-    const media = real
-      ? `<video src="${esc(v.src)}" poster="${esc(v.poster)}" width="${v.w}" height="${v.h}" muted loop playsinline preload="none" aria-label="${esc(tp.alt.video)}"></video>`
-      : cover
-        ? `<img src="${esc(cover)}" width="${v.w}" height="${v.h}" alt="${esc(clean(tp.alt.video))}" loading="lazy" decoding="async">`
-        : brandPoster || `<img class="${mono(v.poster).trim()}" src="${esc(v.poster)}" width="${v.w}" height="${v.h}" alt="${esc(tp.alt.video)}" loading="lazy" decoding="async">`;
+  const fmt = SHEET_FMT, v = p.video[fmt];
+  const ratio = `--ratio:${v.w} / ${v.h}; --ar:${(v.w / v.h).toFixed(4)}`;
+  const real = v.src && isReal(v.src);
+  if (!real && p.reel) {
     return `
-      <figure class="sheet__video sheet__video--${fmt} media" style="${ratio}">
-        ${media}
-      </figure>`;
-  }).join('');
-  return `${figures}
-      <p class="sheet__caption t-meta"><span>${esc(p.title)} - ${esc(tp.tagline)}</span></p>`;
+        <figure class="sheet__video sheet__video--${fmt} media" style="${ratio}">
+          ${reel(p, tp, fmt)}
+          <button class="reel__toggle" type="button" aria-pressed="false" aria-label="${esc(t.ui.reelPause)}">${svgi(RP.pause, 'reel__ico-pause')}${svgi(RP.play, 'reel__ico-play')}</button>
+        </figure>`;
+  }
+  const cover = p.cover?.[fmt];
+  const brandPoster = p.brand
+    ? `<div class="brand" style="${brandStyle(p.brand)}" role="img" aria-label="${esc(tp.alt.video)}"><img class="brand__logo${mono(p.logo)}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt=""></div>`
+    : null;
+  const media = real
+    ? `<video src="${esc(v.src)}" poster="${esc(v.poster)}" width="${v.w}" height="${v.h}" muted loop playsinline preload="none" aria-label="${esc(tp.alt.video)}"></video>`
+    : cover
+      ? `<img src="${esc(cover)}" width="${v.w}" height="${v.h}" alt="${esc(clean(tp.alt.video))}" loading="lazy" decoding="async">`
+      : brandPoster || `<img class="${mono(v.poster).trim()}" src="${esc(v.poster)}" width="${v.w}" height="${v.h}" alt="${esc(tp.alt.video)}" loading="lazy" decoding="async">`;
+  return `
+        <figure class="sheet__video sheet__video--${fmt} media" style="${ratio}">
+          ${media}
+        </figure>`;
 }
 
-// Projekt: na ekranie tylko wideo albo plansza animowana (+ podpis na telefonie). Tekst i obrazy case study (brief 5.2) zostają w PDF.
+// Panel projektu: po lewej kadr 4:5 (wideo / animacja), po prawej opis - numer i typ, nazwa, hasło, opis,
+// zakres, narzędzia, najważniejsze punkty i link. Telefon: kadr na całą szerokość, opis pod spodem.
+// Tekst i obrazy case study (problem / rozwiązanie / efekt) zostają w PDF (.case.print-only).
 function project(p, i, c, t) {
   const tp = t.projects[p.id];
   const opts = { widths: c.imageWidths };
-  const link = url(p.href) !== '#'
-    ? `<a class="sheet__link link-u t-meta" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a>`
-    : '';
   const fact = key => clean(tp[key]) ? `
             <div class="case__fact">
               <dt class="t-meta">${esc(t.ui[key])}</dt>
               <dd class="t-text">${esc(clean(tp[key]))}</dd>
             </div>` : '';
+  const scope = (tp.meta ?? []).map(clean).filter(Boolean);
+  const tools = (p.tools ?? []).map(clean).filter(Boolean);
+  const points = (t.deck?.projects?.[p.id]?.facts ?? []).map(clean).filter(Boolean);
+  const row = (label, value) => value ? `
+            <div class="pj__row"><dt class="t-meta">${esc(label)}</dt><dd>${value}</dd></div>` : '';
+  const link = url(p.href) !== '#'
+    ? `
+          <p class="pj__link"><a class="link-u" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a></p>`
+    : '';
 
   const bar = `
       <img class="sygnet sheet__sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
       <span class="t-meta sheet__no">${num(i)}</span>
-      <h2 id="${p.id}-title" class="t-project">${esc(p.title)}</h2>
-      <span class="t-meta sheet__year">${esc(p.type)}</span>
-      ${link}`;
+      <span class="t-meta sheet__year">${esc(p.type)}</span>`;
 
-  const body = `${promo(p, tp, t)}
+  const body = `
+      <div class="pj">
+        <div class="pj__media">${promo(p, tp, t)}
+        </div>
+        <div class="pj__info">
+          <h2 id="${p.id}-title" class="t-name pj__title">${esc(p.title)}</h2>
+          <p class="t-text pj__tagline">${esc(tp.tagline)}</p>
+          <p class="t-text t-muted pj__lead">${esc(tp.lead)}</p>
+          <dl class="pj__rows">${row(t.ui.scope, esc(scope.join(' · ')))}${row(t.ui.tools, esc(tools.join(' · ')))}${points.length ? row(t.ui.highlights, `<ul class="pj__points">${points.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : ''}
+          </dl>${link}
+        </div>
+      </div>
       <div class="case print-only">
         <p class="t-meta case__meta">${esc(tp.meta.join(' · '))}</p>
         <div class="case__body grid">
