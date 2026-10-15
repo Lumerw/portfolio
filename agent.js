@@ -41,6 +41,9 @@ const mailLink = c => ({ label: c.email, href: `mailto:${c.email}` });
 export function localAnswer(content, lang, question) {
   const c = content.shared, t = content[lang], A = t.agent.answers;
   const q = norm(question).trim();
+  // Pytanie z FAQ (klik „zapytaj asystenta” pod odpowiedzią) - ta sama odpowiedź co w FAQ
+  const faq = (t.agent.faq ?? []).find(f => norm(f.q).trim() === q);
+  if (faq) return { text: faq.a, links: [mailLink(c)] };
   const project = findProject(c, q);
   const topic = TOPICS.find(([key, re]) => (key === 'project' ? !!project : re.test(q)))?.[0];
 
@@ -125,6 +128,7 @@ export function knowledge(content, lang) {
     }),
     '',
     ...(t.process?.steps?.length ? ['HOW WORKING TOGETHER LOOKS', ...t.process.steps.map((st, i) => `${i + 1}. ${st.title}: ${st.text} ${t.process.get} ${st.result}.`), ''] : []),
+    ...(t.agent?.faq?.length ? ['FAQ', ...t.agent.faq.map(f => `Q: ${f.q}\nA: ${f.a}`), ''] : []),
     'EXPERIENCE',
     ...t.about.experience.filter(e => clean(e.place)).map(e => `- ${clean(e.year)} ${clean(e.place)}, ${clean(e.role)}`),
     line('Education', t.about.education),

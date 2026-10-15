@@ -1656,6 +1656,23 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 .agent__form input::placeholder { color: var(--ink-3); }
 .agent__form input:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--ink); }   /* fokus = ramka 2 px */
+/* FAQ obok czatu - tylko szerokie ekrany (od 1200 px), w wolnym miejscu po prawej. Pytania jak wiersze
+   indeksu (linia 1 px, „+” obraca się w „×”), pod odpowiedzią przycisk zadania pytania asystentowi. */
+.agent-faq { display: none; }
+@media (min-width: 1200px) {
+  .sheet--agent .sheet__body { flex-direction: row; align-items: stretch; gap: var(--s-8); }
+  .agent-faq { display: flex; flex-direction: column; flex: 0 1 400px; min-height: 0; margin-left: auto; padding-left: var(--s-6); border-left: var(--hairline) solid var(--hair); }
+  .agent-faq__title { margin-bottom: var(--s-2); }
+  .agent-faq__list { min-height: 0; overflow-y: auto; overscroll-behavior: contain; border-top: var(--hairline) solid var(--hair); }
+  .agent-faq__item { border-bottom: var(--hairline) solid var(--hair); }
+  .agent-faq__item summary { position: relative; display: block; padding: var(--s-2) var(--s-4) var(--s-2) 0; cursor: pointer; list-style: none; }
+  .agent-faq__item summary::-webkit-details-marker { display: none; }
+  .agent-faq__item summary::after { content: "+"; position: absolute; right: 0; top: var(--s-2); color: var(--ink-3); transition: rotate var(--t-line) var(--ease); }
+  .agent-faq__item[open] summary::after { rotate: 45deg; }
+  .agent-faq__item summary:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  .agent-faq__item p { padding-bottom: var(--s-1); }
+  .agent-faq__ask { margin-bottom: var(--s-2); font-size: var(--fs-meta); background: none; border-width: 0 0 var(--hairline); cursor: pointer; }
+}
 .agent__note { display: none; color: var(--ink-3); }
 .js .agent__note { display: block; }
 @media (max-height: 500px) { .js .agent__note { display: none; } }

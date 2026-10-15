@@ -664,7 +664,17 @@ function agent(c, t) {
           <button class="button" type="submit">${esc(g.send)}</button>
         </form>
         <p class="agent__note t-meta">${esc(g.note)}</p>
-      </div>`;
+      </div>${g.faq?.length ? `
+      <aside class="agent-faq" aria-labelledby="agent-faq-title">
+        <h3 id="agent-faq-title" class="t-meta agent-faq__title">${esc(g.faqTitle)}</h3>
+        <div class="agent-faq__list">${g.faq.map(f => `
+          <details class="agent-faq__item">
+            <summary>${esc(f.q)}</summary>
+            <p class="t-text t-muted">${esc(f.a)}</p>
+            <button class="link-u agent-faq__ask" type="button" data-ask="${esc(f.q)}">${esc(g.faqAsk)} →</button>
+          </details>`).join('')}
+        </div>
+      </aside>` : ''}`;
   return sheet({ id: 'agent', cls: 'sheet--agent', bar, body, t });
 }
 

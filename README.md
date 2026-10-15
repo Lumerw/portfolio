@@ -166,6 +166,8 @@ Ustawienia: `shared.booking = { calUsername: 'wojciech-lumer-sxkqby', events: [{
 
 Awatar-moneta w hero (tęczowa poświata) otwiera panel `#agent` z czatem (telefon: panel od dołu z przyciemnionym pasem u góry - klik w niego zamyka - i kreską-uchwytem: panel można zsunąć palcem; od 768 px wąska kolumna w prawym dolnym rogu). Teksty: `pl/en.agent` w `content.js`, silnik: `agent.js`, obsługa czatu: `main.js`.
 
+Na szerokich ekranach (od 1200 px) obok czatu stoi FAQ (`pl/en.agent.faq`): pytania jak wiersze indeksu, odpowiedzi wyłącznie z treści strony, pod każdą „zapytaj asystenta” - zadaje to pytanie w czacie (asystent odpowiada tym samym tekstem, FAQ jest też w jego wiedzy).
+
 - **Tryb lokalny (teraz):** dopóki `shared.agent.endpoint` jest placeholderem, asystent odpowiada gotowymi zdaniami z `content.js` (projekty, kontakt, narzędzia, doświadczenie, marka, PDF). Pytania nie opuszczają strony.
 - **Tryb AI:** odpowiada Claude, wyłącznie na podstawie treści portfolio (`knowledge()` w `agent.js` - wszystko z `content.js` bez [placeholderów]). Klucz API nie może być w przeglądarce, dlatego pośredniczy darmowy Cloudflare Worker (`agent/worker.js`): sprawdza adres strony (CORS), limituje 10 pytań na minutę z IP i przycina rozmowę. Gdy AI nie odpowiada, czat wraca do trybu lokalnego.
 
