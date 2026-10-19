@@ -8,7 +8,11 @@ const app = document.getElementById('app');
 const LANGS = ['pl', 'en'];
 
 // Asystent AI (stan na górze - panel #agent może być otwarty już przy wejściu na stronę)
-const chat = [];        // [{ role: 'user' | 'assistant', content, answer? }]
+// Rozmowa z asystentem: [{ role: 'user' | 'assistant', content, answer? }]. Zapisana w sessionStorage karty,
+// więc przetrwa przejście w tej samej karcie na link z odpowiedzi i powrót (albo odświeżenie); znika z kartą.
+const CHAT_KEY = 'agent-chat';
+const chat = (() => { try { const a = JSON.parse(sessionStorage.getItem(CHAT_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch { return []; } })();
+const saveChat = () => { try { sessionStorage.setItem(CHAT_KEY, JSON.stringify(chat.slice(-40))); } catch { /* bez zapisu */ } };
 let agentBusy = false;
 let agentMod = null;
 const loadAgent = () => (agentMod ??= import('./agent.js'));
@@ -514,6 +518,7 @@ async function askAgent(q) {
   agentBusy = true;
   app.querySelector('[data-agent]').classList.add('has-chat');
   chat.push({ role: 'user', content: q });
+  saveChat();
   addMsg('user', q);
   const typing = addMsg('typing', { text: '' });
   typing?.classList.add('agent__typing');
@@ -525,13 +530,19 @@ async function askAgent(q) {
     const wait = 500 - (performance.now() - t0);   // tryb lokalny odpowiada od razu - bez „wskakiwania”
     if (wait > 0) await new Promise(r => setTimeout(r, wait));
     chat.push({ role: 'assistant', content: [answer.text, ...(answer.items ?? [])].join('\n'), answer });
+    saveChat();
     app.querySelector('.agent__typing')?.remove();
     addMsg('assistant', answer);
+  } catch {
+    chat.pop();                          // pytanie bez odpowiedzi nie zostaje w historii
+    saveChat();
   } finally {
     app.querySelector('.agent__typing')?.remove();
     agentBusy = false;
   }
 }
+// Po wejściu na stronę: zapisana rozmowa wraca do panelu
+restoreChat();
 
 app.addEventListener('submit', e => {
   const form = e.target.closest('[data-agent-form]');
