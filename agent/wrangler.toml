@@ -5,6 +5,8 @@
 # Adres z wyniku (https://portfolio-agent.<konto>.workers.dev) wpisz w content.js → shared.agent.endpoint.
 name = "portfolio-agent"
 main = "worker.js"
+workers_dev = true      # adres https://portfolio-agent.teraz-platforma.workers.dev
+preview_urls = false
 compatibility_date = "2026-09-01"
 
 [vars]

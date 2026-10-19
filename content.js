@@ -72,7 +72,7 @@ export const shared = {
   // Asystent AI („zapytaj AI” obok przycisku kontakt). endpoint = adres Workera z agent/worker.js
   // (odpowiada model Claude na podstawie treści tego pliku - instrukcja w README).
   // Dopóki to placeholder: tryb lokalny - gotowe odpowiedzi z content.js, pytania nie opuszczają strony.
-  agent: { endpoint: '[https://portfolio-agent.<twoje-konto>.workers.dev]' },
+  agent: { endpoint: 'https://portfolio-agent.teraz-platforma.workers.dev' },   // Cloudflare Worker (agent/), Claude Opus 5.5
 
   // Brandbook (panel pod znakiem w hero): kolory marki osobistej - wartości dosłowne, kontrast z papierem.
   brandbook: {
