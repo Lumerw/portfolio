@@ -18,7 +18,7 @@ export const shared = {
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
   // calUsername = <nazwa> z cal.com/<nazwa>, events = typy spotkań z cal.com/<nazwa>/<slug> (pierwszy domyślny).
   // Klucz API NIE jest potrzebny (i nie może trafić na stronę - byłby publiczny).
-  booking: { calUsername: 'wojciech-lumer-sxkqby', events: [{ slug: '30min', minutes: 30 }, { slug: '15min', minutes: 15 }] },
+  booking: { calUsername: 'wojciech-lumer-sxkqby', events: [{ slug: '30min', minutes: 30 }] },   // tylko rozmowy 30-minutowe
   // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/wojciechlumer/' },
@@ -142,6 +142,7 @@ export const shared = {
       // Narzędzia i technologie (panel projektu) - z repozytorium projektu
       tools: ['React', 'TypeScript', 'Tailwind CSS', 'Supabase', 'Stripe', 'Daily.co', 'Cloudflare'],
       href: 'https://teraz.eu',      // testowo
+      brandbook: 'https://teraz.eu/marka',   // księga marki projektu (panel i PDF)
       images: {
         main:    { src: 'assets/teraz/01.jpg',      w: 1600, h: 1000 },
         a:       { src: 'assets/teraz/02.jpg',      w: 1200, h: 1500 },
@@ -171,6 +172,7 @@ export const shared = {
         '9x16': { src: '', poster: 'assets/loom/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       href: '[https://loom.studio]', // [podaj właściwy adres - loom.studio wygląda na domenę zaparkowaną]
+      brandbook: '[brandbook loom.studio]',  // [adres księgi marki] - dopóki placeholder, „brandbook” bez linku, z dopiskiem „wkrótce”
       images: {
         main:    { src: 'assets/loom/01.jpg',      w: 1600, h: 1000 },
         a:       { src: 'assets/loom/02.jpg',      w: 1200, h: 1500 },
@@ -243,6 +245,9 @@ export const pl = {
     tools: 'Narzędzia',
     scope: 'Zakres',               // panel projektu
     highlights: 'Najważniejsze',   // panel projektu: punkty z deck.projects.<id>.facts
+    projectSite: 'strona projektu',   // panel projektu i PDF: link (bez adresu - tekst z „wkrótce”)
+    projectBrandbook: 'brandbook',
+    soon: 'wkrótce',
     contact: 'Kontakt',
     copy: 'kopiuj adres',
     copied: 'skopiowano',
@@ -430,14 +435,14 @@ export const pl = {
     title: 'Jak pracuję',
     get: 'Dostajesz:',
     steps: [
-      { title: 'Rozmowa', text: '15 lub 30 minut online. Poznaję cel, budżet i termin.', result: 'wycenę i plan' },
+      { title: 'Rozmowa', text: '30 minut online. Poznaję cel, budżet i termin.', result: 'wycenę i plan' },
       { title: 'Projekt', text: 'Research i 2-3 kierunki do wyboru, potem projekt na prawdziwych treściach. AI pomaga mi szybko sprawdzić więcej wariantów.', result: 'gotowe pliki i system' },
       { title: 'Wdrożenie', text: 'Kod, uruchomienie i przekazanie - z instrukcją, jak to dalej rozwijać.', result: 'działającą rzecz, nie tylko makiety' },
     ],
   },
   booking: {
     title: 'Umów rozmowę',
-    intro: 'Rozmowa online. Wybierz długość, dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.',
+    intro: 'Rozmowa online, 30 minut. Wybierz dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.',
     length: 'Długość rozmowy',
     loading: 'Wczytuję wolne terminy…',
     empty: 'Brak wolnych terminów w najbliższych tygodniach. Napisz do mnie:',
@@ -467,12 +472,12 @@ export const pl = {
     faqTitle: 'Częste pytania',
     faqAsk: 'zapytaj asystenta',
     faq: [
-      { q: 'Jak wygląda współpraca?', a: 'W trzech krokach: rozmowa (15 lub 30 minut online - cel, budżet i termin), projekt (research, 2-3 kierunki do wyboru, potem projekt na prawdziwych treściach) i wdrożenie (kod, uruchomienie i przekazanie z instrukcją).' },
+      { q: 'Jak wygląda współpraca?', a: 'W trzech krokach: rozmowa (30 minut online - cel, budżet i termin), projekt (research, 2-3 kierunki do wyboru, potem projekt na prawdziwych treściach) i wdrożenie (kod, uruchomienie i przekazanie z instrukcją).' },
       { q: 'Ile kosztuje projekt?', a: 'To zależy od zakresu. Wycenę i plan dostajesz po pierwszej rozmowie.' },
       { q: 'Czy zajmujesz się też wdrożeniem?', a: 'Tak - projektuję od pomysłu do wdrożenia, żeby powstała działająca rzecz, nie tylko makiety.' },
       { q: 'Jak używasz AI w pracy?', a: 'AI pomaga mi szybko sprawdzić więcej wariantów projektu. Na co dzień pracuję jako AI designer w Promotrafic.' },
       { q: 'Co projektujesz?', a: 'Identyfikacje, strony i produkty cyfrowe. Prowadzę też loom.studio - studio projektowe w modelu subskrypcji.' },
-      { q: 'Jak się skontaktować?', a: 'Najszybciej mailem albo przez kalendarz na stronie: rozmowa online, 15 lub 30 minut.' },
+      { q: 'Jak się skontaktować?', a: 'Najszybciej mailem albo przez kalendarz na stronie: rozmowa online, 30 minut.' },
     ],
     label: 'Twoje pytanie',
     placeholder: 'Zadaj pytanie…',
@@ -532,6 +537,9 @@ export const en = {
     tools: 'Tools',
     scope: 'Scope',
     highlights: 'Highlights',
+    projectSite: 'project site',
+    projectBrandbook: 'brand book',
+    soon: 'soon',
     contact: 'Contact',
     copy: 'copy address',
     copied: 'copied',
@@ -714,14 +722,14 @@ export const en = {
     title: 'How I work',
     get: 'You get:',
     steps: [
-      { title: 'Call', text: '15 or 30 minutes online. I learn the goal, budget and deadline.', result: 'a quote and a plan' },
+      { title: 'Call', text: '30 minutes online. I learn the goal, budget and deadline.', result: 'a quote and a plan' },
       { title: 'Design', text: 'Research and 2-3 directions to choose from, then the design on real content. AI helps me test more options, faster.', result: 'final files and a system' },
       { title: 'Launch', text: 'Code, launch and handover - with notes on how to grow it further.', result: 'a working thing, not just mockups' },
     ],
   },
   booking: {
     title: 'Book a call',
-    intro: 'An online call. Pick the length, day and time - the confirmation and meeting link will arrive by e-mail.',
+    intro: 'A 30-minute online call. Pick the day and time - the confirmation and meeting link will arrive by e-mail.',
     length: 'Call length',
     loading: 'Loading free slots…',
     empty: 'No free slots in the coming weeks. Write to me:',
@@ -749,12 +757,12 @@ export const en = {
     faqTitle: 'FAQ',
     faqAsk: 'ask the assistant',
     faq: [
-      { q: 'What does working together look like?', a: 'Three steps: a call (15 or 30 minutes online - goal, budget and deadline), design (research, 2-3 directions to choose from, then the design on real content) and launch (code, launch and handover with notes).' },
+      { q: 'What does working together look like?', a: 'Three steps: a call (30 minutes online - goal, budget and deadline), design (research, 2-3 directions to choose from, then the design on real content) and launch (code, launch and handover with notes).' },
       { q: 'How much does a project cost?', a: 'It depends on the scope. You get a quote and a plan after the first call.' },
       { q: 'Do you also build what you design?', a: 'Yes - I design from idea to launch, so you get a working thing, not just mockups.' },
       { q: 'How do you use AI?', a: 'AI helps me test more design options, faster. Day to day I work as an AI designer at Promotrafic.' },
       { q: 'What do you design?', a: 'Identities, websites and digital products. I also run loom.studio - a subscription-based design studio.' },
-      { q: 'How can I get in touch?', a: 'Email is the fastest, or book a call in the calendar on the site: an online call, 15 or 30 minutes.' },
+      { q: 'How can I get in touch?', a: 'Email is the fastest, or book a call in the calendar on the site: an online call, 30 minutes.' },
     ],
     label: 'Your question',
     placeholder: 'Ask a question…',

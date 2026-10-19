@@ -69,31 +69,19 @@
   }
 }
 
-/* Tryb ciemny: domyślnie wg systemu, przełącznik w nagłówku zapisuje wybór (data-theme). */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper:  #000000;
-    --ink:    #EDEDE8;
-    --ink-2:  #A3A39E;              /* 7.4:1 */
-    --ink-3:  #8C8C87;              /* 5.5:1 */
-    --ink-4:  #5A5A56;
-    --hair:   rgba(237, 237, 232, .16);
-  }
-}
+/* Tryb ciemny: domyślnie zawsze jasny (niezależnie od systemu); przełącznik w nagłówku włącza ciemny
+   i zapisuje wybór (data-theme). */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --paper:  #000000;
   --ink:    #EDEDE8;
-  --ink-2:  #A3A39E;
-  --ink-3:  #8C8C87;
+  --ink-2:  #A3A39E;              /* 7.4:1 */
+  --ink-3:  #8C8C87;              /* 5.5:1 */
   --ink-4:  #5A5A56;
   --hair:   rgba(237, 237, 232, .16);
 }
 
 /* Grafiki jednokolorowe (SVG z czarną kreską) odwrócone w trybie ciemnym */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .mono { filter: invert(1) hue-rotate(180deg); }
-}
 :root[data-theme="dark"] .mono { filter: invert(1) hue-rotate(180deg); }
 
 /* Linie 0,5 px na ekranach retina */
@@ -1329,7 +1317,8 @@ html:has(.sheet:target) { overflow: hidden; }
 .pj__points { display: grid; gap: 2px; }
 .pj__points li { padding-left: 1.1em; text-indent: -1.1em; }
 .pj__points li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
-.pj__link { margin-top: var(--s-1); }
+.pj__link { margin-top: var(--s-1); display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); }
+.pj__soon { color: var(--ink-2); }
 @media screen and (min-width: 560px) and (orientation: landscape) {
   .sheet--project .sheet__body { overflow: hidden; container-type: size; }
   .pj { height: 100%; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-6); align-items: center; }
@@ -1696,15 +1685,6 @@ html:has(.sheet:target) { overflow: hidden; }
 @media (max-width: 767px) {
   .site-footer { margin-top: var(--s-5); }
   .site-footer__in { padding-block: var(--s-6) var(--s-5); }
-}
-@media (max-width: 1023px) and (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .site-footer, :root:not([data-theme="light"]) .colophon {
-    --paper:  #FAFAF7;
-    --ink:    #111111;
-    --ink-2:  #6E6E6A;
-    --ink-3:  #73736E;
-    --hair:   rgba(17, 17, 17, .14);
-  }
 }
 @media (max-width: 1023px) {
   :root[data-theme="dark"] .site-footer, :root[data-theme="dark"] .colophon {

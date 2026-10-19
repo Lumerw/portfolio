@@ -64,12 +64,13 @@ function doc(lang, fmt, dark) {
   const c = content.shared, t = content[lang], U = t.ui;
   const [W, H] = FORMATS[fmt];
   const site = c.siteUrl.replace(/\/$/, '');
-  const cal = c.booking?.calUsername ? `https://cal.com/${c.booking.calUsername}` : (isReal(c.calendly) ? c.calendly : `mailto:${c.email}`);
+  const cal = c.booking?.calUsername ? `https://cal.com/${c.booking.calUsername}/${c.booking.events?.[0]?.slug ?? ''}` : (isReal(c.calendly) ? c.calendly : `mailto:${c.email}`);   // rozmowa 30 min
   const linkedin = c.links.find(l => l.label === 'LinkedIn')?.href;
   const total = 2 + c.projects.length;
   const counter = n => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
   const wide = fmt === '16x9';
 
+  const exp = t.about.experience.map(e => ({ year: clean(e.year), place: clean(e.place), role: clean(e.role) })).filter(e => e.place);
   const cover = `
   <section class="page cover">
     ${wide ? sphere(560, `left:${W - 760}px;top:-470px`) : sphere(470, `left:${W - 520}px;top:-400px`)}
@@ -84,8 +85,19 @@ function doc(lang, fmt, dark) {
       </p>
       <p class="cover__foot"><span>${esc(c.year)}</span><a href="${esc(site)}/">${esc(site.replace(/^https?:\/\//, ''))}</a></p>
     </div>
+    <aside class="about">
+      <h2 class="about__title">${esc(t.about.title)}</h2>
+      <dl class="about__rows">
+        <div class="about__row"><dt>${esc(U.experience)}</dt><dd><ul>${exp.map(e => `<li><span class="meta">${esc(e.year)}</span> ${esc(e.place)}, ${esc(e.role)}</li>`).join('')}</ul></dd></div>
+        <div class="about__row"><dt>${esc(t.cv.skills)}</dt><dd><ul class="dash">${t.cv.skillsList.map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div>
+      </dl>
+    </aside>
   </section>`;
 
+  // Linki projektu: strona i brandbook; bez adresu - nazwa z „wkrótce”, bez linku
+  const pjLink = (href, label) => (isReal(href)
+    ? `<a class="link-u" href="${esc(href)}">${esc(label)} ↗</a>`
+    : `<span class="pj__soon">${esc(label)} <span class="meta">${esc(U.soon)}</span></span>`);
   const projects = c.projects.map((p, i) => {
     const tp = t.projects[p.id];
     const scope = (tp.meta ?? []).map(clean).filter(Boolean);
@@ -102,7 +114,7 @@ function doc(lang, fmt, dark) {
         <p class="pj__tagline">${esc(tp.tagline)}</p>
         <p class="pj__lead">${esc(tp.lead)}</p>
         <dl class="pj__rows">${row(U.scope, esc(scope.join(' · ')))}${row(U.tools, esc(tools.join(' · ')))}${points.length ? row(U.highlights, `<ul class="dash">${points.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : ''}</dl>
-        ${isReal(p.href) ? `<p class="pj__link"><a class="link-u" href="${esc(p.href)}">${esc(U.view)}</a></p>` : ''}
+        <p class="pj__link">${[pjLink(p.href, U.projectSite), ...(p.brandbook ? [pjLink(p.brandbook, U.projectBrandbook)] : [])].join('')}</p>
       </div>
     </div>
   </section>`;

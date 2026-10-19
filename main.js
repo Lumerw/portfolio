@@ -33,10 +33,9 @@ function setLang(lang) {
 const saved = store.get();
 if (LANGS.includes(saved) && saved !== root.lang) setLang(saved);
 
-/* Tryb ciemny: domyślnie wg systemu; wybór z przełącznika zapisany w localStorage.
+/* Tryb ciemny: domyślnie jasny na każdym urządzeniu; przełącznik włącza ciemny, wybór zapisany w localStorage.
    (Zapisany wybór ustawia już mały skrypt w <head>, żeby strona nie mignęła jasno.) */
-const darkSystem = matchMedia('(prefers-color-scheme: dark)');
-const isDark = () => (root.dataset.theme ? root.dataset.theme === 'dark' : darkSystem.matches);
+const isDark = () => root.dataset.theme === 'dark';
 
 function syncThemeButton() {
   const btn = app.querySelector('[data-theme-switch]');
@@ -51,7 +50,6 @@ app.addEventListener('click', e => {
   try { localStorage.setItem('theme', next); } catch { /* bez zapamiętania */ }
   syncThemeButton();
 });
-darkSystem.addEventListener('change', syncThemeButton);
 syncThemeButton();
 
 app.addEventListener('click', e => {

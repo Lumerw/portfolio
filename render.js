@@ -360,10 +360,12 @@ function project(p, i, c, t) {
   const points = (t.deck?.projects?.[p.id]?.facts ?? []).map(clean).filter(Boolean);
   const row = (label, value) => value ? `
             <div class="pj__row"><dt class="t-meta">${esc(label)}</dt><dd>${value}</dd></div>` : '';
-  const link = url(p.href) !== '#'
-    ? `
-          <p class="pj__link"><a class="link-u" href="${esc(p.href)}" target="_blank" rel="noopener">${esc(t.ui.view)}</a></p>`
-    : '';
+  // Linki projektu: strona i brandbook. Bez prawdziwego adresu - sama nazwa z dopiskiem „wkrótce” (nieklikalna).
+  const pjLink = (href, label) => (url(href) !== '#'
+    ? `<a class="link-u" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} ↗</a>`
+    : `<span class="pj__soon">${esc(label)} <span class="t-meta">${esc(t.ui.soon)}</span></span>`);
+  const link = `
+          <p class="pj__link">${[pjLink(p.href, t.ui.projectSite), ...(p.brandbook ? [pjLink(p.brandbook, t.ui.projectBrandbook)] : [])].join('')}</p>`;
 
   const bar = `
       <img class="sygnet sheet__sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">

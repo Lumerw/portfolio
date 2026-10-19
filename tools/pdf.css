@@ -99,7 +99,9 @@ img { display: block; }
 .pj__row dt { color: var(--ink-3); font-size: 18px; padding-top: 3px; }
 .dash li { padding-left: 1.1em; text-indent: -1.1em; }
 .dash li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
-.pj__link { margin-top: 36px; font-size: 24px; }
+.pj__link { margin-top: 36px; font-size: 24px; display: flex; flex-wrap: wrap; gap: 12px 40px; }
+.pj__soon { color: var(--ink-2); }
+.pj__soon .meta { font-size: .8em; }
 
 /* 16:9: kadr po lewej na całą wysokość, opis obok */
 :root[data-fmt="16x9"] .pj { grid-template-columns: auto minmax(0, 1fr); gap: 96px; align-items: center; }
@@ -128,3 +130,14 @@ img { display: block; }
 :root[data-fmt="9x16"] .contact .buttons { flex-direction: column; align-items: flex-start; }
 :root[data-fmt="9x16"] .contact .button { min-width: 520px; }
 :root[data-fmt="9x16"] .contact__foot { flex-direction: column; align-items: flex-start; gap: 20px; }
+
+/* Okładka: blok „O mnie” - 16:9 po prawej na dole, 9:16 na dole pod hasłem i przyciskami */
+.about { position: relative; z-index: 1; }
+.about__title { font-size: 22px; font-weight: 400; color: var(--ink-3); padding-bottom: 14px; border-bottom: 1px solid var(--hair); }
+.about__row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding-block: 16px; border-bottom: 1px solid var(--hair); font-size: 22px; line-height: 1.5; }
+.about__row dt { color: var(--ink-3); font-size: 18px; padding-top: 3px; }
+.about__row .meta { font-size: 18px; }
+:root[data-fmt="16x9"] .cover .about { position: absolute; right: var(--m); bottom: var(--m); width: 680px; }
+:root[data-fmt="16x9"] .cover__text { max-width: 900px; }
+:root[data-fmt="9x16"] .cover__text { margin-top: 160px; }
+:root[data-fmt="9x16"] .cover .about { margin-top: auto; }
