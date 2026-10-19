@@ -51,7 +51,7 @@ globalThis.fetch = async (url, init) => {
   return new Response(JSON.stringify({ content: [{ type: 'text', text: 'loom.studio — studio w subskrypcji.' }] }));
 };
 const env = { ANTHROPIC_API_KEY: 'test', LIMITER: { limit: async () => ({ success: true }) } };
-const req = (body, { origin = 'https://lumerw.github.io', method = 'POST' } = {}) => new Request('https://agent.test/', {
+const req = (body, { origin = 'https://lumerw.com', method = 'POST' } = {}) => new Request('https://agent.test/', {
   method, headers: { Origin: origin, 'content-type': 'application/json' }, body: method === 'POST' ? JSON.stringify(body) : undefined,
 });
 const q = [{ role: 'user', content: 'Co to loom?' }];
