@@ -121,7 +121,7 @@ export function knowledge(content, lang) {
     ...c.projects.map(p => {
       const tp = t.projects[p.id];
       return [
-        `- ${p.title} (${p.type}): ${tp.tagline}. ${tp.lead}`,
+        `- ${p.title} (${p.type}${p.beta ? ', beta version' : ''}): ${tp.tagline}. ${tp.lead}`,
         realUrl(p.href) ? `  Website: ${p.href}` : '',
         tp.meta?.length ? `  Scope: ${tp.meta.map(clean).filter(Boolean).join(', ')}` : '',
         ...['problem', 'solution', 'result'].map(k => (clean(tp[k]) ? `  ${clean(tp[k])}` : '')),

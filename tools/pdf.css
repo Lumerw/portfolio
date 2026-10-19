@@ -141,3 +141,6 @@ img { display: block; }
 :root[data-fmt="16x9"] .cover__text { max-width: 900px; }
 :root[data-fmt="9x16"] .cover__text { margin-top: 160px; }
 :root[data-fmt="9x16"] .cover .about { margin-top: auto; }
+
+/* Znacznik „beta” przy nazwie projektu */
+.beta { display: inline-block; margin-left: 20px; padding: 2px 12px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 22px; font-weight: 400; letter-spacing: .02em; vertical-align: .9em; line-height: 1.4; }

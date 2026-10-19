@@ -137,11 +137,14 @@ function indexRow(p, i) {
         <li ${reveal(i + 3)}>
           <a class="index__row${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" aria-haspopup="dialog">
             <span class="index__no t-meta">${num(i)}</span>
-            <span class="index__title">${esc(p.title)}</span>
+            <span class="index__title">${esc(p.title)}${betaTag(p)}</span>
             <span class="index__year t-meta">${esc(p.type)}</span>
           </a>
         </li>`;
 }
+
+// Znacznik „beta” przy nazwie projektu (projects[].beta) - ramka 1 px, mały stopień pisma
+const betaTag = p => (p.beta ? ' <span class="beta">beta</span>' : '');
 
 // Ikonka LinkedIn kreską 1 px: ramka + „in” (przy imieniu w hero).
 const liIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
@@ -262,7 +265,7 @@ function sphere(c, t) {
           <a class="sphere__card${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" tabindex="-1" style="--lon:${Math.round((360 / n) * i)}deg;--lat:${CARD_LAT[i % CARD_LAT.length]}deg">
             <span class="sphere__media">${inner}</span>${p.sphereLogo ? `
             <span class="sphere__logo" style="--ls:${p.sphereLogo.size ?? .8}"><img class="mono" src="${esc(p.sphereLogo.src)}" width="${p.sphereLogo.w}" height="${p.sphereLogo.h}" alt="" loading="lazy" decoding="async"></span>` : ''}
-            <span class="sphere__tag t-meta">${esc(p.title)}</span>
+            <span class="sphere__tag t-meta">${esc(p.title)}${betaTag(p)}</span>
           </a>`;
   }).join('');
   return `
@@ -377,7 +380,7 @@ function project(p, i, c, t) {
         <div class="pj__media">${promo(p, tp, t)}
         </div>
         <div class="pj__info">
-          <h2 id="${p.id}-title" class="t-name pj__title">${esc(p.title)}</h2>
+          <h2 id="${p.id}-title" class="t-name pj__title">${esc(p.title)}${betaTag(p)}</h2>
           <p class="t-text pj__tagline">${esc(tp.tagline)}</p>
           <p class="t-text t-muted pj__lead">${esc(tp.lead)}</p>
           <dl class="pj__rows">${row(t.ui.scope, esc(scope.join(' · ')))}${row(t.ui.tools, esc(tools.join(' · ')))}${points.length ? row(t.ui.highlights, `<ul class="pj__points">${points.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : ''}

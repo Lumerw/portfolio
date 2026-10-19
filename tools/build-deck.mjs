@@ -65,7 +65,7 @@ function deck(lang) {
     </section>
     <section class="slide" id="s-${p.id}-o">
       ${projectTop(p, i, n + 1, `${visit(p)}`)}
-      <h2 class="detail__title">${esc(p.title)}</h2>
+      <h2 class="detail__title">${esc(p.title)}${p.beta ? ' <span class="beta">beta</span>' : ''}</h2>
       <p class="detail__lead">${esc(tp.lead)}</p>
       <div class="shots">
         <img class="shots__desktop" src="${esc(p.deck.desktop)}" alt="">

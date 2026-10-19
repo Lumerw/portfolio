@@ -116,6 +116,7 @@ export const shared = {
       id: 'teraz',
       title: 'teraz',
       type: 'marketplace',           // typ projektu - po prawej w indeksie
+      beta: true,                    // wersja beta - znacznik „beta” przy nazwie (indeks, panel, sfera, PDF)
       year: '2026',                  // [potwierdź] - tylko w PDF
       symbol: 'teraz',
       // Synchronizacja marki: codziennie pobiera logo, sygnet i kolory z teraz.eu (brand.json / favicon).
@@ -155,6 +156,7 @@ export const shared = {
       id: 'loom',
       title: 'loom.studio',
       type: 'studio',
+      beta: true,
       year: '2026',                  // [potwierdź] - tylko w PDF
       symbol: 'loom',
       // Logo (Haus w krzywych) i sygnet - trzy figury Bauhausu - z brand kitu loom.studio (repozytorium loomstudio)

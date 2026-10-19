@@ -110,7 +110,7 @@ function doc(lang, fmt, dark) {
     <div class="pj">
       <figure class="pj__media"><img src="${SHOTS}/${p.id}.jpg" alt=""></figure>
       <div class="pj__info">
-        <h2 class="pj__title">${esc(p.title)}</h2>
+        <h2 class="pj__title">${esc(p.title)}${p.beta ? ' <span class="beta">beta</span>' : ''}</h2>
         <p class="pj__tagline">${esc(tp.tagline)}</p>
         <p class="pj__lead">${esc(tp.lead)}</p>
         <dl class="pj__rows">${row(U.scope, esc(scope.join(' · ')))}${row(U.tools, esc(tools.join(' · ')))}${points.length ? row(U.highlights, `<ul class="dash">${points.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : ''}</dl>
