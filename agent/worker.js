@@ -7,12 +7,12 @@ import { systemPrompt } from '../agent.js';
 
 const MAX_MESSAGES = 12;     // ostatnie wiadomości rozmowy wysyłane do modelu
 const MAX_CHARS = 500;       // = maxlength pola na stronie
-const MAX_TOKENS = 500;      // długość odpowiedzi (1-4 zdania mieszczą się z zapasem)
+const MAX_TOKENS = 2000;     // limit odpowiedzi razem z myśleniem modelu (Opus 5.5 myśli zawsze; 1-4 zdania z zapasem)
 
 export default {
   async fetch(req, env) {
     const origin = req.headers.get('Origin') || '';
-    const allowed = (env.ALLOWED_ORIGINS || 'https://lumerw.github.io').split(',').map(s => s.trim());
+    const allowed = (env.ALLOWED_ORIGINS || 'https://lumerw.com').split(',').map(s => s.trim());
     const ok = allowed.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin);
     const cors = {
       'Access-Control-Allow-Origin': ok ? origin : allowed[0],
@@ -44,11 +44,15 @@ export default {
       headers: {
         'x-api-key': env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
+        // odmowa modelu (klasyfikatory bezpieczeństwa) → API samo ponawia na zapasowym modelu
+        'anthropic-beta': 'server-side-fallback-2026-07-01',
         'content-type': 'application/json',
       },
       body: JSON.stringify({
         model: env.MODEL || 'claude-opus-5-5',
         max_tokens: MAX_TOKENS,
+        output_config: { effort: 'low' },   // krótkie odpowiedzi z treści portfolio - niski wysiłek wystarcza
+        fallbacks: 'default',
         // Wiedza się nie zmienia między pytaniami - cache obniża koszt kolejnych zapytań.
         system: [{ type: 'text', text: systemPrompt(content, lang), cache_control: { type: 'ephemeral' } }],
         messages,
@@ -56,6 +60,7 @@ export default {
     });
     if (!res.ok) return json({ error: 'upstream', status: res.status }, 502);
     const data = await res.json();
+    if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);   // czat przejdzie na tryb lokalny
     const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
     if (!text) return json({ error: 'empty' }, 502);
     return json({ text: text.replace(/[—–]/g, '-') });

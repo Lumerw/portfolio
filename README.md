@@ -191,7 +191,7 @@ Każda sekcja (start, Portfolio, Jak pracuję, Rekomendacje, Kontakt) zajmuje je
 
 ## Wyszukiwarki
 
-`npm run build` dopisuje do `<head>` dane strukturalne schema.org `Person` (imię, rola, opis, mail, adres strony, `sameAs` tylko z prawdziwych linków profili) i tworzy `sitemap.xml` + `robots.txt` z `shared.siteUrl`. Na adresie `lumerw.github.io/portfolio` roboty czytają `robots.txt` tylko z głównej domeny, więc mapę strony zgłoś ręcznie w Google Search Console; po podpięciu własnej domeny zadziała sama.
+`npm run build` dopisuje do `<head>` dane strukturalne schema.org `Person` (imię, rola, opis, mail, adres strony, `sameAs` tylko z prawdziwych linków profili) i tworzy `sitemap.xml` + `robots.txt` z `shared.siteUrl`. Strona stoi na własnej domenie `lumerw.com` (GoDaddy: 4 rekordy A na GitHub Pages + `www` CNAME na `lumerw.github.io`; w repozytorium plik `CNAME`), więc roboty znajdą `robots.txt` i mapę strony same.
 
 ## Testy na GitHubie
 

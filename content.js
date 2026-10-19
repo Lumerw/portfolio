@@ -11,7 +11,7 @@ export const shared = {
   name: 'Wojciech Lumer',            // [potwierdź zapis]
   slug: 'lumer',                     // używane w nazwie PDF: portfolio-lumer-pl.pdf
   year: '2026',
-  siteUrl: 'https://lumerw.github.io/portfolio', // adres strony - QR w PDF, Open Graph; zmień po podpięciu domeny
+  siteUrl: 'https://lumerw.com', // adres strony (domena z GoDaddy → GitHub Pages) - QR w PDF, Open Graph, sitemap
   email: 'wojciechlumer@gmail.com',
   // Przycisk „kontakt” - link do kalendarza spotkań. [Wpisz swój link Calendly]
   calendly: 'https://calendly.com/wojciechlumer/30min',  // przycisk „kontakt” (placeholder = mail)

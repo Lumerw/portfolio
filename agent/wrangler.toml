@@ -9,7 +9,7 @@ compatibility_date = "2026-09-01"
 
 [vars]
 # Strony, które mogą pytać (po przecinku). localhost działa zawsze - do testów.
-ALLOWED_ORIGINS = "https://lumerw.github.io"
+ALLOWED_ORIGINS = "https://lumerw.com,https://www.lumerw.com,https://lumerw.github.io"
 # Model Claude. Taniej: claude-haiku-5-5 albo claude-sonnet-5-5.
 MODEL = "claude-opus-5-5"
 
