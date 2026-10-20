@@ -544,8 +544,15 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
    Kalendarz rezerwacji (panel #rozmowa): dni i godziny jako przyciski kreską 1 px, formularz jak czat
    ========================================================================== */
 .sheet--booking .sheet__bar .icon { width: 16px; height: 16px; }
-.book { max-width: 760px; padding-bottom: var(--s-6); }
-.book__intro { max-width: 34em; margin-bottom: var(--s-4); }
+.book { padding-bottom: var(--s-6); }
+/* Kolumna informacji: kto, po co, 30 min, online, strefa czasowa */
+.book__info { display: grid; gap: var(--s-2); align-content: start; max-width: 34em; margin-bottom: var(--s-3); }
+.book__who { display: flex; align-items: center; gap: var(--s-1); font-weight: var(--fw-medium); }
+.book__who img { width: 32px; height: 32px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 var(--hairline) var(--hair); }
+.book__intro { max-width: 30em; }
+.book__facts { display: grid; gap: 2px; }
+.book__facts li { padding-left: 1.1em; text-indent: -1.1em; }
+.book__facts li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
 .book__nojs { display: block; }
 .js .book__nojs { display: none; }
 .book__label { margin: var(--s-3) 0 var(--s-1); }
@@ -570,8 +577,21 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
   .book__pick { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: var(--s-5); align-items: start; }
   .book__pick .book__times { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
 }
+/* Szeroki ekran: trzy kolumny jak w Calendly - informacje | kalendarz | godziny (po wyborze godziny: formularz),
+   całość wyśrodkowana w panelu, bez przewijania. Węziej (tablet) informacje nad kalendarzem i godzinami. */
+@media (min-width: 1200px) {
+  .sheet--booking .sheet__body { display: flex; flex-direction: column; justify-content: center; }
+  .book { display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: var(--s-6); align-items: start; width: 100%; max-width: 1160px; margin-inline: auto; padding-bottom: var(--s-3); }
+  .book__info { margin: 0; padding-right: var(--s-5); border-right: var(--hairline) solid var(--hair); min-height: 100%; }
+  .book__pick { grid-template-columns: minmax(0, 400px) minmax(260px, 340px); gap: var(--s-6); }
+  .book__label:first-child { margin-top: 0; }
+  .book__col--side { max-height: 460px; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
+  .book__col--side .book__times { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .book__col--side .book__form { margin-top: 0; padding-top: 0; border-top: 0; }
+}
 .book__form { display: grid; gap: var(--s-2); margin-top: var(--s-4); padding-top: var(--s-3); border-top: var(--hairline) solid var(--hair); }
-.book__when { font-weight: var(--fw-medium); }
+.book__when { display: grid; gap: 4px; font-weight: var(--fw-medium); }
+.book__back { justify-self: start; font-weight: var(--fw-regular); background: none; border-width: 0 0 var(--hairline); cursor: pointer; }
 .book__field { display: grid; gap: 4px; }
 .book__field input, .book__field textarea {
   min-height: 48px;

@@ -80,7 +80,7 @@ function deck(lang) {
 
   const site = c.siteUrl.replace(/^https?:\/\//, '');
   const links = [
-    ...(isReal(c.calendly) ? [ext(c.calendly, t.ui.contactButton + ' ↗')] : []),
+    ...(isReal(c.calendly) ? [ext(c.booking?.calUsername ? `${c.siteUrl.replace(/\/$/, '')}/${lang === 'en' ? 'en/' : ''}#rozmowa` : c.calendly, t.ui.contactButton + ' ↗')] : []),   // kalendarz na stronie
     ...c.links.filter(l => isReal(l.href)).map(l => ext(l.href, l.label)),
   ];
   const contact = `

@@ -434,7 +434,9 @@ export const pl = {
   },
   booking: {
     title: 'Umów rozmowę',
-    intro: 'Rozmowa online, 30 minut. Wybierz dzień i godzinę - potwierdzenie i link do spotkania przyjdą na Twój e-mail.',
+    intro: 'Porozmawiajmy o Twoim projekcie. Wybierz dzień i godzinę.',
+    // kolumna informacji obok kalendarza (desktop: po lewej, telefon: nad kalendarzem)
+    facts: ['30 minut', 'online - link do spotkania w mailu', 'potwierdzenie od razu na e-mail'],
     length: 'Długość rozmowy',
     loading: 'Wczytuję wolne terminy…',
     empty: 'Brak wolnych terminów w najbliższych tygodniach. Napisz do mnie:',
@@ -488,7 +490,7 @@ export const pl = {
       open: 'otwórz projekt',
       site: 'strona projektu ↗',
       contact: 'Najszybciej mailem:',
-      call: 'umów rozmowę ↗',
+      call: 'umów rozmowę',
       tools: 'Narzędzia:',
       experience: 'Doświadczenie:',
       education: 'Wykształcenie:',
@@ -719,7 +721,8 @@ export const en = {
   },
   booking: {
     title: 'Book a call',
-    intro: 'A 30-minute online call. Pick the day and time - the confirmation and meeting link will arrive by e-mail.',
+    intro: 'Let’s talk about your project. Pick a day and time.',
+    facts: ['30 minutes', 'online - meeting link by e-mail', 'confirmation sent right away'],
     length: 'Call length',
     loading: 'Loading free slots…',
     empty: 'No free slots in the coming weeks. Write to me:',
@@ -771,7 +774,7 @@ export const en = {
       open: 'open project',
       site: 'project site ↗',
       contact: 'Email is the fastest:',
-      call: 'book a call ↗',
+      call: 'book a call',
       tools: 'Tools:',
       experience: 'Experience:',
       education: 'Education:',

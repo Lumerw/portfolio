@@ -429,7 +429,10 @@ function appendText(node, text) {
     node.append(text.slice(i, m.index));
     const a = el('a', 'link-u', m[0]);
     a.href = m[0].startsWith('http') ? m[0] : `mailto:${m[0]}`;
-    if (m[0].startsWith('http')) { a.target = '_blank'; a.rel = 'noopener'; }
+    // adres tej strony z kotwicą (np. …/#rozmowa) - otwiera panel w tej samej karcie; reszta w nowej
+    const own = m[0].startsWith('http') && new URL(m[0]).hostname === location.hostname && new URL(m[0]).hash;
+    if (own) a.href = new URL(m[0]).hash;
+    else if (m[0].startsWith('http')) { a.target = '_blank'; a.rel = 'noopener'; }
     node.append(a);
     i = m.index + m[0].length;
   }

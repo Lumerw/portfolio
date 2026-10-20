@@ -50,7 +50,7 @@ function cv(lang) {
   const tools = t.about.tools.map(clean).filter(Boolean);
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'Behance', 'GitHub'].includes(l.label));
   const contactLinks = [
-    ...(isReal(c.calendly) ? [link(c.calendly, V.call)] : []),
+    ...(isReal(c.calendly) ? [link(c.booking?.calUsername ? `${site}/${lang === 'en' ? 'en/' : ''}#rozmowa` : c.calendly, V.call)] : []),   // kalendarz na stronie
     ...profiles.map(l => link(l.href, l.label)),
   ].join('');
 

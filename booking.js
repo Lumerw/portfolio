@@ -3,7 +3,7 @@
 //   GET  /v2/slots     (cal-api-version 2024-09-04)  - wolne terminy na 4 tygodnie, w strefie odwiedzającego
 //   POST /v2/bookings  (cal-api-version 2024-08-13)  - rezerwacja: imię, e-mail, strefa, opcjonalna notatka
 // Cal.com sam wysyła potwierdzenie z linkiem do spotkania i wpisuje je do kalendarza właściciela.
-// Kroki: długość rozmowy → dzień (siatka tygodni pn-nd) → godzina → formularz → potwierdzenie.
+// Kroki: dzień (siatka tygodni pn-nd) → godzina → formularz w miejscu listy godzin → potwierdzenie.
 // main.js ładuje ten moduł przy pierwszym otwarciu panelu. Teksty: pl/en.booking w content.js.
 
 const API = 'https://api.cal.com/v2';
@@ -41,10 +41,13 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
   const locale = lang === 'pl' ? 'pl-PL' : 'en-GB';
   const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
   const fmtDate = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+  const fmtDay = fmtDate;
   const fmtFull = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
   const fmtMonth = new Intl.DateTimeFormat(locale, { month: 'long' });
   const fmtWeekday = new Intl.DateTimeFormat(locale, { weekday: 'short' });
   let ev = events[0], slots = {}, day = null, slot = null, seq = 0;
+  const tzOut = root.querySelector('[data-book-tz]');
+  if (tzOut) tzOut.textContent = tz;
 
   const mailLink = () => Object.assign(el('a', 'link-u', email), { href: `mailto:${email}` });
   const status = (text, withMail = false) => {
@@ -115,27 +118,36 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
     const left = el('div', 'book__col');
     left.append(el('p', 'book__label t-meta', `${copy.day} · ${months}`), cal);
 
-    // 3. Godzina wybranego dnia
-    const times = group('book__times', copy.time);
-    for (const iso of slots[day] || []) {
-      times.append(button('book__time', fmtTime.format(new Date(iso)), iso === slot, () => {
-        slot = iso; render(); ui.querySelector('#book-name')?.focus();
-      }));
+    // 3. Prawa kolumna: godziny wybranego dnia, a po wyborze godziny - w tym samym miejscu formularz
+    // (jak w Calendly: wszystko na jednym ekranie, bez przewijania na desktopie)
+    const right = el('div', 'book__col book__col--side');
+    if (slot) {
+      right.append(form());
+    } else {
+      const times = group('book__times', copy.time);
+      for (const iso of slots[day] || []) {
+        times.append(button('book__time', fmtTime.format(new Date(iso)), false, () => {
+          slot = iso; render();
+          const name = ui.querySelector('#book-name');
+          name?.focus({ preventScroll: true });
+          name?.closest('.book__form')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }));
+      }
+      right.append(el('p', 'book__label t-meta', `${copy.time} · ${fmtDay.format(new Date(`${day}T12:00:00`))}`), times);
     }
-    const right = el('div', 'book__col');
-    right.append(el('p', 'book__label t-meta', `${copy.time} · ${copy.tz}: ${tz}`), times);
-    // Od 768 px: kalendarz po lewej, godziny po prawej
     const pick = el('div', 'book__pick');
     pick.append(left, right);
     parts.push(pick);
 
     ui.replaceChildren(...parts);
-    if (slot) ui.append(form());
   }
 
   function form() {
     const f = el('form', 'book__form');
-    f.append(el('p', 'book__when t-text', `${fmtFull.format(new Date(slot))} · ${ev.minutes} min`));
+    // wybrany termin + powrót do listy godzin
+    const when = el('div', 'book__when');
+    when.append(el('p', 't-text', `${fmtFull.format(new Date(slot))} · ${ev.minutes} min`), button('book__back link-u t-meta', `← ${copy.change}`, null, () => { slot = null; render(); }));
+    f.append(when);
     const field = (id, label, type, required) => {
       const l = el('label', 'book__field');
       l.append(el('span', 't-meta', label));
@@ -152,7 +164,7 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
     };
     f.append(field('book-name', copy.name, 'text', true), field('book-email', copy.email, 'email', true), field('book-note', copy.note, 'textarea', false));
     const actions = el('div', 'book__actions');
-    const submit = el('button', 'button', copy.submit);
+    const submit = el('button', 'button button--primary', copy.submit);
     submit.type = 'submit';
     actions.append(submit);
     f.append(actions);

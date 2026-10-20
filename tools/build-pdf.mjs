@@ -64,7 +64,7 @@ function doc(lang, fmt, dark) {
   const c = content.shared, t = content[lang], U = t.ui;
   const [W, H] = FORMATS[fmt];
   const site = c.siteUrl.replace(/\/$/, '');
-  const cal = c.booking?.calUsername ? `https://cal.com/${c.booking.calUsername}/${c.booking.events?.[0]?.slug ?? ''}` : (isReal(c.calendly) ? c.calendly : `mailto:${c.email}`);   // rozmowa 30 min
+  const cal = c.booking?.calUsername ? `${site}/${lang === 'en' ? 'en/' : ''}#rozmowa` : (isReal(c.calendly) ? c.calendly : `mailto:${c.email}`);   // kalendarz rozmowy na stronie (30 min)
   const linkedin = c.links.find(l => l.label === 'LinkedIn')?.href;
   const total = 2 + c.projects.length;
   const counter = n => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;

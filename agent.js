@@ -37,8 +37,9 @@ function findProject(c, q) {
 }
 
 const mailLink = c => ({ label: c.email, href: `mailto:${c.email}` });
-// Rozmowa: kalendarz Cal.com (30 min), zapasowo shared.calendly
-const callUrl = c => (c.booking?.calUsername ? `https://cal.com/${c.booking.calUsername}/${c.booking.events?.[0]?.slug ?? ''}` : c.calendly);
+// Rozmowa: kalendarz na stronie (panel #rozmowa, 30 min); bez kalendarza - zewnętrzna strona rezerwacji
+const hasCal = c => !!c.booking?.calUsername;
+const callUrl = (c, lang = 'pl') => (hasCal(c) ? `${c.siteUrl.replace(/\/$/, '')}/${lang === 'en' ? 'en/' : ''}#rozmowa` : c.calendly);
 
 export function localAnswer(content, lang, question) {
   const c = content.shared, t = content[lang], A = t.agent.answers;
@@ -59,7 +60,8 @@ export function localAnswer(content, lang, question) {
     case 'thanks': return { text: A.thanks, links: [mailLink(c)] };
     case 'contact': {
       const links = [mailLink(c)];
-      if (realUrl(callUrl(c))) links.push({ label: A.call, href: callUrl(c), ext: true });
+      if (hasCal(c)) links.push({ label: A.call, href: '#rozmowa' });
+      else if (realUrl(c.calendly)) links.push({ label: A.call, href: c.calendly, ext: true });
       for (const l of c.links) if (realUrl(l.href)) links.push({ label: l.label, href: l.href, ext: true });
       return { text: A.contact, links };
     }
@@ -71,7 +73,7 @@ export function localAnswer(content, lang, question) {
     case 'process': {
       const P = t.process;
       if (!P?.steps?.length) return unknown();
-      const links = realUrl(callUrl(c)) ? [{ label: A.call, href: callUrl(c), ext: true }] : [mailLink(c)];
+      const links = hasCal(c) ? [{ label: A.call, href: '#rozmowa' }] : realUrl(c.calendly) ? [{ label: A.call, href: c.calendly, ext: true }] : [mailLink(c)];
       return { text: A.process, items: P.steps.map(st => `${st.title} - ${st.text} ${P.get} ${st.result}.`), links };
     }
     case 'pdf': return { text: A.pdf, links: [{ label: A.pdfLink, href: t.ui.pdfFile, download: true }] };
@@ -113,7 +115,7 @@ export function knowledge(content, lang) {
     line('Bio', t.about.bio),
     line('Website', c.siteUrl),
     `E-mail: ${c.email}`,
-    realUrl(callUrl(c)) ? `Book a 30-minute call: ${callUrl(c)} (or the calendar on the site)` : null,
+    realUrl(callUrl(c, lang)) ? `Book a 30-minute call in the calendar on this site: ${callUrl(c, lang)} (the "book a call" button in the Contact section)` : null,
     ...c.links.filter(l => realUrl(l.href)).map(l => `${l.label}: ${l.href}`),
     `Portfolio PDF: ${c.siteUrl}/${t.ui.pdfFile}`,
     realUrl(c.drive) ? `Work archive (campaigns, key visuals, videos) on Google Drive: ${c.drive}` : null,
