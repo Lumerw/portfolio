@@ -224,7 +224,7 @@ function work(c, t) {
       <ul>${c.projects.map(indexRow).join('')}
 ${url(c.drive) !== '#' ? `
         <li ${reveal(n + 4)}>
-          <a class="index__row index__row--sub" href="${esc(c.drive)}" target="_blank" rel="noopener"><span class="index__no">${driveIcon}</span><span class="index__title">${esc(t.ui.drive)} ↗</span><span class="index__year t-meta">${esc(t.ui.driveType)}</span></a>
+          <a class="index__row index__row--sub" href="${esc(c.drive)}" target="_blank" rel="noopener"><span class="index__no">${driveIcon}</span><span class="index__title">${esc(t.ui.drive)}</span><span class="index__year t-meta">${esc(t.ui.driveType)}</span></a>
         </li>` : ''}
         <li ${reveal(n + 5)}>
           <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year t-meta">${esc(t.ui.downloadType)}</span></a>

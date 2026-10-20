@@ -15,7 +15,7 @@ export const shared = {
   email: 'wojciechlumer@gmail.com',
   // Zewnętrzna strona rezerwacji rozmowy (zapas dla kalendarza na stronie, CV i deck)
   // Archiwum prac (kampanie, KV, wideo) - publiczny folder Google Drive; wiersz w sekcji Portfolio
-  drive: 'https://drive.google.com/drive/folders/1oHAvj983Vswnud6h8LEDwE2bzd2_Og__',
+  drive: 'https://drive.google.com/drive/folders/1oHAvj983Vswnud6h8LEDwE2bzd2_Og__?usp=sharing',
   calendly: 'https://cal.com/wojciech-lumer-sxkqby/30min',  // zewnętrzna strona rezerwacji (Cal.com, 30 min) - zapas, gdy kalendarz na stronie nie działa
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
   // calUsername = <nazwa> z cal.com/<nazwa>, events = typy spotkań z cal.com/<nazwa>/<slug> (pierwszy domyślny).
