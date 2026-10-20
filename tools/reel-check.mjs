@@ -747,54 +747,24 @@ async function toggleGroup(browser) {
   const bad = [], notes = [];
   try {
     await go(page, '#teraz', 'sheet');
+    // Bez przycisku pauzy (decyzja właściciela, 20.10.2026); klik w kadr otwiera stronę projektu w nowej karcie
     const info = await page.evaluate(() => {
       const reel = window.__reel.target('sheet');
-      const tg = reel?.parentElement?.querySelector(':scope > .reel__toggle');
-      if (!reel || !tg) return { reel: !!reel, tg: !!tg };
-      const r = tg.getBoundingClientRect();
-      return {
-        reel: true, tg: true, role: reel.getAttribute('role'), sibling: tg.parentElement === reel.parentElement,
-        inImg: !!tg.closest('[role="img"]'), w: r.width, h: r.height, tag: tg.tagName, type: tg.getAttribute('type'),
-        pressed: tg.getAttribute('aria-pressed'), label: tg.getAttribute('aria-label'),
-      };
+      const open = reel?.parentElement?.querySelector(':scope > .sheet__open');
+      return { reel: !!reel, role: reel?.getAttribute('role'), toggles: document.querySelectorAll('.reel__toggle').length, href: open?.getAttribute('href'), target: open?.getAttribute('target'), label: open?.getAttribute('aria-label') };
     });
-    if (!info.reel || !info.tg) throw new Error(info.reel ? 'brak .reel__toggle obok widocznego .reel' : 'brak widocznego .reel w #teraz');
+    if (!info.reel) throw new Error('brak widocznego .reel w #teraz');
     if (info.role !== 'img') bad.push(`.reel role="${info.role}"`);
-    if (!info.sibling || info.inImg) bad.push('przełącznik nie jest rodzeństwem role=img');
-    if (Math.abs(info.w - 40) > .5 || Math.abs(info.h - 40) > .5) bad.push(`rozmiar ${info.w}x${info.h}`);
-    if (info.tag !== 'BUTTON' || info.type !== 'button') bad.push(`<${info.tag.toLowerCase()} type=${info.type}>`);
-    if (info.pressed !== 'false') bad.push(`na starcie aria-pressed="${info.pressed}"`);
-    if (!info.label) bad.push('brak aria-label');
-    const state = () => page.evaluate(async () => {
-      await window.__reel.frames(2);
-      const reel = window.__reel.target('sheet');
-      const tg = reel.parentElement.querySelector(':scope > .reel__toggle');
-      return { paused: reel.classList.contains('is-paused'), pressed: tg.getAttribute('aria-pressed'), clock: window.__reel.clock(reel)?.playState ?? null };
-    });
-    const tg = page.locator('#teraz .reel__toggle >> visible=true').first();
-    const expectState = (s, on, how) => {
-      const ok = s.paused === on && s.pressed === String(on) && s.clock === (on ? 'paused' : 'running');
-      if (!ok) bad.push(`${how}: .is-paused ${s.paused}, aria-pressed ${s.pressed}, reel-clock ${s.clock}`);
-      return ok;
-    };
-    await tg.click();
-    const okA = expectState(await state(), true, 'klik 1');
-    await tg.click();
-    const okB = expectState(await state(), false, 'klik 2');
-    await tg.focus();
-    await page.keyboard.press('Enter');
-    const okC = expectState(await state(), true, 'Enter');
-    await page.keyboard.press('Space');
-    const okD = expectState(await state(), false, 'Spacja');
-    if (okA && okB && okC && okD) notes.push('klik i klawiatura przełączają .is-paused, aria-pressed i zegar');
-    notes.unshift(`rodzeństwo role=img, ${info.w}x${info.h}`);
+    if (info.toggles) bad.push(`przyciski pauzy: ${info.toggles}`);
+    if (!info.href || info.target !== '_blank' || !info.label) bad.push(`nakładka-link: ${JSON.stringify(info)}`);
+    else notes.push(`bez pauzy; kadr → ${info.href} (nowa karta, „${info.label}”)`);
     if (bad.length) await shot(page, 'toggle');
   } catch (e) {
     bad.push(`błąd: ${e.message.split('\n')[0]}`);
   } finally {
     await ctx.close();
   }
-  check('Przełącznik pauzy: rodzeństwo role=img, 40x40, klik i Enter/Spacja', !bad.length, list(bad.length ? bad : notes));
+  check('Panel: bez przycisku pauzy, klik w kadr otwiera stronę projektu', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- prefers-reduced-motion: zero animacji, kadr stały z sekcji 9 ---------- */
@@ -961,9 +931,8 @@ async function nojsGroup(browser) {
     });
     const a = await read();
     if (a.js) bad.push('klasa .js bez JS');
-    if (!a.toggles.length) bad.push('brak .reel__toggle w HTML');
-    else if (a.toggles.some(d => d !== 'none')) bad.push(`przełącznik widoczny (${a.toggles.join(', ')})`);
-    else notes.push('przełącznik ukryty');
+    if (a.toggles.length) bad.push(`przyciski pauzy w HTML: ${a.toggles.length}`);
+    else notes.push('bez przycisku pauzy');
     const closedT = a.sheetT.filter(t => t != null); // ukryty format (display: none) nie ma animacji
     if (!closedT.length || closedT.some(t => t > 100)) bad.push(`zamknięty panel: zegar ${a.sheetT.map(t => (t == null ? '-' : Math.round(t))).join('/')} ms`);
     // Wiersz jest pod pierwszym ekranem; przewinięcie bez płynnej animacji, potem klik (jak użytkownik)
@@ -986,7 +955,7 @@ async function nojsGroup(browser) {
   } finally {
     await ctx.close();
   }
-  check('Bez JS: #teraz od 0, przełącznik ukryty, format z CSS', !bad.length, list(bad.length ? bad : notes));
+  check('Bez JS: #teraz od 0, bez przycisku pauzy, format z CSS', !bad.length, list(bad.length ? bad : notes));
 }
 
 /* ---------- Tryb ciemny: reel identyczny w obu motywach ---------- */

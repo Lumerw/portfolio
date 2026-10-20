@@ -346,10 +346,6 @@ export function loadCss() {
   return css;
 }
 
-// Przycisk pauzy w panelu (WCAG 2.2.2) - ten sam co przy planszy teraz; stan niesie aria-pressed.
-export const toggleMarkup = (label, pressed = false) =>
-  `<button class="reel__toggle" type="button" aria-pressed="${pressed}" aria-label="${esc(label)}">${svgi(RP.pause, 'reel__ico-pause')}${svgi(RP.play, 'reel__ico-play')}</button>`;
-
 // HTML grafiki. static: bez ruchu (stan końcowy) - do generowania statycznej planszy (cover).
 // lite: wersja uproszczona na kartę sfery (reh.ab bez akapitu i paska z cytatami).
 export function liveMarkup(p, { static: still = false, lite = false } = {}) {

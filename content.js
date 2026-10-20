@@ -276,7 +276,6 @@ export const pl = {
     avatar: 'Zapytaj o mnie - asystent AI',
     sphereHint: 'przeciągnij, żeby obrócić',
     qr: 'wersja www',
-    reelPause: 'zatrzymaj animację', // przycisk pauzy planszy w panelu (stan: aria-pressed)
   },
   hero: {
     role: 'projektant',                                   // podpis przy imieniu nad hasłem
@@ -568,7 +567,6 @@ export const en = {
     avatar: 'Ask about me - AI assistant',
     sphereHint: 'drag to rotate',
     qr: 'website',
-    reelPause: 'pause animation',
   },
   hero: {
     role: 'designer',

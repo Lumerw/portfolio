@@ -325,11 +325,14 @@ function promo(p, tp, t) {
   const fmt = SHEET_FMT, v = p.video[fmt];
   const ratio = `--ratio:${v.w} / ${v.h}; --ar:${(v.w / v.h).toFixed(4)}`;
   const real = v.src && isReal(v.src);
+  const open = url(p.href) !== '#'
+    ? `
+          <a class="sheet__open" href="${esc(p.href)}" target="_blank" rel="noopener" aria-label="${esc(`${p.title} - ${t.ui.view}`)}"></a>`
+    : '';
   if (!real && p.reel) {
     return `
         <figure class="sheet__video sheet__video--${fmt} media" style="${ratio}">
-          ${reel(p, tp, fmt)}
-          <button class="reel__toggle" type="button" aria-pressed="false" aria-label="${esc(t.ui.reelPause)}">${svgi(RP.pause, 'reel__ico-pause')}${svgi(RP.play, 'reel__ico-play')}</button>
+          ${reel(p, tp, fmt)}${open}
         </figure>`;
   }
   const cover = p.cover?.[fmt];
@@ -343,7 +346,7 @@ function promo(p, tp, t) {
       : brandPoster || `<img class="${mono(v.poster).trim()}" src="${esc(v.poster)}" width="${v.w}" height="${v.h}" alt="${esc(tp.alt.video)}" loading="lazy" decoding="async">`;
   return `
         <figure class="sheet__video sheet__video--${fmt} media" style="${ratio}">
-          ${media}
+          ${media}${open}
         </figure>`;
 }
 
@@ -609,7 +612,7 @@ function footer(c, t) {
   </div>
   <div class="site-footer__actions">
     <a class="button button--primary site-footer__button" href="${book ? '#rozmowa' : cal ? esc(cal) : mailHref}"${book ? ' aria-haspopup="dialog"' : cal ? ' target="_blank" rel="noopener"' : ''}>${book || cal ? calendarIcon : ''}${esc(t.ui.contactButton)}</a>
-    <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-dot" aria-hidden="true"></span>${esc(t.ui.askAgent)}</a>
+    <a class="button site-footer__agent" href="#agent" aria-haspopup="dialog"><span class="agent-glow" aria-hidden="true"></span><img class="agent-btn-face" src="${esc(c.avatar.drawing)}" width="256" height="256" alt="" loading="lazy" decoding="async">${esc(t.ui.askAgent)}</a>
   </div>
   <figure class="contact__qr print-only">
     <img src="assets/qr.svg" width="96" height="96" alt="QR - ${esc(c.siteUrl)}">

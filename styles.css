@@ -1185,30 +1185,6 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
   .reel__stage { --l-s: .7; }
 }
 
-/* Pauza (tylko w panelu, tylko z JS): okrągły przycisk 40 × 40 obok planszy, nie w niej */
-.reel__toggle { display: none; }
-.js .reel__toggle {
-  display: grid;
-  place-items: center;
-  position: absolute;
-  z-index: 2;
-  top: 12px;
-  right: 12px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 0;
-  background: rgb(0 0 0 / .6);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25);
-  color: #fff;
-  cursor: pointer;
-}
-.reel__toggle svg { width: 14px; height: 14px; fill: currentColor; }
-.reel__toggle .reel__ico-play,
-.reel__toggle[aria-pressed="true"] .reel__ico-pause { display: none; }
-.reel__toggle[aria-pressed="true"] .reel__ico-play { display: block; }
-/* Focus niezależny od motywu (--ink na ciemnej planszy byłby niewidoczny w jasnym trybie) */
-.reel__toggle:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* Bez ruchu: globalne animation: none zatrzymuje wszystko; tu sensowna klatka stała —
    znak w nagłówku, oba kafelki z obwódkami, tytuł i podpis rozmowy, hasło z narysowaną falką na dole */
@@ -1217,7 +1193,7 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
   .reel__field--l, .reel__field--e { opacity: .35; }
   .reel__field--m { opacity: 1; }
   .reel__tile, .reel__ring, .reel__title, .reel__cap { opacity: 1; }
-  .reel__ring::after, .reel__glyph, .reel__scene, .reel__legend, .js .reel__toggle { display: none; }
+  .reel__ring::after, .reel__glyph, .reel__scene, .reel__legend { display: none; }
   .reel .reel__claim { top: auto; bottom: calc(var(--pad) + .5em); opacity: 1; }
   .reel .reel__call { bottom: calc(var(--pad) + var(--claim-fs) * 2.8); }
   .reel__falka, .reel__falka-in { translate: none; }        /* stała, w pełni narysowana */
@@ -1311,6 +1287,10 @@ html:has(.sheet:target) { overflow: hidden; }
 .pj { display: grid; gap: var(--s-4); }
 .sheet__video { width: 100%; }
 .sheet__video video { background: var(--ink); }
+/* Klik w kadr otwiera stronę projektu (nakładka-link nad grafiką; bez adresu - brak nakładki) */
+.sheet__video { position: relative; }
+.sheet__open { position: absolute; inset: 0; z-index: 3; cursor: pointer; }
+.sheet__open:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .pj__info { display: flex; flex-direction: column; gap: var(--s-2); max-width: 34em; }
 .pj__tagline { color: var(--ink); }
 .pj__rows { display: grid; margin-top: var(--s-2); border-top: var(--hairline) solid var(--hair); }
@@ -1392,7 +1372,26 @@ html:has(.sheet:target) { overflow: hidden; }
   .site-footer__actions { display: flex; flex-wrap: wrap; }
   .site-footer__actions > * { flex: none; width: 15em; }   /* oba przyciski tej samej szerokości, obok siebie lub jeden pod drugim */
 }
-.site-footer__agent { gap: var(--s-1); }
+.site-footer__agent { position: relative; isolation: isolate; gap: var(--s-1); }
+.site-footer { overflow-x: clip; }   /* poświata przycisku asystenta nie poszerza strony na telefonie */
+/* Przycisk asystenta: rysunek kreską (jak w panelu czatu) i tęczowa poświata za przyciskiem - tylko w lewym
+   górnym i prawym dolnym rogu, słabsza niż przy awatarze; kolory płyną (obrót koła pod maską rogów). */
+.agent-btn-face { flex: none; width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 var(--hairline) var(--hair); }
+.agent-glow {
+  --g: 64px;                             /* pole poświaty wokół przycisku - maska gaśnie przed jego brzegiem */
+  position: absolute;
+  z-index: -1;
+  inset: calc(var(--g) * -1);
+  pointer-events: none;
+  filter: blur(10px);
+  opacity: .6;
+  -webkit-mask-image: radial-gradient(46px 24px at calc(var(--g) + 36px) calc(var(--g) + 2px), #000 10%, transparent 100%), radial-gradient(46px 24px at calc(100% - var(--g) - 36px) calc(100% - var(--g) - 2px), #000 10%, transparent 100%);
+  mask-image: radial-gradient(46px 24px at calc(var(--g) + 36px) calc(var(--g) + 2px), #000 10%, transparent 100%), radial-gradient(46px 24px at calc(100% - var(--g) - 36px) calc(100% - var(--g) - 2px), #000 10%, transparent 100%);
+}
+.agent-glow::before { content: ""; position: absolute; left: 50%; top: 50%; width: 130%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: var(--rainbow); animation: agent-spin 7s linear infinite; }
+/* tło przycisku nad poświatą (::after po niej w DOM), więc kolory widać tylko na zewnątrz krawędzi */
+.site-footer__agent::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--paper); transition: background-color var(--t-line) var(--ease); }
+.site-footer__agent:hover::after, .site-footer__agent:focus-visible::after { background: var(--ink); }
 @media (min-width: 400px) { .site-footer .mail { white-space: nowrap; } }   /* przy 320 px adres może się złamać */
 .site-footer__button { gap: var(--s-1); }
 /* Nawigator sekcji (desktop): linia 1 px z samymi kółkami jak znak, aktywne wypełnione. Nazwy sekcji
@@ -1585,7 +1584,6 @@ html:has(.sheet:target) { overflow: hidden; }
 @keyframes agent-spin { to { transform: rotate(1turn); } }
 
 /* Znak asystenta w pasku panelu: kółko wypełnione tęczą, kolory płyną (obrót koła) */
-.agent-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--rainbow); animation: agent-spin 6s linear infinite; }
 /* Awatar w pasku panelu asystenta: rysunek kreską (czarno-biały) z tęczowym cieniem jak w hero */
 .agent-face { position: relative; isolation: isolate; flex: none; width: 32px; height: 32px; border-radius: 50%; }
 .agent-face::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: 50%; background: var(--rainbow); filter: blur(6px); opacity: .8; animation: agent-spin 6s linear infinite; }

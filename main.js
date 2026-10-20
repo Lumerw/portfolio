@@ -141,20 +141,13 @@ async function showLive(host, id) {
   const old = host.querySelector('.live');
   if (old) { for (const a of old.getAnimations({ subtree: true })) a.currentTime = 0; return; }
   liveMod ??= import('./live.js');
-  const { liveMarkup, startLive, loadCss, toggleMarkup } = await liveMod;
+  const { liveMarkup, startLive, loadCss } = await liveMod;
   await loadCss();
   const img = host.querySelector(':scope > img');
   if (!img || host.querySelector('.live') || !host.isConnected) return;
   // Karta na sferze: wersja uproszczona (lite); panel: pełna
   img.insertAdjacentHTML('afterend', liveMarkup(content.shared.projects.find(p => p.id === id), { lite: !!host.closest('.sphere__card') }));
   const el = img.nextElementSibling;
-  // Panel: przycisk pauzy; stan wspólny dla formatów (obrót ekranu nie wznawia ruchu)
-  const sheet = host.closest('.sheet');
-  if (sheet) {
-    const paused = !!sheet.querySelector('.reel__toggle[aria-pressed="true"]');
-    host.insertAdjacentHTML('beforeend', toggleMarkup(content[root.lang].ui.reelPause, paused));
-    el.classList.toggle('is-paused', paused);
-  }
   startLive(el);
 }
 const visibleFigure = sheet => [...sheet.querySelectorAll('.sheet__video')].find(f => f.offsetParent !== null);
@@ -233,26 +226,9 @@ const onFormatChange = () => {
   const sheet = openSheet();
   playVisible(sheet);
   if (sheet) showLive(visibleFigure(sheet), sheet.id);
-  const f = document.activeElement;
-  if (sheet && f?.matches('.reel__toggle') && f.offsetParent === null) {
-    [...sheet.querySelectorAll('.reel__toggle')].find(t => t.offsetParent !== null)?.focus({ preventScroll: true });
-  }
 };
 matchMedia('(min-width: 768px) and (orientation: portrait)').addEventListener('change', onFormatChange);
 matchMedia('(max-width: 767px) and (orientation: portrait)').addEventListener('change', onFormatChange);
-
-/* Pauza planszy animowanej w panelu. Stan niesie aria-pressed; etykieta stała.
-   Stan wspólny dla obu formatów panelu (16:9 i 4:5) - obrót tabletu nie wznawia ruchu.
-   Po zmianie języka (nowy DOM) plansza znów gra. */
-app.addEventListener('click', e => {
-  const b = e.target.closest('.reel__toggle');
-  if (!b) return;
-  const paused = b.getAttribute('aria-pressed') !== 'true';
-  for (const f of b.closest('.sheet')?.querySelectorAll('.sheet__video') ?? [b.parentElement]) {
-    f.querySelector('.reel, .live')?.classList.toggle('is-paused', paused);
-    f.querySelector('.reel__toggle')?.setAttribute('aria-pressed', String(paused));
-  }
-});
 
 /* Kalendarz rezerwacji (panel #rozmowa, Cal.com): booking.js ładuje się przy pierwszym otwarciu panelu,
    każde otwarcie odświeża wolne terminy. */

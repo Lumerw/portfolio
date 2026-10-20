@@ -58,7 +58,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       if (claim.length > 26) console.warn(`⚠ ${p.title} (${lang}): hasło reel ma ${claim.length} znaków - limit 26`);
     }
     for (const lang of ['pl', 'en']) {
-      if (!content[lang].ui.reelPause) errors.push(`(${lang}): brak ui.reelPause`);
     }
   }
   // Cała treść (nie tylko reel): krótki łącznik „-” zamiast długich myślników.
