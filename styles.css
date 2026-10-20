@@ -534,10 +534,11 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .beta { display: inline-block; margin-left: .5em; padding: 1px 6px; border: var(--hairline) solid var(--ink-3); color: var(--ink-2); font-size: var(--fs-meta); font-weight: var(--fw-regular); line-height: 1.4; letter-spacing: .02em; vertical-align: .25em; }
 .pj__title .beta { vertical-align: .55em; }
 
-/* Ikonki w kolumnie numerów: LinkedIn, znak (brandbook), pobieranie */
+/* Ikonki w kolumnie numerów: Google Drive (archiwum), pobieranie */
 .index__no { display: flex; align-self: center; }
 .index__glyph { width: 14px; height: 14px; color: var(--ink-3); }
 .index__mark { --size: 14; }
+.index__glyph--fill { fill: currentColor; stroke: none; }   /* logo Google Drive: wypełnione, nie kreską */
 
 /* ==========================================================================
    Kalendarz rezerwacji (panel #rozmowa): dni i godziny jako przyciski kreską 1 px, formularz jak czat

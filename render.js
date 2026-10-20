@@ -149,7 +149,9 @@ const betaTag = p => (p.beta ? ' <span class="beta">beta</span>' : '');
 // Ikonka LinkedIn kreską 1 px: ramka + „in” (przy imieniu w hero).
 const liIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
 
-// Ikonki w kolumnie numerów: „i” (o mnie) i pobieranie (PDF), kreska 1 px.
+// Ikonki w kolumnie numerów: archiwum (Google Drive) i pobieranie (PDF).
+// Logo Google Drive jednym kolorem (Simple Icons, CC0) - w kolorze pozostałych ikon wiersza
+const driveIcon = `<svg class="icon index__glyph index__glyph--fill" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z"/></svg>`;
 const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg>`;
 
 // Karuzela firm „Współpracowałem z”: lista + jej kopia (aria-hidden) dla płynnej pętli.
@@ -220,9 +222,10 @@ function work(c, t) {
     <h2 id="work-title" class="work__title t-name section-title">${esc(t.ui.work)}</h2>
     <nav class="index" aria-label="${esc(t.ui.indexLabel)}">
       <ul>${c.projects.map(indexRow).join('')}
+${url(c.drive) !== '#' ? `
         <li ${reveal(n + 4)}>
-          <a class="index__row index__row--sub" href="#brandbook" aria-haspopup="dialog"><span class="index__no">${symbol('personal', { cls: 'index__glyph index__mark' })}</span><span class="index__title">${esc(t.ui.brandbook)}</span><span class="index__year t-meta">${esc(t.ui.brandbookType)}</span></a>
-        </li>
+          <a class="index__row index__row--sub" href="${esc(c.drive)}" target="_blank" rel="noopener"><span class="index__no">${driveIcon}</span><span class="index__title">${esc(t.ui.drive)} ↗</span><span class="index__year t-meta">${esc(t.ui.driveType)}</span></a>
+        </li>` : ''}
         <li ${reveal(n + 5)}>
           <a class="index__row index__row--sub" href="${esc(t.ui.pdfFile)}" download><span class="index__no">${downloadIcon}</span><span class="index__title">${esc(t.ui.download)}</span><span class="index__year t-meta">${esc(t.ui.downloadType)}</span></a>
         </li>

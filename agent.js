@@ -116,6 +116,7 @@ export function knowledge(content, lang) {
     realUrl(callUrl(c)) ? `Book a 30-minute call: ${callUrl(c)} (or the calendar on the site)` : null,
     ...c.links.filter(l => realUrl(l.href)).map(l => `${l.label}: ${l.href}`),
     `Portfolio PDF: ${c.siteUrl}/${t.ui.pdfFile}`,
+    realUrl(c.drive) ? `Work archive (campaigns, key visuals, videos) on Google Drive: ${c.drive}` : null,
     '',
     'PROJECTS',
     ...c.projects.map(p => {

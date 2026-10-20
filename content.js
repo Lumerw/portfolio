@@ -14,6 +14,8 @@ export const shared = {
   siteUrl: 'https://lumerw.com', // adres strony (domena z GoDaddy → GitHub Pages) - QR w PDF, Open Graph, sitemap
   email: 'wojciechlumer@gmail.com',
   // Zewnętrzna strona rezerwacji rozmowy (zapas dla kalendarza na stronie, CV i deck)
+  // Archiwum prac (kampanie, KV, wideo) - publiczny folder Google Drive; wiersz w sekcji Portfolio
+  drive: 'https://drive.google.com/drive/folders/1oHAvj983Vswnud6h8LEDwE2bzd2_Og__',
   calendly: 'https://cal.com/wojciech-lumer-sxkqby/30min',  // zewnętrzna strona rezerwacji (Cal.com, 30 min) - zapas, gdy kalendarz na stronie nie działa
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
   // calUsername = <nazwa> z cal.com/<nazwa>, events = typy spotkań z cal.com/<nazwa>/<slug> (pierwszy domyślny).
@@ -261,6 +263,8 @@ export const pl = {
     askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
     brandbookType: 'zasady marki',
+    drive: 'Archiwum prac',         // wiersz w Portfolio → folder Google Drive
+    driveType: 'Google Drive',
     avatar: 'Zapytaj o mnie - asystent AI',
     sphereHint: 'przeciągnij, żeby obrócić',
     qr: 'wersja www',
@@ -549,6 +553,8 @@ export const en = {
     askAgent: 'ask my assistant',
     recs: 'Kind words',
     brandbookType: 'brand rules',
+    drive: 'Work archive',
+    driveType: 'Google Drive',
     avatar: 'Ask about me - AI assistant',
     sphereHint: 'drag to rotate',
     qr: 'website',
