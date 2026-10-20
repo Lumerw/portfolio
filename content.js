@@ -437,9 +437,9 @@ export const pl = {
     title: 'Jak pracuję',
     get: 'Dostajesz:',
     steps: [
-      { title: 'Rozmowa', text: '30 minut online. Poznaję cel, budżet i termin.', result: 'wycenę i plan' },
-      { title: 'Projekt', text: 'Research i 2-3 kierunki do wyboru, potem projekt na prawdziwych treściach. AI pomaga mi szybko sprawdzić więcej wariantów.', result: 'gotowe pliki i system' },
-      { title: 'Wdrożenie', text: 'Kod, uruchomienie i przekazanie - z instrukcją, jak to dalej rozwijać.', result: 'działającą rzecz, nie tylko makiety' },
+      { title: 'Discovery', text: '30 minut rozmowy, w czasie której ustalimy, jak rozwiązać Twój problem.', result: 'feedback, wycenę i plan' },
+      { title: 'Projektowanie', text: 'Moodboard i projekty zgodne z briefem.', result: 'gotowe projekty i spójny system' },
+      { title: 'Wdrożenie', text: 'Testowanie kreacji w wybranej technologii.', result: 'w pełni działający design' },
     ],
   },
   booking: {
@@ -474,7 +474,7 @@ export const pl = {
     faqTitle: 'Częste pytania',
     faqAsk: 'zapytaj asystenta',
     faq: [
-      { q: 'Jak wygląda współpraca?', a: 'W trzech krokach: rozmowa (30 minut online - cel, budżet i termin), projekt (research, 2-3 kierunki do wyboru, potem projekt na prawdziwych treściach) i wdrożenie (kod, uruchomienie i przekazanie z instrukcją).' },
+      { q: 'Jak wygląda współpraca?', a: 'W trzech krokach: discovery (30 minut rozmowy, w czasie której ustalimy, jak rozwiązać Twój problem), projektowanie (moodboard i projekty zgodne z briefem) i wdrożenie (testowanie kreacji w wybranej technologii). Na końcu dostajesz w pełni działający design.' },
       { q: 'Ile kosztuje projekt?', a: 'To zależy od zakresu. Wycenę i plan dostajesz po pierwszej rozmowie.' },
       { q: 'Czy zajmujesz się też wdrożeniem?', a: 'Tak - projektuję od pomysłu do wdrożenia, żeby powstała działająca rzecz, nie tylko makiety.' },
       { q: 'Jak używasz AI w pracy?', a: 'AI pomaga mi szybko sprawdzić więcej wariantów projektu. Na co dzień pracuję jako AI designer w Promotrafic.' },
@@ -724,9 +724,9 @@ export const en = {
     title: 'How I work',
     get: 'You get:',
     steps: [
-      { title: 'Call', text: '30 minutes online. I learn the goal, budget and deadline.', result: 'a quote and a plan' },
-      { title: 'Design', text: 'Research and 2-3 directions to choose from, then the design on real content. AI helps me test more options, faster.', result: 'final files and a system' },
-      { title: 'Launch', text: 'Code, launch and handover - with notes on how to grow it further.', result: 'a working thing, not just mockups' },
+      { title: 'Discovery', text: 'A 30-minute call where we figure out how to solve your problem.', result: 'feedback, a quote and a plan' },
+      { title: 'Design', text: 'A moodboard and designs that follow the brief.', result: 'finished designs and a consistent system' },
+      { title: 'Launch', text: 'Testing the creative in your chosen technology.', result: 'a fully working design' },
     ],
   },
   booking: {
@@ -759,7 +759,7 @@ export const en = {
     faqTitle: 'FAQ',
     faqAsk: 'ask the assistant',
     faq: [
-      { q: 'What does working together look like?', a: 'Three steps: a call (30 minutes online - goal, budget and deadline), design (research, 2-3 directions to choose from, then the design on real content) and launch (code, launch and handover with notes).' },
+      { q: 'What does working together look like?', a: 'Three steps: discovery (a 30-minute call where we figure out how to solve your problem), design (a moodboard and designs that follow the brief) and launch (testing the creative in your chosen technology). You end up with a fully working design.' },
       { q: 'How much does a project cost?', a: 'It depends on the scope. You get a quote and a plan after the first call.' },
       { q: 'Do you also build what you design?', a: 'Yes - I design from idea to launch, so you get a working thing, not just mockups.' },
       { q: 'How do you use AI?', a: 'AI helps me test more design options, faster. Day to day I work as an AI designer at Promotrafic.' },
