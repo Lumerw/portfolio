@@ -51,37 +51,39 @@ img { display: block; }
 .sphere .ring--eq { opacity: .22; }
 .sphere .rim { opacity: .2; }
 
-/* Przyciski: główny pełny tuszem, drugi z ramką */
-.buttons { display: flex; flex-wrap: wrap; gap: 20px; }
+/* Przyciski jak na stronie (48 px, tekst 15 px) w skali --k: główny pełny tuszem, drugi z ramką */
+/* równa szerokość obu przycisków (jak na stronie) */
+.buttons { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: calc(12px * var(--k)); }
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  min-width: 340px;
-  height: 84px;
-  padding-inline: 40px;
-  border: 1.5px solid var(--ink);
-  font-size: 28px;
+  gap: calc(10px * var(--k));
+  height: calc(48px * var(--k));
+  padding-inline: calc(32px * var(--k));
+  border: 1px solid var(--ink);
+  font-size: calc(15px * var(--k));
 }
 .button--primary { background: var(--ink); color: var(--paper); }
-.button svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.2; }
-.dot { width: 22px; height: 22px; border-radius: 50%; background: var(--rainbow); flex: none; }
+.button svg { width: calc(16px * var(--k)); height: calc(16px * var(--k)); fill: none; stroke: currentColor; stroke-width: 1.2; }
+.dot { width: calc(12px * var(--k)); height: calc(12px * var(--k)); border-radius: 50%; background: var(--rainbow); flex: none; }
 
-/* ---------- Okładka ---------- */
-.cover__avatar { position: relative; isolation: isolate; width: 200px; height: 200px; border-radius: 50%; }
+/* ---------- Okładka: układ i proporcje hero strony na desktopie (awatar 58, imię 15, hasło 28, akapit 15,
+   przycisk 48 px) w skali --k: 16:9 ×1,5, 9:16 ×2,4 (czytany na telefonie) ---------- */
+:root[data-fmt="16x9"] { --k: 1.5; }
+:root[data-fmt="9x16"] { --k: 2.4; }
+.cover__avatar { position: relative; isolation: isolate; width: calc(58px * var(--k)); height: calc(58px * var(--k)); border-radius: 50%; }
 .cover__avatar::before,
 .cover__avatar::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; background: var(--rainbow); }
-.cover__avatar::before { inset: -4px; }
-.cover__avatar::after { inset: -6px; filter: blur(22px); opacity: .7; }
+.cover__avatar::before { inset: calc(-2px * var(--k)); }
+.cover__avatar::after { inset: calc(-3px * var(--k)); filter: blur(calc(10px * var(--k))); opacity: .75; }
 .cover__avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff; }
-.cover__text { margin-top: auto; max-width: 1100px; }
-.cover__name { display: flex; align-items: center; gap: 16px; font-size: 32px; }
-.cover__name svg { width: 30px; height: 30px; fill: none; stroke: var(--ink-2); stroke-width: 1; }
-.cover__title { margin-top: 28px; font-size: 84px; line-height: 1.05; font-weight: 500; letter-spacing: -.02em; }
-.cover__line { margin-top: 32px; font-size: 32px; line-height: 1.5; color: var(--ink-2); max-width: 28em; }
-.cover .buttons { margin-top: 56px; }
-.cover__foot { margin-top: 64px; display: flex; gap: 40px; font-size: 22px; color: var(--ink-3); }
+.cover__text { position: relative; z-index: 1; margin-block: auto; max-width: calc(560px * var(--k)); }
+.cover__name { margin-top: calc(32px * var(--k)); display: flex; align-items: center; gap: calc(12px * var(--k)); font-size: calc(15px * var(--k)); }
+.cover__name svg { width: calc(16px * var(--k)); height: calc(16px * var(--k)); fill: none; stroke: var(--ink-2); stroke-width: 1; }
+.cover__title { margin-top: calc(8px * var(--k)); font-size: calc(28px * var(--k)); line-height: 1.2; font-weight: 500; letter-spacing: -.01em; }
+.cover__line { margin-top: calc(16px * var(--k)); font-size: calc(15px * var(--k)); line-height: 1.6; color: var(--ink-2); max-width: 30em; }
+.cover .buttons { margin-top: calc(32px * var(--k)); }
 
 /* ---------- Projekt: kadr 4:5 + opis (jak panel projektu na stronie) ---------- */
 .bar { display: flex; align-items: center; gap: 18px; font-size: 22px; color: var(--ink-3); height: 40px; flex: none; }
@@ -108,7 +110,7 @@ img { display: block; }
 :root[data-fmt="16x9"] .pj__media { height: calc(var(--H) - 2 * var(--m) - 80px); aspect-ratio: 4 / 5; }
 :root[data-fmt="16x9"] .pj__info { max-width: 900px; }
 /* 9:16: kadr na całą szerokość, opis pod spodem */
-:root[data-fmt="9x16"] .pj { grid-template-rows: auto minmax(0, 1fr); gap: 32px; align-content: start; margin-top: 28px; }
+:root[data-fmt="9x16"] .pj { grid-template-rows: auto minmax(0, 1fr); gap: 24px; align-content: start; margin-top: 24px; }
 :root[data-fmt="9x16"] .pj__media { width: 100%; aspect-ratio: 4 / 5; }
 :root[data-fmt="9x16"] .pj__title { font-size: 52px; }
 :root[data-fmt="9x16"] .pj__tagline { font-size: 26px; margin-top: 14px; }
@@ -119,28 +121,26 @@ img { display: block; }
 
 /* ---------- Kontakt (jak sekcja Kontakt na stronie) ---------- */
 .contact { margin-block: auto; position: relative; z-index: 1; }
-.contact__title { font-size: 72px; font-weight: 500; letter-spacing: -.02em; }
-.contact__mail { margin-top: 48px; font-size: 36px; }
-.contact .buttons { margin-top: 56px; }
+.contact__title { font-size: calc(28px * var(--k)); font-weight: 500; letter-spacing: -.02em; }
+.contact__mail { margin-top: calc(24px * var(--k)); font-size: calc(22px * var(--k)); }
+.contact .buttons { margin-top: calc(32px * var(--k)); }
 .contact__foot { position: relative; z-index: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 32px; font-size: 22px; }
 .contact__links { display: flex; flex-wrap: wrap; }
 .contact__links li + li::before { content: "·"; padding-inline: 14px; color: var(--ink-3); }
 .contact__links a { border-bottom: 1px solid var(--hair); }
 .contact__copy { color: var(--ink-3); }
-:root[data-fmt="9x16"] .contact .buttons { flex-direction: column; align-items: flex-start; }
-:root[data-fmt="9x16"] .contact .button { min-width: 520px; }
+:root[data-fmt="9x16"] .contact .buttons { grid-auto-flow: row; }
 :root[data-fmt="9x16"] .contact__foot { flex-direction: column; align-items: flex-start; gap: 20px; }
 
-/* Okładka: blok „O mnie” - 16:9 po prawej na dole, 9:16 na dole pod hasłem i przyciskami */
+/* Okładka: blok „O mnie” na dole pod hasłem i przyciskami (16:9 w lewej kolumnie, poza sferą) */
 .about { position: relative; z-index: 1; }
 .about__title { font-size: 22px; font-weight: 400; color: var(--ink-3); padding-bottom: 14px; border-bottom: 1px solid var(--hair); }
 .about__row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding-block: 16px; border-bottom: 1px solid var(--hair); font-size: 22px; line-height: 1.5; }
 .about__row dt { color: var(--ink-3); font-size: 18px; padding-top: 3px; }
 .about__row .meta { font-size: 18px; }
-:root[data-fmt="16x9"] .cover .about { position: absolute; right: var(--m); bottom: var(--m); width: 680px; }
-:root[data-fmt="16x9"] .cover__text { max-width: 900px; }
-:root[data-fmt="9x16"] .cover__text { margin-top: 160px; }
-:root[data-fmt="9x16"] .cover .about { margin-top: auto; }
+:root[data-fmt="16x9"] .cover .about { width: 1140px; }
+:root[data-fmt="16x9"] .cover .about__rows { display: grid; grid-template-columns: 1fr 1fr; column-gap: 48px; }
+:root[data-fmt="16x9"] .cover .about__row { grid-template-columns: 1fr; align-content: start; gap: 8px; }
 
 /* Znacznik „beta” przy nazwie projektu */
 .beta { display: inline-block; margin-left: 20px; padding: 2px 12px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 22px; font-weight: 400; letter-spacing: .02em; vertical-align: .9em; line-height: 1.4; }

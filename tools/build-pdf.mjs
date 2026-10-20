@@ -5,10 +5,11 @@
 //     portfolio-lumer-<lang>-9x16.pdf       9:16 (1080 × 1920), jasny  - telefon
 //     portfolio-lumer-<lang>-9x16-dark.pdf  9:16, ciemny
 // Link „pobierz PDF” wybiera plik po urządzeniu (telefon / pionowo → 9:16) i motywie strony (main.js).
-// Strony: okładka (awatar z tęczową poświatą, hasło, „kontakt” → mail, „umów rozmowę” → Cal.com, zarys sfery
-// w prawym górnym rogu) · projekty (kadr 4:5 + opis, jak panel projektu) · kontakt (jak sekcja Kontakt,
-// sfera przycięta krawędzią). Kadry projektów: zrzuty z paneli strony (teraz - plakat animacji, loom.studio
-// i reh.ab - pierwsza klatka grafiki), zapisywane w private/pdf/ (poza repozytorium).
+// Strony: okładka (układ i proporcje hero strony na desktopie: awatar, imię, hasło, akapit, przyciski; „kontakt” → mail,
+// „umów rozmowę” → kalendarz na stronie) · projekty (kadr 4:5 + opis, jak panel projektu) · kontakt (jak sekcja
+// Kontakt). Sfera przycięta krawędzią - w tym samym miejscu na okładce i na stronie kontaktu. Kadry projektów:
+// zrzuty z paneli strony (teraz - samo logo na środku planszy, loom.studio i reh.ab - pierwsza klatka grafiki),
+// zapisywane w private/pdf/ (poza repozytorium).
 // Kontrola: 5 stron, nic poza kadrem, linki, rozmiar < 8 MB.
 import { chromium } from 'playwright';
 import { mkdir, readFile, stat } from 'node:fs/promises';
@@ -69,13 +70,16 @@ function doc(lang, fmt, dark) {
   const total = 2 + c.projects.length;
   const counter = n => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
   const wide = fmt === '16x9';
+  // Sfera: to samo miejsce na okładce i na stronie kontaktu - 16:9 przy prawej krawędzi na środku wysokości, 9:16 w prawym górnym rogu
+  const globe = wide ? sphere(480, `left:${W - 580}px;top:${H / 2 - 480}px`) : sphere(470, `left:${W - 520}px;top:-400px`);
 
   const exp = t.about.experience.map(e => ({ year: clean(e.year), place: clean(e.place), role: clean(e.role) })).filter(e => e.place);
   const cover = `
   <section class="page cover">
-    ${wide ? sphere(560, `left:${W - 760}px;top:-470px`) : sphere(470, `left:${W - 520}px;top:-400px`)}
-    <div class="cover__avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
+    ${globe}
+    <header class="bar"><a href="${esc(site)}/">${esc(site.replace(/^https?:\/\//, ''))}</a><span>${esc(c.year)}</span><span class="bar__right">${counter(1)}</span></header>
     <div class="cover__text">
+      <div class="cover__avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
       <p class="cover__name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a> <a href="${esc(linkedin)}" aria-label="LinkedIn">${icon.linkedin}</a>` : esc(c.name)}</p>
       <h1 class="cover__title">${esc(t.hero.title)}</h1>
       <p class="cover__line">${esc(t.hero.line)}</p>
@@ -83,7 +87,6 @@ function doc(lang, fmt, dark) {
         <a class="button button--primary" href="mailto:${esc(c.email)}">${icon.mail}${esc(U.contactCta)}</a>
         <a class="button" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>
       </p>
-      <p class="cover__foot"><span>${esc(c.year)}</span><a href="${esc(site)}/">${esc(site.replace(/^https?:\/\//, ''))}</a></p>
     </div>
     <aside class="about">
       <h2 class="about__title">${esc(t.about.title)}</h2>
@@ -123,7 +126,7 @@ function doc(lang, fmt, dark) {
   const links = c.links.filter(l => isReal(l.href));
   const contact = `
   <section class="page">
-    ${wide ? sphere(470, `left:${W - 380}px;top:${H / 2 - 470}px`) : sphere(560, `left:${W - 460}px;top:${H / 2 - 560}px`)}
+    ${globe}
     <header class="bar"><span>${esc(c.name)}</span><span class="bar__right">${counter(total)}</span></header>
     <div class="contact">
       <h2 class="contact__title">${esc(t.contact.title)}</h2>
@@ -153,7 +156,8 @@ function doc(lang, fmt, dark) {
 </html>`;
 }
 
-/* Kadry projektów 4:5 z paneli strony (2x): teraz - plakat animacji (t = 0), reszta - pierwsza klatka (cover). */
+/* Kadry projektów 4:5 z paneli strony (2x): teraz - plansza animacji z samym logo na środku (bez hasła, legendy
+   i rozmowy), reszta - pierwsza klatka (cover). */
 async function shots(browser) {
   await mkdir(join(root, SHOTS), { recursive: true });
   for (const p of content.shared.projects) {
@@ -169,6 +173,14 @@ async function shots(browser) {
         if (el?.closest?.(`#${id} .reel`)) { a.pause(); a.currentTime = 0; }
       }
       document.querySelector(`#${id} .reel__toggle`)?.remove();
+      // teraz: tylko tło marki i logo na środku kadru
+      const stage = document.querySelector(`#${id} .sheet__video > .reel .reel__stage`);
+      const logo = stage?.querySelector('.reel__logo');
+      if (logo) {
+        for (const el of stage.children) if (el !== logo) el.style.display = 'none';
+        logo.getAnimations().forEach(a => a.cancel());
+        Object.assign(logo.style, { animation: 'none', top: '50%', left: '50%', translate: '-50% -50%', scale: '1', transform: 'none', opacity: '1' });
+      }
     }, p.id);
     await page.waitForTimeout(200);
     // sama grafika (bez ramki figury i jej obwódki): plansza teraz albo statyczna klatka
@@ -196,11 +208,12 @@ for (const lang of ['pl', 'en']) {
       });
       // Każda strona dokładnie W × H, treść w kadrze
       const over = await page.evaluate(([W, H]) => [...document.querySelectorAll('.page')].map((s, i) => {
-        const bad = [...s.querySelectorAll('.pj__info, .cover__text, .contact, .contact__foot, .bar')].some(el => {
+        // ile pikseli treść wychodzi poza stronę (dół, prawa krawędź, przewijanie w bloku)
+        const px = Math.max(0, ...[...s.querySelectorAll('.pj__info, .cover__text, .about, .contact, .contact__foot, .bar')].map(el => {
           const r = el.getBoundingClientRect(), b = s.getBoundingClientRect();
-          return r.bottom > b.bottom + .5 || r.right > b.right + .5 || el.scrollHeight > el.clientHeight + 1;
-        });
-        return (s.offsetWidth !== W || s.offsetHeight !== H || bad) ? i + 1 : null;
+          return Math.max(r.bottom - b.bottom, r.right - b.right, el.scrollHeight - el.clientHeight - .5);
+        }));
+        return (s.offsetWidth !== W || s.offsetHeight !== H || px > .5) ? `${i + 1} (+${Math.ceil(px)} px)` : null;
       }).filter(Boolean), [W, H]);
       const name = pdfName(content[lang].ui.pdfFile, fmt, dark);
       const file = join(root, 'pdf', name);   // poza repozytorium; publikacja: npm run publish-pdf (GitHub Releases)

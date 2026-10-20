@@ -390,12 +390,16 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .hero__top { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-4); }
 .hero__icons {
   display: flex;
-  gap: var(--s-2);
+  gap: var(--s-3);
+  padding-inline: var(--s-1);           /* miejsce na szerokie logotypy wystające ze slotu - maska przycina do ramki */
+  margin-inline: calc(-1 * var(--s-1));
   -webkit-mask-image: linear-gradient(to right, #000 0%, transparent 100%);
   mask-image: linear-gradient(to right, #000 0%, transparent 100%);
 }
+/* Znaki mają pola o tej samej powierzchni optycznej (viewBox w assets/icons/07-16): kwadratowe 32 px,
+   szerokie logotypy szersze (do ~46 px) - na środku slotu, wystają w odstęp między slotami */
 .hero__slot { position: relative; width: 32px; height: 32px; }
-.hero__icon { position: absolute; inset: 0; width: 32px; height: 32px; visibility: hidden; }
+.hero__icon { position: absolute; top: 0; left: 50%; translate: -50% 0; width: auto; height: 32px; max-width: none; visibility: hidden; }
 .hero__icon.is-on { visibility: visible; }
 
 /* Awatar-moneta: zdjęcie ↔ rysunek kreską, obrót co ~4,5 s. Tęczowy pierścień i poświata

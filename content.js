@@ -168,8 +168,8 @@ export const shared = {
       video: {
         '4x5':  { src: '', poster: 'assets/loom/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
       },
-      href: '[https://loom.studio]', // [podaj właściwy adres - loom.studio wygląda na domenę zaparkowaną]
-      brandbook: '[brandbook loom.studio]',  // [adres księgi marki] - dopóki placeholder, „brandbook” bez linku, z dopiskiem „wkrótce”
+      href: 'https://loomstudio.pl/pl/',
+      brandbook: 'https://loomstudio.pl/pl/marka/',
       images: {
         main:    { src: 'assets/loom/01.jpg',      w: 1600, h: 1000 },
         a:       { src: 'assets/loom/02.jpg',      w: 1200, h: 1500 },
@@ -436,7 +436,7 @@ export const pl = {
     title: 'Umów rozmowę',
     intro: 'Porozmawiajmy o Twoim projekcie. Wybierz dzień i godzinę.',
     // kolumna informacji obok kalendarza (desktop: po lewej, telefon: nad kalendarzem)
-    facts: ['30 minut', 'online - link do spotkania w mailu', 'potwierdzenie od razu na e-mail'],
+    facts: ['30 minut', 'online - potwierdzenie i link do spotkania od razu na e-mail'],
     length: 'Długość rozmowy',
     loading: 'Wczytuję wolne terminy…',
     empty: 'Brak wolnych terminów w najbliższych tygodniach. Napisz do mnie:',
@@ -722,7 +722,7 @@ export const en = {
   booking: {
     title: 'Book a call',
     intro: 'Let’s talk about your project. Pick a day and time.',
-    facts: ['30 minutes', 'online - meeting link by e-mail', 'confirmation sent right away'],
+    facts: ['30 minutes', 'online - confirmation and meeting link sent to your e-mail right away'],
     length: 'Call length',
     loading: 'Loading free slots…',
     empty: 'No free slots in the coming weeks. Write to me:',
