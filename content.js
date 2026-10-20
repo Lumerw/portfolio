@@ -51,7 +51,7 @@ export const shared = {
 
   // Rekomendacje z LinkedIna (karuzela w pętli po Portfolio): skrócony fragment w PL i EN (tłumaczenie),
   // osoba i rola. Placeholdery = sekcja ukryta.
-  // photo: zdjęcie z LinkedIna (96 × 96 webp, za zgodą osób); bez zdjęcia - kółko z inicjałami.
+  // photo: zdjęcie z LinkedIna (96 × 96 webp, czarno-białe, za zgodą osób); bez zdjęcia - kółko z inicjałami.
   recommendations: [
     { name: 'Patryk Kurek', photo: 'assets/recs/patryk-kurek.webp', role: { pl: 'Software Engineer · projekt loom.studio, 2025', en: 'Software Engineer · loom.studio project, 2025' },
       quote: { pl: 'Współpraca z Wojciechem przy stronie loom.studio była wyjątkowym doświadczeniem…', en: 'Working with Wojciech on the loom.studio website project was an outstanding experience…' } },
