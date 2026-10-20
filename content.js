@@ -191,11 +191,10 @@ export const shared = {
       live: {
         title: ['Make an', 'impact', 'toget', 'her', '.'],   // „impact” i „toget” przygasają, za „her” poświata
         lede: [
-          ['40% of the world plays games online.', '1'],
+          ['40% of the world plays games online.'],
           ['Gaming is one of the biggest social spaces on earth - and one of the least supported.'],
         ],
         ticker: ['data.', 'vision.', 'tools - put to use.'],
-        quotes: ['this is more helpful than you think', 'we made the safe space you needed', 'someone who gets it is usually online', 'you\'re not alone in this lobby'],
         avatars: ['assets/rehab/live/p1.svg', 'assets/rehab/live/p2.svg', 'assets/rehab/live/p3.svg'],
       },
       tools: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages'],

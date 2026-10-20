@@ -3,7 +3,7 @@
 //                 ten sam gradient w CSS), po prawej trzy figury Bauhausu pływające na sprężynach
 //                 (fizyka z loom.studio: dryf, odbicia, uspokojenie pod kursorem). Bez logo i napisów.
 //   reh.ab      - hero reh.ab w pętli 21 s: pisanie nagłówka, przygaszenie „impact” / „toget”,
-//                 poświata „her”, taśma słów, pasek: gradient, awatary, cytaty, ładowanie co 7 s. Sam CSS.
+//                 poświata „her”, taśma słów, pasek: gradient, awatary, ładowanie co 7 s. Sam CSS.
 // Źródła: repozytoria loomstudio (components/ui/flow-gl.ts, lib/hero-physics.ts, styles/hero.css)
 // i reh.ab (css/style.css, js/main.js).
 // main.js ładuje ten moduł leniwie i wstawia grafikę tylko do aktywnego podglądu / otwartego panelu,
@@ -313,7 +313,6 @@ function rehabMarkup(p, { lite = false } = {}) {
   const h = `${words(lead)} <span class="w d1">${chars(dim1)}</span> <span class="w"><span class="d2">${chars(dim2)}</span><span class="her"><span class="her-light"><span class="her-glow"></span></span>${chars(her)}</span>${chars(end)}</span>`;
   const lede = L.lede.map(([text, fn]) => `${esc(text)}${fn ? `<sup>${esc(fn)}</sup>` : ''}`).join(' ');
   const ticker = [...L.ticker, L.ticker[0], L.ticker[1]].map(w => `<span>${esc(w)}</span>`).join('');
-  const quotes = L.quotes.map((q, i) => `<span style="--q:${i}">“${esc(q)}”</span>`).join('');
   const avatars = L.avatars.map(src => `<img src="${esc(new URL(src, import.meta.url).href)}" alt="" width="34" height="34">`).join('');   // od katalogu głównego (strona / i /en/)
   return `
           <div class="rh-copy">
@@ -324,7 +323,6 @@ function rehabMarkup(p, { lite = false } = {}) {
           <div class="rh-band">${lite ? '' : `
             <div class="rh-row">
               <span class="rh-avatars">${avatars}</span>
-              <span class="rh-quotes" style="--n:${L.quotes.length}">${quotes}</span>
               <span class="rh-bar"><span></span></span>
             </div>`}
           </div>`;
@@ -347,7 +345,7 @@ export function loadCss() {
 }
 
 // HTML grafiki. static: bez ruchu (stan końcowy) - do generowania statycznej planszy (cover).
-// lite: wersja uproszczona na kartę sfery (reh.ab bez akapitu i paska z cytatami).
+// lite: wersja uproszczona na kartę sfery (reh.ab bez akapitu i paska z awatarami).
 export function liveMarkup(p, { static: still = false, lite = false } = {}) {
   const inner = MARKUP[p.id]?.(p, { lite });
   if (!inner) return '';

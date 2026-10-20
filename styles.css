@@ -1381,21 +1381,39 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 .site-footer__agent { position: relative; isolation: isolate; gap: var(--s-1); }
 .site-footer { overflow-x: clip; }   /* poświata przycisku asystenta nie poszerza strony na telefonie */
-/* Przycisk asystenta: rysunek kreską (jak w panelu czatu) i tęczowa poświata za przyciskiem - tylko w lewym
-   górnym i prawym dolnym rogu, słabsza niż przy awatarze; kolory płyną (obrót koła pod maską rogów). */
+/* Przycisk asystenta: rysunek kreską (jak w panelu czatu) i tęczowy kontur z poświatą jak przy awatarze -
+   wzdłuż krawędzi w lewym górnym i prawym dolnym rogu, gasnący ku środkowi boków. Kolory płyną (kąt --agent-a). */
+@property --agent-a { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+@keyframes agent-a { to { --agent-a: 360deg; } }
 .agent-btn-face { flex: none; width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 var(--hairline) var(--hair); }
 .agent-glow {
-  --g: 64px;                             /* pole poświaty wokół przycisku - maska gaśnie przed jego brzegiem */
+  --g: 20px;                             /* margines na poświatę wokół przycisku */
   position: absolute;
   z-index: -1;
   inset: calc(var(--g) * -1);
   pointer-events: none;
-  filter: blur(10px);
-  opacity: .6;
-  -webkit-mask-image: radial-gradient(46px 24px at calc(var(--g) + 36px) calc(var(--g) + 2px), #000 10%, transparent 100%), radial-gradient(46px 24px at calc(100% - var(--g) - 36px) calc(100% - var(--g) - 2px), #000 10%, transparent 100%);
-  mask-image: radial-gradient(46px 24px at calc(var(--g) + 36px) calc(var(--g) + 2px), #000 10%, transparent 100%), radial-gradient(46px 24px at calc(100% - var(--g) - 36px) calc(100% - var(--g) - 2px), #000 10%, transparent 100%);
+  animation: agent-a 6s linear infinite;
+  /* tylko dwa rogi: ukośne przejścia od lewego górnego i prawego dolnego */
+  -webkit-mask-image: linear-gradient(to bottom right, #000 0, #000 28%, transparent 48%), linear-gradient(to top left, #000 0, #000 28%, transparent 48%);
+  mask-image: linear-gradient(to bottom right, #000 0, #000 28%, transparent 48%), linear-gradient(to top left, #000 0, #000 28%, transparent 48%);
 }
-.agent-glow::before { content: ""; position: absolute; left: 50%; top: 50%; width: 130%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: var(--rainbow); animation: agent-spin 7s linear infinite; }
+.agent-glow::before,
+.agent-glow::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--g) - 1px);           /* = krawędź przycisku (ramka 1 px) */
+  background: conic-gradient(from var(--agent-a), #FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D);
+}
+/* kontur: sama ramka 2 px (środek wycięty maską) - przykrywa czarną kreskę w rogach */
+.agent-glow::before {
+  padding: 2px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+/* poświata: ta sama tęcza rozmyta za konturem (środek zakrywa tło przycisku) */
+.agent-glow::after { inset: calc(var(--g) - 4px); filter: blur(9px); opacity: .65; }
+@media (prefers-reduced-motion: reduce) { .agent-glow { animation: none; } }
 /* tło przycisku nad poświatą (::after po niej w DOM), więc kolory widać tylko na zewnątrz krawędzi */
 .site-footer__agent::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--paper); transition: background-color var(--t-line) var(--ease); }
 .site-footer__agent:hover::after, .site-footer__agent:focus-visible::after { background: var(--ink); }

@@ -147,7 +147,7 @@
   66.67%, 88.89% { translate: 0 calc(var(--line) * -2); animation-timing-function: var(--rh-ease); }
   100% { translate: 0 calc(var(--line) * -3); }
 }
-/* Pasek: dryfujący gradient „her”, awatary, cytat na ciemnej pigułce, ładowanie 7 s */
+/* Pasek: dryfujący gradient „her”, awatary, ładowanie 7 s (bez cytatu) */
 .rh-band {
   position: relative;
   flex: none;
@@ -172,24 +172,7 @@
 .rh-avatars { display: flex; flex: none; animation: rh-swap 7s var(--rh-ease) infinite; }
 .rh-avatars img { width: min(7cqw, 5cqh); height: auto; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .9); margin-right: max(-11px, -2.3cqw); background: rgba(255, 255, 255, .25); }
 @keyframes rh-swap { 0%, 5.43% { opacity: 0; } 10.86%, 100% { opacity: 1; } }
-.rh-quotes { display: grid; min-width: 0; }
-.rh-quotes span {
-  grid-area: 1 / 1;
-  justify-self: start;
-  max-width: 100%;
-  padding: .3em .8em;
-  border-radius: 99px;
-  background: rgba(0, 0, 0, .55);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  opacity: 0;
-  animation: rh-quote calc(var(--n) * 7s) var(--rh-ease) calc(var(--q) * 7s) infinite both;
-}
-.rh-quotes span:first-child { opacity: 1; }
-@keyframes rh-quote { 0%, 1.36% { opacity: 0; } 2.71%, 25% { opacity: 1; } 26.36%, 100% { opacity: 0; } }
 .rh-bar { flex: 0 0 min(19cqw, 190px); margin-left: auto; height: 9px; padding: 1.5px; border: 1.5px solid rgba(255, 255, 255, .85); border-radius: 99px; overflow: hidden; }
 .rh-bar span { display: block; height: 100%; border-radius: 99px; background: rgba(255, 255, 255, .95); transform-origin: left center; transform: scaleX(.72); animation: rh-bar 7s linear infinite; }
 @keyframes rh-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@container (aspect-ratio < .7) { .rh-bar { display: none; } }   /* telefon pionowo: miejsce na cytat */
 @container (max-height: 360px) { .rh-lede { display: none; } .rh-ticker { margin-top: 3cqh; } }

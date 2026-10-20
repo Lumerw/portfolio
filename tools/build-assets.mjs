@@ -115,14 +115,4 @@ if (shared.portrait.src.endsWith('.svg')) {
   await out(shared.portrait.src, placeholder('personal', 600, 750));
 }
 
-// Favicony ze znaku osobistego. Grubsza kreska niż w symbolu, bo 16–32 px.
-const favicon = (bg, pad) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${48 + 2 * pad} ${48 + 2 * pad}" width="48" height="48">
-${bg ? `<rect x="${-pad}" y="${-pad}" width="${48 + 2 * pad}" height="${48 + 2 * pad}" fill="${PAPER}"/>` : ''}
-<circle cx="24" cy="24" r="19" fill="none" stroke="${INK}" stroke-width="3.5"/>
-<circle cx="24" cy="24" r="5.5" fill="${HANKO}"/>
-</svg>
-`;
-await out('assets/favicon.svg', favicon(false, 0));
-await sharp(Buffer.from(favicon(true, 2))).resize(32, 32).png().toFile(join(root, 'assets/favicon-32.png'));
-await sharp(Buffer.from(favicon(true, 14))).resize(180, 180).png().toFile(join(root, 'assets/apple-touch-icon.png'));
-console.log('   assets/favicon-32.png, assets/apple-touch-icon.png');
+// Favicony to czarno-biały rysunek awatara (assets/me/avatar-drawing.webp) - pliki w assets/, tu nie generowane.
