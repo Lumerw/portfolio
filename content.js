@@ -13,8 +13,8 @@ export const shared = {
   year: '2026',
   siteUrl: 'https://lumerw.com', // adres strony (domena z GoDaddy → GitHub Pages) - QR w PDF, Open Graph, sitemap
   email: 'wojciechlumer@gmail.com',
-  // Przycisk „kontakt” - link do kalendarza spotkań. [Wpisz swój link Calendly]
-  calendly: 'https://calendly.com/wojciechlumer/30min',  // przycisk „kontakt” (placeholder = mail)
+  // Zewnętrzna strona rezerwacji rozmowy (zapas dla kalendarza na stronie, CV i deck)
+  calendly: 'https://cal.com/wojciech-lumer-sxkqby/30min',  // zewnętrzna strona rezerwacji (Cal.com, 30 min) - zapas, gdy kalendarz na stronie nie działa
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
   // calUsername = <nazwa> z cal.com/<nazwa>, events = typy spotkań z cal.com/<nazwa>/<slug> (pierwszy domyślny).
   // Klucz API NIE jest potrzebny (i nie może trafić na stronę - byłby publiczny).
@@ -101,10 +101,7 @@ export const shared = {
   // Projekt:
   //  logo   - na środku podglądu (desktop), najlepiej SVG
   //  sygnet - favicon / sygnet przy opisie zakresu i w panelu (kwadrat)
-  //  video  - pętla w panelu, dwa formaty (CSS pokazuje jeden):
-  //           '16x9' - desktop i każdy ekran poziomy (także telefon obrócony);
-  //           '9x16' - telefon pionowo (< 768 px + orientacja pionowa) - kadr na całą wysokość panelu;
-  //           '4x5'  - tablet pionowo (min. 768 px + orientacja pionowa) = ta sama proporcja co podgląd na stronie;
+  //  video  - kadr panelu projektu, format 4:5 (desktop obok opisu, telefon nad opisem):
   //           src = plik mp4 (bez dźwięku), poster = kadr
   //  reel   - true: zamiast postera animowana plansza marki (8 s, render.js → reel()) - w panelu i w podglądzie.
   //           Kolejność: prawdziwe wideo (src) > reel > plansza marki (brand) > poster
@@ -135,9 +132,7 @@ export const shared = {
         speed: '26s',
       },
       video: {
-        '16x9': { src: '', poster: 'assets/teraz/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/teraz/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
-        '9x16': { src: '', poster: 'assets/teraz/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” (dopóki nie ma src)
       // Narzędzia i technologie (panel projektu) - z repozytorium projektu
@@ -167,11 +162,9 @@ export const shared = {
       live: true,
       tools: ['Figma', 'Next.js', 'TypeScript', 'Tailwind CSS', 'WebGL', 'Stripe', 'Claude API'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
-      cover: { '4x5': 'assets/loom/cover-4x5.webp', '16x9': 'assets/loom/cover-16x9.webp', '9x16': 'assets/loom/cover-9x16.webp' },
+      cover: { '4x5': 'assets/loom/cover-4x5.webp' },
       video: {
-        '16x9': { src: '', poster: 'assets/loom/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/loom/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
-        '9x16': { src: '', poster: 'assets/loom/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       href: '[https://loom.studio]', // [podaj właściwy adres - loom.studio wygląda na domenę zaparkowaną]
       brandbook: '[brandbook loom.studio]',  // [adres księgi marki] - dopóki placeholder, „brandbook” bez linku, z dopiskiem „wkrótce”
@@ -205,11 +198,9 @@ export const shared = {
       },
       tools: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
-      cover: { card: 'assets/rehab/cover-card.webp', '4x5': 'assets/rehab/cover-4x5.webp', '16x9': 'assets/rehab/cover-16x9.webp', '9x16': 'assets/rehab/cover-9x16.webp' },
+      cover: { card: 'assets/rehab/cover-card.webp', '4x5': 'assets/rehab/cover-4x5.webp' },
       video: {
-        '16x9': { src: '', poster: 'assets/rehab/video-16x9.svg', w: 1920, h: 1080 }, // desktop i każdy ekran poziomy
         '4x5':  { src: '', poster: 'assets/rehab/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
-        '9x16': { src: '', poster: 'assets/rehab/video-9x16.svg', w: 1080, h: 1920 }, // telefon pionowo (< 768 + pionowo)
       },
       href: 'https://lumerw.github.io/reh.ab/',
       images: {
@@ -258,12 +249,10 @@ export const pl = {
     themeLight: 'Włącz tryb jasny',
     linkedin: 'LinkedIn',
     skip: 'Przejdź do treści',
-    next: 'następny',
-    backToIndex: 'wróć do indeksu ↑',
     links: 'Profile',
     close: 'zamknij',
     brandbook: 'Brandbook',
-    contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → Calendly
+    contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → kalendarz (#rozmowa)
     work: 'Portfolio',               // tytuł sekcji z linkami
     sectionsLabel: 'Sekcje strony',  // nawigator przewijania (desktop)
     start: 'start',
@@ -271,7 +260,6 @@ export const pl = {
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
     askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
-    prev: 'poprzednia',
     brandbookType: 'zasady marki',
     avatar: 'Zapytaj o mnie - asystent AI',
     sphereHint: 'przeciągnij, żeby obrócić',
@@ -307,10 +295,10 @@ export const pl = {
         call: 'wideo 1:1, 30 albo 60 minut',
       },
       problem: '[Problem: 2-3 zdania.]',
-      solution: '[Rozwiązanie: 2-3 zdania.]',
+      solution: 'Rozmowy wideo 1:1 (30 albo 60 minut) słuchaczy z ekspertami z 5+ lat praktyki. Darmowe konto i płatność przez Escrow.',
       result: '[Efekt: 1-2 zdania lub liczby.] W planach: płatności Stripe, ekspansja na Ukrainę i rynek kreatywny Europy Wschodniej.',
       alt: {
-        video: 'teraz - [opis wideo promocyjnego]',
+        video: 'teraz - animacja: najpierw jesteś słuchaczem, potem stajesz się ekspertem; społeczność i rozmowa wideo 1:1',
         logo: 'teraz - logo',
         main: 'teraz - strona główna teraz.eu na desktopie',
         a: 'teraz - plansza marki: logo i hasło porozmawiajmy tu i teraz',
@@ -351,14 +339,14 @@ export const pl = {
   about: {
     title: 'O mnie',
     portraitAlt: 'Wojciech Lumer - portret', // [potwierdź po dodaniu zdjęcia]
-    bio: '[Bio: 3-4 zdania. Kim jesteś, czym się zajmujesz, co cię wyróżnia, czego szukasz.]',
+    bio: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio, a od 2025 roku pracuję jako AI designer w Promotrafic.',
     experience: [
       { year: '2025.05 - teraz', place: 'Promotrafic', role: 'AI designer' },
       { year: '2023.11 - teraz', place: 'loom.studio', role: 'założyciel, projektant' },
     ],
     education: '[Uniwersytet SWPS - kierunek, lata]',
     languages: '[polski - ojczysty · angielski - poziom]',
-    tools: ['Figma', '[Adobe …]', 'Blender', 'Adtron', 'HTML/CSS', '[…]'],
+    tools: ['Figma', '[Adobe …]', 'Blender', 'Adtron', 'HTML/CSS'],
   },
   brandbook: {
     intro: 'Zasady mojej marki osobistej: czerń, biel, cienka linia i dużo pustej przestrzeni.',
@@ -510,7 +498,7 @@ export const pl = {
   },
   contact: {
     title: 'Kontakt',
-    line: '[Jedno zdanie zaproszenia, np. „Chętnie porozmawiam o projekcie albo pracy.”]',
+    line: 'Chętnie porozmawiam o Twoim projekcie.',
   },
 };
 
@@ -549,8 +537,6 @@ export const en = {
     themeLight: 'Switch to light mode',
     linkedin: 'LinkedIn',
     skip: 'Skip to content',
-    next: 'next',
-    backToIndex: 'back to index ↑',
     links: 'Profiles',
     close: 'close',
     brandbook: 'Brandbook',
@@ -562,7 +548,6 @@ export const en = {
     contactCta: 'contact',
     askAgent: 'ask my assistant',
     recs: 'Kind words',
-    prev: 'previous',
     brandbookType: 'brand rules',
     avatar: 'Ask about me - AI assistant',
     sphereHint: 'drag to rotate',
@@ -597,10 +582,10 @@ export const en = {
         call: '1:1 video, 30 or 60 minutes',
       },
       problem: '[Problem: 2-3 sentences.]',
-      solution: '[Solution: 2-3 sentences.]',
+      solution: '1:1 video calls (30 or 60 minutes) between listeners and experts with 5+ years of practice. A free account and payment via Escrow.',
       result: '[Result: 1-2 sentences or numbers.] Next: Stripe payments, expansion to Ukraine and the Eastern European creative market.',
       alt: {
-        video: 'teraz - [promo video description]',
+        video: 'teraz - animation: first you are a listener, then you become an expert; the community and a 1:1 video call',
         logo: 'teraz - logo',
         main: 'teraz - the teraz.eu home page on desktop',
         a: 'teraz - brand board: logo and the line let’s talk here and now',
@@ -641,14 +626,14 @@ export const en = {
   about: {
     title: 'About',
     portraitAlt: 'Wojciech Lumer - portrait',
-    bio: '[Bio: 3-4 sentences.]',
+    bio: 'I design identities, websites and digital products - from idea to launch. I run loom.studio, and since 2025 I have worked as an AI designer at Promotrafic.',
     experience: [
       { year: '2025.05 - now', place: 'Promotrafic', role: 'AI designer' },
       { year: '2023.11 - now', place: 'loom.studio', role: 'founder, designer' },
     ],
     education: '[SWPS University - field, years]',
     languages: '[Polish - native · English - level]',
-    tools: ['Figma', '[Adobe …]', 'Blender', 'Adtron', 'HTML/CSS', '[…]'],
+    tools: ['Figma', '[Adobe …]', 'Blender', 'Adtron', 'HTML/CSS'],
   },
   brandbook: {
     intro: 'The rules of my personal brand: black, white, a thin line and plenty of empty space.',
@@ -794,7 +779,7 @@ export const en = {
   },
   contact: {
     title: 'Contact',
-    line: '[One inviting sentence, e.g. “Happy to talk about a project or a role.”]',
+    line: 'Happy to talk about your project.',
   },
 };
 

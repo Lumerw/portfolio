@@ -1,11 +1,13 @@
 // Zachowanie strony: PL/EN, indeks ↔ podgląd, panele, kopiowanie maila.
 // Treść i szablony: content.js, render.js. Bez JS strona działa na kotwicach i :target.
 import { content } from './content.js';
-import { render } from './render.js';
 
 const root = document.documentElement;
 const app = document.getElementById('app');
-const LANGS = ['pl', 'en'];
+// Katalog główny strony (main.js leży w nim): polska wersja = /, angielska = /en/. Ścieżki assetów
+// z content.js liczone od niego, więc działają z obu adresów.
+const SITE = new URL('./', import.meta.url);
+const abs = p => new URL(p, SITE).href;
 
 // Asystent AI (stan na górze - panel #agent może być otwarty już przy wejściu na stronę)
 // Rozmowa z asystentem: [{ role: 'user' | 'assistant', content, answer? }]. Zapisana w sessionStorage karty,
@@ -25,17 +27,11 @@ const store = {
 
 root.classList.add('js');
 
-function setLang(lang) {
-  const t = content[lang];
-  app.innerHTML = render(content, lang);
-  root.lang = lang;
-  document.title = t.meta.title;
-  document.querySelector('meta[name="description"]')?.setAttribute('content', t.meta.description);
-}
-
-// index.html ma już polską treść (npm run build). Render tylko, gdy zapisany jest inny język.
+// Wersje językowe to osobne strony (npm run build: index.html i en/index.html). Zapisany wybór EN
+// przenosi ze strony głównej na /en/; adres /en/ zawsze zostaje angielski (można go komuś wysłać).
+const langUrl = lang => abs(lang === 'en' ? 'en/' : './') + location.hash;
 const saved = store.get();
-if (LANGS.includes(saved) && saved !== root.lang) setLang(saved);
+if (root.lang === 'pl' && saved === 'en') location.replace(langUrl('en'));
 
 /* Tryb ciemny: domyślnie jasny na każdym urządzeniu; przełącznik włącza ciemny, wybór zapisany w localStorage.
    (Zapisany wybór ustawia już mały skrypt w <head>, żeby strona nie mignęła jasno.) */
@@ -59,10 +55,8 @@ syncThemeButton();
 app.addEventListener('click', e => {
   if (!e.target.closest('[data-lang-switch]')) return;
   const next = root.lang === 'pl' ? 'en' : 'pl';
-  root.classList.add('no-intro'); // bez powtórnej animacji wejścia
-  setLang(next);
   store.set(next);
-  app.querySelector('[data-lang-switch]').focus();
+  location.href = langUrl(next);
 });
 
 /* Kopiowanie maila do schowka + cichy komunikat. */
@@ -249,9 +243,9 @@ const ICON_SETS = [
   {
     sel: '.hero__slot',
     live: () => !openSheet(),
-    get: slot => slot.querySelector('.is-on')?.getAttribute('src'),
+    get: slot => slot.querySelector('.is-on')?.src,
     set: (slot, src) => {
-      let next = [...slot.children].find(img => img.getAttribute('src') === src);
+      let next = [...slot.children].find(img => img.src === src);
       if (!next) {
         next = Object.assign(new Image(40, 40), { className: `hero__icon${src.endsWith('.svg') ? ' mono' : ''}`, src, alt: '' });
         slot.append(next);
@@ -263,7 +257,7 @@ const ICON_SETS = [
   {
     sel: '[data-bb-icon]',
     live: () => openSheet()?.id === 'brandbook',
-    get: img => img.getAttribute('src'),
+    get: img => img.src,
     set: (img, src) => { img.src = src; img.classList.toggle('mono', src.endsWith('.svg')); },
   },
 ];
@@ -271,7 +265,7 @@ function tickIcon(set, k) {
   const slots = [...app.querySelectorAll(set.sel)];
   if (slots[k] && set.live()) {
     const shown = new Set([k - 1, k, k + 1].map(i => slots[i] && set.get(slots[i])));
-    const free = content.shared.icons.filter(src => !shown.has(src));
+    const free = content.shared.icons.map(abs).filter(src => !shown.has(src));
     if (free.length) set.set(slots[k], free[Math.floor(Math.random() * free.length)]);
   }
   setTimeout(() => tickIcon(set, k), ICON_MS[0] + Math.random() * (ICON_MS[1] - ICON_MS[0]));
@@ -417,17 +411,6 @@ syncSheet();
 syncScrollnav();
 mountSphere();
 
-// Po zmianie języka DOM jest nowy: przywróć aktywny projekt i stan panelu.
-new MutationObserver(() => {
-  const id = active;
-  active = null;
-  activate(id);
-  syncSheet();
-  syncThemeButton();
-  restoreChat();
-  mountSphere();
-  syncScrollnav();
-}).observe(app, { childList: true });
 
 /* Asystent AI (panel #agent). Rozmowa żyje w pamięci strony (przetrwa zmianę języka),
    silnik agent.js ładuje się przy pierwszym pytaniu: AI przez shared.agent.endpoint albo tryb lokalny.
@@ -465,7 +448,7 @@ function addMsg(role, payload) {
       const p = el('p', 'agent__links t-meta');
       for (const l of payload.links) {
         const a = el('a', 'link-u', l.label);
-        a.href = l.href;
+        a.href = /^(https?:|mailto:|#)/.test(l.href) ? l.href : abs(l.href);
         if (l.ext) { a.target = '_blank'; a.rel = 'noopener'; }
         if (l.download) a.setAttribute('download', '');
         p.append(a);

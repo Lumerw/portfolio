@@ -19,9 +19,12 @@
     "check-agent": "node tools/agent-check.mjs",
     "deck": "node tools/build-deck.mjs",
     "covers": "node tools/build-covers.mjs",
-    "cv": "node tools/build-cv.mjs"
+    "cv": "node tools/build-cv.mjs",
+    "dist": "node tools/build-dist.mjs",
+    "publish-pdf": "node tools/publish-pdf.mjs"
   },
   "devDependencies": {
+    "esbuild": "^0.25.12",
     "lighthouse": "^13.5.0",
     "playwright": "~1.63.0",
     "qrcode": "^1.5.4",

@@ -631,6 +631,9 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
   mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
 .recs__track { display: flex; width: max-content; gap: var(--gutter); padding-right: var(--gutter); animation: marquee 70s linear infinite; }
+/* Karuzela jedzie cały czas (decyzja właściciela) - zatrzymuje ją tylko fokus z klawiatury (WCAG 2.2.2) */
+.recs__marquee:focus-within .recs__track { animation-play-state: paused; }
+.recs__marquee:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
 .recs__card { flex: none; width: 280px; display: flex; flex-direction: column; justify-content: space-between; gap: var(--s-3); padding: var(--s-3); border: var(--hairline) solid var(--hair); }
 .recs__quote { font-size: var(--fs-text); line-height: var(--lh-text); }
 /* Podpis zawsze na tej samej wysokości: rola rezerwuje 2 linie, awatar przy imieniu - kółka w jednej linii */
@@ -850,6 +853,9 @@ img.recs__avatar { border-color: var(--hair); object-fit: cover; background: var
 .sheet .reel { content-visibility: hidden; transition: content-visibility 0s linear var(--t-sheet) allow-discrete; }
 .sheet:target .reel { content-visibility: visible; transition-delay: 0s; }
 .sheet:target .reel.is-paused { --reel-play: paused; }
+/* WCAG 2.2.2 bez widocznego przycisku: fokus z klawiatury na kadrze (link do strony projektu) zatrzymuje ruch;
+   przy ograniczonym ruchu w systemie wszystko stoi od początku */
+.sheet:target .sheet__video:focus-within .reel { --reel-play: paused; }
 /* Bez JS: trzy pętle (24 s) i stop na plakacie - 0% = 100%, więc forwards zostawia ten sam kadr */
 html:not(.js) .reel,
 html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-mode: forwards !important; }

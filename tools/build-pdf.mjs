@@ -1,5 +1,5 @@
 // PDF portfolio do pobrania ze strony - własny szablon (tools/pdf.css), nie wydruk strony.
-//   npm run pdf  →  dla pl i en po 4 pliki:
+//   npm run pdf  →  pdf/ (poza repozytorium), dla pl i en po 4 pliki; npm run publish-pdf wysyła je do GitHub Releases:
 //     portfolio-lumer-<lang>.pdf            16:9 (1920 × 1080), jasny   - desktop
 //     portfolio-lumer-<lang>-dark.pdf       16:9, ciemny
 //     portfolio-lumer-<lang>-9x16.pdf       9:16 (1080 × 1920), jasny  - telefon
@@ -180,6 +180,7 @@ async function shots(browser) {
 const server = await serve(PORT);
 const browser = await chromium.launch().catch(() => chromium.launch({ channel: 'chrome' }));
 let failed = false;
+await mkdir(join(root, 'pdf'), { recursive: true });
 await shots(browser);
 
 for (const lang of ['pl', 'en']) {
@@ -202,7 +203,7 @@ for (const lang of ['pl', 'en']) {
         return (s.offsetWidth !== W || s.offsetHeight !== H || bad) ? i + 1 : null;
       }).filter(Boolean), [W, H]);
       const name = pdfName(content[lang].ui.pdfFile, fmt, dark);
-      const file = join(root, name);
+      const file = join(root, 'pdf', name);   // poza repozytorium; publikacja: npm run publish-pdf (GitHub Releases)
       await page.pdf({ path: file, preferCSSPageSize: true, printBackground: true, tagged: true, outline: false });
       await page.close();
 

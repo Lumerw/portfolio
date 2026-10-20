@@ -681,7 +681,7 @@ async function gateGroup(browser) {
   check('Otwarcie panelu zeruje zegar (< 100 ms po 2 klatkach)', !bad3.length && notes3.length > 0, list(bad3.length ? bad3 : notes3));
 }
 
-/* ---------- PL ↔ EN: tekst reela, restart od zera ---------- */
+/* ---------- PL ↔ EN (osobne strony / i /en/): tekst reela ---------- */
 async function langGroup(browser, content) {
   const ctx = await newCtx(browser, { lang: 'pl' });
   const page = await newPage(ctx, { vw: 1440, vh: 900 }, 'lang');
@@ -700,10 +700,12 @@ async function langGroup(browser, content) {
         label: sheet[0]?.getAttribute('aria-label') ?? null,
       };
     });
-    const flip = () => page.evaluate(async () => {
-      document.querySelector('[data-lang-switch]').click();
-      await window.__reel.frames(2);
-    });
+    // Wersje językowe to osobne strony (/ i /en/) - przełącznik przechodzi na drugi adres
+    const flip = async () => {
+      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('[data-lang-switch]')]);
+      await page.waitForFunction(() => window.__reel && document.querySelector('#teraz .reel'));
+      notes.push(`→ ${new URL(page.url()).pathname}`);
+    };
     const norm = s => String(s).replace(/\s+/g, ' ').trim();
     const expect = (state, lang) => {
       const r = content?.[lang]?.projects?.teraz?.reel;

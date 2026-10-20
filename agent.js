@@ -37,7 +37,7 @@ function findProject(c, q) {
 }
 
 const mailLink = c => ({ label: c.email, href: `mailto:${c.email}` });
-// Rozmowa: kalendarz Cal.com (30 min), zapasowo Calendly
+// Rozmowa: kalendarz Cal.com (30 min), zapasowo shared.calendly
 const callUrl = c => (c.booking?.calUsername ? `https://cal.com/${c.booking.calUsername}/${c.booking.events?.[0]?.slug ?? ''}` : c.calendly);
 
 export function localAnswer(content, lang, question) {

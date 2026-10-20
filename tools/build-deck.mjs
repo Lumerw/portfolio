@@ -6,7 +6,7 @@
 // Spis i „spis” na każdym slajdzie to linki wewnątrz PDF; strony projektów, mail i www - linki zewnętrzne.
 // Fonty: Helvetica Neue (macOS), Open Sans (teraz, OFL, lokalnie). Haus (loom.studio) tylko jako logo w krzywych.
 import { chromium } from 'playwright';
-import { readFile, stat } from 'node:fs/promises';
+import { mkdir, readFile, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
@@ -114,6 +114,7 @@ function deck(lang) {
 
 /* ---------- Druk + kontrola ---------- */
 await buildQr();
+await mkdir(join(root, 'pdf'), { recursive: true });
 const server = await serve(PORT);
 const browser = await chromium.launch();
 let failed = false;
@@ -129,7 +130,7 @@ for (const lang of ['pl', 'en']) {
   // Każdy slajd musi mieć dokładnie 1080 × 1080 (nic nie wychodzi poza kadr).
   const over = await page.evaluate(() => [...document.querySelectorAll('.slide')]
     .filter(s => s.scrollHeight > 1080 || s.scrollWidth > 1080 || s.offsetHeight !== 1080).map(s => s.id));
-  const file = join(root, content[lang].deck.file);
+  const file = join(root, 'pdf', content[lang].deck.file);   // poza repozytorium (npm run publish-pdf)
   await page.pdf({ path: file, preferCSSPageSize: true, printBackground: true, tagged: true });
   await page.close();
 

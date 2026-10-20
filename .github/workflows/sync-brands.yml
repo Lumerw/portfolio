@@ -11,7 +11,7 @@ on:
 
 permissions:
   contents: write
-  pages: write
+  actions: write
 
 concurrency:
   group: sync-brands
@@ -42,7 +42,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Przebuduj stronę
+      - name: Przebuduj stronę (index.html i en/index.html)
         if: steps.diff.outputs.changed == 'true'
         run: npm run build
 
@@ -56,5 +56,5 @@ jobs:
           git add -A
           git commit -m "Synchronizacja marek: nowe assety ze stron projektów"
           git push
-          # push z tokenem akcji nie zawsze uruchamia budowanie Pages — wywołaj je jawnie
-          gh api -X POST "repos/${{ github.repository }}/pages/builds" || true
+          # push z tokenem akcji nie uruchamia innych workflow - publikację (testy + strona) wywołaj jawnie
+          gh workflow run checks.yml --ref main

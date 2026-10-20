@@ -1,8 +1,8 @@
-// Wpisuje polską treść z content.js do index.html (między znacznikami app/meta).
-// Dzięki temu strona działa i indeksuje się bez JS. Uruchom po każdej zmianie treści:
+// Wpisuje treść z content.js do index.html (polska, /) i en/index.html (angielska, /en/) między znacznikami
+// app/meta. Dzięki temu obie wersje działają i indeksują się bez JS. Uruchom po każdej zmianie treści:
 //   npm run build
 // `npm run dev` robi to samo w locie przy każdym odświeżeniu (tools/serve.mjs --dev).
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,14 +11,22 @@ const file = join(root, 'index.html');
 const fill = (html, key, inner) =>
   html.replace(new RegExp(`<!-- ${key}:start -->[\\s\\S]*?<!-- ${key}:end -->`), `<!-- ${key}:start -->\n  ${inner}\n  <!-- ${key}:end -->`);
 
+// Strona w podkatalogu /en/: względne adresy (src, href, srcset, poster) dostają „../” - pliki leżą w katalogu
+// głównym. Kotwice (#…), adresy pełne, mailto: i data: zostają bez zmian.
+const REL = /^(?!https?:|\/\/|#|mailto:|tel:|data:|\/|\.\.\/)/;
+export const toSubdir = html => html
+  .replace(/(\s(?:src|href|poster)=")([^"]*)"/g, (m, a, v) => (v && REL.test(v) ? `${a}../${v}"` : m))
+  .replace(/(\ssrcset=")([^"]*)"/g, (m, a, v) => `${a}${v.split(',').map(x => { const t = x.trim(); return REL.test(t) ? `../${t}` : t; }).join(', ')}"`);
+
 // Świeży import przy każdym wywołaniu — serwer deweloperski widzi zmiany bez restartu.
-export async function renderIndex() {
+export async function renderIndex(lang = 'pl') {
   const t = Date.now();
   const { content } = await import(`../content.js?t=${t}`);
   const { render, renderMeta } = await import(`../render.js?t=${t}`);
   let html = await readFile(file, 'utf8');
-  html = fill(html, 'meta', renderMeta(content, 'pl'));
-  html = fill(html, 'app', render(content, 'pl'));
+  html = fill(html, 'meta', renderMeta(content, lang));
+  html = fill(html, 'app', render(content, lang));
+  if (lang !== 'pl') html = toSubdir(html.replace(/<html lang="pl">/, `<html lang="${lang}">`));
   return { html, content };
 }
 
@@ -73,13 +81,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
   await writeFile(file, html);
   console.log('index.html ← content.js (pl)');
+  await mkdir(join(root, 'en'), { recursive: true });
+  await writeFile(join(root, 'en', 'index.html'), (await renderIndex('en')).html);
+  console.log('en/index.html ← content.js (en)');
 
   // sitemap.xml + robots.txt z adresu strony (shared.siteUrl).
   const site = content.shared.siteUrl.replace(/\/$/, '');
   if (!site.includes('[')) {
+    // obie wersje językowe z wzajemnymi odnośnikami hreflang
+    const alt = `<xhtml:link rel="alternate" hreflang="pl" href="${site}/"/><xhtml:link rel="alternate" hreflang="en" href="${site}/en/"/>`;
     await writeFile(join(root, 'sitemap.xml'),
-      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-      `  <url><loc>${site}/</loc></url>\n</urlset>\n`);
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n` +
+      `  <url><loc>${site}/</loc>${alt}</url>\n  <url><loc>${site}/en/</loc>${alt}</url>\n</urlset>\n`);
     await writeFile(join(root, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${site}/sitemap.xml\n`);
   }
 

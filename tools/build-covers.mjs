@@ -1,5 +1,5 @@
 // Grafiki marek projektów na stronę (statyczne, zamiast placeholderów i zanim powstanie wideo):
-//   npm run covers  →  assets/<id>/cover-4x5.webp, cover-16x9.webp, cover-9x16.webp
+//   npm run covers  →  assets/<id>/cover-4x5.webp (i cover-card.webp)
 //                      dla projektów z polem `cover` w content.js (podgląd na stronie głównej + panel);
 //                      przy `live` to pierwsza klatka grafiki interaktywnej (live.js, stan bez ruchu)
 //                   →  assets/<id>/01.jpg, 02.jpg, 03.jpg - obrazy case study do PDF A4
@@ -17,7 +17,7 @@ import { liveMarkup } from '../live.js';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 8095;
 // Rozmiar pliku: podgląd 4:5 ma do ~610 px (2x), panel 16:9 do 1280 px, telefon 9:16 do ~680 px wysokości (3x).
-const FORMATS = { card: [540, 675], '4x5': [1080, 1350], '16x9': [2560, 1440], '9x16': [864, 1536] };   // card: karta na sferze (wersja lite)
+const FORMATS = { card: [540, 675], '4x5': [1080, 1350] };   // card: karta na sferze (wersja lite), 4x5: panel projektu
 const CASE_A = [1200, 1500];  // obraz „a” case study (4:5)
 
 const page = (inner, [w, h]) => `<!doctype html><html><head><meta charset="utf-8">

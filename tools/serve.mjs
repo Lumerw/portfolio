@@ -1,5 +1,5 @@
 // Minimalny serwer statyczny bez zależności: `npm run dev` → http://localhost:8080
-// Z flagą --dev index.html jest renderowany z content.js przy każdym odświeżeniu.
+// Z flagą --dev index.html i en/index.html są renderowane z content.js przy każdym odświeżeniu.
 // Używany też przez build-pdf.mjs i screenshots.mjs.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
@@ -22,10 +22,16 @@ export function serve(port = 8080, { dev = false } = {}) {
     let file = join(root, path);
     try {
       if ((await stat(file)).isDirectory()) file = join(file, 'index.html');
-      const body = dev && file === join(root, 'index.html') ? (await renderIndex()).html : await readFile(file);
+      const body = dev && file === join(root, 'index.html') ? (await renderIndex()).html
+        : dev && file === join(root, 'en', 'index.html') ? (await renderIndex('en')).html
+        : await readFile(file);
       res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream', 'cache-control': 'no-store' });
       res.end(body);
     } catch {
+      // PDF-y leżą lokalnie w pdf/ (na stronie: z GitHub Releases) - ten sam adres co na lumerw.com
+      if (extname(file) === '.pdf') {
+        try { const body = await readFile(join(root, 'pdf', path.replace(/^.*[/\\]/, ''))); res.writeHead(200, { 'content-type': TYPES['.pdf'] }); return res.end(body); } catch { /* brak */ }
+      }
       res.writeHead(404).end('404');
     }
   });

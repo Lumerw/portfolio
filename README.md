@@ -15,7 +15,9 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 | `npm run dev` | serwer podglądu; zmiany w `content.js` widać po odświeżeniu |
 | `npm run build` | wpisuje polską treść z `content.js` do `index.html` (strona działa bez JS, szybciej się ładuje). **Przed wdrożeniem.** |
 | `npm run images` | AVIF/WebP/JPG 640/1280/1920 z obrazów `.jpg`/`.png` wpisanych w `content.js`; portret od razu w duotonie |
-| `npm run pdf` | PDF do pobrania, po 4 na język: `portfolio-lumer-<pl|en>.pdf` (16:9, jasny), `-dark.pdf` (16:9, ciemny), `-9x16.pdf` i `-9x16-dark.pdf` (telefon); własny szablon `tools/pdf.css`, kadry projektów zrzucane z paneli strony do `private/pdf/`; sprawdza 5 stron, kadr i rozmiar < 8 MB |
+| `npm run pdf` | PDF do pobrania (do `pdf/`, poza repozytorium), po 4 na język: `portfolio-lumer-<pl|en>.pdf` (16:9, jasny), `-dark.pdf` (16:9, ciemny), `-9x16.pdf` i `-9x16-dark.pdf` (telefon); własny szablon `tools/pdf.css`, kadry projektów zrzucane z paneli strony do `private/pdf/`; sprawdza 5 stron, kadr i rozmiar < 8 MB |
+| `npm run publish-pdf` | wysyła PDF-y z `pdf/` do GitHub Releases (tag `pdf`) i uruchamia publikację strony - na lumerw.com mają te same adresy co wcześniej |
+| `npm run dist` | strona do publikacji w `_site/`: kopia plików strony ze zminifikowanym JS i CSS (robi to GitHub Actions) |
 | `npm run covers` | plansze marek na stronę (`cover-4x5/16x9/9x16.webp` dla projektów z polem `cover`) i obrazy case study do PDF A4 (`01-03.jpg` ze zrzutów i planszy); potem `npm run images` |
 | `npm run cv` | CV na jedną stronę 1080 × 1080 (PL i EN) do wysyłania → `private/` (poza repozytorium); projekty, doświadczenie, kompetencje, narzędzia, kontakt z Calendly i QR |
 | `npm run deck` | `portfolio-lumer-1080-pl.pdf` i `-en.pdf`: karuzela 1080 × 1080 na LinkedIn / Instagram (8 slajdów, klikalny spis i linki); sprawdza liczbę stron, kadr i linki |
@@ -142,6 +144,19 @@ Font Haus (loom) jest na licencji, więc w PDF jest tylko logo w krzywych i zrzu
 - Zrzuty: `shared.projects[].deck` → `assets/deck/` (desktop 1600 × 1000, telefon 480 × 1039, JPG).
 - Nowy zrzut: zrób go w 1440 × 900 (2x) i 390 × 844 (3x), bez banera cookies, i podmień plik.
 
+## Publikacja (GitHub Actions)
+
+Workflow „Testy i publikacja” (`.github/workflows/checks.yml`) przy każdym pushu na `main`:
+1. testy na macOS (Helvetica jak na Twoim Macu): `index.html` i `en/index.html` zbudowane z `content.js`, asystent, plansze i strona;
+2. publikacja strony na GitHub Pages: `npm run dist` (zminifikowany JS i CSS) + PDF-y pobrane z wydania `pdf` w GitHub Releases;
+3. wdrożenie asystenta AI (Cloudflare Worker) z aktualną wiedzą z `content.js` - gdy w repozytorium są sekrety `CLOUDFLARE_API_TOKEN` i `CLOUDFLARE_ACCOUNT_ID`.
+
+PDF-y nie są w historii repozytorium: po zmianie treści `npm run pdf && npm run deck && npm run publish-pdf`.
+
+## Wersje językowe
+
+Polska strona to `/` (`index.html`), angielska `/en/` (`en/index.html`) - obie zbudowane przez `npm run build`, z `hreflang` i w sitemapie, więc wyszukiwarki widzą obie. Przełącznik PL/EN przechodzi między adresami i zapamiętuje wybór (zapisany EN przenosi ze strony głównej na `/en/`). Ścieżki do plików w `/en/` dostają `../` przy budowaniu; skrypty liczą ścieżki od katalogu głównego (`import.meta.url`).
+
 ## Sfera: logo i karty
 
 Na stronie głównej (desktop) sfera pokazuje na miejscu kart same logo projektów tuszem (`shared.projects[].sphereLogo`: teraz, loom.studio, „her” reh.ab). Po najechaniu na logo w jego miejscu pojawia się karta projektu (gra jej animacja), klik otwiera panel. W sekcji Portfolio sfera przechodzi w karty jak wcześniej (`.home__sphere.is-cards`, ustawia `main.js` razem z nawigatorem sekcji).
@@ -231,6 +246,7 @@ Wynik widać w zakładce **Actions** repozytorium; GitHub wyśle maila, gdy coś
 - **CV poza repozytorium:** `npm run cv` zapisuje do `private/` (w `.gitignore`) - CV jest do wysyłania, nie do publikacji.
 - **Tęczowa poświata asystenta AI** (decyzja właściciela, 13.10.2026) - jedyny kolor marki osobistej, zapisany jako wyjątek w brandbooku. Gradient obraca się przez `transform` (bez przemalowywania), przy ograniczonym ruchu stoi. Od 14.10.2026 poświata jest na awatarze w hero (przycisk „zapytaj AI” usunięty).
 - **Marka czarno-biała:** bez koloru akcentu (zamiast czerwonej/niebieskiej kropki z briefu). Kropka w znaku osobistym ma kolor tuszu; aktywny wiersz indeksu oznacza tylko podkreślenie. Kolory mają wyłącznie marki projektów (np. teraz).
+- **Ruch bez przycisku pauzy:** animacje w panelach i karuzela rekomendacji zatrzymują się przy fokusie z klawiatury (kadr / karuzela są fokusowalne) i nie ruszają przy ograniczonym ruchu w systemie.
 - **Motyw:** domyślnie jasny na każdym urządzeniu (decyzja właściciela, 20.10.2026), ciemny tylko z przełącznika (zapamiętany w localStorage).
 - **Kalendarz:** wyłącznie rozmowy 30-minutowe (`shared.booking.events`), linki w PDF i u asystenta prowadzą do `cal.com/<nazwa>/30min`.
 - **PDF do pobrania** (decyzja właściciela, 15.10.2026; 20.10: na okładce blok „O mnie” - doświadczenie i kompetencje, na stronach projektów linki do strony i brandbooka, bez adresu z dopiskiem „wkrótce”): telefon albo ekran pionowy z dotykiem dostaje 9:16 (1080 × 1920), reszta 16:9 (1920 × 1080); motyw strony wybiera tło (jasne / czarne) - `pdfVariant()` w `main.js` podmienia adres przy kliknięciu, bez JS zostaje 16:9 jasny. Strony: okładka (awatar z tęczową poświatą, hasło, „kontakt” → mail, „umów rozmowę” → Cal.com, zarys sfery w rogu), 3 projekty (kadr 4:5 + opis jak panel projektu), kontakt (sfera przycięta krawędzią).

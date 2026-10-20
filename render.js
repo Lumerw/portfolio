@@ -411,46 +411,6 @@ function project(p, i, c, t) {
   return sheet({ id: p.id, cls: 'sheet--project', bar, body, t });
 }
 
-// O mnie (brief 5.3) — w panelu.
-// Panel „o mnie” - na razie wyłączony (na stronie i w PDF); dane about zasilają asystenta i CV (npm run cv).
-function about(c, t) {
-  const a = t.about;
-  const rows = a.experience.filter(e => clean(e.place)).map(e => `
-            <li class="row">
-              <span class="row__year t-meta">${esc(clean(e.year))}</span>
-              <span class="row__place">${esc(clean(e.place))}</span>
-              <span class="row__role t-muted">${esc(clean(e.role))}</span>
-            </li>`).join('');
-  const detail = (label, value) => clean(value) ? `
-            <div class="detail">
-              <dt class="t-meta">${esc(label)}</dt>
-              <dd>${esc(clean(value))}</dd>
-            </div>` : '';
-  const tools = a.tools.map(clean).filter(Boolean).join(' · ');
-  const details = detail(t.ui.education, a.education) + detail(t.ui.languages, a.languages) + detail(t.ui.tools, tools);
-
-  const bar = `
-      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
-      <h2 id="o-mnie-title" class="t-project">${esc(a.title)}</h2>`;
-
-  const body = `
-      <div class="about grid">
-        <figure class="about__portrait media media--4x5">
-          ${image(c.portrait, a.portraitAlt, '(min-width: 1024px) 25vw, 66vw', { widths: c.imageWidths })}
-        </figure>
-        <div class="about__text">
-          ${clean(a.bio) ? `<p class="t-text">${esc(clean(a.bio))}</p>` : ''}
-          ${rows ? `<h3 class="t-meta about__label">${esc(t.ui.experience)}</h3>
-          <ul class="rows">${rows}
-          </ul>` : ''}
-          ${details ? `<dl class="details">${details}
-          </dl>` : ''}
-        </div>
-      </div>`;
-
-  return sheet({ id: 'o-mnie', cls: 'sheet--about', bar, body, t });
-}
-
 // Brandbook - księga znaku marki osobistej (otwiera ją znak z ikonami w hero). Treść w content.js,
 // wartości kolorów w shared.brandbook. Kolory pokazane dosłownie - te same w obu motywach.
 function brandbook(c, t) {
@@ -525,7 +485,7 @@ const copyIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focus
 
 // Stopka = kontakt (brief 5.4, uproszczony): mail + kopiowanie, profile, przycisk „kontakt”.
 // W PDF ta sama stopka jest stroną 6 (tytuł, zdanie i QR tylko w druku).
-// Kalendarz kreską 1 px (przycisk „umów rozmowę” → Calendly)
+// Kalendarz kreską 1 px (przycisk „umów rozmowę”)
 const calendarIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5" /></svg>`;
 
 // Rekomendacje z LinkedIna: karuzela w pętli (lista + kopia aria-hidden, jak karuzela logo), karty bez linków.
@@ -544,7 +504,7 @@ function recommendations(c, t, lang) {
   return `
   <section id="rekomendacje" class="recs" aria-labelledby="recs-title">
     <h2 id="recs-title" class="t-name section-title recs__title">${esc(t.ui.recs)}</h2>
-    <div class="recs__marquee">
+    <div class="recs__marquee" tabindex="0" role="region" aria-label="${esc(t.ui.recs)}">
       <ul class="recs__track">${cards(false)}${cards(true)}
       </ul>
     </div>
@@ -591,7 +551,7 @@ function booking(c, t) {
 
 function footer(c, t) {
   const mailHref = isReal(c.email) ? `mailto:${esc(c.email)}` : '#kontakt';
-  // Przycisk „umów rozmowę”: własny kalendarz (#rozmowa, Cal.com) → Calendly (shared.calendly) → mail.
+  // Przycisk „umów rozmowę”: własny kalendarz (#rozmowa, Cal.com) → strona rezerwacji (shared.calendly) → mail.
   const cal = url(c.calendly) !== '#' && new URL(c.calendly).pathname.length > 1 ? c.calendly : '';
   const book = hasBooking(c);
   const links = c.links.filter(l => url(l.href) !== '#');
@@ -703,12 +663,17 @@ export function renderMeta(content, lang) {
   const c = content.shared, m = content[lang].meta;
   const site = isReal(c.siteUrl) ? c.siteUrl.replace(/\/$/, '') : '';
   const abs = path => (site ? `${site}/${path}` : path);
+  // Wersje językowe: / (pl) i /en/ (en) - canonical do własnej, hreflang do obu
+  const page = l => `${site}/${l === 'en' ? 'en/' : ''}`;
   return [
     `<title>${esc(m.title)}</title>`,
     `<meta name="description" content="${esc(m.description)}">`,
-    site && `<link rel="canonical" href="${esc(site)}/">`,
+    site && `<link rel="canonical" href="${esc(page(lang))}">`,
+    site && `<link rel="alternate" hreflang="pl" href="${esc(page('pl'))}">`,
+    site && `<link rel="alternate" hreflang="en" href="${esc(page('en'))}">`,
+    site && `<link rel="alternate" hreflang="x-default" href="${esc(page('pl'))}">`,
     `<meta property="og:type" content="website">`,
-    site && `<meta property="og:url" content="${esc(site)}/">`,
+    site && `<meta property="og:url" content="${esc(page(lang))}">`,
     `<meta property="og:title" content="${esc(m.title)}">`,
     `<meta property="og:description" content="${esc(m.description)}">`,
     `<meta property="og:image" content="${esc(abs('assets/og.jpg'))}">`,

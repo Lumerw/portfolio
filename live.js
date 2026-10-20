@@ -314,7 +314,7 @@ function rehabMarkup(p, { lite = false } = {}) {
   const lede = L.lede.map(([text, fn]) => `${esc(text)}${fn ? `<sup>${esc(fn)}</sup>` : ''}`).join(' ');
   const ticker = [...L.ticker, L.ticker[0], L.ticker[1]].map(w => `<span>${esc(w)}</span>`).join('');
   const quotes = L.quotes.map((q, i) => `<span style="--q:${i}">“${esc(q)}”</span>`).join('');
-  const avatars = L.avatars.map(src => `<img src="${esc(src)}" alt="" width="34" height="34">`).join('');
+  const avatars = L.avatars.map(src => `<img src="${esc(new URL(src, import.meta.url).href)}" alt="" width="34" height="34">`).join('');   // od katalogu głównego (strona / i /en/)
   return `
           <div class="rh-copy">
             <p class="rh-h">${h}</p>
@@ -339,7 +339,7 @@ const MARKUP = { loom: loomMarkup, rehab: rehabMarkup };
 let css = null;
 export function loadCss() {
   css ??= new Promise(resolve => {
-    const link = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: 'live.css' });
+    const link = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: new URL('live.css', import.meta.url).href });
     link.onload = link.onerror = resolve;
     document.head.append(link);
   });

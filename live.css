@@ -19,6 +19,7 @@
 .home__sphere:not(.is-cards) .sphere__card:hover .live,
 .sheet:target .live { --live-play: running; }
 .sheet:target .live.is-paused { --live-play: paused; }
+.sheet:target .sheet__video:focus-within .live { --live-play: paused; }   /* fokus z klawiatury na kadrze = pauza */
 .live *, .live *::before, .live *::after { animation-play-state: var(--live-play) !important; }
 .live--static, .live--static *, .live--static *::before, .live--static *::after { animation: none !important; }
 .live--static .og-grain { display: none; }   /* ziarno (6%) niewidoczne w planszy, a mocno ją powiększa */

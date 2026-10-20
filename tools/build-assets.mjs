@@ -4,7 +4,7 @@
 // Placeholdery zastępujesz prawdziwymi obrazami i zmieniasz ścieżki w content.js.
 // Istniejących plików .jpg/.webp/.avif skrypt nie dotyka.
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, access } from 'node:fs/promises';
 import sharp from 'sharp';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,14 +37,17 @@ ${symbolInner(name)}
 `;
 }
 
-async function out(path, data) {
+// Placeholdery tylko tam, gdzie pliku jeszcze nie ma - prawdziwe logo, ikony i plansze nigdy nie są nadpisywane.
+// Symbole (assets/symbols/) generuje zawsze, bo powstają z symbols.js.
+async function out(path, data, { always = false } = {}) {
   const file = join(root, path);
+  if (!always && await access(file).then(() => true, () => false)) return;
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, data);
   console.log('  ', path);
 }
 
-for (const name of SYMBOL_NAMES) await out(`assets/symbols/${name}.svg`, symbolFile(name));
+for (const name of SYMBOL_NAMES) await out(`assets/symbols/${name}.svg`, symbolFile(name), { always: true });
 
 const FONT = 'Helvetica Neue, Helvetica, Arial, sans-serif';
 
@@ -91,7 +94,7 @@ for (const p of shared.projects) {
     await out(img.src, placeholder(p.symbol, img.w / 2, img.h / 2));
   }
   for (const v of Object.values(p.video)) {
-    // Plakaty obu formatów panelu: video-16x9.svg i video-4x5.svg (połowa wymiarów z content.js).
+    // Plakat kadru panelu (video-4x5.svg, połowa wymiarów z content.js).
     // Bez ramki: ramkę rysuje CSS na figurze.
     if (v.poster.endsWith('.svg')) await out(v.poster, placeholder(p.symbol, v.w / 2, v.h / 2, { frame: false }));
   }

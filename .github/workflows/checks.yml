@@ -1,9 +1,11 @@
-# Automatyczne testy przy każdym pushu i pull requeście.
-# 1) index.html, sitemap.xml i robots.txt muszą być zbudowane z aktualnego content.js (npm run build).
+# Testy i publikacja przy każdym pushu na main (pull request: same testy).
+# 1) index.html, en/index.html, sitemap.xml i robots.txt muszą być zbudowane z aktualnego content.js (npm run build).
 # 2) Testy asystenta AI: tryb lokalny i Worker z podstawionym Claude API (tools/agent-check.mjs).
 # 3) Testy planszy i strony w Chromium (tools/reel-check.mjs): kadry, języki, tryb ciemny, bez JS, ruch.
 # Runner macOS - ma Helveticę, więc układ wygląda jak na Twoim Macu.
-name: Testy
+# Po testach (tylko main): strona na GitHub Pages - zminifikowana kopia (npm run dist) + PDF-y z GitHub Releases;
+# asystent AI - Cloudflare Worker z aktualną wiedzą z content.js (gdy jest sekret CLOUDFLARE_API_TOKEN).
+name: Testy i publikacja
 
 on:
   push:
@@ -16,7 +18,7 @@ permissions:
 
 concurrency:
   group: checks-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   checks:
@@ -35,7 +37,7 @@ jobs:
       - name: Strona zbudowana z content.js?
         run: |
           npm run build
-          git diff --exit-code index.html sitemap.xml robots.txt || {
+          git diff --exit-code index.html en/index.html sitemap.xml robots.txt || {
             echo "::error::index.html nie zgadza się z content.js - uruchom lokalnie: npm run build i zapisz zmiany"
             exit 1
           }
@@ -58,3 +60,67 @@ jobs:
           name: reel-qa
           path: ${{ runner.temp }}/reel-qa
           if-no-files-found: ignore
+
+  # Strona: zminifikowana kopia + PDF-y z wydania „pdf” → GitHub Pages
+  deploy:
+    needs: checks
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Strona do publikacji (minifikacja JS i CSS)
+        run: npm run dist
+
+      - name: PDF-y z GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download pdf --pattern '*.pdf' --dir _site --clobber || echo "::warning::brak wydania pdf - uruchom lokalnie npm run publish-pdf"
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - id: pages
+        uses: actions/deploy-pages@v5
+
+  # Asystent AI: Worker z wiedzą z aktualnego content.js (sekrety repozytorium: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
+  worker:
+    needs: checks
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        if: env.CLOUDFLARE_API_TOKEN != ''
+
+      - uses: actions/setup-node@v7
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        with:
+          node-version: 22
+
+      - name: Wdrożenie Workera
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: npx --yes wrangler@4 deploy -c agent/wrangler.toml
+
+      - name: Brak tokenu Cloudflare
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "::notice::Worker nie wdrożony - dodaj sekret CLOUDFLARE_API_TOKEN (README → Asystent AI)"

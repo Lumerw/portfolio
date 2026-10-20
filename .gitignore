@@ -8,3 +8,8 @@ BRIEF.md
 
 # CV do wysyłania (npm run cv) - prywatne, nie publikujemy
 private/
+
+# PDF-y (npm run pdf / deck) - publikowane w GitHub Releases (npm run publish-pdf), nie w repozytorium
+pdf/
+# Strona do publikacji (npm run dist) - budowana w GitHub Actions
+_site/
