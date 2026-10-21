@@ -348,6 +348,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
     position: sticky;
     top: 0;
     height: 100svh;
+    height: 100dvh;                    /* faktyczna wysokość ekranu (Safari na iPadzie: pasek zwinięty lub nie) */
     align-self: start;
     display: flex;
     flex-direction: column;
@@ -378,6 +379,9 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
     padding-block: var(--s-8);
     scroll-snap-align: start;
   }
+  /* Kontakt leży na dnie strony: ta sama wysokość co kolumna sfery, więc treść stoi na wysokości jej środka
+     także przy zwiniętym pasku Safari (100svh byłoby niższe od ekranu i sekcja zjechałaby w dół) */
+  .home .site-footer { min-height: 100dvh; }
   html { scrollbar-width: none; }
   html::-webkit-scrollbar { display: none; }
 }
