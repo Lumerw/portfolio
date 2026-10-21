@@ -1,7 +1,7 @@
 // Uniwersalne CV na jedną stronę 1080 × 1080, w designie strony i PDF portfolio, z klikalnymi linkami.
 //   npm run cv  →  private/cv-wojciech-lumer-pl.pdf, private/cv-wojciech-lumer-en.pdf
 // Folder private/ jest w .gitignore - CV nie trafia do publicznego repozytorium ani na stronę.
-// Układ: awatar z tęczową obwódką, obok adres strony i imię · hasło z hero, pod nim skrócone zdanie (pl/en.cv.line) · wiersze z cienką linią:
+// Układ (4 wielkości tekstu: 40 hasło, 22 imię i zdanie, 18 treść, 15 opisy + znacznik beta): awatar z tęczową obwódką, obok adres strony i imię · hasło z hero, pod nim skrócone zdanie (pl/en.cv.line) · wiersze z cienką linią:
 // doświadczenie, projekty, kompetencje, narzędzia, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
 // (logo firm, bez freshly) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
 // Treść z content.js (pl/en.about, pl/en.cv, shared.clients); placeholdery w [nawiasach] są pomijane.
@@ -24,7 +24,6 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const isReal = v => !!v && !String(v).includes('[');
 const host = u => u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 const icon = {
-  linkedin: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>',
   mail: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3.5" width="12" height="9"/><path d="M2 4l6 5 6-5"/></svg>',
   calendar: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5"/></svg>',
 };
@@ -39,10 +38,8 @@ function cv(lang) {
   const experience = t.about.experience.filter(e => isReal(e.place)).map(e => `
           <li><span class="meta">${esc(clean(e.year))}</span><span><b>${esc(clean(e.place))}</b><span class="muted">, ${esc(clean(e.role))}</span></span></li>`).join('');
   const projects = c.projects.map(p => {
-    const tp = t.projects[p.id];
     const href = isReal(p.href) ? p.href : `${site}/${lang === 'en' ? 'en/' : ''}#${p.id}`;
-    return `
-          <li><span><a class="link-u" href="${esc(href)}"><b>${esc(p.title)}</b></a>${p.beta ? ' <span class="beta">beta</span>' : ''}</span><span class="muted">${esc(tp.tagline)}</span></li>`;
+    return `<li><a class="link-u" href="${esc(href)}"><b>${esc(p.title)}</b></a>${p.beta ? '<span class="beta">beta</span>' : ''}</li>`;
   }).join('');
   const tools = t.about.tools.filter(isReal).map(clean);
   const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.85)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
@@ -64,7 +61,7 @@ function cv(lang) {
         <div class="avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
         <div>
           <p class="site"><a href="${esc(site)}/">${esc(host(site))}</a></p>
-          <p class="name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a><a class="name__li" href="${esc(linkedin)}" aria-label="LinkedIn">${icon.linkedin}</a>` : esc(c.name)}</p>
+          <p class="name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a>` : esc(c.name)}</p>
         </div>
       </div>
       <h1 class="title">${esc(t.hero.title)}</h1>
@@ -72,9 +69,9 @@ function cv(lang) {
     </section>
     <dl class="rows">
       ${row(V.experience, `<ul class="list">${experience}</ul>`)}
-      ${row(V.projects, `<ul class="list list--proj">${projects}</ul>`)}
+      ${row(V.projects, `<ul class="projs">${projects}</ul>`)}
       ${row(V.skills, `<ul class="dash">${V.skillsList.map(s => `<li>${esc(s)}</li>`).join('')}</ul>`)}
-      ${row(V.tools, tools.length ? esc(tools.join(' · ')) : '')}
+      ${row(V.tools, tools.length ? `<p class="tools">${esc(tools.join(' · '))}</p>` : '')}
       ${isReal(t.about.education) ? row(V.education ?? (lang === 'pl' ? 'Wykształcenie' : 'Education'), esc(t.about.education)) : ''}
       ${isReal(t.about.languages) ? row(V.languages ?? (lang === 'pl' ? 'Języki' : 'Languages'), esc(t.about.languages)) : ''}
       ${row(U.clients, clients ? `<p class="clients">${clients}</p>` : '')}
@@ -106,7 +103,8 @@ for (const lang of ['pl', 'en']) {
   // ile pikseli treść wychodzi poza stronę (dół stopki, prawa krawędź)
   const over = await page.evaluate(S => {
     const els = [...document.querySelectorAll('.intro, .rows, .foot')];
-    return Math.max(0, ...els.map(el => { const r = el.getBoundingClientRect(); return Math.max(r.bottom - (S - 64), r.right - S); }));
+    const tools = document.querySelector('.tools');   // narzędzia w jednej linii
+    return Math.max(0, tools ? tools.scrollWidth - tools.clientWidth : 0, ...els.map(el => { const r = el.getBoundingClientRect(); return Math.max(r.bottom - (S - 64), r.right - S); }));
   }, SIZE);
   if (process.env.CV_PNG) await page.screenshot({ path: join(process.env.CV_PNG, `cv-${lang}.png`) });
   const file = join(out, content[lang].cv.file);

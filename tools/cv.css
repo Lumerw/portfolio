@@ -41,10 +41,13 @@ b { font-weight: 500; }
 .sphere .rim { opacity: .2; }
 
 
+/* Wielkości tekstu (4 + znacznik): --fs-xl 40 hasło · --fs-l 22 imię, zdanie · --fs-m 18 treść, przyciski · --fs-s 15 opisy, daty, adres */
+:root { --fs-xl: 40px; --fs-l: 22px; --fs-m: 18px; --fs-s: 15px; }
+
 /* Awatar z adresem strony i imieniem obok, hasło i zdanie - jak hero na stronie */
 .intro { position: relative; z-index: 1; max-width: 760px; }
-.who { display: flex; align-items: center; gap: calc(16px * var(--k)); }
-.site { font-size: 18px; color: var(--ink-3); }
+.who { display: flex; align-items: center; gap: 22px; }
+.site { font-size: var(--fs-s); color: var(--ink-3); }
 .site a { border-bottom: 1px solid var(--hair); }
 .avatar { position: relative; isolation: isolate; width: calc(58px * var(--k)); height: calc(58px * var(--k)); border-radius: 50%; }
 .avatar::before,
@@ -52,39 +55,40 @@ b { font-weight: 500; }
 .avatar::before { inset: calc(-2px * var(--k)); }
 .avatar::after { inset: calc(-3px * var(--k)); filter: blur(calc(10px * var(--k))); opacity: .75; }
 .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff; }
-.name { margin-top: 6px; display: flex; align-items: center; gap: 12px; font-size: 24px; line-height: 1.3; }
-.name__li svg { display: block; width: 20px; height: 20px; fill: none; stroke: var(--ink-2); stroke-width: 1; }
-.title { margin-top: calc(24px * var(--k)); font-size: calc(28px * var(--k)); line-height: 1.2; font-weight: 500; letter-spacing: -.01em; }
-.line { margin-top: calc(10px * var(--k)); font-size: calc(15px * var(--k)); line-height: 1.55; color: var(--ink-2); }
+.name { margin-top: 4px; font-size: var(--fs-l); line-height: 1.3; }
+.title { margin-top: 40px; font-size: var(--fs-xl); line-height: 1.2; font-weight: 500; letter-spacing: -.01em; }
+.line { margin-top: 12px; font-size: var(--fs-l); line-height: 1.35; color: var(--ink-2); }
 
 /* Wiersze z cienką linią - jak opis projektu w panelu */
-.rows { position: relative; z-index: 1; margin-top: 44px; border-top: 1px solid var(--hair); font-size: 19px; line-height: 1.5; }
-.row { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 24px; padding-block: 13px; border-bottom: 1px solid var(--hair); }
-.row dt { color: var(--ink-3); font-size: 16px; padding-top: 2px; }
+.rows { position: relative; z-index: 1; margin-top: 64px; border-top: 1px solid var(--hair); font-size: var(--fs-m); line-height: 1.5; }
+.row { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 24px; padding-block: 21px; border-bottom: 1px solid var(--hair); }
+.row dt { color: var(--ink-3); font-size: var(--fs-s); padding-top: 2px; }
 .list li { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 16px; }
-.list .meta { font-size: 16px; padding-top: 2px; }
-.list--proj li { grid-template-columns: 190px minmax(0, 1fr); }
+.list .meta { font-size: var(--fs-s); padding-top: 2px; }
+.projs { display: flex; flex-wrap: wrap; gap: 8px 40px; }
+.projs li { display: flex; align-items: center; gap: 10px; }
 .dash { columns: 2; column-gap: 32px; }
 .dash li { padding-left: 1.1em; text-indent: -1.1em; break-inside: avoid; }
 .dash li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
-.beta { display: inline-block; margin-left: 8px; padding: 0 7px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 13px; line-height: 1.5; vertical-align: .2em; }
+.beta { display: inline-block; padding: 0 7px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 13px; line-height: 1.5; }
 .clients { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; padding-block: 4px; }
 .clients img { width: auto; opacity: .6; }
 
 /* Kontakt: przyciski jak na stronie, profile */
 .foot { position: relative; z-index: 1; margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.buttons { display: flex; gap: calc(12px * var(--k)); }
+.buttons { display: flex; gap: 16px; }
 .button {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  height: calc(48px * var(--k));
-  padding-inline: calc(24px * var(--k));
+  height: 64px;
+  padding-inline: 32px;
   border: 1px solid var(--ink);
-  font-size: calc(14px * var(--k));
+  font-size: var(--fs-m);
 }
 .button--primary { background: var(--ink); color: var(--paper); }
 .button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.2; }
-.profiles { display: flex; font-size: 17px; }
+.profiles { display: flex; font-size: var(--fs-m); }
 .profiles li + li::before { content: "·"; padding-inline: 10px; color: var(--ink-3); }
 .profiles a { border-bottom: 1px solid var(--hair); }
+.tools { white-space: nowrap; overflow: hidden; }   /* wszystkie narzędzia w jednej linii (build-cv.mjs sprawdza, czy się mieszczą) */
