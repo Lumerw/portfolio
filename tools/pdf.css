@@ -115,9 +115,9 @@ img { display: block; }
 :root[data-fmt="9x16"] .pj__title { font-size: 52px; }
 :root[data-fmt="9x16"] .pj__tagline { font-size: 26px; margin-top: 14px; }
 :root[data-fmt="9x16"] .pj__lead { font-size: 22px; margin-top: 10px; }
-:root[data-fmt="9x16"] .pj__rows { margin-top: 24px; }
-:root[data-fmt="9x16"] .pj__row { grid-template-columns: 170px minmax(0, 1fr); padding-block: 10px; font-size: 20px; }
-:root[data-fmt="9x16"] .pj__link { margin-top: 18px; }
+:root[data-fmt="9x16"] .pj__rows { margin-top: 18px; }
+:root[data-fmt="9x16"] .pj__row { grid-template-columns: 170px minmax(0, 1fr); padding-block: 8px; font-size: 20px; }
+:root[data-fmt="9x16"] .pj__link { margin-top: 12px; }
 
 /* ---------- Kontakt (jak sekcja Kontakt na stronie) ---------- */
 .contact { margin-block: auto; position: relative; z-index: 1; }
