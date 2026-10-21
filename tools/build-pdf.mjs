@@ -17,7 +17,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
 import { content } from '../content.js';
-import { clean } from '../render.js';
+import { clean, DRIVE_D } from '../render.js';
 import { sphere } from './sphere-svg.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -48,8 +48,8 @@ function doc(lang, fmt, dark) {
   const total = 2 + c.projects.length;
   const counter = n => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
   const wide = fmt === '16x9';
-  // Sfera: to samo miejsce na okładce i na stronie kontaktu - 16:9 przy prawej krawędzi na środku wysokości, 9:16 w prawym górnym rogu
-  const globe = wide ? sphere(480, `left:${W - 580}px;top:${H / 2 - 480}px`) : sphere(470, `left:${W - 520}px;top:-400px`);
+  // Sfera: to samo miejsce na okładce i na stronie kontaktu - duża, w prawym górnym rogu, przycięta górą i prawą krawędzią
+  const globe = wide ? sphere(620, `left:${W - 120 - 620}px;top:${170 - 620}px`) : sphere(560, `left:${W - 80 - 560}px;top:${110 - 560}px`);
 
   const exp = t.about.experience.map(e => ({ year: clean(e.year), place: clean(e.place), role: clean(e.role) })).filter(e => e.place);
   const cover = `
@@ -113,6 +113,7 @@ function doc(lang, fmt, dark) {
         <a class="button button--primary" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>
         <a class="button" href="${esc(site)}/#agent"><span class="dot"></span>${esc(U.askAgent)}</a>
       </p>
+      ${isReal(c.drive) ? `<p class="contact__drive"><a class="link-u" href="${esc(c.drive)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)} - ${esc(U.driveType)} ↗</a></p>` : ''}
     </div>
     <footer class="contact__foot">
       <ul class="contact__links">${links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('')}</ul>

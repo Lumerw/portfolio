@@ -8,14 +8,13 @@ import { symbol } from './symbols.js';
 
 // Plansza animowana teraz (reel): jedna pętla. Trafia do --t-reel oraz do data-dwell / --t-auto wiersza indeksu.
 export const REEL_MS = 15000;
-// Ścieżki wpisane w HTML (bez dodatkowych plików): glify „?” i „!” z teraz, ikony ról, falka, pauza / start.
+// Ścieżki wpisane w HTML (bez dodatkowych plików): glify „?” i „!” z teraz, ikony ról, pauza / start.
 export const RP = {
   q: 'M66.3 152.1C49.2 105.6 94.5 85.2 94.5 47.7C94.5 36.6 89.7 18.9 68.4 14.4L41.1 55.8L0 34.5C17.7 11.1 43.5 0 83.1 0C126.3 0 158.7 15.9 158.7 49.2C158.7 100.8 80.7 106.2 80.7 152.1H66.3ZM75.3 233.4C59.1 233.4 45.3 219.3 45.3 203.1C45.3 186.9 59.1 173.1 75.3 173.1C91.5 173.1 105.6 186.9 105.6 203.1C105.6 219.3 91.5 233.4 75.3 233.4Z',
   x: 'M71.4 0 42.9 149.1H28.5L0 0H71.4ZM36 230.4C19.8 230.4 6 216.3 6 200.1C6 183.9 19.8 170.1 36 170.1C52.2 170.1 66.3 183.9 66.3 200.1C66.3 216.3 52.2 230.4 36 230.4Z',
   headphones: 'M2.5 12A9.5 9.5 0 0 1 21.5 12V20A1.5 1.5 0 0 1 20 21.5H17A1.5 1.5 0 0 1 15.5 20V14.5A1.5 1.5 0 0 1 17 13H18.5V12A6.5 6.5 0 0 0 5.5 12V13H7A1.5 1.5 0 0 1 8.5 14.5V20A1.5 1.5 0 0 1 7 21.5H4A1.5 1.5 0 0 1 2.5 20Z',
   presentation: 'M3 3.5A1 1 0 0 1 4 2.5H20A1 1 0 0 1 21 3.5V14.5H13.5L18 21.5H14.75L12 17.1 9.25 21.5H6L10.5 14.5H3ZM7.13 11.75L9.52 9.36 12.52 12.11 18.63 6 16.37 6 12.48 9.89 9.48 7.14 4.87 11.75Z',
   video: 'M3.5 5.5H13.5A1.5 1.5 0 0 1 15 7V17A1.5 1.5 0 0 1 13.5 18.5H3.5A1.5 1.5 0 0 1 2 17V7A1.5 1.5 0 0 1 3.5 5.5ZM16.5 9.17L22 5.5V18.5L16.5 14.83Z',
-  falka: 'M2.7 21.4 C14.9 21.7, 48.2 23.1, 76.1 22.9 C104.1 22.7, 146.3 22.4, 170.7 20.2 C195 18, 212.1 12.2, 222.4 9.7 C232.8 7.1, 232.9 5, 232.8 4.8 C232.8 4.6, 224.1 7.9, 222.4 8.5',
   pause: 'M6 4h4v16H6zM14 4h4v16h-4z', play: 'M7 4l13 8-13 8z',
 };
 export const svgi = (d, cls = '', vb = '0 0 24 24', eo = false) =>
@@ -74,9 +73,9 @@ const brandStyle = b => `--brand-bg:${esc(b.bg)};${b.aurora.map((c, i) => `--a${
 
 /* Plansza animowana teraz (projects[].reel): 15 s w pętli, sam CSS (styles.css → Reel). fmt: '4x5'. Kolory i logo z p.brand / p.logo, więc synchronizacja marki działa także tu.
    decorative: kopia na stronie głównej (tekst niesie podpis pod ramką); w panelu role=img + aria-label.
-   Glify i falka ruszają się na opakowaniach <span>, nie na <svg>: Chromium nie przenosi animacji
+   Glify ruszają się na opakowaniach <span>, nie na <svg>: Chromium nie przenosi animacji
    elementu <svg> na kompozytor i przelicza wtedy styl w każdej klatce. */
-// lite (karta na sferze): tylko tło, animacja logo i dwa kafelki słuchacz / ekspert - bez tekstów.
+// lite (karta na sferze): tylko tło, logo i dwa kafelki (Ty / ekspert) - bez tekstów.
 function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = {}) {
   const r = tp.reel;
   const a11y = decorative ? 'aria-hidden="true"' : `role="img" aria-label="${esc(r.label)}"`;
@@ -85,7 +84,7 @@ function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = 
   const lr = (p.logo.h / p.logo.w / 2).toFixed(5);
   const tiles = `
       <div class="reel__tiles">
-        <div class="reel__tile reel__tile--l"><span class="reel__avatar">${svgi(RP.headphones)}</span><span class="reel__chip">${esc(r.listener)}</span><span class="reel__ring"></span></div>
+        <div class="reel__tile reel__tile--l"><span class="reel__avatar">${svgi(RP.headphones)}</span><span class="reel__chip">${esc(r.you)}</span><span class="reel__ring"></span></div>
         <div class="reel__tile reel__tile--e"><span class="reel__avatar">${svgi(RP.presentation, '', '0 0 24 24', true)}</span><span class="reel__chip">${esc(r.expert)}</span><span class="reel__ring"></span></div>
       </div>`;
   if (lite) {
@@ -97,8 +96,8 @@ function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = 
     </div>
   </div></div>`;
   }
-  // Pełna plansza 15 s (render: 4:5): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat
-  const pillL = cls => `<span class="reel__pill reel__pill--l${cls}">${svgi(RP.headphones)}${esc(r.listener)}</span>`;
+  // Pełna plansza 15 s (render: 4:5): plakat (logo tylko tu) → szukasz eksperta → albo nim zostań → społeczność → rozmowa 1:1 → plakat
+  const pillL = `<span class="reel__pill reel__pill--l">${svgi(RP.headphones)}${esc(r.listener)}</span>`;
   const pillE = `<span class="reel__pill reel__pill--e">${svgi(RP.presentation, '', '0 0 24 24', true)}${esc(r.expert)}</span>`;
   const crowd = ['l', 'e', 'l', 'l', 'e', 'l', 'e', 'l'].map((k, i) => `<i class="reel__dot reel__dot--${k}" style="--k:${i}"></i>`).join('');
   return `<div class="reel reel--${fmt} brand" style="${brandStyle(p.brand)};--t-reel:${REEL_MS}ms;--lr:${lr}" ${a11y}>
@@ -107,15 +106,15 @@ function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = 
     <span class="reel__glyph reel__glyph--q">${svgi(RP.q, '', '0 0 158.7 233.4')}</span>
     <span class="reel__glyph reel__glyph--x">${svgi(RP.x, '', '0 0 71.4 230.4')}</span>
     <img class="reel__logo" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${img}>
-    <p class="reel__claim">${esc(r.claimA)} <span class="reel__key">${esc(r.claimKey)}<span class="reel__falka"><span class="reel__falka-in"><svg viewBox="0 0 240 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="${RP.falka}"/></svg></span></span></span></p>
+    <p class="reel__claim">${esc(r.claimA)} <span class="reel__key">${esc(r.claimKey)}</span></p>
     <p class="reel__legend"><span>${esc(r.listeners)}</span><span>${esc(r.experts)}</span></p>
     <div class="reel__scene reel__scene--l">
-      <p class="reel__row">${pillL('')}</p>
+      <p class="reel__row">${pillL}</p>
       <p class="reel__head">${esc(r.stepL)}</p>
       <p class="reel__sub">${esc(r.subL)}</p>
     </div>
     <div class="reel__scene reel__scene--e">
-      <p class="reel__row">${pillL(' reel__pill--was')}<span class="reel__arrow"></span>${pillE}</p>
+      <p class="reel__row">${pillE}</p>
       <p class="reel__head">${esc(r.stepE)}</p>
       <p class="reel__sub">${esc(r.subE)}</p>
     </div>
@@ -151,7 +150,9 @@ const liIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusab
 
 // Ikonki w kolumnie numerów: archiwum (Google Drive) i pobieranie (PDF).
 // Logo Google Drive jednym kolorem (Simple Icons, CC0) - w kolorze pozostałych ikon wiersza
-const driveIcon = `<svg class="icon index__glyph index__glyph--fill" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z"/></svg>`;
+// Znak Google Drive (Simple Icons) - też w PDF portfolio i CV (tools/)
+export const DRIVE_D = 'M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z';
+const driveIcon = `<svg class="icon index__glyph index__glyph--fill" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${DRIVE_D}"/></svg>`;
 const downloadIcon = `<svg class="icon index__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg>`;
 
 // Karuzela firm „Współpracowałem z”: lista + jej kopia (aria-hidden) dla płynnej pętli.

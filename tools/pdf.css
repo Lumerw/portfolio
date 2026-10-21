@@ -65,6 +65,8 @@ img { display: block; }
   font-size: calc(15px * var(--k));
 }
 .button--primary { background: var(--ink); color: var(--paper); }
+.button { white-space: nowrap; }
+:root[data-fmt="9x16"] .button { padding-inline: calc(20px * var(--k)); }   /* dwa przyciski obok siebie w 936 px */
 .button svg { width: calc(16px * var(--k)); height: calc(16px * var(--k)); fill: none; stroke: currentColor; stroke-width: 1.2; }
 .dot { width: calc(12px * var(--k)); height: calc(12px * var(--k)); border-radius: 50%; background: var(--rainbow); flex: none; }
 
@@ -124,6 +126,10 @@ img { display: block; }
 .contact__title { font-size: calc(28px * var(--k)); font-weight: 500; letter-spacing: -.02em; }
 .contact__mail { margin-top: calc(24px * var(--k)); font-size: calc(22px * var(--k)); }
 .contact .buttons { margin-top: calc(32px * var(--k)); }
+/* archiwum prac (Google Drive) - zwykły link pod przyciskami, nie trzeci przycisk */
+.contact__drive { margin-top: calc(24px * var(--k)); font-size: calc(15px * var(--k)); }
+.contact__drive a { display: inline-flex; align-items: center; gap: calc(10px * var(--k)); }
+.contact__drive svg { width: calc(15px * var(--k)); height: calc(15px * var(--k)); fill: currentColor; flex: none; }
 .contact__foot { position: relative; z-index: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 32px; font-size: 22px; }
 .contact__links { display: flex; flex-wrap: wrap; }
 .contact__links li + li::before { content: "·"; padding-inline: 14px; color: var(--ink-3); }

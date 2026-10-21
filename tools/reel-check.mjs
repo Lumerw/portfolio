@@ -202,9 +202,12 @@ function helpers() {
     const fsi = shown.filter(i => i.fs != null);
     const minFs = fsi.length ? Math.min(...fsi.map(i => i.fs)) : null;
     for (const i of fsi) if (i.fs < 11.99) add('font', `${i.name} „${i.text}” ${i.fs.toFixed(1)} px`, i.rects);
-    // 4. Znak w nagłówku >= 72 px (3200-14000 ms oraz kadr stały).
-    if (!compact && (t === 'rm' || (t >= 3200 && t <= 14000)) && (!logo || logo.w < 71.5)) {
-      add('logo', `znak w nagłówku ${logo ? logo.w.toFixed(1) : 0} px`, logo ? [logo.r] : []);
+    // 4. Znak teraz tylko na plakacie: na plakacie (< 2000 ms i kadr stały) >= 72 px, w scenach (3200-14000 ms) niewidoczny.
+    if (!compact && (t === 'rm' || t < 2000) && (!logo || logo.op < .5 || logo.w < 71.5)) {
+      add('logo', `znak na plakacie ${logo ? `${logo.w.toFixed(1)} px, krycie ${logo.op.toFixed(2)}` : 'brak'}`, logo ? [logo.r] : []);
+    }
+    if (!compact && t !== 'rm' && t >= 3200 && t <= 14000 && logo && logo.op > .05) {
+      add('logo', `znak widoczny w scenie (krycie ${logo.op.toFixed(2)})`, [logo.r]);
     }
     // 5. Kompakt: najwyżej jeden blok roli naraz (w środku obu scen dokładnie jeden).
     const roles = [...reel.querySelectorAll('.reel__role')].filter(role => shown.some(i => role.contains(i.el)));
@@ -366,8 +369,9 @@ function helpers() {
       cap: q('.reel__cap').some(on),
       title: q('.reel__title').some(on),
       claim: q('.reel__claim').some(on),
+      legend: q('.reel__legend').some(on),
       logo: logo && on(logo) ? logo.getBoundingClientRect().width : 0,
-      extra: q('.reel__glyph, .reel__role, .reel__legend').filter(vis).map(name),
+      extra: q('.reel__glyph, .reel__role, .reel__scene').filter(vis).map(name),
       toggle: !!tg && vis(tg),
     };
   }
@@ -504,7 +508,7 @@ async function visualGroup(browser) {
     overlap: 'Tekst (krycie > .5) nie nachodzi na ? i ! ani na znak teraz',
     outside: 'Widoczny tekst w całości w kadrze',
     font: 'Najmniejszy widoczny tekst >= 12 px',
-    logo: 'Znak teraz w nagłówku >= 72 px (3200-14000 ms)',
+    logo: 'Znak teraz tylko na plakacie (>= 72 px), w scenach ukryty',
     roles: 'Kompakt: jeden blok roli naraz (nie dotyczy 4:5)',
     toggle: 'Przełącznik pauzy nie zasłania tekstu',
     overflow: 'Brak poziomego przewijania w kadrach',
@@ -567,7 +571,7 @@ async function visualGroup(browser) {
         const record = async (t, m) => {
           if (!m.found) { missing.push(`${tag} t=${t}`); return; }
           if (m.minFs != null) minFs = Math.min(minFs, m.minFs);
-          if (!m.compact && (t === 'rm' || (t >= 3200 && t <= 14000)) && m.logoW != null) minLogo = Math.min(minLogo, m.logoW);
+          if (!m.compact && (t === 'rm' || t < 2000) && m.logoW != null) minLogo = Math.min(minLogo, m.logoW);
           const seen = new Set();
           for (const is of m.issues) {
             const line = `${tag} t=${t}: ${is.msg}`;
@@ -769,7 +773,7 @@ async function toggleGroup(browser) {
   check('Panel: bez przycisku pauzy, klik w kadr otwiera stronę projektu', !bad.length, list(bad.length ? bad : notes));
 }
 
-/* ---------- prefers-reduced-motion: zero animacji, kadr stały z sekcji 9 ---------- */
+/* ---------- prefers-reduced-motion: zero animacji, kadr stały = plakat (logo, hasło, legenda ról) ---------- */
 async function reducedGroup(browser) {
   const ctx = await newCtx(browser, { lang: LANGS[0], reducedMotion: 'reduce' });
   const bad = [], notes = [];
@@ -784,19 +788,17 @@ async function reducedGroup(browser) {
       if (!s) { bad.push(`${id}: brak .reel`); continue; }
       const err = [];
       if (s.anims) err.push(`${s.anims} animacji w .reel`);
-      if (s.tiles !== 2) err.push(`kafle ${s.tiles}/2`);
-      if (s.rings !== 2) err.push(`pierścienie ${s.rings}/2`);
-      if (!s.cap) err.push('brak podpisu wideo');
+      if (s.tiles || s.rings || s.cap || s.title) err.push(`widoczna rozmowa (kafle ${s.tiles}, pierścienie ${s.rings}${s.cap ? ', podpis' : ''}${s.title ? ', tytuł' : ''})`);
       if (s.extra.length) err.push(`widoczne: ${[...new Set(s.extra)].join(', ')}`);
       if (s.toggle) err.push('widoczny przełącznik');
       if (s.compact) {
         if (s.claim) err.push('hasło widoczne w kompakcie');
         if (s.logo) err.push('znak widoczny w kompakcie');
       } else {
-        if (!s.title) err.push('brak tytułu rozmowy');
         if (!s.claim) err.push('brak hasła');
+        if (!s.legend) err.push('brak legendy ról');
         if (!s.logo) err.push('brak znaku');
-        else if (s.logo < 71.5 || s.logo > s.w * .5) err.push(`znak ${Math.round(s.logo)} px (ma być w nagłówku)`);
+        else if (s.logo < 71.5 || s.logo > s.w * .6) err.push(`znak ${Math.round(s.logo)} px (plakat: 72 px - 60% kadru)`);
       }
       if (err.length) bad.push(`${id}: ${err.join(', ')}`);
       else notes.push(`${id} ok`);
@@ -807,7 +809,7 @@ async function reducedGroup(browser) {
     }
   }
   await ctx.close();
-  check('prefers-reduced-motion: zero animacji w .reel, kadr stały z sekcji 9', !bad.length, `${list(bad.length ? bad : notes)} · zrzuty: ${SNAP}`);
+  check('prefers-reduced-motion: zero animacji w .reel, kadr stały = plakat', !bad.length, `${list(bad.length ? bad : notes)} · zrzuty: ${SNAP}`);
 }
 
 /* ---------- Błyski: średnia luminancja co 40 ms przez 8 s ---------- */

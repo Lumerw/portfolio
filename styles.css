@@ -893,11 +893,11 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 
 /* Geometria 4:5 (zmienne; cq rozwiązują się tam, gdzie są użyte). Panel projektu i karta sfery mają ten sam format. */
 .reel--4x5 {
-  --pad: 7.5cqw; --lw: 52cqw; --l-s: .42; --ly: 40cqh;    /* plakat: środek znaku na 40% wysokości (optycznie wyżej) */
+  --pad: 7.5cqw; --lw: 52cqw; --ly: 40cqh;    /* plakat: środek znaku na 40% wysokości (optycznie wyżej) */
   --claim-fs: max(13px, 4.8cqw); --claim-gap: calc(var(--lw) * .16); --leg-fs: max(12px, 2.9cqw);
   --f-size: 100cqw; --fm-size: 110cqw; --fl-x: 28cqw; --fl-y: 34cqh; --fe-x: 72cqw; --fe-y: 74cqh;
   --pill-fs: max(12px, 3.2cqw); --head-fs: max(15px, 7.4cqw); --sub-fs: max(12px, 3.6cqw); --sgap: 2.6cqw;
-  --call-top: 16cqh; --call-bot: 8cqh; --cgap: 3.6cqw;
+  --call-top: 10cqh; --call-bot: 10cqh; --cgap: 3.6cqw;
   --ts: 40cqw; --tgap: 4cqw; --ring: max(2px, .55cqw);
   --chip-fs: max(12px, 2.7cqw); --title-fs: max(13px, 5cqw); --title-w: 84cqw; --cap-fs: max(12px, 3.1cqw);
 }
@@ -953,8 +953,7 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 @keyframes reel-op-e { 0%, 16% { opacity: .35; } 21.333%, 38.667% { opacity: .25; } 44%, 60% { opacity: 1; } 65.333%, 77.333% { opacity: .75; } 82.667%, 94.667% { opacity: .2; } 100% { opacity: .35; } }
 @keyframes reel-op-m { 0%, 77.333% { opacity: 0; } 82.667%, 94.667% { opacity: 1; } 98.667%, 100% { opacity: 0; } }
 
-/* Znak: ułożony w rozmiarze plakatu i zmniejszany do nagłówka — ostry i nadal element LCP.
-   --lr = wysokość / szerokość / 2 (render.js; dla 575 × 178 = .15478) */
+/* Znak w rozmiarze plakatu (element LCP). --lr = wysokość / szerokość / 2 (render.js; dla 575 × 178 = .15478) */
 .brand.reel .reel__logo {                                  /* (0,3,0) wygrywa z .media .brand img (0,2,1) */
   position: absolute;
   left: calc(50cqw - var(--lw) / 2);
@@ -963,14 +962,12 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
   max-width: none;
   height: auto;
   object-fit: contain;
-  transform-origin: 0 0;
-  --hx: calc(var(--pad) - 50cqw + var(--lw) / 2);
-  --hy: calc(var(--pad) - var(--ly) + var(--lw) * var(--lr, .15478));
-  animation: reel-logo var(--t-reel, 15s) cubic-bezier(.65, 0, .35, 1) infinite;
+  animation: reel-logo var(--t-reel, 15s) linear infinite;
 }
-@keyframes reel-logo { 0%, 16% { translate: 0 0; scale: 1; } 20%, 94.667% { translate: var(--hx) var(--hy); scale: var(--l-s); } 98.667%, 100% { translate: 0 0; scale: 1; } }
+/* Logo tylko na plakacie: znika razem z hasłem, wraca na końcu pętli (bez zjazdu do rogu) */
+@keyframes reel-logo { 0%, 14% { opacity: 1; translate: 0 0; } 16% { opacity: 0; translate: 0 0; } 16.003%, 95.667% { opacity: 0; translate: 0 .5cqh; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 99.333%, 100% { opacity: 1; translate: 0 0; } }
 
-/* Hasło, falka (wycieranie przesunięciem — tylko kompozycja) i legenda ról */
+/* Hasło i legenda ról */
 .reel__claim {
   position: absolute;
   inset-inline: 0;
@@ -983,30 +980,6 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
   animation: reel-claim var(--t-reel, 15s) linear infinite;
 }
 .reel__key { position: relative; display: inline-block; white-space: nowrap; }
-.reel__falka {
-  position: absolute;
-  left: -3%;
-  width: 106%;
-  bottom: -.55em;
-  height: .6em;
-  overflow: hidden;
-  animation: reel-falka-w var(--t-reel, 15s) linear infinite;
-}
-.reel__falka-in {                                         /* przeciwruch na opakowaniu, nie na <svg> (kompozycja) */
-  display: block;
-  width: 100%;
-  height: 100%;
-  animation: reel-falka-i var(--t-reel, 15s) linear infinite;
-}
-.reel .reel__falka svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  overflow: visible;
-  fill: none;
-}
-.reel__falka path { stroke: var(--tz-red); stroke-width: max(2px, .11em); stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .reel__legend {
   position: absolute;
   inset-inline: 0;
@@ -1033,15 +1006,10 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 .reel__legend span + span::before { background: var(--tz-blue); }
 @keyframes reel-claim  { 0%, 14.667% { opacity: 1; translate: 0 0; } 16.667% { opacity: 0; translate: 0 0; } 16.67%, 96.333% { opacity: 0; translate: 0 .4em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 100% { opacity: 1; translate: 0 0; } }
 @keyframes reel-legend { 0%, 15% { opacity: 1; translate: 0 0; } 17% { opacity: 0; translate: 0 0; } 17.003%, 97% { opacity: 0; translate: 0 .4em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 100% { opacity: 1; translate: 0 0; } }
-/* falka: wytarcie do przodu, niewidoczny skok, rysowanie na końcu pętli (krzywa marki) */
-@keyframes reel-falka-w { 0%, 12.667% { translate: 0 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 16% { translate: 100% 0; } 16.003%, 96.667% { translate: -100% 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 100% { translate: 0 0; } }
-@keyframes reel-falka-i { 0%, 12.667% { translate: 0 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 16% { translate: -100% 0; } 16.003%, 96.667% { translate: 100% 0; animation-timing-function: cubic-bezier(.65, 0, .35, 1); } 100% { translate: 0 0; } }
-
-/* Sceny: słuchacz → ekspert → społeczność. Ta sama kolumna przy lewej krawędzi, wyśrodkowana w pionie
-   między nagłówkiem a dołem. Wejście 500 ms od dołu (wiersz, nagłówek, opis co 150 ms), wyjście 300 ms razem. */
+/* Sceny: szukasz eksperta → albo nim zostań → społeczność. Ta sama kolumna przy lewej krawędzi, wyśrodkowana w pionie. Wejście 500 ms od dołu (wiersz, nagłówek, opis co 150 ms), wyjście 300 ms razem. */
 .reel__scene {
   position: absolute;
-  inset: 22cqh var(--pad) 14cqh;
+  inset: 14cqh var(--pad) 14cqh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1076,14 +1044,31 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 .reel .reel__cap svg { width: 1.2em; height: 1.2em; fill: currentColor; flex: none; }
 .reel__pill--l { background: var(--tz-pink); color: var(--tz-ink-pink); }   /* 8.6:1 */
 .reel__pill--e { background: var(--tz-blue); color: #fff; }               /* 4.61:1 — pogrubione, min. 12 px, pełne tło */
-.reel__pill--was { opacity: .5; }                                          /* „byłeś słuchaczem” */
-/* słuchacz → ekspert: kreska ze strzałką rysuje się w prawo, potem wskakuje pigułka eksperta */
-.reel__arrow { position: relative; width: 8cqw; height: 2px; background: #fff; opacity: 0; animation: reel-e-arrow var(--t-reel, 15s) linear infinite; }
-.reel__arrow::after { content: ""; position: absolute; right: 0; top: 50%; width: 1.6cqw; height: 1.6cqw; border-top: 2px solid #fff; border-right: 2px solid #fff; translate: 0 -50%; rotate: 45deg; }
-.reel__scene--e .reel__pill--e { opacity: 0; animation: reel-e-pill var(--t-reel, 15s) linear infinite; }
-/* społeczność: kropki słuchaczy (róż) i ekspertów (błękit); dwie przechodzą ze słuchacza w eksperta */
+/* społeczność: kropki słuchaczy (róż) i ekspertów (błękit); dwie zmieniają rolę - można być jednym i drugim.
+   Kółka falują góra-dół naprzemiennie (parzyste w przeciwfazie, --bob ujemne), z nierówną amplitudą fal
+   i trochę inną u każdego kółka (--k) - ruch organiczny. Pętla 15 s bez opóźnień: 0% = 100% (zegar planszy). */
 .reel__crowd { gap: 1.8cqw; }
-.reel__dot { position: relative; width: 6.4cqw; height: 6.4cqw; border-radius: 50%; background: rgb(255 255 255 / .1); box-shadow: inset 0 0 0 var(--ring) var(--tz-pink); font-style: normal; }
+.reel__dot {
+  position: relative; width: 6.4cqw; height: 6.4cqw; border-radius: 50%; background: rgb(255 255 255 / .1); box-shadow: inset 0 0 0 var(--ring) var(--tz-pink); font-style: normal;
+  --bob: calc(.8cqw + var(--k) * .07cqw);
+  animation: reel-bob var(--t-reel, 15s) linear infinite;
+}
+.reel__dot:nth-child(even) { --bob: calc(-.85cqw - var(--k) * .06cqw); }
+@keyframes reel-bob {
+  0%, 100% { translate: 0 0; animation-timing-function: cubic-bezier(.33, 0, .67, 1); }
+  4.167%  { translate: 0 calc(var(--bob) * -.9);  animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  12.5%   { translate: 0 var(--bob);               animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  20.833% { translate: 0 calc(var(--bob) * -.75); animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  29.167% { translate: 0 calc(var(--bob) * 1.15); animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  37.5%   { translate: 0 calc(var(--bob) * -1);   animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  45.833% { translate: 0 calc(var(--bob) * .85);  animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  54.167% { translate: 0 calc(var(--bob) * -1.1); animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  62.5%   { translate: 0 calc(var(--bob) * .9);   animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  70.833% { translate: 0 calc(var(--bob) * -.8);  animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  79.167% { translate: 0 calc(var(--bob) * 1.1);  animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  87.5%   { translate: 0 calc(var(--bob) * -.95); animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  95.833% { translate: 0 calc(var(--bob) * .7);   animation-timing-function: cubic-bezier(.33, 0, .67, 1); }
+}
 .reel__dot--e { box-shadow: inset 0 0 0 var(--ring) var(--tz-blue); }
 .reel__dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 var(--ring) var(--tz-blue); opacity: 0; }
 .reel__dot:nth-child(4)::after, .reel__dot:nth-child(8)::after { animation: reel-c-switch var(--t-reel, 15s) linear infinite; }
@@ -1096,8 +1081,6 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 @keyframes reel-c-row { 0%, 62% { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 65.333%, 77.333% { opacity: 1; translate: 0 0; } 79.333% { opacity: 0; translate: 0 -.3em; } 79.337%, 100% { opacity: 0; translate: 0 .5em; } }
 @keyframes reel-c-head { 0%, 63% { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 66.333%, 77.333% { opacity: 1; translate: 0 0; } 79.333% { opacity: 0; translate: 0 -.3em; } 79.337%, 100% { opacity: 0; translate: 0 .5em; } }
 @keyframes reel-c-sub { 0%, 64% { opacity: 0; translate: 0 .5em; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 67.333%, 77.333% { opacity: 1; translate: 0 0; } 79.333% { opacity: 0; translate: 0 -.3em; } 79.337%, 100% { opacity: 0; translate: 0 .5em; } }
-@keyframes reel-e-arrow { 0%, 43% { opacity: 0; translate: -.6em 0; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 46.333%, 60% { opacity: 1; translate: 0 0; } 62% { opacity: 0; translate: 0 0; } 62.003%, 100% { opacity: 0; translate: -.6em 0; } }
-@keyframes reel-e-pill { 0%, 45% { opacity: 0; translate: .6em 0; animation-timing-function: cubic-bezier(.2, .7, .2, 1); } 48.333%, 60% { opacity: 1; translate: 0 0; } 62% { opacity: 0; translate: 0 0; } 62.003%, 100% { opacity: 0; translate: .6em 0; } }
 @keyframes reel-c-switch { 0%, 67.333% { opacity: 0; } 70.667%, 77.333% { opacity: 1; } 79.333%, 100% { opacity: 0; } }
 
 /* Glify: „?” = słuchacz pyta, „!” = ekspert odpowiada. Białe, duże, przycięte z prawej, bez obrotu */
@@ -1212,27 +1195,15 @@ html:not(.js) .reel * { animation-iteration-count: 3 !important; animation-fill-
 @container reel (min-width: 600px) {
   .reel__stage { --pill-fs: 2.7cqw; --chip-fs: 2.3cqw; --cap-fs: 2.6cqw; --leg-fs: 2.4cqw; --sub-fs: 3cqw; }
 }
-/* wąska ramka (telefon 320 px): znak w nagłówku nie mniejszy niż 72 px (minimum marki) */
-@container reel (max-width: 360px) {
-  .reel__stage { --l-s: .52; }
-}
-@container reel (max-width: 260px) {                       /* telefon poziomo: ramka ~200 px */
-  .reel__stage { --l-s: .7; }
-}
 
 
-/* Bez ruchu: globalne animation: none zatrzymuje wszystko; tu sensowna klatka stała —
-   znak w nagłówku, oba kafelki z obwódkami, tytuł i podpis rozmowy, hasło z narysowaną falką na dole */
+/* Bez ruchu: globalne animation: none zatrzymuje wszystko; klatka stała = plakat (logo, hasło, legenda ról).
+   Karta sfery (lite): logo i dwa kafelki z obwódkami */
 @media (prefers-reduced-motion: reduce) {
-  .brand.reel:not(.reel--lite) .reel__logo { translate: var(--hx) var(--hy); scale: var(--l-s); }
   .reel__field--l, .reel__field--e { opacity: .35; }
-  .reel__field--m { opacity: 1; }
-  .reel__tile, .reel__ring, .reel__title, .reel__cap { opacity: 1; }
-  .reel__ring::after, .reel__glyph, .reel__scene, .reel__legend { display: none; }
-  .reel .reel__claim { top: auto; bottom: calc(var(--pad) + .5em); opacity: 1; }
-  .reel .reel__call { bottom: calc(var(--pad) + var(--claim-fs) * 2.8); }
-  .reel__falka, .reel__falka-in { translate: none; }        /* stała, w pełni narysowana */
-  .reel--lite .reel__claim { display: none; }
+  .reel:not(.reel--lite) .reel__call, .reel__glyph, .reel__scene { display: none; }
+  .reel--lite .reel__ring { opacity: 1; }
+  .reel--lite .reel__ring::after { display: none; }
 }
 
 .sygnet { width: 20px; height: 20px; flex: none; object-fit: contain; }

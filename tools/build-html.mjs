@@ -45,7 +45,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // Plansza animowana (projects[].reel): te same klucze w pl i en, niepusty opis, bez długich myślników,
   // limity znaków (dłuższy tekst wyjdzie poza kadr na telefonie). Błąd przerywa build, limit tylko ostrzega.
   const REEL_MAX = {
-    listener: 12, expert: 12, listeners: 14, experts: 14,
+    listener: 12, expert: 12, you: 12, listeners: 14, experts: 14,
     stepL: 30, stepE: 30, community: 24, subL: 54, subE: 54, communitySub: 60,
     callTitle: 36, call: 32, label: 340,
   };

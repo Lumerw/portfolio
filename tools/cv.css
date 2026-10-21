@@ -92,3 +92,5 @@ b { font-weight: 500; }
 .profiles li + li::before { content: "·"; padding-inline: 10px; color: var(--ink-3); }
 .profiles a { border-bottom: 1px solid var(--hair); }
 .tools { white-space: nowrap; overflow: hidden; }   /* wszystkie narzędzia w jednej linii (build-cv.mjs sprawdza, czy się mieszczą) */
+.drive { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); }   /* archiwum prac (Google Drive) po projektach */
+.drive svg { width: 15px; height: 15px; fill: currentColor; flex: none; }

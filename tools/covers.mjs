@@ -6,13 +6,13 @@ import { RP } from '../render.js';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 export const covers = {
-  // teraz: czerń z aurorą z teraz.eu, logo, hasło z falką (Open Sans 700 - krój teraz)
+  // teraz: czerń z aurorą z teraz.eu, logo, hasło (Open Sans 700 - krój teraz)
   teraz(p, tp) {
     const [a, b, c, d] = p.brand.aurora;
     return `
       <div class="cover cover--teraz" style="--a:${a};--b:${b};--c:${c};--d:${d}">
         <img class="cover__logo" src="${esc(p.logo.src)}" alt="teraz">
-        <p class="cover__claim">${esc(tp.reel.claimA)} <span class="cover__key">${esc(tp.reel.claimKey)}<svg viewBox="0 0 240 32" preserveAspectRatio="none" aria-hidden="true"><path d="${RP.falka}"/></svg></span></p>
+        <p class="cover__claim">${esc(tp.reel.claimA)} <span class="cover__key">${esc(tp.reel.claimKey)}</span></p>
       </div>`;
   },
   // loom.studio: oś - czerń z mgławicą po lewej, papier z trzema figurami Bauhausu po prawej, logo na osi

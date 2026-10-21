@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
 import { sphere } from './sphere-svg.mjs';
 import { content } from '../content.js';
-import { clean } from '../render.js';
+import { clean, DRIVE_D } from '../render.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'private');
@@ -41,6 +41,7 @@ function cv(lang) {
     const href = isReal(p.href) ? p.href : `${site}/${lang === 'en' ? 'en/' : ''}#${p.id}`;
     return `<li><a class="link-u" href="${esc(href)}"><b>${esc(p.title)}</b></a>${p.beta ? '<span class="beta">beta</span>' : ''}</li>`;
   }).join('');
+  const archive = isReal(c.drive) ? `<li><a class="link-u drive" href="${esc(c.drive)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)} ↗\uFE0E</a></li>` : '';
   const tools = t.about.tools.filter(isReal).map(clean);
   const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.85)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
@@ -69,7 +70,7 @@ function cv(lang) {
     </section>
     <dl class="rows">
       ${row(V.experience, `<ul class="list">${experience}</ul>`)}
-      ${row(V.projects, `<ul class="projs">${projects}</ul>`)}
+      ${row(V.projects, `<ul class="projs">${projects}${archive}</ul>`)}
       ${row(V.skills, `<ul class="dash">${V.skillsList.map(s => `<li>${esc(s)}</li>`).join('')}</ul>`)}
       ${row(V.tools, tools.length ? `<p class="tools">${esc(tools.join(' · '))}</p>` : '')}
       ${isReal(t.about.education) ? row(V.education ?? (lang === 'pl' ? 'Wykształcenie' : 'Education'), esc(t.about.education)) : ''}
