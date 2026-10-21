@@ -546,7 +546,7 @@ function booking(c, t) {
   const body = `
       <div class="book" data-booking data-user="${esc(c.booking.calUsername)}" data-events="${esc(c.booking.events.filter(e => isReal(e.slug)).map(e => `${e.slug}:${e.minutes}`).join(','))}">
         <div class="book__info">
-          <p class="book__who"><img src="${esc(c.avatar.drawing)}" width="256" height="256" alt="" loading="lazy" decoding="async"><span>${esc(c.name)}</span></p>
+          <p class="book__who"><img src="${esc(c.avatar.photo)}" width="256" height="256" alt="" loading="lazy" decoding="async"><span>${esc(c.name)}</span></p>
           <p class="book__intro t-text">${esc(g.intro)}</p>
           <ul class="book__facts t-text t-muted">${(g.facts ?? []).map(f => `<li>${esc(f)}</li>`).join('')}
             <li>${esc(g.tz)}: <span data-book-tz>Europe/Warsaw</span></li>

@@ -552,7 +552,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 /* Kolumna informacji: kto, po co, 30 min, online, strefa czasowa */
 .book__info { display: grid; gap: var(--s-2); align-content: start; max-width: 34em; margin-bottom: var(--s-3); }
 .book__who { display: flex; align-items: center; gap: var(--s-1); font-weight: var(--fw-medium); }
-.book__who img { width: 32px; height: 32px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 var(--hairline) var(--hair); }
+.book__who img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #FFFFFF; box-shadow: 0 0 0 var(--hairline) var(--hair); }
 .book__intro { max-width: 30em; }
 .book__facts { display: grid; gap: 2px; }
 .book__facts li { padding-left: 1.1em; text-indent: -1.1em; }
