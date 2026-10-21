@@ -82,7 +82,7 @@ export function initBooking(root, { lang, copy, email, calendly = '' }) {
       if (my !== seq) return;
       // Cal.com nie odpowiada / brak typu spotkania - zapasowo strona rezerwacji Cal.com i mail
       const st = status(copy.error, true);
-      if (calendly) st.append(' · ', Object.assign(el('a', 'link-u', 'Cal.com ↗'), { href: calendly, target: '_blank', rel: 'noopener' }));
+      if (calendly) st.append(' · ', Object.assign(el('a', 'link-u', 'Cal.com ↗\uFE0E'), { href: calendly, target: '_blank', rel: 'noopener' }));
       ui.replaceChildren(st);
     }
   }

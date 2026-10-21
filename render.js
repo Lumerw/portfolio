@@ -371,7 +371,7 @@ function project(p, i, c, t) {
             <div class="pj__row"><dt class="t-meta">${esc(label)}</dt><dd>${value}</dd></div>` : '';
   // Linki projektu: strona i brandbook. Bez prawdziwego adresu - sama nazwa z dopiskiem „wkrótce” (nieklikalna).
   const pjLink = (href, label) => (url(href) !== '#'
-    ? `<a class="link-u" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} ↗</a>`
+    ? `<a class="link-u" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} ↗\uFE0E</a>`
     : `<span class="pj__soon">${esc(label)} <span class="t-meta">${esc(t.ui.soon)}</span></span>`);
   const link = `
           <p class="pj__link">${[pjLink(p.href, t.ui.projectSite), ...(p.brandbook ? [pjLink(p.brandbook, t.ui.projectBrandbook)] : [])].join('')}</p>`;

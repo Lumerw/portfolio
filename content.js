@@ -138,7 +138,7 @@ export const shared = {
       },
       reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” (dopóki nie ma src)
       // Narzędzia i technologie (panel projektu) - z repozytorium projektu
-      tools: ['React', 'TypeScript', 'Tailwind CSS', 'Supabase', 'Stripe', 'Daily.co', 'Cloudflare'],
+      tools: ['Claude', 'React', 'TypeScript', 'Tailwind CSS', 'Supabase', 'Stripe', 'Daily.co', 'Cloudflare'],
       href: 'https://teraz.eu',      // testowo
       brandbook: 'https://teraz.eu/marka',   // księga marki projektu (panel i PDF)
       images: {
@@ -232,7 +232,7 @@ export const pl = {
     problem: 'Problem',
     solution: 'Rozwiązanie',
     result: 'Efekt',
-    view: 'zobacz projekt ↗',
+    view: 'zobacz projekt ↗\uFE0E',
     experience: 'Doświadczenie',
     education: 'Edukacja',
     languages: 'Języki',
@@ -276,8 +276,8 @@ export const pl = {
   projects: {
     teraz: {
       meta: ['projekt produktu', 'UX/UI', 'identyfikacja', 'development z AI'], // [potwierdź]
-      tagline: 'marketplace ekspertów dla branży kreatywnej', // krótki opis pod podglądem
-      lead: 'Platforma typu marketplace łącząca słuchaczy z ekspertami, z sekcją społeczności.',
+      tagline: 'marketplace dla ekspertów z branży kreatywnej', // krótki opis pod podglądem
+      lead: 'Tu i teraz znajdziesz eksperta z Twojej branży. MVP platformy: rozmowy wideo 1:1 z ekspertami z 5+ lat praktyki, płatność przez Escrow i społeczność.',
       // Plansza animowana (reel, 15 s): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat.
       // Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
       reel: {
@@ -310,8 +310,8 @@ export const pl = {
     },
     loom: {
       meta: ['założyciel', 'identyfikacja', 'projekt strony w Figmie', 'wdrożenie'], // [potwierdź]
-      tagline: 'studio projektowe w modelu subskrypcji', // krótki opis pod podglądem
-      lead: 'Strona-wizytówka i studio projektowe w modelu subskrypcji: stała miesięczna opłata za pracę projektową.',
+      tagline: 'studio projektowe w systemie subskrypcji', // krótki opis pod podglądem
+      lead: 'Jedna stała opłata miesięczna, kolejne zadania projektowe bez osobnych wycen. Strona, identyfikacja i panel klienta na Stripe.',
       problem: '[Problem: 2-3 zdania.]',
       solution: 'Styl inspirowany Bauhausem, font Haus, wersje PL/EN, subskrypcje i panel klienta na Stripe. [Dopisz 1-2 zdania.]',
       result: '[Efekt: 1-2 zdania lub liczby.]',
@@ -325,8 +325,8 @@ export const pl = {
     },
     rehab: {
       meta: ['koncepcja', 'narracja', 'projekt', 'development'], // [potwierdź]
-      tagline: 'pitch deck platformy łączącej gaming ze zdrowiem psychicznym', // krótki opis pod podglądem
-      lead: 'Strona-pitch deck dla koncepcji platformy łączącej gaming ze zdrowiem psychicznym.',
+      tagline: 'platforma łącząca gaming z psychologami i psychiatrami', // krótki opis pod podglądem
+      lead: 'Pitch deck w formie strony: gracze dostają wsparcie psychologów i psychiatrów tam, gdzie już są - na serwerach gier.',
       problem: '[Problem: 2-3 zdania.]',
       solution: 'Prezentacja inwestorska w formie strony www, bez ciasteczek i zbierania danych. [Dopisz 1-2 zdania.]',
       result: '[Efekt: 1-2 zdania lub liczby.]',
@@ -397,8 +397,8 @@ export const pl = {
     experience: 'Doświadczenie',
     skills: 'Kompetencje',
     tools: 'Narzędzia',
-    view: 'zobacz ↗',
-    call: 'umów rozmowę ↗',
+    view: 'zobacz ↗\uFE0E',
+    call: 'umów rozmowę ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['identyfikacja wizualna', 'UX/UI i projekt stron', 'front-end: HTML, CSS, JS, Next.js', 'projektowanie i development z AI', 'dostępność WCAG 2.2', 'grafika i motion generowane z AI'],
     line: ['Projektuję identyfikacje, strony', 'i produkty cyfrowe - od pomysłu do wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
@@ -409,7 +409,7 @@ export const pl = {
     label: 'portfolio 2026',
     back: 'spis',                    // link powrotu na każdym slajdzie
     contactRow: 'kontakt',           // ostatni wiersz spisu
-    visit: 'zobacz projekt ↗',
+    visit: 'zobacz projekt ↗\uFE0E',
     soon: 'strona wkrótce online',
     scope: 'Zakres',
     facts: 'W skrócie',
@@ -489,7 +489,7 @@ export const pl = {
       projects: 'Projekty w portfolio:',
       process: 'Współpraca wygląda tak - 3 kroki:',
       open: 'otwórz projekt',
-      site: 'strona projektu ↗',
+      site: 'strona projektu ↗\uFE0E',
       contact: 'Najszybciej mailem:',
       call: 'umów rozmowę',
       tools: 'Narzędzia:',
@@ -525,7 +525,7 @@ export const en = {
     problem: 'Problem',
     solution: 'Solution',
     result: 'Result',
-    view: 'view project ↗',
+    view: 'view project ↗\uFE0E',
     experience: 'Experience',
     education: 'Education',
     languages: 'Languages',
@@ -569,8 +569,8 @@ export const en = {
   projects: {
     teraz: {
       meta: ['product design', 'UX/UI', 'identity', 'AI-assisted development'],
-      tagline: 'marketplace of experts for the creative industry', // krótki opis pod podglądem
-      lead: 'A marketplace platform connecting listeners with experts, plus a community section.',
+      tagline: 'a marketplace for experts from the creative industry', // krótki opis pod podglądem
+      lead: 'Find an expert from your industry, here and now. The platform MVP: 1:1 video calls with experts with 5+ years of practice, Escrow payments and a community.',
       // Plansza animowana (reel, 15 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
         label: 'teraz - first you are a listener: you get knowledge from the best creative industry experts, right away. Then you become an expert yourself: you share what you know and earn from your calls. One community of listeners and experts, 1:1 video calls, 30 or 60 minutes. Let’s talk here and now.',
@@ -602,8 +602,8 @@ export const en = {
     },
     loom: {
       meta: ['founder', 'identity', 'website design in Figma', 'build'],
-      tagline: 'subscription-based design studio', // krótki opis pod podglądem
-      lead: 'A studio website and a subscription design studio: a fixed monthly fee for design work.',
+      tagline: 'a design studio running on subscription', // krótki opis pod podglądem
+      lead: 'One flat monthly fee, design tasks one after another with no separate quotes. Website, identity and a client portal on Stripe.',
       problem: '[Problem: 2-3 sentences.]',
       solution: 'Bauhaus-inspired style, the Haus typeface, PL/EN versions, subscriptions and a client panel on Stripe. [Add 1-2 sentences.]',
       result: '[Result: 1-2 sentences or numbers.]',
@@ -617,8 +617,8 @@ export const en = {
     },
     rehab: {
       meta: ['concept', 'narrative', 'design', 'development'],
-      tagline: 'pitch deck for a platform connecting gaming and mental health', // krótki opis pod podglądem
-      lead: 'A pitch-deck website for a platform concept connecting gaming and mental health.',
+      tagline: 'a platform connecting gaming with psychologists and psychiatrists', // krótki opis pod podglądem
+      lead: 'A pitch deck as a website: players get support from psychologists and psychiatrists where they already are - on game servers.',
       problem: '[Problem: 2-3 sentences.]',
       solution: 'An investor presentation built as a website, with no cookies and no data collection. [Add 1-2 sentences.]',
       result: '[Result: 1-2 sentences or numbers.]',
@@ -688,8 +688,8 @@ export const en = {
     experience: 'Experience',
     skills: 'Skills',
     tools: 'Tools',
-    view: 'view ↗',
-    call: 'book a call ↗',
+    view: 'view ↗\uFE0E',
+    call: 'book a call ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['visual identity', 'UX/UI and web design', 'front-end: HTML, CSS, JS, Next.js', 'AI-assisted design and development', 'accessibility, WCAG 2.2', 'generative AI visuals and motion'],
     line: ['I design identities, websites', 'and digital products - from idea to launch.'],
@@ -699,7 +699,7 @@ export const en = {
     label: 'portfolio 2026',
     back: 'contents',
     contactRow: 'contact',
-    visit: 'view project ↗',
+    visit: 'view project ↗\uFE0E',
     soon: 'site coming soon',
     scope: 'Scope',
     facts: 'In short',
@@ -774,7 +774,7 @@ export const en = {
       projects: 'Projects in the portfolio:',
       process: 'Working together looks like this - 3 steps:',
       open: 'open project',
-      site: 'project site ↗',
+      site: 'project site ↗\uFE0E',
       contact: 'Email is the fastest:',
       call: 'book a call',
       tools: 'Tools:',
