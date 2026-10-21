@@ -349,7 +349,7 @@ export const pl = {
     ],
     education: '[Uniwersytet SWPS - kierunek, lata]',
     languages: '[polski - ojczysty · angielski - poziom]',
-    tools: ['Figma', '[Adobe …]', 'Blender', 'Adtron', 'HTML/CSS'],
+    tools: ['Figma', 'Adobe CC', 'Claude', 'Magnific', 'Cavalry', 'Blender', 'Adtron', 'ClickUp', 'HTML/CSS'],
   },
   brandbook: {
     intro: 'Zasady mojej marki osobistej: czerń, biel, cienka linia i dużo pustej przestrzeni.',
@@ -400,7 +400,8 @@ export const pl = {
     view: 'zobacz ↗',
     call: 'umów rozmowę ↗',
     portfolio: 'portfolio',
-    skillsList: ['identyfikacja wizualna', 'UX/UI i projekt stron', 'front-end: HTML, CSS, JS, Next.js', 'projektowanie i development z AI', 'dostępność WCAG 2.2'],
+    skillsList: ['identyfikacja wizualna', 'UX/UI i projekt stron', 'front-end: HTML, CSS, JS, Next.js', 'projektowanie i development z AI', 'dostępność WCAG 2.2', 'grafika i motion generowane z AI'],
+    line: ['Projektuję identyfikacje, strony', 'i produkty cyfrowe - od pomysłu do wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
   },
   // PDF 1080 × 1080 (npm run deck): karuzela na LinkedIn / Instagram, linki klikalne.
   deck: {
@@ -640,7 +641,7 @@ export const en = {
     ],
     education: '[SWPS University - field, years]',
     languages: '[Polish - native · English - level]',
-    tools: ['Figma', '[Adobe …]', 'Blender', 'Adtron', 'HTML/CSS'],
+    tools: ['Figma', 'Adobe CC', 'Claude', 'Magnific', 'Cavalry', 'Blender', 'Adtron', 'ClickUp', 'HTML/CSS'],
   },
   brandbook: {
     intro: 'The rules of my personal brand: black, white, a thin line and plenty of empty space.',
@@ -690,7 +691,8 @@ export const en = {
     view: 'view ↗',
     call: 'book a call ↗',
     portfolio: 'portfolio',
-    skillsList: ['visual identity', 'UX/UI and web design', 'front-end: HTML, CSS, JS, Next.js', 'AI-assisted design and development', 'accessibility, WCAG 2.2'],
+    skillsList: ['visual identity', 'UX/UI and web design', 'front-end: HTML, CSS, JS, Next.js', 'AI-assisted design and development', 'accessibility, WCAG 2.2', 'generative AI visuals and motion'],
+    line: ['I design identities, websites', 'and digital products - from idea to launch.'],
   },
   deck: {
     file: 'portfolio-lumer-1080-en.pdf',

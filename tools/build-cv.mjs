@@ -1,9 +1,9 @@
 // Uniwersalne CV na jedną stronę 1080 × 1080, w designie strony i PDF portfolio, z klikalnymi linkami.
 //   npm run cv  →  private/cv-wojciech-lumer-pl.pdf, private/cv-wojciech-lumer-en.pdf
 // Folder private/ jest w .gitignore - CV nie trafia do publicznego repozytorium ani na stronę.
-// Układ: pasek (CV · rok, lumerw.com) · awatar z tęczową obwódką, imię, zdanie z hero · wiersze z cienką linią:
+// Układ: awatar z tęczową obwódką, obok adres strony i imię · hasło z hero, pod nim skrócone zdanie (pl/en.cv.line) · wiersze z cienką linią:
 // doświadczenie, projekty, kompetencje, narzędzia, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
-// (logo firm) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
+// (logo firm, bez freshly) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
 // Treść z content.js (pl/en.about, pl/en.cv, shared.clients); placeholdery w [nawiasach] są pomijane.
 import { chromium } from 'playwright';
 import { mkdir, readFile, stat } from 'node:fs/promises';
@@ -18,6 +18,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'private');
 const PORT = 8097;
 const SIZE = 1080;
+const CV_SKIP_CLIENTS = ['freshly'];   // logo pominięte w CV (na stronie zostają)
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isReal = v => !!v && !String(v).includes('[');
@@ -44,7 +45,7 @@ function cv(lang) {
           <li><span><a class="link-u" href="${esc(href)}"><b>${esc(p.title)}</b></a>${p.beta ? ' <span class="beta">beta</span>' : ''}</span><span class="muted">${esc(tp.tagline)}</span></li>`;
   }).join('');
   const tools = t.about.tools.filter(isReal).map(clean);
-  const clients = c.clients.filter(x => x.logo).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.85)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
+  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.85)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
   return `<!doctype html>
@@ -57,12 +58,17 @@ function cv(lang) {
 </head>
 <body>
   <main class="page">
-    ${sphere(420, `left:${SIZE - 460}px;top:-460px`)}
-    <header class="bar"><span>CV · ${esc(c.year)}</span><a class="bar__right" href="${esc(site)}/">${esc(host(site))}</a></header>
+    ${sphere(420, `left:${SIZE - 460}px;top:-560px`)}
     <section class="intro">
-      <div class="avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
-      <h1 class="name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a><a class="name__li" href="${esc(linkedin)}" aria-label="LinkedIn">${icon.linkedin}</a>` : esc(c.name)}</h1>
-      <p class="line">${esc(t.about.bio)}</p>
+      <div class="who">
+        <div class="avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
+        <div>
+          <p class="site"><a href="${esc(site)}/">${esc(host(site))}</a></p>
+          <p class="name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a><a class="name__li" href="${esc(linkedin)}" aria-label="LinkedIn">${icon.linkedin}</a>` : esc(c.name)}</p>
+        </div>
+      </div>
+      <h1 class="title">${esc(t.hero.title)}</h1>
+      <p class="line">${(V.line ?? [t.hero.line]).map(esc).join('<br>')}</p>
     </section>
     <dl class="rows">
       ${row(V.experience, `<ul class="list">${experience}</ul>`)}
@@ -99,7 +105,7 @@ for (const lang of ['pl', 'en']) {
   });
   // ile pikseli treść wychodzi poza stronę (dół stopki, prawa krawędź)
   const over = await page.evaluate(S => {
-    const els = [...document.querySelectorAll('.bar, .intro, .rows, .foot')];
+    const els = [...document.querySelectorAll('.intro, .rows, .foot')];
     return Math.max(0, ...els.map(el => { const r = el.getBoundingClientRect(); return Math.max(r.bottom - (S - 64), r.right - S); }));
   }, SIZE);
   if (process.env.CV_PNG) await page.screenshot({ path: join(process.env.CV_PNG, `cv-${lang}.png`) });
