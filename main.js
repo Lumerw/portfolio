@@ -173,6 +173,9 @@ app.addEventListener('focusin', onIndex);
 /* Panele. Otwiera je zmiana adresu (#teraz), CSS robi wysunięcie.
    Tu: tło nieaktywne, focus w panelu, Esc, powrót focusu, pauza wideo. */
 let opener = null;      // element, który otworzył panel — wraca do niego focus
+let keyboardNav = false; // ostatnia interakcja z klawiatury (ramka fokusu przy powrocie do przycisku)
+addEventListener('keydown', () => { keyboardNav = true; }, { capture: true });
+addEventListener('pointerdown', () => { keyboardNav = false; }, { capture: true });
 let openedHere = false; // panel otwarty kliknięciem na stronie → zamknięcie = krok wstecz w historii
 
 const openSheet = () => {
@@ -197,7 +200,9 @@ function syncSheet() {
     const first = sheet.id === 'agent' && matchMedia('(hover: hover)').matches ? sheet.querySelector('#agent-q') : null;
     requestAnimationFrame(() => (first ?? sheet.querySelector('[data-close]')).focus({ preventScroll: true }));
   } else {
-    opener?.focus({ preventScroll: true });
+    // fokus wraca do przycisku tylko przy obsłudze klawiaturą; po stuknięciu/kliknięciu Safari obrysowałby przycisk ramką
+    if (keyboardNav) opener?.focus({ preventScroll: true });
+    else document.activeElement?.blur();
     opener = null;
   }
 }
@@ -403,8 +408,22 @@ app.addEventListener('click', e => {
   const sec = document.getElementById(a.dataset.section || 'kontakt');
   if (!sec) return;
   e.preventDefault();
-  sec.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+  scrollToSection(sec);
 });
+/* Płynne przewijanie do sekcji przy scroll-snap: Safari (iPad) przerywa płynny ruch przez kilka sekcji
+   i wraca do najbliższej - na czas ruchu przyciąganie jest wyłączone, wraca po dojechaniu (albo po 2 s). */
+function scrollToSection(sec) {
+  const html = document.documentElement;
+  const top = Math.min(sec.getBoundingClientRect().top + scrollY, html.scrollHeight - innerHeight);
+  html.style.scrollSnapType = 'none';
+  scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+  const t0 = performance.now();
+  const done = () => {
+    if (Math.abs(scrollY - top) > 1 && performance.now() - t0 < 2000) { requestAnimationFrame(done); return; }
+    html.style.scrollSnapType = '';
+  };
+  requestAnimationFrame(done);
+}
 
 addEventListener('hashchange', syncSheet);
 syncSheet();

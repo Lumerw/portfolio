@@ -1440,7 +1440,8 @@ html:has(.sheet:target) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .agent-glow { animation: none; } }
 /* tło przycisku nad poświatą (::after po niej w DOM), więc kolory widać tylko na zewnątrz krawędzi */
 .site-footer__agent::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--paper); transition: background-color var(--t-line) var(--ease); }
-.site-footer__agent:hover::after, .site-footer__agent:focus-visible::after { background: var(--ink); }
+.site-footer__agent:focus-visible::after { background: var(--ink); }
+@media (hover: hover) { .site-footer__agent:hover::after { background: var(--ink); } }
 @media (min-width: 400px) { .site-footer .mail { white-space: nowrap; } }   /* przy 320 px adres może się złamać */
 .site-footer__button { gap: var(--s-1); }
 /* Nawigator sekcji (desktop): linia 1 px z samymi kółkami jak znak, aktywne wypełnione. Nazwy sekcji
@@ -1543,12 +1544,15 @@ html:has(.sheet:target) { overflow: hidden; }
   color: var(--ink);
   transition: background-color var(--t-line) var(--ease), color var(--t-line) var(--ease);
 }
-.button:hover,
 .button:focus-visible { background: var(--ink); color: var(--paper); }
 /* Przyciski główne („kontakt”, „umów rozmowę”): pełne tuszem; po najechaniu - sama ramka */
 .button--primary { background: var(--ink); color: var(--paper); }
-.button--primary:hover,
 .button--primary:focus-visible { background: transparent; color: var(--ink); }
+/* Najechanie tylko z myszką/gładzikiem - na dotyku (tablet, telefon) przycisk nie zostaje „najechany” po stuknięciu */
+@media (hover: hover) {
+  .button:hover { background: var(--ink); color: var(--paper); }
+  .button--primary:hover { background: transparent; color: var(--ink); }
+}
 .button--small { min-height: 32px; padding-inline: var(--s-2); font-size: var(--fs-meta); }
 
 /* Elementy tylko do PDF (rok na okładce, tekst case study, QR) */
