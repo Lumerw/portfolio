@@ -1,58 +1,51 @@
-// CV na jedną stronę 1080 × 1080 do wysyłania, z klikalnymi linkami.
+// Uniwersalne CV na jedną stronę 1080 × 1080, w designie strony i PDF portfolio, z klikalnymi linkami.
 //   npm run cv  →  private/cv-wojciech-lumer-pl.pdf, private/cv-wojciech-lumer-en.pdf
 // Folder private/ jest w .gitignore - CV nie trafia do publicznego repozytorium ani na stronę.
-// Treść z content.js: imię, rola, zdanie z hero, projekty (zrzuty assets/deck/), doświadczenie, narzędzia
-// (pl/en.about), kompetencje i etykiety (pl/en.cv), kontakt (mail, Calendly, profile, QR do portfolio).
+// Układ: pasek (CV · rok, lumerw.com) · awatar z tęczową obwódką, imię, zdanie z hero · wiersze z cienką linią:
+// doświadczenie, projekty, kompetencje, narzędzia, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
+// (logo firm) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
+// Treść z content.js (pl/en.about, pl/en.cv, shared.clients); placeholdery w [nawiasach] są pomijane.
 import { chromium } from 'playwright';
 import { mkdir, readFile, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
-import { buildQr } from './build-qr.mjs';
+import { sphere } from './sphere-svg.mjs';
 import { content } from '../content.js';
 import { clean } from '../render.js';
-import { symbol } from '../symbols.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'private');
 const PORT = 8097;
+const SIZE = 1080;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isReal = v => !!v && !String(v).includes('[');
-const link = (href, label) => `<a class="link-u" href="${esc(href)}">${esc(label)}</a>`;
 const host = u => u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+const icon = {
+  linkedin: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>',
+  mail: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3.5" width="12" height="9"/><path d="M2 4l6 5 6-5"/></svg>',
+  calendar: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5"/></svg>',
+};
 
 function cv(lang) {
-  const c = content.shared, t = content[lang], V = t.cv;
+  const c = content.shared, t = content[lang], V = t.cv, U = t.ui;
   const site = c.siteUrl.replace(/\/$/, '');
+  const cal = c.booking?.calUsername ? `${site}/${lang === 'en' ? 'en/' : ''}#rozmowa` : c.calendly;
+  const linkedin = c.links.find(l => l.label === 'LinkedIn')?.href;
+  const row = (label, value) => (value ? `<div class="row"><dt>${esc(label)}</dt><dd>${value}</dd></div>` : '');
 
-  const projects = c.projects.map((p, i) => {
+  const experience = t.about.experience.filter(e => isReal(e.place)).map(e => `
+          <li><span class="meta">${esc(clean(e.year))}</span><span><b>${esc(clean(e.place))}</b><span class="muted">, ${esc(clean(e.role))}</span></span></li>`).join('');
+  const projects = c.projects.map(p => {
     const tp = t.projects[p.id];
-    const scope = (tp.meta ?? []).map(clean).filter(Boolean).join(' · ');
-    const links = [
-      ...(isReal(p.href) ? [link(p.href, `${host(p.href)} ↗`)] : []),
-      link(`${site}/#${p.id}`, `${V.portfolio} ↗`),
-    ].join('');
+    const href = isReal(p.href) ? p.href : `${site}/${lang === 'en' ? 'en/' : ''}#${p.id}`;
     return `
-        <li class="proj">
-          <a class="proj__thumb" href="${esc(isReal(p.href) ? p.href : `${site}/#${p.id}`)}"><img src="${esc(p.deck.desktop)}" alt=""></a>
-          <div>
-            <p class="proj__head"><span class="meta">${String(i + 1).padStart(2, '0')}</span><b>${esc(p.title)}</b><span class="meta">${esc(p.type)}</span></p>
-            <p class="proj__tag">${esc(tp.tagline)}</p>
-            ${scope ? `<p class="meta proj__scope">${esc(scope)}</p>` : ''}
-            <p class="links">${links}</p>
-          </div>
-        </li>`;
+          <li><span><a class="link-u" href="${esc(href)}"><b>${esc(p.title)}</b></a>${p.beta ? ' <span class="beta">beta</span>' : ''}</span><span class="muted">${esc(tp.tagline)}</span></li>`;
   }).join('');
-
-  const experience = t.about.experience.filter(e => clean(e.place)).map(e => `
-          <li><span class="meta">${esc(clean(e.year))}</span><b>${esc(clean(e.place))}</b><span class="muted">${esc(clean(e.role))}</span></li>`).join('');
-  const tools = t.about.tools.map(clean).filter(Boolean);
-  const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'Behance', 'GitHub'].includes(l.label));
-  const contactLinks = [
-    ...(isReal(c.calendly) ? [link(c.booking?.calUsername ? `${site}/${lang === 'en' ? 'en/' : ''}#rozmowa` : c.calendly, V.call)] : []),   // kalendarz na stronie
-    ...profiles.map(l => link(l.href, l.label)),
-  ].join('');
+  const tools = t.about.tools.filter(isReal).map(clean);
+  const clients = c.clients.filter(x => x.logo).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.85)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
+  const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
   return `<!doctype html>
 <html lang="${lang}">
@@ -64,56 +57,52 @@ function cv(lang) {
 </head>
 <body>
   <main class="page">
-    <header class="top">
-      ${symbol('personal', { cls: 'mark' })}
-      <span class="meta">CV · ${esc(c.year)}</span>
-      <span class="top__site">${link(`${site}/`, `${host(site)} ↗`)}</span>
-    </header>
+    ${sphere(420, `left:${SIZE - 460}px;top:-460px`)}
+    <header class="bar"><span>CV · ${esc(c.year)}</span><a class="bar__right" href="${esc(site)}/">${esc(host(site))}</a></header>
     <section class="intro">
-      <h1>${esc(c.name)}</h1>
-      <p><span class="ink">${esc(t.hero.role)}</span> - ${esc(t.hero.line)}</p>
+      <div class="avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
+      <h1 class="name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a><a class="name__li" href="${esc(linkedin)}" aria-label="LinkedIn">${icon.linkedin}</a>` : esc(c.name)}</h1>
+      <p class="line">${esc(t.about.bio)}</p>
     </section>
-    <div class="cols">
-      <section>
-        <h2 class="label">${esc(V.projects)}</h2>
-        <ul class="projs">${projects}
-        </ul>
-      </section>
-      <aside>
-        <h2 class="label">${esc(V.experience)}</h2>
-        <ul class="exp">${experience}
-        </ul>
-        <h2 class="label">${esc(V.skills)}</h2>
-        <ul class="dash">${V.skillsList.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
-        ${tools.length ? `<h2 class="label">${esc(V.tools)}</h2><p>${esc(tools.join(', '))}</p>` : ''}
-      </aside>
-    </div>
-    <footer class="contact">
-      <div>
-        <p class="contact__mail">${link(`mailto:${c.email}`, c.email)}</p>
-        <p class="links">${contactLinks}</p>
-      </div>
-      <a class="qr" href="${esc(site)}/"><img src="assets/qr.svg" alt=""></a>
+    <dl class="rows">
+      ${row(V.experience, `<ul class="list">${experience}</ul>`)}
+      ${row(V.projects, `<ul class="list list--proj">${projects}</ul>`)}
+      ${row(V.skills, `<ul class="dash">${V.skillsList.map(s => `<li>${esc(s)}</li>`).join('')}</ul>`)}
+      ${row(V.tools, tools.length ? esc(tools.join(' · ')) : '')}
+      ${isReal(t.about.education) ? row(V.education ?? (lang === 'pl' ? 'Wykształcenie' : 'Education'), esc(t.about.education)) : ''}
+      ${isReal(t.about.languages) ? row(V.languages ?? (lang === 'pl' ? 'Języki' : 'Languages'), esc(t.about.languages)) : ''}
+      ${row(U.clients, clients ? `<p class="clients">${clients}</p>` : '')}
+    </dl>
+    <footer class="foot">
+      <p class="buttons">
+        <a class="button button--primary" href="mailto:${esc(c.email)}">${icon.mail}${esc(c.email)}</a>
+        ${cal ? `<a class="button" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>` : ''}
+      </p>
+      <ul class="profiles">${profiles.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('')}</ul>
     </footer>
   </main>
 </body>
 </html>`;
 }
 
-await buildQr();
 await mkdir(out, { recursive: true });
 const server = await serve(PORT);
-const browser = await chromium.launch();
+const browser = await chromium.launch().catch(() => chromium.launch({ channel: 'chrome' }));
 let failed = false;
 for (const lang of ['pl', 'en']) {
-  const page = await browser.newPage();
+  const page = await browser.newPage({ viewport: { width: SIZE, height: SIZE } });
   await page.route(`http://localhost:${PORT}/__cv.html`, r => r.fulfill({ contentType: 'text/html; charset=utf-8', body: cv(lang) }));
   await page.goto(`http://localhost:${PORT}/__cv.html`, { waitUntil: 'networkidle' });
   await page.evaluate(async () => {
     await Promise.all([...document.images].map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; })));
     await document.fonts.ready;
   });
-  const over = await page.evaluate(() => { const p = document.querySelector('.page'); return p.scrollHeight > 1080 || p.scrollWidth > 1080; });
+  // ile pikseli treść wychodzi poza stronę (dół stopki, prawa krawędź)
+  const over = await page.evaluate(S => {
+    const els = [...document.querySelectorAll('.bar, .intro, .rows, .foot')];
+    return Math.max(0, ...els.map(el => { const r = el.getBoundingClientRect(); return Math.max(r.bottom - (S - 64), r.right - S); }));
+  }, SIZE);
+  if (process.env.CV_PNG) await page.screenshot({ path: join(process.env.CV_PNG, `cv-${lang}.png`) });
   const file = join(out, content[lang].cv.file);
   await page.pdf({ path: file, preferCSSPageSize: true, printBackground: true, tagged: true });
   await page.close();
@@ -121,9 +110,9 @@ for (const lang of ['pl', 'en']) {
   const pages = (raw.match(/\/Type\s*\/Page(?!s)/g) || []).length;
   const uris = (raw.match(/\/URI\s*\(/g) || []).length;
   const { size } = await stat(file);
-  const ok = pages === 1 && !over;
+  const ok = pages === 1 && over < .5;
   if (!ok) failed = true;
-  console.log(`${ok ? '✓' : '✗'} private/${content[lang].cv.file}: ${pages} str. · ${uris} linków · ${(size / 1024).toFixed(0)} kB${over ? ' · treść wychodzi poza 1080 × 1080' : ''}`);
+  console.log(`${ok ? '✓' : '✗'} private/${content[lang].cv.file}: ${pages} str. · ${uris} linków · ${(size / 1024).toFixed(0)} kB${over >= .5 ? ` · poza kadrem +${Math.ceil(over)} px` : ''}`);
 }
 await browser.close();
 server.close();

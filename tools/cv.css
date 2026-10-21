@@ -1,57 +1,88 @@
-/* CV 1080 × 1080 (tools/build-cv.mjs). System strony: papier, tusz, linia 1 px, Helvetica Neue 400 / 500. */
-@page { size: 1080px 1080px; margin: 0; }
+/* CV 1080 × 1080 (tools/build-cv.mjs) - design strony i PDF portfolio: papier, tusz, cienka linia, Helvetica,
+   proporcje hero ze strony w skali --k, zarys sfery przycięty krawędzią. */
 :root {
   --paper: #FAFAF7;
   --ink: #111111;
   --ink-2: #6E6E6A;
   --ink-3: #73736E;
   --hair: rgba(17, 17, 17, .14);
-  --m: 64px;
+  --rainbow: conic-gradient(#FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D);
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --m: 72px;
+  --k: 1.4;
 }
+@page { size: 1080px 1080px; margin: 0; }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: var(--paper); color: var(--ink); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+html, body { background: var(--paper); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
 ul { list-style: none; }
+img { display: block; }
 b { font-weight: 500; }
-.link-u { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
-.meta { font-size: 15px; color: var(--ink-3); }
+.meta { color: var(--ink-3); }
 .muted { color: var(--ink-2); }
-.ink { color: var(--ink); }
+.link-u { border-bottom: 1px solid var(--hair); }
 
-.page { width: 1080px; height: 1080px; padding: var(--m); display: flex; flex-direction: column; overflow: hidden; font-size: 17px; line-height: 1.45; }
+.page {
+  position: relative;
+  width: 1080px;
+  height: 1080px;
+  padding: var(--m);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-.symbol { --size: 48; width: calc(var(--size) * 1px); height: calc(var(--size) * 1px); fill: none; stroke: currentColor; stroke-width: calc(48 / var(--size)); overflow: visible; flex: none; }
-.symbol .hanko { fill: currentColor; stroke: none; }
-.top { display: flex; align-items: center; gap: 16px; }
-.mark { --size: 32; }
-.top__site { margin-left: auto; font-size: 16px; }
+/* Sfera: kreska 1 px, prawy górny róg */
+.sphere { position: absolute; pointer-events: none; color: var(--ink); }
+.sphere path, .sphere circle { fill: none; stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.sphere .ring { opacity: .12; }
+.sphere .ring--eq { opacity: .22; }
+.sphere .rim { opacity: .2; }
 
-.intro { margin-top: 32px; }
-.intro h1 { font-size: 64px; line-height: 1.05; font-weight: 500; letter-spacing: -.02em; }
-.intro p { margin-top: 12px; font-size: 21px; line-height: 1.45; color: var(--ink-2); max-width: 900px; }
+.bar { position: relative; display: flex; align-items: center; gap: 18px; height: 32px; font-size: 18px; color: var(--ink-3); }
+.bar__right { margin-left: auto; }
 
-.label { font-size: 15px; font-weight: 400; color: var(--ink-3); padding-bottom: 10px; border-bottom: 1px solid var(--hair); margin-bottom: 14px; }
-.cols { display: grid; grid-template-columns: 1fr 300px; gap: 56px; margin-top: 36px; }
-aside .label:not(:first-child) { margin-top: 26px; }
+/* Awatar, imię, bio - jak hero na stronie */
+.intro { position: relative; z-index: 1; margin-top: 44px; max-width: 760px; }
+.avatar { position: relative; isolation: isolate; width: calc(58px * var(--k)); height: calc(58px * var(--k)); border-radius: 50%; }
+.avatar::before,
+.avatar::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; background: var(--rainbow); }
+.avatar::before { inset: calc(-2px * var(--k)); }
+.avatar::after { inset: calc(-3px * var(--k)); filter: blur(calc(10px * var(--k))); opacity: .75; }
+.avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff; }
+.name { margin-top: calc(24px * var(--k)); display: flex; align-items: center; gap: calc(12px * var(--k)); font-size: calc(28px * var(--k)); line-height: 1.2; font-weight: 500; letter-spacing: -.01em; }
+.name__li svg { display: block; width: calc(16px * var(--k)); height: calc(16px * var(--k)); fill: none; stroke: var(--ink-2); stroke-width: 1; }
+.line { margin-top: calc(10px * var(--k)); font-size: calc(15px * var(--k)); line-height: 1.55; color: var(--ink-2); }
 
-.projs { display: grid; gap: 18px; }
-.proj { display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: start; }
-.proj__thumb img { display: block; width: 168px; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border: 1px solid var(--hair); }
-.proj__head { display: flex; align-items: baseline; gap: 10px; font-size: 22px; line-height: 1.2; }
-.proj__head .meta:last-child { margin-left: auto; }
-.proj__tag { margin-top: 4px; }
-.proj__scope { margin-top: 2px; line-height: 1.4; }
-.links { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; font-size: 15px; }
-
-.exp { display: grid; gap: 14px; }
-.exp li { display: grid; line-height: 1.35; }
-.exp b { font-size: 20px; }
-.dash { display: grid; gap: 3px; }
-.dash li { padding-left: 1.1em; text-indent: -1.1em; }
+/* Wiersze z cienką linią - jak opis projektu w panelu */
+.rows { position: relative; z-index: 1; margin-top: 44px; border-top: 1px solid var(--hair); font-size: 19px; line-height: 1.5; }
+.row { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 24px; padding-block: 13px; border-bottom: 1px solid var(--hair); }
+.row dt { color: var(--ink-3); font-size: 16px; padding-top: 2px; }
+.list li { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 16px; }
+.list .meta { font-size: 16px; padding-top: 2px; }
+.list--proj li { grid-template-columns: 190px minmax(0, 1fr); }
+.dash { columns: 2; column-gap: 32px; }
+.dash li { padding-left: 1.1em; text-indent: -1.1em; break-inside: avoid; }
 .dash li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
+.beta { display: inline-block; margin-left: 8px; padding: 0 7px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 13px; line-height: 1.5; vertical-align: .2em; }
+.clients { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; padding-block: 4px; }
+.clients img { width: auto; opacity: .6; }
 
-.contact { margin-top: auto; display: flex; align-items: flex-end; gap: 32px; padding-top: 24px; border-top: 1px solid var(--hair); }
-.contact__mail { font-size: 28px; }
-.contact .links { font-size: 17px; gap: 6px 24px; margin-top: 10px; }
-.qr { margin-left: auto; display: block; width: 104px; height: 104px; flex: none; }
-.qr img { width: 100%; height: 100%; display: block; }
+/* Kontakt: przyciski jak na stronie, profile */
+.foot { position: relative; z-index: 1; margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.buttons { display: flex; gap: calc(12px * var(--k)); }
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: calc(48px * var(--k));
+  padding-inline: calc(24px * var(--k));
+  border: 1px solid var(--ink);
+  font-size: calc(14px * var(--k));
+}
+.button--primary { background: var(--ink); color: var(--paper); }
+.button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+.profiles { display: flex; font-size: 17px; }
+.profiles li + li::before { content: "·"; padding-inline: 10px; color: var(--ink-3); }
+.profiles a { border-bottom: 1px solid var(--hair); }
