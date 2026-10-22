@@ -195,7 +195,7 @@ export const shared = {
           ['Gaming is one of the biggest social spaces on earth - and one of the least supported.'],
         ],
         ticker: ['data.', 'vision.', 'tools - put to use.'],
-        avatars: ['assets/rehab/live/p1.svg', 'assets/rehab/live/p2.svg', 'assets/rehab/live/p3.svg'],
+        avatars: ['assets/rehab/live/p1.webp', 'assets/rehab/live/p2.webp', 'assets/rehab/live/p3.webp'],   // zdjęcia ze strony reh.ab
       },
       tools: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers

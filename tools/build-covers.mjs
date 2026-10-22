@@ -49,7 +49,8 @@ for (const p of content.shared.projects) {
   if (p.cover) {
     for (const [fmt, size] of Object.entries(FORMATS)) {
       if (!p.cover[fmt]) continue;
-      const coverHtml = p.live ? sz => page(liveMarkup(p, { static: true, lite: fmt === 'card' }), sz) : html;
+      // live.js wskazuje zasoby od katalogu strony (import.meta.url = file:// w Node) - tu ten sam katalog przez serwer
+      const coverHtml = p.live ? sz => page(liveMarkup(p, { static: true, lite: fmt === 'card' }).replaceAll(new URL('../', import.meta.url).href, `http://localhost:${PORT}/`), sz) : html;
       const out = join(root, p.cover[fmt]);
       await sharp(await shoot(coverHtml(size), size)).webp({ quality: 80, smartSubsample: true }).toFile(out);
       console.log(`✓ ${p.cover[fmt]}`);

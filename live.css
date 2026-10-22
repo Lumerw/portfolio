@@ -170,7 +170,7 @@
 @keyframes rh-breathe { 0%, 100% { opacity: .24; } 50% { opacity: .6; } }
 .rh-row { position: relative; z-index: 2; display: flex; align-items: center; gap: min(2.6cqw, 3cqh); height: min(5.2cqh, 7cqw); font-size: min(3.4cqw, 2.4cqh); }
 .rh-avatars { display: flex; flex: none; animation: rh-swap 7s var(--rh-ease) infinite; }
-.rh-avatars img { width: min(7cqw, 5cqh); height: auto; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .9); margin-right: max(-11px, -2.3cqw); background: rgba(255, 255, 255, .25); }
+.rh-avatars img { width: min(7cqw, 5cqh); height: auto; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .9); margin-right: max(-11px, -2.3cqw); background: rgba(255, 255, 255, .25); object-fit: cover; }
 @keyframes rh-swap { 0%, 5.43% { opacity: 0; } 10.86%, 100% { opacity: 1; } }
 .rh-bar { flex: 0 0 min(19cqw, 190px); margin-left: auto; height: 9px; padding: 1.5px; border: 1.5px solid rgba(255, 255, 255, .85); border-radius: 99px; overflow: hidden; }
 .rh-bar span { display: block; height: 100%; border-radius: 99px; background: rgba(255, 255, 255, .95); transform-origin: left center; transform: scaleX(.72); animation: rh-bar 7s linear infinite; }
