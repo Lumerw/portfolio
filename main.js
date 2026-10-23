@@ -140,7 +140,7 @@ async function showLive(host, id) {
   const img = host.querySelector(':scope > img');
   if (!img || host.querySelector('.live') || !host.isConnected) return;
   // Karta na sferze: wersja uproszczona (lite); panel: pełna
-  img.insertAdjacentHTML('afterend', liveMarkup(content.shared.projects.find(p => p.id === id), { lite: !!host.closest('.sphere__card') }));
+  img.insertAdjacentHTML('afterend', liveMarkup(content.shared.projects.find(p => p.id === id), { lite: !!host.closest('.sphere__card'), lang: document.documentElement.lang }));
   const el = img.nextElementSibling;
   startLive(el);
 }

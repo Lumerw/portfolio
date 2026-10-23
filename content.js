@@ -136,7 +136,10 @@ export const shared = {
       video: {
         '4x5':  { src: '', poster: 'assets/teraz/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
       },
-      reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” (dopóki nie ma src)
+      reel: true,                    // animowana plansza „Dwie role, jedna rozmowa” w panelu projektu (dopóki nie ma src)
+      // Okładka (live.js): czerń, organicznie płynąca niebieska łuna, logo na środku - karta na sferze i PDF.
+      live: true,
+      cover: { card: 'assets/teraz/cover-card.webp', '4x5': 'assets/teraz/cover-4x5.webp' },
       // Narzędzia i technologie (panel projektu) - z repozytorium projektu
       tools: ['Claude', 'React', 'TypeScript', 'Tailwind CSS', 'Supabase', 'Stripe', 'Daily.co', 'Cloudflare'],
       href: 'https://teraz.eu',      // testowo
@@ -160,11 +163,12 @@ export const shared = {
       logo:   { src: 'assets/loom/logo.svg', w: 453, h: 70 },
       sygnet: { src: 'assets/loom/sygnet.svg', mono: false },
       sphereLogo: { src: 'assets/loom/logo.svg', w: 453, h: 70, size: .78 },
-      // Grafika interaktywna (live.js): gradient z hero loom.studio + pływające figury, bez logo i napisów.
-      live: true,
+      // Okładka (live.js): papier, trzy figury Bauhausu na środku (fizyka z loom.studio), na dole pas gradientu
+      // z hero, z boku pionowe logo, u góry PL / EN (język strony) i znak trybu. perLang: osobna klatka PL i EN.
+      live: { perLang: true },
       tools: ['Figma', 'Next.js', 'TypeScript', 'Tailwind CSS', 'WebGL', 'Stripe', 'Claude API'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
-      cover: { '4x5': 'assets/loom/cover-4x5.webp' },
+      cover: { card: 'assets/loom/cover-card.webp', '4x5': 'assets/loom/cover-4x5.webp' },
       video: {
         '4x5':  { src: '', poster: 'assets/loom/video-4x5.svg',  w: 1080, h: 1350 }, // tablet pionowo (>= 768 + pionowo)
       },
@@ -187,17 +191,13 @@ export const shared = {
       logo:   { src: 'assets/rehab/logo.svg', w: 480, h: 120 },
       sygnet: { src: 'assets/rehab/sygnet.png', mono: false },   // favicon reh.ab: „her” na czerwieni
       sphereLogo: { src: 'assets/rehab/logo-her.svg', w: 48, h: 48, size: .5 },   // to samo „her” (odwrócone), tuszem
-      // Grafika interaktywna (live.js): hero reh.ab 1:1 w pętli. Tekst marki - po angielsku w obu wersjach.
+      // Okładka (live.js): nagłówek w jednej linii z ciasnym odstępem (przycięty krawędzią), wielkie „her”
+      // z poświatą przy lewej krawędzi, zmieniające się słowa w prawym dolnym rogu. Tekst marki - po angielsku.
       live: {
         title: ['Make an', 'impact', 'toget', 'her', '.'],   // „impact” i „toget” przygasają, za „her” poświata
-        lede: [
-          ['40% of the world plays games online.'],
-          ['Gaming is one of the biggest social spaces on earth - and one of the least supported.'],
-        ],
         ticker: ['data.', 'vision.', 'tools - put to use.'],
-        avatars: ['assets/rehab/live/p1.webp', 'assets/rehab/live/p2.webp', 'assets/rehab/live/p3.webp'],   // zdjęcia ze strony reh.ab
       },
-      tools: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages'],
+      tools: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages', 'Claude', 'Figma'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
       cover: { card: 'assets/rehab/cover-card.webp', '4x5': 'assets/rehab/cover-4x5.webp' },
       video: {

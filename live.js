@@ -1,18 +1,32 @@
-// Interaktywne plansze projektów (projects[].live) - grafika na żywo zamiast wideo:
-//   loom.studio - po lewej płynny gradient z hero loom.studio (WebGL, reaguje na kursor; pod spodem
-//                 ten sam gradient w CSS), po prawej trzy figury Bauhausu pływające na sprężynach
-//                 (fizyka z loom.studio: dryf, odbicia, uspokojenie pod kursorem). Bez logo i napisów.
-//   reh.ab      - hero reh.ab w pętli 21 s: pisanie nagłówka, przygaszenie „impact” / „toget”,
-//                 poświata „her”, taśma słów, pasek: gradient, awatary, ładowanie co 7 s. Sam CSS.
+// Okładki projektów (projects[].live) - mikroanimacje na żywo (4:5):
+//   teraz       - czerń z niebieską łuną, która organicznie płynie (sam CSS), logo na środku.
+//   loom.studio - papier, trzy figury Bauhausu na środku pływające na sprężynach (fizyka z loom.studio:
+//                 dryf, odbicia, uspokojenie pod kursorem); na dole pas płynnego gradientu z hero
+//                 (WebGL, reaguje na kursor; pod spodem ten sam gradient w CSS); pionowe logo przy lewej
+//                 krawędzi (tuszem na papierze, papierem na gradiencie), PL / EN wg języka strony, znak trybu.
+//   reh.ab      - nagłówek w jednej linii z ciasnym odstępem, przycięty prawą krawędzią (pisanie,
+//                 przygaszenie „impact” / „toget”), wielkie „her” z poświatą przy lewej krawędzi,
+//                 zmieniające się słowa w prawym dolnym rogu. Sam CSS, pętla 21 s.
 // Źródła: repozytoria loomstudio (components/ui/flow-gl.ts, lib/hero-physics.ts, styles/hero.css)
 // i reh.ab (css/style.css, js/main.js).
-// main.js ładuje ten moduł leniwie i wstawia grafikę tylko do aktywnego podglądu / otwartego panelu,
-// nad statyczną planszą (cover). Bez JS i przy ograniczonym ruchu zostaje cover - to jej pierwsza klatka
+// main.js ładuje ten moduł leniwie i wstawia grafikę tylko do aktywnego podglądu (karta sfery; teraz - tylko tam,
+// w panelu teraz gra dłuższa plansza reel) i otwartego panelu, nad statyczną planszą (cover). Bez JS i przy ograniczonym ruchu zostaje cover - to jej pierwsza klatka
 // (generuje ją npm run covers z liveMarkup(p, { static: true })).
 
 import { RP, svgi } from './render.js';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+// Zasoby od katalogu głównego strony (strona / i /en/)
+const abs = src => esc(new URL(src, import.meta.url).href);
+
+/* ==========================================================================
+   teraz - łuna z hero teraz.eu: jasny łuk u góry dużej elipsy, w środku granat, dół czarny
+   ========================================================================== */
+function terazMarkup(p) {
+  return `
+          <span class="tz-light"></span><span class="tz-core"></span><span class="tz-shade"></span>
+          <img class="tz-logo" src="${abs(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="">`;
+}
 
 /* ==========================================================================
    loom.studio
@@ -44,13 +58,20 @@ function tiles() {
   }).join('');
 }
 
-function loomMarkup() {
+// Znak trybu (koło, lewa połowa wypełniona) jak w nagłówku loom.studio
+const MODE = '<svg class="lm-mode" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.25" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 1.75a10.25 10.25 0 0 0 0 20.5z" fill="currentColor"/></svg>';
+
+function loomMarkup(p, { lang = 'pl' } = {}) {
   const blobs = OG_BLOBS.map((b, i) => {
     const k = i % 4;
     return `<span class="og-blob" style="--c:${b.c};--x:${b.x}%;--y:${b.y}%;--s:${b.s};--d1:${CALM.d1[k]}s;--d2:${CALM.d2[k]}s;--d3:${CALM.d3[k]}s;--p:${-(7 * i + 3)}s"></span>`;
   }).join('');
+  // Pionowe logo dwa razy: tuszem (przycięte do papieru) i papierem (przycięte do pasa gradientu)
+  const word = tone => `<span class="lm-word lm-word--${tone}"><img src="${abs(`assets/deck/loom-logo-${tone}.svg`)}" width="4531" height="700" alt=""></span>`;
   return `
           <div class="lv-flow"><div class="og">${blobs}<span class="og-grain"></span></div></div>
+          <span class="lm-lang">${lang === 'en' ? 'EN' : 'PL'}</span>${MODE}
+          ${word('ink')}${word('paper')}
           <div class="lv-paper">
             <div class="bauhaus">
               <div class="bh-body bh-body--square" data-body="square"><span class="bh-fx">${tiles()}</span><span class="bh-square"></span></div>
@@ -302,36 +323,25 @@ function startLoom(root) {
 /* ==========================================================================
    reh.ab - hero w pętli (cały ruch w CSS, sekcja „Interaktywne plansze” w styles.css)
    ========================================================================== */
-// lite (karta na sferze): nagłówek, przeskakujący tekst pod nim i płynący gradient na dole - bez reszty.
-function rehabMarkup(p, { lite = false } = {}) {
+function rehabMarkup(p) {
   const L = p.live;
   let n = 0;
-  // Nagłówek litera po literze (--i = kolejność pisania, 26 ms na znak)
-  const chars = s => [...s].map(ch => (ch === ' ' ? ' ' : `<i class="ch" style="--i:${n++}">${esc(ch)}</i>`)).join('');
-  const words = s => s.split(' ').map(w => `<span class="w">${chars(w)}</span>`).join(' ');
-  const [lead, dim1, dim2, her, end] = L.title;
-  const h = `${words(lead)} <span class="w d1">${chars(dim1)}</span> <span class="w"><span class="d2">${chars(dim2)}</span><span class="her"><span class="her-light"><span class="her-glow"></span></span>${chars(her)}</span>${chars(end)}</span>`;
-  const lede = L.lede.map(([text, fn]) => `${esc(text)}${fn ? `<sup>${esc(fn)}</sup>` : ''}`).join(' ');
-  const ticker = [...L.ticker, L.ticker[0], L.ticker[1]].map(w => `<span>${esc(w)}</span>`).join('');
-  const avatars = L.avatars.map(src => `<img src="${esc(new URL(src, import.meta.url).href)}" alt="" width="34" height="34">`).join('');   // od katalogu głównego (strona / i /en/)
+  // Nagłówek litera po literze (--i = kolejność pisania, 26 ms na znak); „her” osobno, wielkie, z poświatą
+  const chars = str => [...str].map(ch => (ch === ' ' ? ' ' : `<i class="ch" style="--i:${n++}">${esc(ch)}</i>`)).join('');
+  const [lead, dim1, dim2, her] = L.title;
+  const h = `${chars(lead)} <span class="d1">${chars(dim1)}</span> <span class="d2">${chars(dim2)}</span>`;
+  // 4 widoczne linie, przesuw o 3 słowa i skok do identycznej klatki: lista + jej powtórka + pierwsze słowo
+  const ticker = [...L.ticker, ...L.ticker, L.ticker[0]].map(w => `<span>${esc(w)}</span>`).join('');
   return `
-          <div class="rh-copy">
-            <p class="rh-h">${h}</p>
-            ${lite ? '' : `<p class="rh-lede">${lede}</p>`}
-            <div class="rh-ticker"><div class="rh-track">${ticker}</div></div>
-          </div>
-          <div class="rh-band">${lite ? '' : `
-            <div class="rh-row">
-              <span class="rh-avatars">${avatars}</span>
-              <span class="rh-bar"><span></span></span>
-            </div>`}
-          </div>`;
+          <p class="rh-h">${h}</p>
+          <p class="rh-her"><span class="her-light"><span class="her-glow"></span></span><span class="her-word">${chars(her)}</span></p>
+          <div class="rh-ticker"><div class="rh-track">${ticker}</div></div>`;
 }
 
 /* ==========================================================================
    API
    ========================================================================== */
-const MARKUP = { loom: loomMarkup, rehab: rehabMarkup };
+const MARKUP = { teraz: terazMarkup, loom: loomMarkup, rehab: rehabMarkup };
 
 // Style grafik (live.css) - wczytywane przy pierwszej grafice, nie blokują pierwszego wyświetlenia strony.
 let css = null;
@@ -344,10 +354,10 @@ export function loadCss() {
   return css;
 }
 
-// HTML grafiki. static: bez ruchu (stan końcowy) - do generowania statycznej planszy (cover).
-// lite: wersja uproszczona na kartę sfery (reh.ab bez akapitu i paska z awatarami).
-export function liveMarkup(p, { static: still = false, lite = false } = {}) {
-  const inner = MARKUP[p.id]?.(p, { lite });
+// HTML grafiki. static: bez ruchu (stan końcowy) - do generowania statycznej planszy (cover) i PDF.
+// lite: karta na sferze (ta sama grafika, mniejsza). lang: język strony (loom.studio: PL / EN).
+export function liveMarkup(p, { static: still = false, lite = false, lang = 'pl' } = {}) {
+  const inner = MARKUP[p.id]?.(p, { lite, lang });
   if (!inner) return '';
   return `<div class="live live--${p.id}${lite ? ' live--lite' : ''}${still ? ' live--static' : ''}" aria-hidden="true">${inner}
         </div>`;

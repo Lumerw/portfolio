@@ -1,7 +1,8 @@
 /* ==========================================================================
-   Interaktywne plansze (projects[].live, live.js): loom.studio i reh.ab.
+   Okładki projektów (projects[].live, live.js): teraz, loom.studio i reh.ab - mikroanimacje 4:5.
    Osobny plik: live.js wczytuje go przy pierwszej grafice - nie blokuje pierwszego wyświetlenia strony.
-   Wstawiane przez main.js nad statyczną planszą (cover): na karcie z przodu sfery i w otwartym panelu.
+   Wstawiane przez main.js nad statyczną planszą (cover): na karcie z przodu sfery i w otwartym panelu
+   (loom.studio, reh.ab; teraz w panelu ma dłuższą planszę reel).
    Grają, gdy widać je w aktywnym podglądzie albo otwartym panelu (--live-play), pauza: .is-paused.
    Wymiary w cq - ta sama grafika w 4:5, 16:9 i 9:16. .live--static = stan końcowy bez ruchu (cover).
    ========================================================================== */
@@ -24,9 +25,32 @@
 .live--static, .live--static *, .live--static *::before, .live--static *::after { animation: none !important; }
 .live--static .og-grain { display: none; }   /* ziarno (6%) niewidoczne w planszy, a mocno ją powiększa */
 
-/* ---- loom.studio: gradient (lewe 20%) + figury Bauhausu (reszta, duże) ---- */
-.live--loom { background: #E8E6DF; }
-.lv-flow { position: absolute; inset: 0 80% 0 0; overflow: hidden; }
+/* ---- teraz: łuna z hero teraz.eu - jasny niebieski łuk u góry dużej elipsy, w środku granat, dół czarny.
+   Trzy warstwy płyną w różnym tempie (14-23 s), więc kształt łuny ciągle się zmienia. ---- */
+.live--teraz { background: #000; }
+.tz-light, .tz-core, .tz-shade { position: absolute; border-radius: 50%; pointer-events: none; }
+.tz-light {
+  left: -38%; top: 12%; width: 176%; height: 118%;
+  background: radial-gradient(closest-side, #3b8cff 0%, #2275ff 48%, #1356de 68%, rgb(12 52 160 / .6) 84%, transparent 100%);
+  filter: blur(3.6cqw);
+  animation: tz-light 17s ease-in-out infinite alternate;
+}
+.tz-core {
+  left: -20%; top: 25%; width: 140%; height: 118%;
+  background: radial-gradient(closest-side, #020611 0%, #030b22 48%, rgb(4 16 52 / .9) 70%, transparent 100%);
+  filter: blur(3.5cqw);
+  animation: tz-core 23s ease-in-out infinite alternate;
+}
+/* dół w czerń, lewy górny róg ciemniejszy - łuk najjaśniejszy z prawej */
+.tz-shade { inset: 0; border-radius: 0; background: linear-gradient(180deg, transparent 52%, #000 96%), radial-gradient(70% 46% at 4% 8%, #000 0%, rgb(0 0 0 / .7) 40%, transparent 100%); animation: tz-shade 14s ease-in-out infinite alternate; }
+@keyframes tz-light { 0% { translate: 4cqw 0; scale: 1 1; rotate: -4deg; } 50% { translate: -3cqw 2cqh; scale: 1.06 .96; rotate: 3deg; } 100% { translate: 2cqw -2cqh; scale: .97 1.05; rotate: 6deg; } }
+@keyframes tz-core { 0% { translate: -2cqw 1cqh; scale: 1; } 50% { translate: 3cqw -1.5cqh; scale: 1.04 .98; } 100% { translate: -1cqw 2cqh; scale: .98 1.03; } }
+@keyframes tz-shade { from { opacity: 1; } to { opacity: .82; } }
+.live .tz-logo { position: absolute; left: 50%; top: 48%; width: 46cqw; height: auto; translate: -50% -50%; }   /* (0,2,0) wygrywa z .media img */
+
+/* ---- loom.studio: papier, figury Bauhausu na środku, pas gradientu na dole, pionowe logo, PL / EN ---- */
+.live--loom { --band: 15.5%; background: #E8E6DF; color: #111; }
+.lv-flow { position: absolute; inset: auto 0 0; height: var(--band); overflow: hidden; }
 .og {
   --a: 9%;
   --b0: .92;
@@ -65,7 +89,14 @@
 .lv-canvas[data-live] { opacity: 1; }
 .lv-flow:has(> .lv-canvas[data-live]) > .og { visibility: hidden; transition: visibility 0s linear 450ms; }
 
-.lv-paper { position: absolute; inset: 0 0 0 20%; container-type: size; }
+.lv-paper { position: absolute; inset: 0 0 var(--band) 0; container-type: size; }
+.lm-lang { position: absolute; left: 5.3cqw; top: 4.6cqw; font: 700 5.2cqw/1 Futura, "Avenir Next", "Helvetica Neue", Arial, sans-serif; letter-spacing: -.01em; z-index: 2; }
+.lm-mode { position: absolute; right: 6.2cqw; top: 4.3cqw; width: 5.4cqw; height: 5.4cqw; z-index: 2; }
+/* Logo pionowo (czytane od dołu): obrót wokół lewego dolnego rogu; tuszem nad pasem, papierem na pasie */
+.lm-word { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.lm-word--ink { clip-path: inset(0 0 var(--band) 0); }
+.lm-word--paper { clip-path: inset(calc(100% - var(--band)) 0 0 0); }
+.lm-word img { position: absolute; left: calc(5.3cqw + 4cqw); bottom: 5.5cqh; width: 26cqw; height: auto; transform-origin: 0 100%; rotate: -90deg; }
 /* Kompozycja 179 × 138 z loom.studio, skalowana do ramki; ciała w % jej boków */
 .bauhaus {
   --snappy: linear(0, .2 6%, .62 14%, .98 24%, 1.08 31%, 1.06 40%, 1 52%, .99 66%, 1);
@@ -73,7 +104,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(74cqw, 56cqh);
+  width: min(46cqw, 44cqh);
   aspect-ratio: 179 / 138;
   translate: -50% -50%;
 }
@@ -92,87 +123,57 @@
 .bh-tri:hover { clip-path: inset(-20%); transition: none; }
 .bh-tri:hover svg { transform: rotate(90deg); }          /* trójkąt → ▶ */
 
-/* ---- reh.ab: hero w pętli 21 s (pisanie, przygaszenie, poświata; taśma 6,3 s; pasek 7 s) ---- */
+/* ---- reh.ab: nagłówek w jednej linii, ciasno (przycięty prawą krawędzią); wielkie „her” z poświatą
+   przy lewej krawędzi; słowa w prawym dolnym rogu przewijają się w górę i gasną. Pętla 21 s. ---- */
 .live--rehab {
   --rh-loop: 21s;
   --rh-ease: cubic-bezier(.4, 0, .2, 1);
-  display: flex;
-  flex-direction: column;
   background: #CA002A;
   color: #fff;
   font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-.rh-copy { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 7cqw; }
-.rh-h { font-size: min(9.5cqw, 7.4cqh); font-weight: 700; line-height: 1.02; letter-spacing: -.025em; }
-.rh-h .w { display: inline-block; }
-.rh-h .ch { display: inline-block; font-style: normal; position: relative; z-index: 1; animation: rh-ch var(--rh-loop) linear calc(var(--i) * 26ms) infinite both; }
+.rh-h { position: absolute; left: 4cqw; top: 13.5cqh; margin: 0; white-space: nowrap; font-size: 13cqw; font-weight: 700; line-height: 1; letter-spacing: -.09em; }
+.rh-h .ch { display: inline-block; font-style: normal; position: relative; animation: rh-ch var(--rh-loop) linear calc(var(--i) * 26ms) infinite both; }
 @keyframes rh-ch { 0% { opacity: 0; } 1.14% { opacity: 1; } 96% { opacity: 1; } 97.2%, 100% { opacity: 0; } }
 .rh-h .d1 { opacity: .66; animation: rh-d1 var(--rh-loop) var(--rh-ease) infinite both; }
 .rh-h .d2 { opacity: .3;  animation: rh-d2 var(--rh-loop) var(--rh-ease) infinite both; }
 @keyframes rh-d1 { 0%, 4.1% { opacity: 1; } 11.7%, 100% { opacity: .66; } }
 @keyframes rh-d2 { 0%, 4.1% { opacity: 1; } 11.7%, 100% { opacity: .3; } }
-.rh-h .her { position: relative; }
-.her-light { position: absolute; inset: 0; animation: rh-light var(--rh-loop) var(--rh-ease) infinite both; }
-@keyframes rh-light { 0% { opacity: 0; } 3%, 95% { opacity: 1; } 98%, 100% { opacity: 0; } }
+.rh-her { position: absolute; left: -2.2cqw; bottom: 16.5cqh; margin: 0; font-size: 26cqw; font-weight: 700; line-height: .8; letter-spacing: -.08em; white-space: nowrap; }
+.her-word { position: relative; z-index: 1; }
+.her-word .ch { display: inline-block; font-style: normal; animation: rh-her var(--rh-loop) var(--rh-ease) calc(400ms + var(--i) * 0ms) infinite both; }
+@keyframes rh-her { 0%, 2% { opacity: 0; translate: 0 6%; } 6%, 96% { opacity: 1; translate: 0 0; } 98.5%, 100% { opacity: 0; translate: 0 0; } }
+.her-light { position: absolute; inset: -20% -10% -10% 0; animation: rh-light var(--rh-loop) var(--rh-ease) infinite both; }
+@keyframes rh-light { 0%, 4% { opacity: 0; } 9%, 95% { opacity: 1; } 98%, 100% { opacity: 0; } }
 .her-glow {
   position: absolute;
-  left: 50%;
-  top: 52%;
-  width: 165%;
-  height: 150%;
+  left: 52%;
+  top: 55%;
+  width: 120%;
+  height: 120%;
   translate: -50% -50%;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0) 74%);
-  filter: blur(.17em);
-  opacity: .6;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0) 78%);
+  filter: blur(3cqw);
   animation: rh-glow 5s var(--rh-ease) infinite;
 }
-@keyframes rh-glow { 0%, 100% { opacity: .4; scale: 1; } 50% { opacity: .92; scale: 1.09; } }
-.rh-lede { margin-top: min(4.4cqw, 4cqh); font-size: min(4cqw, 2.6cqh); line-height: 1.55; max-width: 62ch; }
-.rh-lede sup { font-size: .62em; line-height: 0; }
+@keyframes rh-glow { 0%, 100% { opacity: .45; scale: 1; } 50% { opacity: .95; scale: 1.08; } }
+/* Słowa: cztery linie, pierwsza jasna, kolejne gasną; jedno słowo w górę co 2,1 s (1,4 s postoju + 0,7 s ruchu) */
 .rh-ticker {
-  --line: min(5.6cqw, 4.2cqh);
-  height: calc(var(--line) * 3.1);
-  margin-top: min(6.4cqw, 5.4cqh);
+  --line: 4.1cqh;
+  position: absolute;
+  left: 51cqw;
+  top: 72cqh;
+  height: calc(var(--line) * 4);
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 27%, rgba(0, 0, 0, .5) 54%, rgba(0, 0, 0, .19) 78%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0, #000 27%, rgba(0, 0, 0, .5) 54%, rgba(0, 0, 0, .19) 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 20%, rgba(0, 0, 0, .6) 38%, rgba(0, 0, 0, .32) 62%, rgba(0, 0, 0, .12) 86%, transparent);
+  mask-image: linear-gradient(180deg, #000 0, #000 20%, rgba(0, 0, 0, .6) 38%, rgba(0, 0, 0, .32) 62%, rgba(0, 0, 0, .12) 86%, transparent);
 }
 .rh-track { animation: rh-tick 6.3s infinite; }
-.rh-track span { height: var(--line); display: flex; align-items: center; white-space: nowrap; font-size: min(3.4cqw, 2.4cqh); font-weight: 700; letter-spacing: -.02em; }
-/* jedno słowo w górę: 1,4 s postoju + 0,7 s przewijania; po trzecim skok do identycznej klatki */
+.rh-track span { height: var(--line); display: flex; align-items: center; white-space: nowrap; font-size: 2.9cqw; font-weight: 700; letter-spacing: -.02em; }
 @keyframes rh-tick {
   0%, 22.22% { translate: 0 0; animation-timing-function: var(--rh-ease); }
   33.33%, 55.56% { translate: 0 calc(var(--line) * -1); animation-timing-function: var(--rh-ease); }
   66.67%, 88.89% { translate: 0 calc(var(--line) * -2); animation-timing-function: var(--rh-ease); }
   100% { translate: 0 calc(var(--line) * -3); }
 }
-/* Pasek: dryfujący gradient „her”, awatary, ładowanie 7 s (bez cytatu) */
-.rh-band {
-  position: relative;
-  flex: none;
-  padding: min(3.2cqh, 4cqw) 7cqw;
-  background-image: linear-gradient(120deg, #E3297D 0%, #72527B 25%, #9AA5C3 50%, #8D998D 75%, #FCC59C 100%);
-  background-size: 220% 220%;
-  animation: rh-drift 24s var(--rh-ease) infinite;
-}
-.rh-band::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(302deg, #FCC59C 0%, #8D998D 25%, #9AA5C3 50%, #72527B 75%, #E3297D 100%);
-  background-size: 250% 250%;
-  opacity: .35;
-  animation: rh-drift 34.8s var(--rh-ease) infinite reverse, rh-breathe 20.4s var(--rh-ease) infinite;
-}
-.rh-band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(238, 36, 59, 0) 30%, #EE243B 100%); }
-@keyframes rh-drift { 0%, 100% { background-position: 0% 50%; } 25% { background-position: 55% 18%; } 50% { background-position: 100% 50%; } 75% { background-position: 45% 82%; } }
-@keyframes rh-breathe { 0%, 100% { opacity: .24; } 50% { opacity: .6; } }
-.rh-row { position: relative; z-index: 2; display: flex; align-items: center; gap: min(2.6cqw, 3cqh); height: min(5.2cqh, 7cqw); font-size: min(3.4cqw, 2.4cqh); }
-.rh-avatars { display: flex; flex: none; animation: rh-swap 7s var(--rh-ease) infinite; }
-.rh-avatars img { width: min(7cqw, 5cqh); height: auto; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .9); margin-right: max(-11px, -2.3cqw); background: rgba(255, 255, 255, .25); object-fit: cover; }
-@keyframes rh-swap { 0%, 5.43% { opacity: 0; } 10.86%, 100% { opacity: 1; } }
-.rh-bar { flex: 0 0 min(19cqw, 190px); margin-left: auto; height: 9px; padding: 1.5px; border: 1.5px solid rgba(255, 255, 255, .85); border-radius: 99px; overflow: hidden; }
-.rh-bar span { display: block; height: 100%; border-radius: 99px; background: rgba(255, 255, 255, .95); transform-origin: left center; transform: scaleX(.72); animation: rh-bar 7s linear infinite; }
-@keyframes rh-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@container (max-height: 360px) { .rh-lede { display: none; } .rh-ticker { margin-top: 3cqh; } }

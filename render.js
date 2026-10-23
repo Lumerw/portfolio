@@ -68,6 +68,13 @@ const mono = img => {
   return on ? ' mono' : '';
 };
 
+// Język renderowanej strony (render) - okładki z napisem PL / EN (live.perLang) mają osobny plik dla EN.
+let LANG = 'pl';
+export const coverSrc = (p, fmt, lang = LANG) => {
+  const src = p.cover?.[fmt];
+  return src && lang === 'en' && p.live?.perLang ? src.replace(/(\.\w+)$/, '-en$1') : src;
+};
+
 // Tło w stylu marki projektu (projects[].brand): kolor + animowana aurora.
 const brandStyle = b => `--brand-bg:${esc(b.bg)};${b.aurora.map((c, i) => `--a${i + 1}:${esc(c)}`).join(';')};--brand-speed:${esc(b.speed || '26s')}`;
 
@@ -255,15 +262,15 @@ function sphere(c, t) {
     return `
           <span class="sphere__mark" style="--lon:${lon}deg;--lat:${lat}deg"><img class="${mono(src).trim()}" src="${esc(src)}" width="40" height="40" alt=""></span>`;
   }).join('');
-  // Karty jak dawny podgląd: teraz - plansza animowana (reel 4:5), loom.studio / reh.ab - pierwsza klatka
-  // grafiki interaktywnej (cover), nad którą main.js wstawia żywą grafikę. Gra tylko karta z przodu.
+  // Karty: okładka projektu (cover, pierwsza klatka okładki z live.js), nad którą main.js wstawia żywą
+  // mikroanimację; bez okładki - plansza reel (lite). Gra tylko karta z przodu.
   // Na karcie leży też logo projektu (sphereLogo): poza sekcją Portfolio sfera pokazuje same logo,
   // karta pojawia się po najechaniu (main.js: .home__sphere.is-cards w sekcji Portfolio).
   const cards = c.projects.map((p, i) => {
-    const inner = p.reel
-      ? reel(p, t.projects[p.id], '4x5', { decorative: true, lite: true })
-      : p.cover
-        ? `<img src="${esc(p.cover.card ?? p.cover['4x5'])}" width="1080" height="1350" alt="" loading="lazy" decoding="async">`
+    const inner = p.cover
+      ? `<img src="${esc(coverSrc(p, 'card') ?? coverSrc(p, '4x5'))}" width="1080" height="1350" alt="" loading="lazy" decoding="async">`
+      : p.reel
+        ? reel(p, t.projects[p.id], '4x5', { decorative: true, lite: true })
         : image(p.images.a, '', '240px', { widths: c.imageWidths });
     return `
           <a class="sphere__card${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" tabindex="-1" style="--lon:${Math.round((360 / n) * i)}deg;--lat:${CARD_LAT[i % CARD_LAT.length]}deg">
@@ -339,7 +346,7 @@ function promo(p, tp, t) {
           ${reel(p, tp, fmt)}${open}
         </figure>`;
   }
-  const cover = p.cover?.[fmt];
+  const cover = coverSrc(p, fmt);
   const brandPoster = p.brand
     ? `<div class="brand" style="${brandStyle(p.brand)}" role="img" aria-label="${esc(tp.alt.video)}"><img class="brand__logo${mono(p.logo)}" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt=""></div>`
     : null;
@@ -657,6 +664,7 @@ function agent(c, t) {
 }
 
 export function render(content, lang) {
+  LANG = lang;
   const c = content.shared, t = content[lang];
   return `${header(c, t)}
 <div class="home wrap">

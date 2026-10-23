@@ -13,6 +13,7 @@ import { serve } from './serve.mjs';
 import { content } from '../content.js';
 import { covers } from './covers.mjs';
 import { liveMarkup } from '../live.js';
+import { coverSrc } from '../render.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 8095;
@@ -47,13 +48,16 @@ for (const p of content.shared.projects) {
   // Strona: plansze w trzech formatach (tylko projekty z polem cover - teraz ma planszę animowaną).
   // Projekt z grafiką interaktywną (live): cover = jej stan końcowy bez ruchu, ta sama kompozycja.
   if (p.cover) {
-    for (const [fmt, size] of Object.entries(FORMATS)) {
-      if (!p.cover[fmt]) continue;
-      // live.js wskazuje zasoby od katalogu strony (import.meta.url = file:// w Node) - tu ten sam katalog przez serwer
-      const coverHtml = p.live ? sz => page(liveMarkup(p, { static: true, lite: fmt === 'card' }).replaceAll(new URL('../', import.meta.url).href, `http://localhost:${PORT}/`), sz) : html;
-      const out = join(root, p.cover[fmt]);
-      await sharp(await shoot(coverHtml(size), size)).webp({ quality: 80, smartSubsample: true }).toFile(out);
-      console.log(`✓ ${p.cover[fmt]}`);
+    // live.perLang (loom.studio: napis PL / EN): osobna klatka dla każdego języka (…-en.webp)
+    for (const lang of p.live?.perLang ? ['pl', 'en'] : ['pl']) {
+      for (const [fmt, size] of Object.entries(FORMATS)) {
+        if (!p.cover[fmt]) continue;
+        // live.js wskazuje zasoby od katalogu strony (import.meta.url = file:// w Node) - tu ten sam katalog przez serwer
+        const coverHtml = p.live ? sz => page(liveMarkup(p, { static: true, lite: fmt === 'card', lang }).replaceAll(new URL('../', import.meta.url).href, `http://localhost:${PORT}/`), sz) : html;
+        const src = coverSrc(p, fmt, lang);
+        await sharp(await shoot(coverHtml(size), size)).webp({ quality: 80, smartSubsample: true }).toFile(join(root, src));
+        console.log(`✓ ${src}`);
+      }
     }
   }
 

@@ -8,8 +8,7 @@
 // Strony: okładka (układ i proporcje hero strony na desktopie: awatar, imię, hasło, akapit, przyciski; „kontakt” → mail,
 // „umów rozmowę” → kalendarz na stronie) · projekty (kadr 4:5 + opis, jak panel projektu) · kontakt (jak sekcja
 // Kontakt). Sfera przycięta krawędzią - w tym samym miejscu na okładce i na stronie kontaktu. Kadry projektów:
-// zrzuty z paneli strony (teraz - samo logo na środku planszy, loom.studio i reh.ab - pierwsza klatka grafiki),
-// zapisywane w private/pdf/ (poza repozytorium).
+// statyczne okładki projektów (cover-4x5, npm run covers - pierwsza klatka okładek z live.js; loom.studio w języku PDF).
 // Kontrola: 5 stron, nic poza kadrem, linki, rozmiar < 8 MB.
 import { chromium } from 'playwright';
 import { mkdir, readFile, stat } from 'node:fs/promises';
@@ -17,7 +16,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
 import { content } from '../content.js';
-import { clean, DRIVE_D } from '../render.js';
+import { clean, DRIVE_D, coverSrc } from '../render.js';
 import { sphere } from './sphere-svg.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -25,7 +24,6 @@ const PORT = 8093;
 const EXPECTED_PAGES = 5;   // okładka, 3 projekty, kontakt
 const MAX_BYTES = 8 * 1024 * 1024;
 const FORMATS = { '16x9': [1920, 1080], '9x16': [1080, 1920] };
-const SHOTS = 'private/pdf';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isReal = v => !!v && !String(v).includes('[');
@@ -89,7 +87,7 @@ function doc(lang, fmt, dark) {
   <section class="page">
     <header class="bar"><img src="${esc(p.sygnet.src)}" alt=""><span>${num(i)}</span><span>${esc(p.type)}</span><span class="bar__right">${counter(i + 2)}</span></header>
     <div class="pj">
-      <figure class="pj__media"><img src="${SHOTS}/${p.id}.jpg" alt=""></figure>
+      <figure class="pj__media"><img src="${esc(coverSrc(p, '4x5', lang))}" alt=""></figure>
       <div class="pj__info">
         <h2 class="pj__title">${esc(p.title)}${p.beta ? ' <span class="beta">beta</span>' : ''}</h2>
         <p class="pj__tagline">${esc(tp.tagline)}</p>
@@ -105,7 +103,7 @@ function doc(lang, fmt, dark) {
   const contact = `
   <section class="page">
     ${globe}
-    <header class="bar"><span>${esc(c.name)}</span><span class="bar__right">${counter(total)}</span></header>
+    <header class="bar"><span class="bar__right">${counter(total)}</span></header>
     <div class="contact">
       <h2 class="contact__title">${esc(t.contact.title)}</h2>
       <p class="contact__mail"><a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
@@ -135,44 +133,10 @@ function doc(lang, fmt, dark) {
 </html>`;
 }
 
-/* Kadry projektów 4:5 z paneli strony (2x): teraz - plansza animacji z samym logo na środku (bez hasła, legendy
-   i rozmowy), reszta - pierwsza klatka (cover). */
-async function shots(browser) {
-  await mkdir(join(root, SHOTS), { recursive: true });
-  for (const p of content.shared.projects) {
-    const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 2, reducedMotion: p.reel ? 'no-preference' : 'reduce' });
-    await ctx.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch {} });
-    const page = await ctx.newPage();
-    await page.goto(`http://localhost:${PORT}/#${p.id}`, { waitUntil: 'networkidle' });
-    await page.evaluate(async () => { await document.fonts.ready; });
-    await page.waitForTimeout(900);
-    await page.evaluate(id => {
-      for (const a of document.getAnimations()) {
-        const el = a.effect?.target;
-        if (el?.closest?.(`#${id} .reel`)) { a.pause(); a.currentTime = 0; }
-      }
-      document.querySelector(`#${id} .reel__toggle`)?.remove();
-      // teraz: tylko tło marki i logo na środku kadru
-      const stage = document.querySelector(`#${id} .sheet__video > .reel .reel__stage`);
-      const logo = stage?.querySelector('.reel__logo');
-      if (logo) {
-        for (const el of stage.children) if (el !== logo) el.style.display = 'none';
-        logo.getAnimations().forEach(a => a.cancel());
-        Object.assign(logo.style, { animation: 'none', top: '50%', left: '50%', translate: '-50% -50%', scale: '1', transform: 'none', opacity: '1' });
-      }
-    }, p.id);
-    await page.waitForTimeout(200);
-    // sama grafika (bez ramki figury i jej obwódki): plansza teraz albo statyczna klatka
-    await page.locator(`#${p.id} .sheet__video > .reel, #${p.id} .sheet__video > img`).first().screenshot({ path: join(root, SHOTS, `${p.id}.jpg`), type: 'jpeg', quality: 88 });
-    await ctx.close();
-  }
-}
-
 const server = await serve(PORT);
 const browser = await chromium.launch().catch(() => chromium.launch({ channel: 'chrome' }));
 let failed = false;
 await mkdir(join(root, 'pdf'), { recursive: true });
-await shots(browser);
 
 for (const lang of ['pl', 'en']) {
   for (const fmt of Object.keys(FORMATS)) {
