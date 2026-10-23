@@ -96,7 +96,7 @@
 .lm-word { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .lm-word--ink { clip-path: inset(0 0 var(--band) 0); }
 .lm-word--paper { clip-path: inset(calc(100% - var(--band)) 0 0 0); }
-.lm-word img { position: absolute; left: calc(5.3cqw + 4cqw); bottom: 5.5cqh; width: 26cqw; height: auto; transform-origin: 0 100%; rotate: -90deg; }
+.lm-word img { padding: 1px; position: absolute; left: calc(5.3cqw + 4cqw); bottom: 5.5cqh; width: 26cqw; height: auto; transform-origin: 0 100%; rotate: -90deg; }
 /* Kompozycja 179 × 138 z loom.studio, skalowana do ramki; ciała w % jej boków */
 .bauhaus {
   --snappy: linear(0, .2 6%, .62 14%, .98 24%, 1.08 31%, 1.06 40%, 1 52%, .99 66%, 1);
@@ -133,16 +133,16 @@
   font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-.rh-h { position: absolute; left: 4cqw; top: 13.5cqh; margin: 0; white-space: nowrap; font-size: 13cqw; font-weight: 700; line-height: 1; letter-spacing: -.09em; }
-.rh-h .ch { display: inline-block; font-style: normal; position: relative; animation: rh-ch var(--rh-loop) linear calc(var(--i) * 26ms) infinite both; }
+/* „Make an impact toget” = 10,17 em (Helvetica / Arial Bold) + 3 spacje × .1 em; przy 12,2cqw i odstępie
+   -.138 em pudełko ma 94cqw - od 4cqw do prawej krawędzi mieści się całe „toget” */
+.rh-h { position: absolute; left: 4cqw; top: 15cqh; margin: 0; white-space: nowrap; font-size: 12.2cqw; font-weight: 700; line-height: 1; letter-spacing: -.138em; word-spacing: .1em; }
+.rh-h .ch { display: inline-block; font-style: normal; color: rgb(255 255 255 / var(--a)); animation: rh-ch var(--rh-loop) linear calc(var(--i) * 26ms) infinite both, rh-fade var(--rh-loop) var(--rh-ease) infinite both; }
 @keyframes rh-ch { 0% { opacity: 0; } 1.14% { opacity: 1; } 96% { opacity: 1; } 97.2%, 100% { opacity: 0; } }
-.rh-h .d1 { opacity: .66; animation: rh-d1 var(--rh-loop) var(--rh-ease) infinite both; }
-.rh-h .d2 { opacity: .3;  animation: rh-d2 var(--rh-loop) var(--rh-ease) infinite both; }
-@keyframes rh-d1 { 0%, 4.1% { opacity: 1; } 11.7%, 100% { opacity: .66; } }
-@keyframes rh-d2 { 0%, 4.1% { opacity: 1; } 11.7%, 100% { opacity: .3; } }
+/* po napisaniu „impact toget” gaśnie od bieli do swojego --a (gradient ku prawej) */
+@keyframes rh-fade { 0%, 4.1% { color: #fff; } 11.7%, 100% { color: rgb(255 255 255 / var(--a)); } }
 .rh-her { position: absolute; left: -2.2cqw; bottom: 16.5cqh; margin: 0; font-size: 26cqw; font-weight: 700; line-height: .8; letter-spacing: -.08em; white-space: nowrap; }
 .her-word { position: relative; z-index: 1; }
-.her-word .ch { display: inline-block; font-style: normal; animation: rh-her var(--rh-loop) var(--rh-ease) calc(400ms + var(--i) * 0ms) infinite both; }
+.her-word .ch { display: inline-block; font-style: normal; animation: rh-her var(--rh-loop) var(--rh-ease) 400ms infinite both; }
 @keyframes rh-her { 0%, 2% { opacity: 0; translate: 0 6%; } 6%, 96% { opacity: 1; translate: 0 0; } 98.5%, 100% { opacity: 0; translate: 0 0; } }
 .her-light { position: absolute; inset: -20% -10% -10% 0; animation: rh-light var(--rh-loop) var(--rh-ease) infinite both; }
 @keyframes rh-light { 0%, 4% { opacity: 0; } 9%, 95% { opacity: 1; } 98%, 100% { opacity: 0; } }

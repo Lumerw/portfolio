@@ -755,7 +755,9 @@ img.recs__avatar { border-color: var(--hair); object-fit: cover; background: var
    Najechanie na logo = w jego miejscu pojawia się karta; klik otwiera panel projektu.
    .home__sphere.is-cards (sekcja Portfolio, main.js) = karty jak dotąd, logo schowane. */
 .sphere__logo { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: opacity var(--t-swap) var(--ease); }
-.sphere__logo img { width: calc(var(--ls, .8) * 100%); height: auto; object-fit: contain; }
+/* padding: przezroczysty brzeg obrazka - przy obrocie sfery GPU rozciąga skrajne piksele tekstury (Chromium),
+   a logo przy samej krawędzi (loom.studio) zostawiało wtedy pionowe „paski” z liter */
+.sphere__logo img { width: calc(var(--ls, .8) * 100%); height: auto; object-fit: contain; padding: 4px; }
 .sphere__card { transition: background-color var(--t-swap) var(--ease), outline-color var(--t-swap) var(--ease); }
 .sphere__media, .sphere__tag { transition: opacity var(--t-swap) var(--ease); }
 .home__sphere:not(.is-cards) .sphere__card:not(:hover) { background: transparent; outline-color: transparent; }

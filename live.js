@@ -323,18 +323,23 @@ function startLoom(root) {
 /* ==========================================================================
    reh.ab - hero w pętli (cały ruch w CSS, sekcja „Interaktywne plansze” w styles.css)
    ========================================================================== */
+// Nagłówek „Make an impact toget” w jednej linii, ściśnięty do szerokości kadru (rozmiar i odstępy w live.css,
+// liczone na metryce Helvetica = Arial), pod spodem wielkie „her” - razem „together”.
+// Litery: --i = kolejność pisania (26 ms na znak), --a = krycie po napisaniu („impact toget” gaśnie ku prawej).
 function rehabMarkup(p) {
   const L = p.live;
-  let n = 0;
-  // Nagłówek litera po literze (--i = kolejność pisania, 26 ms na znak); „her” osobno, wielkie, z poświatą
-  const chars = str => [...str].map(ch => (ch === ' ' ? ' ' : `<i class="ch" style="--i:${n++}">${esc(ch)}</i>`)).join('');
   const [lead, dim1, dim2, her] = L.title;
-  const h = `${chars(lead)} <span class="d1">${chars(dim1)}</span> <span class="d2">${chars(dim2)}</span>`;
+  const dim = [...`${dim1}${dim2}`].length;
+  let n = 0, k = 0;
+  const glyph = (ch, a) => (ch === ' ' ? ' ' : `<i class="ch" style="--i:${n++};--a:${a}">${esc(ch)}</i>`);
+  const fade = ch => glyph(ch, (1 - .62 * (k++ / (dim - 1))).toFixed(3));
+  const line = `${[...lead].map(ch => glyph(ch, 1)).join('')} ${[...dim1].map(fade).join('')} ${[...dim2].map(fade).join('')}`;
+  const herChars = [...her].map(ch => `<i class="ch">${esc(ch)}</i>`).join('');
   // 4 widoczne linie, przesuw o 3 słowa i skok do identycznej klatki: lista + jej powtórka + pierwsze słowo
   const ticker = [...L.ticker, ...L.ticker, L.ticker[0]].map(w => `<span>${esc(w)}</span>`).join('');
   return `
-          <p class="rh-h">${h}</p>
-          <p class="rh-her"><span class="her-light"><span class="her-glow"></span></span><span class="her-word">${chars(her)}</span></p>
+          <p class="rh-h">${line}</p>
+          <p class="rh-her"><span class="her-light"><span class="her-glow"></span></span><span class="her-word">${herChars}</span></p>
           <div class="rh-ticker"><div class="rh-track">${ticker}</div></div>`;
 }
 
