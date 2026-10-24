@@ -256,6 +256,10 @@ function sphere(c, t) {
     return `
           <span class="sphere__ring sphere__ring--lat${lat === 0 ? ' sphere__ring--eq' : ''}" style="--r:${r.toFixed(4)};--y:${y.toFixed(4)}"></span>`;
   }).join('');
+  // Trzy osie (X, Y, Z) przez środek - cienkie linie zaznaczające trójwymiarowość. Każda oś = dwa paski
+  // obrócone o 90° wokół własnej długości, więc nie znika, gdy patrzy się na nią z boku.
+  const axes = ['', 'rotateZ(90deg) ', 'rotateY(90deg) '].flatMap(dir => [dir, `${dir}rotateX(90deg)`]).map(t => `
+          <span class="sphere__axis" style="--t:${t.trim() || 'none'}"></span>`).join('');
   // Znaki kreską z brandbooka (shared.icons) rozsiane między kartami - sfera „z moich linii”
   const marks = SPHERE_MARKS.map(([lon, lat], i) => {
     const src = c.icons[i % Math.min(6, c.icons.length)];   // tylko znaki kreską 01-06
@@ -283,7 +287,7 @@ function sphere(c, t) {
   <div class="home__sphere" aria-hidden="true">
     <div class="sphere" data-sphere>
       <div class="sphere__world" style="--rx:-12deg;--ry:0deg">${meridians}${parallels}
-          <span class="sphere__dot"></span>${marks}${cards}
+${axes}${marks}${cards}
       </div>
     </div>
     <p class="sphere__hint t-meta">${esc(t.ui.sphereHint)}</p>
