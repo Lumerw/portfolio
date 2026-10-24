@@ -133,7 +133,7 @@ export const shared = {
       logo:   { src: 'assets/teraz/wordmark-white.svg', w: 575, h: 178, mono: false },
       sygnet: { src: 'assets/teraz/sygnet.svg', mono: false },
       // Logo na sferze (strona główna, poza sekcją Portfolio): jednokolorowe, tuszem
-      sphereLogo: { src: 'assets/teraz/wordmark-ink.svg', w: 575, h: 178, size: .6 },
+      sphereLogo: { src: 'assets/teraz/wordmark-ink-sphere.svg', w: 635, h: 238, size: .663 },   // z przezroczystym marginesem w pliku (bez pasków przy obrocie sfery)
       // Tło podglądu w stylu marki: czerń + animowana aurora (gradienty z teraz.eu, 26 s).
       brand: {
         bg: '#000000',
@@ -169,7 +169,7 @@ export const shared = {
       // Logo (Haus w krzywych) i sygnet - trzy figury Bauhausu - z brand kitu loom.studio (repozytorium loomstudio)
       logo:   { src: 'assets/loom/logo.svg', w: 453, h: 70 },
       sygnet: { src: 'assets/loom/sygnet.svg', mono: false },
-      sphereLogo: { src: 'assets/loom/logo.svg', w: 453, h: 70, size: .78 },
+      sphereLogo: { src: 'assets/loom/logo-sphere.svg', w: 481, h: 98, size: .828 },   // z przezroczystym marginesem w pliku (bez pasków przy obrocie sfery)
       // Okładka (live.js): papier, trzy figury Bauhausu na środku (fizyka z loom.studio), na dole pas gradientu
       // z hero, z boku pionowe logo, u góry PL / EN (język strony) i znak trybu. perLang: osobna klatka PL i EN.
       live: { perLang: true },
