@@ -86,7 +86,7 @@
 .lv-flow:has(> .lv-canvas[data-live]) > .og { visibility: hidden; transition: visibility 0s linear 450ms; }
 
 .lv-paper { position: absolute; inset: 0 0 var(--band) 0; container-type: size; }
-.lm-lang { position: absolute; left: 5.3cqw; top: 4.6cqw; font: 700 5.2cqw/1 Futura, "Avenir Next", "Helvetica Neue", Arial, sans-serif; letter-spacing: -.01em; z-index: 2; }
+.lm-lang { position: absolute; left: 5.3cqw; top: 5.3cqw; height: 3.75cqw; width: auto; fill: currentColor; z-index: 2; }   /* Haus Bold w krzywych, wysokość wersalika */
 .lm-mode { position: absolute; right: 6.2cqw; top: 4.3cqw; width: 5.4cqw; height: 5.4cqw; z-index: 2; }
 /* Logo pionowo (czytane od dołu): obrót wokół lewego dolnego rogu; tuszem nad pasem, papierem na pasie */
 .lm-word { position: absolute; inset: 0; z-index: 2; pointer-events: none; }

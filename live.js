@@ -59,6 +59,11 @@ function tiles() {
   }).join('');
 }
 
+// PL / EN krojem Haus Bold (krój loom.studio) - w krzywych, jak logo (bez pliku fontu); jednostki fontu, wersalik 700
+const HAUS = {
+  pl: { w: 917, d: 'M217 434H111V700H0V0H217Q262 0 301.5 17.0Q341 34 371.0 63.5Q401 93 418.0 132.5Q435 172 435 217Q435 262 418.0 301.5Q401 341 371.0 370.5Q341 400 301.5 417.0Q262 434 217 434ZM217 323Q239 323 258.5 314.5Q278 306 292.5 292.0Q307 278 315.5 258.5Q324 239 324 217Q324 195 315.5 175.5Q307 156 292.5 142.0Q278 128 258.5 119.5Q239 111 217 111H111V323ZM837 700H515V0H626V589H837V700Z' },
+  en: { w: 977, d: 'M302 370H111V589H350V700H0V0H350V111H111V259H302ZM541 700H430V0L785 405V0H897V700L541 295V700Z' },
+};
 // Znak trybu (koło, lewa połowa wypełniona) jak w nagłówku loom.studio
 const MODE = '<svg class="lm-mode" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.25" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 1.75a10.25 10.25 0 0 0 0 20.5z" fill="currentColor"/></svg>';
 
@@ -71,7 +76,7 @@ function loomMarkup(p, { lang = 'pl' } = {}) {
   const word = tone => `<span class="lm-word lm-word--${tone}"><img src="${abs(`assets/deck/loom-logo-${tone}.svg`)}" width="4531" height="700" alt=""></span>`;
   return `
           <div class="lv-flow"><div class="og">${blobs}<span class="og-grain"></span></div></div>
-          <span class="lm-lang">${lang === 'en' ? 'EN' : 'PL'}</span>${MODE}
+          ${(({ w, d }) => `<svg class="lm-lang" viewBox="0 0 ${w} 700" aria-hidden="true"><path d="${d}"/></svg>`)(HAUS[lang === 'en' ? 'en' : 'pl'])}${MODE}
           ${word('ink')}${word('paper')}
           <div class="lv-paper">
             <div class="bauhaus">
