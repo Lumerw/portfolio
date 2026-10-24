@@ -275,9 +275,9 @@ export const pl = {
   },
   projects: {
     teraz: {
-      meta: ['projekt produktu', 'UX/UI', 'identyfikacja', 'development z AI'], // [potwierdź]
+      meta: ['produkt', 'UX/UI', 'identyfikacja', 'kod z AI'], // [potwierdź] - zakres w jednej linii panelu
       tagline: 'marketplace dla ekspertów z branży kreatywnej', // krótki opis pod podglądem
-      lead: 'Tu i teraz znajdziesz eksperta z Twojej branży. MVP platformy: rozmowy wideo 1:1 z ekspertami z 5+ lat praktyki, płatność przez Escrow i społeczność.',
+      lead: 'Tu i teraz znajdziesz eksperta z Twojej branży. MVP platformy: rozmowy wideo 1:1, płatność przez Escrow i społeczność.',
       // Plansza animowana (reel, 15 s): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat.
       // Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
       reel: {
@@ -310,7 +310,7 @@ export const pl = {
       },
     },
     loom: {
-      meta: ['założyciel', 'identyfikacja', 'projekt strony w Figmie', 'wdrożenie'], // [potwierdź]
+      meta: ['założyciel', 'identyfikacja', 'strona', 'wdrożenie'], // [potwierdź] - zakres w jednej linii panelu
       tagline: 'studio projektowe w systemie subskrypcji', // krótki opis pod podglądem
       lead: 'Jedna stała opłata miesięczna, kolejne zadania projektowe bez osobnych wycen. Strona, identyfikacja i panel klienta na Stripe.',
       problem: '[Problem: 2-3 zdania.]',
@@ -418,8 +418,8 @@ export const pl = {
     site: 'portfolio online',
     projects: {
       teraz: { facts: ['rozmowy wideo 1:1, 30 albo 60 minut', 'eksperci z 5+ lat praktyki', 'darmowe konto, płatność przez Escrow', '0% prowizji w becie'] },
-      loom: { facts: ['subskrypcja: jedno zadanie naraz, średnio 48 godzin', 'płatności i panel klienta na Stripe', 'rezerwacje rozmów przez Calendly', 'asystent AI na stronie, wersje PL i EN'] },
-      rehab: { facts: ['wsparcie zdrowia psychicznego tam, gdzie są gracze', 'serwery z psychologiem lub psychiatrą, który gra', '12-tygodniowy pilotaż z 4 miarami sukcesu', 'WCAG 2.2 AA, każda liczba ze źródłem'] },
+      loom: { facts: ['jedno zadanie naraz, średnio 48 godzin', 'płatności i panel klienta na Stripe', 'rezerwacje rozmów przez Calendly', 'asystent AI na stronie, wersje PL i EN'] },
+      rehab: { facts: ['wsparcie psychiczne tam, gdzie są gracze', 'serwery z psychologiem, który sam gra', '12-tygodniowy pilotaż z 4 miarami sukcesu', 'WCAG 2.2 AA, każda liczba ze źródłem'] },
     },
   },
 
@@ -430,7 +430,7 @@ export const pl = {
     get: 'Dostajesz:',
     steps: [
       { title: 'Discovery', text: '30 minut rozmowy, w czasie której ustalimy, jak rozwiązać Twój problem.', result: 'feedback, wycenę i plan' },
-      { title: 'Projektowanie', text: 'Moodboard i projekty zgodne z briefem.', result: 'gotowe projekty i spójny system' },
+      { title: 'Projektowanie', text: 'Moodboard i projekty zgodne z briefem.', result: 'gotowy design i spójny system' },
       { title: 'Wdrożenie', text: 'Testowanie kreacji w wybranej technologii.', result: 'w pełni działający design' },
     ],
   },
@@ -569,9 +569,9 @@ export const en = {
   },
   projects: {
     teraz: {
-      meta: ['product design', 'UX/UI', 'identity', 'AI-assisted development'],
+      meta: ['product', 'UX/UI', 'identity', 'AI-assisted build'],   // zakres w jednej linii panelu
       tagline: 'a marketplace for experts from the creative industry', // krótki opis pod podglądem
-      lead: 'Find an expert from your industry, here and now. The platform MVP: 1:1 video calls with experts with 5+ years of practice, Escrow payments and a community.',
+      lead: 'Find an expert from your industry, here and now. The platform MVP: 1:1 video calls, Escrow payments and a community.',
       // Plansza animowana (reel, 15 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
         label: 'teraz - a base of creative industry experts. Looking for an expert? Find one here, with 5+ years of practice. Or become one yourself: share what you know and earn from your calls. One community of listeners and experts - you can be both. A 1:1 call with an expert, video, 30 or 60 minutes. Let’s talk here and now.',
@@ -709,8 +709,8 @@ export const en = {
     site: 'portfolio online',
     projects: {
       teraz: { facts: ['1:1 video calls, 30 or 60 minutes', 'experts with 5+ years of practice', 'free account, payment via Escrow', '0% commission in beta'] },
-      loom: { facts: ['subscription: one task at a time, 48 hours on average', 'Stripe payments and client portal', 'calls booked through Calendly', 'AI assistant on the site, PL and EN versions'] },
-      rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist or psychiatrist who plays', 'a 12-week pilot with 4 success measures', 'WCAG 2.2 AA, every number sourced'] },
+      loom: { facts: ['one task at a time, 48 hours on average', 'Stripe payments and client portal', 'calls booked through Calendly', 'AI assistant on the site, PL and EN versions'] },
+      rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist who plays', 'a 12-week pilot with 4 success measures', 'WCAG 2.2 AA, every number sourced'] },
     },
   },
 
@@ -719,7 +719,7 @@ export const en = {
     get: 'You get:',
     steps: [
       { title: 'Discovery', text: 'A 30-minute call where we figure out how to solve your problem.', result: 'feedback, a quote and a plan' },
-      { title: 'Design', text: 'A moodboard and designs that follow the brief.', result: 'finished designs and a consistent system' },
+      { title: 'Design', text: 'A moodboard and designs that follow the brief.', result: 'finished design and a consistent system' },
       { title: 'Launch', text: 'Testing the creative in your chosen technology.', result: 'a fully working design' },
     ],
   },

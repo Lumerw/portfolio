@@ -16,6 +16,11 @@
   animation: live-in 400ms var(--ease) both;
 }
 @keyframes live-in { from { opacity: 0; } }
+/* Grafika przepuszcza kursor (klik w kadr = link do strony projektu pod spodem); figury loom.studio go łapią -
+   w panelu leżą nad tym linkiem (.sheet__open), więc reagują na najechanie jak na loom.studio i na sferze */
+.live { pointer-events: none; }
+.sheet__video .live--loom { z-index: 4; }
+.live--loom .bh-body { pointer-events: auto; }
 .is-cards .sphere__card.is-active .live,
 .home__sphere:not(.is-cards) .sphere__card:hover .live,
 .sheet:target .live { --live-play: running; }
