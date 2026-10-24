@@ -325,15 +325,14 @@ function startLoom(root) {
    ========================================================================== */
 // Nagłówek „Make an impact toget” w jednej linii, ściśnięty do szerokości kadru (rozmiar i odstępy w live.css,
 // liczone na metryce Helvetica = Arial), pod spodem wielkie „her” - razem „together”.
-// Litery: --i = kolejność pisania (26 ms na znak), --a = krycie po napisaniu („impact toget” gaśnie ku prawej).
+// Litery pełne białe (--i = kolejność pisania, 26 ms na znak); „impact toget” gaśnie ku prawej jedną maską na całej
+// grupie - litery nachodzą na siebie, więc krycie na literę dawałoby ciemniejsze zakładki.
 function rehabMarkup(p) {
   const L = p.live;
   const [lead, dim1, dim2, her] = L.title;
-  const dim = [...`${dim1}${dim2}`].length;
-  let n = 0, k = 0;
-  const glyph = (ch, a) => (ch === ' ' ? ' ' : `<i class="ch" style="--i:${n++};--a:${a}">${esc(ch)}</i>`);
-  const fade = ch => glyph(ch, (1 - .62 * (k++ / (dim - 1))).toFixed(3));
-  const line = `${[...lead].map(ch => glyph(ch, 1)).join('')} ${[...dim1].map(fade).join('')} ${[...dim2].map(fade).join('')}`;
+  let n = 0;
+  const glyphs = str => [...str].map(ch => (ch === ' ' ? ' ' : `<i class="ch" style="--i:${n++}">${esc(ch)}</i>`)).join('');
+  const line = `${glyphs(lead)} <span class="rh-dim">${glyphs(`${dim1} ${dim2}`)}</span>`;
   const herChars = [...her].map(ch => `<i class="ch">${esc(ch)}</i>`).join('');
   // 4 widoczne linie, przesuw o 3 słowa i skok do identycznej klatki: lista + jej powtórka + pierwsze słowo
   const ticker = [...L.ticker, ...L.ticker, L.ticker[0]].map(w => `<span>${esc(w)}</span>`).join('');

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
 import { buildQr } from './build-qr.mjs';
 import { content } from '../content.js';
-import { clean } from '../render.js';
+import { clean, coverSrc } from '../render.js';
 import { covers } from './covers.mjs';
 import { symbol } from '../symbols.js';
 
@@ -60,7 +60,7 @@ function deck(lang) {
     return `
     <section class="slide" id="s-${p.id}">
       ${projectTop(p, i, n)}
-      <figure class="frame">${covers[p.id](p, tp)}</figure>
+      <figure class="frame${p.cover ? ' frame--cover' : ''}">${p.cover ? `<img src="${esc(coverSrc(p, '4x5', lang))}" alt="">` : covers[p.id](p, tp)}</figure>
       <p class="caption"><span>${esc(p.title)} - ${esc(tp.tagline)}</span>${visit(p)}</p>
     </section>
     <section class="slide" id="s-${p.id}-o">

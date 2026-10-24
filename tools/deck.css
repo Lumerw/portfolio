@@ -58,6 +58,9 @@ ul { list-style: none; }
 /* 2. Plansza projektu: ramka (jak podgląd na stronie) + podpis */
 .frame { position: relative; flex: 1; margin-top: 32px; overflow: hidden; container-type: size; }
 .frame::after { content: ""; position: absolute; inset: 0; border: 1px solid var(--hair); pointer-events: none; }
+/* okładka projektu (cover-4x5 - ta sama co na sferze i w PDF portfolio): kadr 4:5 na wysokość, na środku */
+.frame--cover { flex: 1 1 0; min-height: 0; aspect-ratio: 4 / 5; align-self: center; }
+.frame--cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .caption { display: flex; align-items: baseline; gap: 24px; margin-top: 22px; font-size: 22px; flex: none; }
 .caption > :last-child { margin-left: auto; white-space: nowrap; }
 /* 3. Szczegóły: tytuł, lead, zrzuty desktop + telefon, zakres i fakty */
