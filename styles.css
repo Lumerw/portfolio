@@ -1580,6 +1580,52 @@ html:has(.sheet:target) { overflow: hidden; }
    Etykieta sekcji w kolumnach 1-3, treść 4-12; na telefonie jedna kolumna.
    ========================================================================== */
 .bb { padding-bottom: var(--s-8); }
+/* Generator znaków (generator.js) - jak blobmaker.app, w stylu strony: pole ze znakiem (zawsze jasne, jak kartka),
+   pod nim pasek z kreską 1 px: kolor, złożoność, styl, pobierz / kod / losuj */
+.gen { padding-bottom: var(--s-8); margin-bottom: var(--s-6); border-bottom: var(--hairline) solid var(--hair); }
+.gen__intro { max-width: 34em; margin-top: var(--s-1); }
+.gen__stage {
+  width: min(100%, 440px);
+  aspect-ratio: 1;
+  margin: var(--s-4) auto 0;
+  background: #FAFAF7;
+  outline: var(--hairline) dashed var(--ink-4);
+  outline-offset: -1px;
+}
+.gen__stage svg { display: block; width: 100%; height: 100%; }
+.gen__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  max-width: 880px;
+  margin: var(--s-4) auto 0;
+  padding: var(--s-2) var(--s-3);
+  border: var(--hairline) solid var(--ink-4);
+}
+.gen__color { display: inline-flex; align-items: center; gap: var(--s-1); padding: 6px 6px 6px var(--s-2); border: var(--hairline) solid var(--hair); }
+.gen__color input[type="text"] { width: 8.5ch; border: 0; background: none; color: var(--ink); font: inherit; font-size: var(--fs-meta); letter-spacing: .04em; text-transform: uppercase; outline: none; }
+.gen__swatch { position: relative; width: 24px; height: 24px; border-radius: 50%; background: var(--gen-c); box-shadow: 0 0 0 var(--hairline) var(--hair); }
+.gen__swatch input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+.gen__color:focus-within { border-color: var(--ink); }
+.gen__range { flex: 1 1 200px; display: flex; align-items: center; gap: var(--s-1); color: var(--ink-2); }
+.gen__range .icon { width: 18px; height: 18px; flex: none; }
+.gen__range input { flex: 1; min-width: 80px; height: 24px; margin: 0; background: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
+.gen__range input::-webkit-slider-runnable-track { height: 1px; background: var(--ink-4); }
+.gen__range input::-moz-range-track { height: 1px; background: var(--ink-4); }
+.gen__range input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -7.5px; border-radius: 50%; background: var(--ink); border: 0; }
+.gen__range input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: 0; }
+.gen__range input:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+.gen__actions { display: flex; gap: var(--s-1); margin-left: auto; }
+.gen__btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-1); min-width: 40px; height: 40px; padding-inline: 11px; border: var(--hairline) solid var(--ink); color: var(--ink); transition: background-color var(--t-line) var(--ease), color var(--t-line) var(--ease); }
+.gen__btn .icon { width: 16px; height: 16px; }
+.gen__btn--roll { padding-inline: var(--s-3); background: var(--ink); color: var(--paper); }
+.gen__btn[data-done] { background: var(--ink); color: var(--paper); }
+@media (hover: hover) {
+  .gen__btn:hover { background: var(--ink); color: var(--paper); }
+  .gen__btn--roll:hover { background: transparent; color: var(--ink); }
+}
+.gen__info { margin-top: var(--s-2); text-align: center; min-height: 1.5em; }
 .bb__intro { max-width: 34em; margin-bottom: var(--s-6); }
 .bb__sec {
   row-gap: var(--s-2);

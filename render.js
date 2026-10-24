@@ -491,10 +491,43 @@ function brandbook(c, t) {
       ${symbol('personal', { cls: 'sheet__symbol', small: true })}
       <h2 id="brandbook-title" class="t-project">${esc(t.ui.brandbook)}</h2>`;
   const body = `
-      <div class="bb">
+      <div class="bb">${generator(c, t)}
         <p class="bb__intro t-text">${esc(b.intro)}</p>${mark}${colors}${type}${symbols}${grid}${motion}${rules}
       </div>`;
   return sheet({ id: 'brandbook', cls: 'sheet--brandbook', bar, body, t });
+}
+
+// Generator znaków (generator.js) - jak blobmaker.app w stylu strony: pole ze znakiem i pasek: kolor (HEX + próbnik),
+// złożoność (trójkąt → wielokąt), styl (kwadrat → koło), pobierz SVG, kopiuj kod, losuj. Bez JS - samo pole z opisem.
+const genIcon = {
+  low: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3 13.5 12.5H2.5Z"/></svg>',
+  high: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.2 13.6 6.3 11.5 12.9H4.5L2.4 6.3Z" stroke-dasharray="2 1.6"/></svg>',
+  square: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10"/></svg>',
+  round: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/></svg>',
+  download: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg>',
+  code: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5"/></svg>',
+  dice: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11"/><circle cx="5.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="5.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/></svg>',
+};
+function generator(c, t) {
+  const g = t.brandbook.gen, G = c.generator;
+  if (!G?.bases?.length) return '';
+  return `
+        <section class="gen" aria-labelledby="gen-title" data-generator style="--gen-c:${esc(G.color)}">
+          <h3 id="gen-title" class="t-project gen__title">${esc(g.title)}</h3>
+          <p class="t-text t-muted gen__intro">${esc(g.intro)}</p>
+          <div class="gen__stage" data-gen-stage role="img" aria-label="${esc(g.title)}"></div>
+          <div class="gen__bar">
+            <label class="gen__color"><span class="visually-hidden">${esc(g.hex)}</span><input data-gen="hex" type="text" value="${esc(G.color.toUpperCase())}" maxlength="7" spellcheck="false" autocomplete="off"><span class="gen__swatch"><input data-gen="color" type="color" value="${esc(G.color)}" aria-label="${esc(g.color)}"></span></label>
+            <label class="gen__range">${genIcon.low}<span class="visually-hidden">${esc(g.complexity)}</span><input data-gen="complexity" type="range" min="0" max="100" value="45">${genIcon.high}</label>
+            <label class="gen__range">${genIcon.square}<span class="visually-hidden">${esc(g.style)}</span><input data-gen="style" type="range" min="0" max="100" value="75">${genIcon.round}</label>
+            <div class="gen__actions">
+              <button class="gen__btn" type="button" data-gen="download" aria-label="${esc(g.download)}">${genIcon.download}</button>
+              <button class="gen__btn" type="button" data-gen="code" aria-label="${esc(g.code)}">${genIcon.code}</button>
+              <button class="gen__btn gen__btn--roll" type="button" data-gen="roll">${genIcon.dice}<span>${esc(g.roll)}</span></button>
+            </div>
+          </div>
+          <p class="t-meta gen__info" data-gen="info" aria-live="polite"></p>
+        </section>`;
 }
 
 // Ikonka kopiowania: dwa przesunięte kwadraty, kreska 1 px — w stylu symboli.

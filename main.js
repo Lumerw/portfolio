@@ -197,6 +197,7 @@ function syncSheet() {
     // Czat: od razu pole pytania (na dotykowych - krzyżyk, żeby nie wyskakiwała klawiatura).
     if (sheet.id === 'agent') loadAgent();
     if (sheet.id === 'rozmowa') openBooking(sheet);
+    if (sheet.id === 'brandbook') openGenerator(sheet);
     const first = sheet.id === 'agent' && matchMedia('(hover: hover)').matches ? sheet.querySelector('#agent-q') : null;
     requestAnimationFrame(() => (first ?? sheet.querySelector('[data-close]')).focus({ preventScroll: true }));
   } else {
@@ -231,6 +232,16 @@ matchMedia('(max-width: 767px) and (orientation: portrait)').addEventListener('c
 
 /* Kalendarz rezerwacji (panel #rozmowa, Cal.com): booking.js ładuje się przy pierwszym otwarciu panelu,
    każde otwarcie odświeża wolne terminy. */
+// Generator znaków (generator.js) - wczytywany przy pierwszym otwarciu panelu brandbooka
+let genMod = null;
+async function openGenerator(sheet) {
+  const root = sheet.querySelector('[data-generator]');
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = '1';
+  const { initGenerator } = await (genMod ??= import('./generator.js'));
+  initGenerator(root, { bases: content.shared.generator.bases.map(abs), copy: content[document.documentElement.lang === 'en' ? 'en' : 'pl'].brandbook.gen });
+}
+
 async function openBooking(sheet) {
   const root = sheet.querySelector('[data-booking]');
   if (!root) return;

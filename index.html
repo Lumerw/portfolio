@@ -572,6 +572,22 @@
     </div>
     <div class="sheet__body wrap">
       <div class="bb">
+        <section class="gen" aria-labelledby="gen-title" data-generator style="--gen-c:#111111">
+          <h3 id="gen-title" class="t-project gen__title">Generator znaków</h3>
+          <p class="t-text t-muted gen__intro">Wylosuj znak z moich sygnetów i przerób go po swojemu: kolor, złożoność i styl - od kwadratowego do obłego.</p>
+          <div class="gen__stage" data-gen-stage role="img" aria-label="Generator znaków"></div>
+          <div class="gen__bar">
+            <label class="gen__color"><span class="visually-hidden">kolor w zapisie HEX</span><input data-gen="hex" type="text" value="#111111" maxlength="7" spellcheck="false" autocomplete="off"><span class="gen__swatch"><input data-gen="color" type="color" value="#111111" aria-label="kolor znaku"></span></label>
+            <label class="gen__range"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3 13.5 12.5H2.5Z"/></svg><span class="visually-hidden">złożoność</span><input data-gen="complexity" type="range" min="0" max="100" value="45"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.2 13.6 6.3 11.5 12.9H4.5L2.4 6.3Z" stroke-dasharray="2 1.6"/></svg></label>
+            <label class="gen__range"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10"/></svg><span class="visually-hidden">styl: kwadratowy - obły</span><input data-gen="style" type="range" min="0" max="100" value="75"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/></svg></label>
+            <div class="gen__actions">
+              <button class="gen__btn" type="button" data-gen="download" aria-label="pobierz SVG"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg></button>
+              <button class="gen__btn" type="button" data-gen="code" aria-label="kopiuj kod SVG"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5"/></svg></button>
+              <button class="gen__btn gen__btn--roll" type="button" data-gen="roll"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11"/><circle cx="5.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="5.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/></svg><span>losuj</span></button>
+            </div>
+          </div>
+          <p class="t-meta gen__info" data-gen="info" aria-live="polite"></p>
+        </section>
         <p class="bb__intro t-text">Zasady mojej marki osobistej: czerń, biel, cienka linia i dużo pustej przestrzeni.</p>
       <section class="bb__sec grid">
         <h3 class="bb__label t-meta">Znak</h3>

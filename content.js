@@ -76,6 +76,13 @@ export const shared = {
   // Dopóki to placeholder: tryb lokalny - gotowe odpowiedzi z content.js, pytania nie opuszczają strony.
   agent: { endpoint: 'https://portfolio-agent.teraz-platforma.workers.dev' },   // Cloudflare Worker (agent/), Claude Opus 5.5
 
+  // Generator znaków (góra panelu brandbooka, jak blobmaker.app): baza = moje sygnety bez tekstu
+  // (bez znaków z literami: p500, snopy, her, „r”). generator.js - kontury, złożoność, styl, kolor, SVG.
+  generator: {
+    bases: ['assets/icons/07.svg', 'assets/icons/08.svg', 'assets/icons/10.svg', 'assets/icons/13.svg', 'assets/icons/14.svg', 'assets/icons/15.svg', 'assets/loom/sygnet.svg'],
+    color: '#111111',
+  },
+
   // Brandbook (panel pod znakiem w hero): kolory marki osobistej - wartości dosłowne, kontrast z papierem.
   brandbook: {
     colors: [
@@ -356,6 +363,14 @@ export const pl = {
   },
   brandbook: {
     intro: 'Zasady mojej marki osobistej: czerń, biel, cienka linia i dużo pustej przestrzeni.',
+    gen: {
+      title: 'Generator znaków',
+      intro: 'Wylosuj znak z moich sygnetów i przerób go po swojemu: kolor, złożoność i styl - od kwadratowego do obłego.',
+      color: 'kolor znaku', hex: 'kolor w zapisie HEX',
+      complexity: 'złożoność', style: 'styl: kwadratowy - obły',
+      roll: 'losuj', download: 'pobierz SVG', code: 'kopiuj kod SVG', copied: 'skopiowano kod SVG',
+      base: 'sygnet',
+    },
     sections: { mark: 'Znak', colors: 'Kolory', type: 'Typografia', symbols: 'Symbole i ikony', grid: 'Siatka', motion: 'Ruch', rules: 'Zasady' },
     mark: 'Koło z kropką w środku, kreska 1 px. Pole ochronne równe promieniowi koła. Na jasnym tle tusz, na ciemnym papier - zawsze jeden kolor.',
     markSizes: 'rozmiary: 16, 24 i 40 px',
@@ -651,6 +666,14 @@ export const en = {
   },
   brandbook: {
     intro: 'The rules of my personal brand: black, white, a thin line and plenty of empty space.',
+    gen: {
+      title: 'Mark generator',
+      intro: 'Roll a mark from my signets and make it your own: colour, complexity and style - from square to round.',
+      color: 'mark colour', hex: 'colour as HEX',
+      complexity: 'complexity', style: 'style: square - round',
+      roll: 'roll', download: 'download SVG', code: 'copy SVG code', copied: 'SVG code copied',
+      base: 'signet',
+    },
     sections: { mark: 'Mark', colors: 'Colours', type: 'Typography', symbols: 'Symbols and icons', grid: 'Grid', motion: 'Motion', rules: 'Rules' },
     mark: 'A circle with a dot in the centre, 1 px stroke. Clear space equals the circle radius. Ink on light backgrounds, paper on dark - always one colour.',
     markSizes: 'sizes: 16, 24 and 40 px',
