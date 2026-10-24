@@ -715,16 +715,17 @@ img.recs__avatar { border-color: var(--hair); object-fit: cover; background: var
 }
 .sphere__ring--lat { transform: translateY(calc(var(--d) / 2 * var(--y))) rotateX(90deg); }
 .sphere__ring--eq { opacity: .4; }
-/* Osie X / Y / Z: kreska 1 px przez środek, trochę dłuższa niż średnica, wygaszona ku końcom */
+/* Osie X / Y / Z w środku: mały znak 3D w miejscu dawnej kropki - kreski 1 px, 28 px długości */
 .sphere__axis {
+  --ax: 28px;
   position: absolute;
   left: 50%;
   top: 50%;
-  width: calc(var(--d) * 1.12);
-  height: var(--hairline);
-  margin: calc(var(--hairline) / -2) 0 0 calc(var(--d) * -.56);
-  background: linear-gradient(90deg, transparent, var(--ink) 12%, var(--ink) 88%, transparent);
-  opacity: .32;
+  width: var(--ax);
+  height: 1px;
+  margin: -.5px 0 0 calc(var(--ax) / -2);
+  background: var(--ink);
+  opacity: .7;
   transform: var(--t);
   pointer-events: none;
 }
