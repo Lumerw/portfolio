@@ -49,6 +49,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     stepL: 30, stepE: 30, community: 24, subL: 54, subE: 54, communitySub: 60,
     callTitle: 36, call: 32, label: 340,
   };
+  const LIST = { tags: [4, 14], slots: [3, 14] };   // [liczba pozycji, maks. znaków] - tyle mieści scena
   const errors = [];
   for (const p of content.shared.projects.filter(p => p.reel)) {
     const [pl, en] = ['pl', 'en'].map(l => content[l].projects[p.id]?.reel);
@@ -58,6 +59,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     for (const [lang, r] of [['pl', pl], ['en', en]]) {
       if (!String(r.label || '').trim()) errors.push(`${p.title} (${lang}): pusty reel.label`);
       for (const [k, v] of Object.entries(r)) {
+        // tags / slots: listy krótkich pigułek (po 14 znaków); reszta - tekst w limicie
+        if (Array.isArray(v) && LIST[k]) {
+          if (v.length !== LIST[k][0]) errors.push(`${p.title} (${lang}): reel.${k} - ${v.length} pozycji, ma być ${LIST[k][0]}`);
+          for (const x of v) if (typeof x !== 'string' || !x.trim() || x.length > LIST[k][1]) errors.push(`${p.title} (${lang}): reel.${k} „${x}” - pusta albo dłuższa niż ${LIST[k][1]} znaków`);
+          continue;
+        }
         if (typeof v !== 'string') { errors.push(`${p.title} (${lang}): reel.${k} musi być tekstem`); continue; }
         if (/[—–]/.test(v)) errors.push(`${p.title} (${lang}): reel.${k} ma długi myślnik - użyj „-”`);
         if (REEL_MAX[k] && v.length > REEL_MAX[k]) console.warn(`⚠ ${p.title} (${lang}): reel.${k} ma ${v.length} znaków - limit ${REEL_MAX[k]}`);

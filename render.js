@@ -8,10 +8,8 @@ import { symbol } from './symbols.js';
 
 // Plansza animowana teraz (reel): jedna pętla. Trafia do --t-reel oraz do data-dwell / --t-auto wiersza indeksu.
 export const REEL_MS = 15000;
-// Ścieżki wpisane w HTML (bez dodatkowych plików): glify „?” i „!” z teraz, ikony ról, pauza / start.
+// Ścieżki wpisane w HTML (bez dodatkowych plików): ikony ról, pauza / start.
 export const RP = {
-  q: 'M66.3 152.1C49.2 105.6 94.5 85.2 94.5 47.7C94.5 36.6 89.7 18.9 68.4 14.4L41.1 55.8L0 34.5C17.7 11.1 43.5 0 83.1 0C126.3 0 158.7 15.9 158.7 49.2C158.7 100.8 80.7 106.2 80.7 152.1H66.3ZM75.3 233.4C59.1 233.4 45.3 219.3 45.3 203.1C45.3 186.9 59.1 173.1 75.3 173.1C91.5 173.1 105.6 186.9 105.6 203.1C105.6 219.3 91.5 233.4 75.3 233.4Z',
-  x: 'M71.4 0 42.9 149.1H28.5L0 0H71.4ZM36 230.4C19.8 230.4 6 216.3 6 200.1C6 183.9 19.8 170.1 36 170.1C52.2 170.1 66.3 183.9 66.3 200.1C66.3 216.3 52.2 230.4 36 230.4Z',
   headphones: 'M2.5 12A9.5 9.5 0 0 1 21.5 12V20A1.5 1.5 0 0 1 20 21.5H17A1.5 1.5 0 0 1 15.5 20V14.5A1.5 1.5 0 0 1 17 13H18.5V12A6.5 6.5 0 0 0 5.5 12V13H7A1.5 1.5 0 0 1 8.5 14.5V20A1.5 1.5 0 0 1 7 21.5H4A1.5 1.5 0 0 1 2.5 20Z',
   presentation: 'M3 3.5A1 1 0 0 1 4 2.5H20A1 1 0 0 1 21 3.5V14.5H13.5L18 21.5H14.75L12 17.1 9.25 21.5H6L10.5 14.5H3ZM7.13 11.75L9.52 9.36 12.52 12.11 18.63 6 16.37 6 12.48 9.89 9.48 7.14 4.87 11.75Z',
   video: 'M3.5 5.5H13.5A1.5 1.5 0 0 1 15 7V17A1.5 1.5 0 0 1 13.5 18.5H3.5A1.5 1.5 0 0 1 2 17V7A1.5 1.5 0 0 1 3.5 5.5ZM16.5 9.17L22 5.5V18.5L16.5 14.83Z',
@@ -103,15 +101,17 @@ function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = 
     </div>
   </div></div>`;
   }
-  // Pełna plansza 15 s (render: 4:5): plakat (logo tylko tu) → szukasz eksperta → albo nim zostań → społeczność → rozmowa 1:1 → plakat
+  // Pełna plansza 15 s (render: 4:5): plakat (logo tylko tu) → szukasz eksperta (dziedziny wpadają jedna po drugiej)
+  // → albo nim zostań (terminy rozmów się rezerwują) → dwie społeczności i trzecia w planach (kółka przerywaną linią
+  // między nimi) → rozmowa 1:1 (dwa okna, mówiący z obwódką) → plakat. Pod spodem duże pola różu i błękitu (plamy z Figmy).
   const pillL = `<span class="reel__pill reel__pill--l">${svgi(RP.headphones)}${esc(r.listener)}</span>`;
   const pillE = `<span class="reel__pill reel__pill--e">${svgi(RP.presentation, '', '0 0 24 24', true)}${esc(r.expert)}</span>`;
-  const crowd = ['l', 'e', 'l', 'l', 'e', 'l', 'e', 'l'].map((k, i) => `<i class="reel__dot reel__dot--${k}" style="--k:${i}"></i>`).join('');
+  const crowd = ['l', 'l', 'l', 'n', 'n', 'e', 'e', 'e'].map((k, i) => `<i class="reel__dot reel__dot--${k}" style="--k:${i}"></i>`).join('');
+  const tags = r.tags.map(x => `<span class="reel__tag">${esc(x)}</span>`).join('');
+  const slots = r.slots.map(x => `<span class="reel__slot">${esc(x)}</span>`).join('');
   return `<div class="reel reel--${fmt} brand" style="${brandStyle(p.brand)};--t-reel:${REEL_MS}ms;--lr:${lr}" ${a11y}>
   <span class="reel__field reel__field--l"></span><span class="reel__field reel__field--e"></span><span class="reel__field reel__field--m"></span>
   <div class="reel__stage">
-    <span class="reel__glyph reel__glyph--q">${svgi(RP.q, '', '0 0 158.7 233.4')}</span>
-    <span class="reel__glyph reel__glyph--x">${svgi(RP.x, '', '0 0 71.4 230.4')}</span>
     <img class="reel__logo" src="${esc(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="" ${img}>
     <p class="reel__claim">${esc(r.claimA)} <span class="reel__key">${esc(r.claimKey)}</span></p>
     <p class="reel__legend"><span>${esc(r.listeners)}</span><span>${esc(r.experts)}</span></p>
@@ -119,11 +119,13 @@ function reel(p, tp, fmt, { eager = false, decorative = false, lite = false } = 
       <p class="reel__row">${pillL}</p>
       <p class="reel__head">${esc(r.stepL)}</p>
       <p class="reel__sub">${esc(r.subL)}</p>
+      <p class="reel__chips">${tags}</p>
     </div>
     <div class="reel__scene reel__scene--e">
       <p class="reel__row">${pillE}</p>
       <p class="reel__head">${esc(r.stepE)}</p>
       <p class="reel__sub">${esc(r.subE)}</p>
+      <p class="reel__chips">${slots}</p>
     </div>
     <div class="reel__scene reel__scene--c">
       <p class="reel__row reel__crowd">${crowd}</p>

@@ -1,5 +1,5 @@
 // Okładki projektów (projects[].live) - mikroanimacje na żywo (4:5):
-//   teraz       - czerń z niebieską łuną, która organicznie płynie (sam CSS), logo na środku.
+//   teraz       - czerń z dużą niebieską plamą z projektu, która organicznie płynie (sam CSS), logo na środku.
 //   loom.studio - papier, trzy figury Bauhausu na środku pływające na sprężynach (fizyka z loom.studio:
 //                 dryf, odbicia, uspokojenie pod kursorem); na dole pas płynnego gradientu z hero
 //                 (WebGL, reaguje na kursor; pod spodem ten sam gradient w CSS); pionowe logo przy lewej
@@ -20,11 +20,12 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const abs = src => esc(new URL(src, import.meta.url).href);
 
 /* ==========================================================================
-   teraz - łuna z hero teraz.eu: jasny łuk u góry dużej elipsy, w środku granat, dół czarny
+   teraz - czerń z dużą niebieską plamą z projektu (Figma, assets/teraz/cover-blob.webp: cała plama z rozmyciem)
+   i logo na środku. Plama płynie organicznie (dryf, obrót, „oddech”); w PDF i bez ruchu stoi jak w projekcie.
    ========================================================================== */
 function terazMarkup(p) {
   return `
-          <span class="tz-light"></span><span class="tz-core"></span><span class="tz-shade"></span>
+          <span class="tz-blob" style="background-image:url('${abs('assets/teraz/cover-blob.webp')}')"></span>
           <img class="tz-logo" src="${abs(p.logo.src)}" width="${p.logo.w}" height="${p.logo.h}" alt="">`;
 }
 

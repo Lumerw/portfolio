@@ -281,13 +281,15 @@ export const pl = {
       // Plansza animowana (reel, 15 s): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat.
       // Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
       reel: {
-        label: 'teraz - baza ekspertów z branży kreatywnej. Szukasz eksperta? Znajdziesz go tu, z 5+ lat praktyki. Albo sam nim zostań: dzielisz się wiedzą i zarabiasz na rozmowach. Jedna społeczność słuchaczy i ekspertów - możesz być jednym i drugim. Rozmowa 1:1 z ekspertem, wideo 30 albo 60 minut. Porozmawiajmy tu i teraz.',
+        label: 'teraz - baza ekspertów z branży kreatywnej. Szukasz eksperta? Znajdziesz go tu, z 5+ lat praktyki. Albo sam nim zostań: dzielisz się wiedzą i zarabiasz na rozmowach. Dwie społeczności - słuchacze i eksperci - a wkrótce trzecia, łącząca obie. Rozmowa 1:1 z ekspertem, wideo 30 albo 60 minut. Porozmawiajmy tu i teraz.',
         stepL: 'Szukasz eksperta?',
         subL: 'Eksperci z branży kreatywnej z 5+ lat praktyki.',
         stepE: 'Albo sam nim zostań.',
         subE: 'Dzielisz się wiedzą i zarabiasz na rozmowach.',
-        community: 'Jedna społeczność.',
-        communitySub: 'Słuchacze i eksperci - możesz być jednym i drugim.',
+        tags: ['branding', 'UX/UI', 'motion', '3D'],          // dziedziny ekspertów (scena „Szukasz eksperta?”)
+        slots: ['pn 10:00', 'śr 14:30', 'pt 18:00'],          // zarezerwowane rozmowy (scena „Albo sam nim zostań”)
+        community: 'Dwie społeczności.',
+        communitySub: 'Słuchacze i eksperci - a wkrótce trzecia, łącząca obie.',
         claimA: 'porozmawiajmy',
         claimKey: 'tu i teraz',          // z falką pod spodem
         listener: 'słuchacz',
@@ -574,13 +576,15 @@ export const en = {
       lead: 'Find an expert from your industry, here and now. The platform MVP: 1:1 video calls, Escrow payments and a community.',
       // Plansza animowana (reel, 15 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
-        label: 'teraz - a base of creative industry experts. Looking for an expert? Find one here, with 5+ years of practice. Or become one yourself: share what you know and earn from your calls. One community of listeners and experts - you can be both. A 1:1 call with an expert, video, 30 or 60 minutes. Let’s talk here and now.',
+        label: 'teraz - a base of creative industry experts. Looking for an expert? Find one here, with 5+ years of practice. Or become one yourself: share what you know and earn from your calls. Two communities - listeners and experts - and soon a third that joins them. A 1:1 call with an expert, video, 30 or 60 minutes. Let’s talk here and now.',
         stepL: 'Looking for an expert?',
         subL: 'Creative industry experts with 5+ years of practice.',
         stepE: 'Or become one yourself.',
         subE: 'Share what you know and earn from your calls.',
-        community: 'One community.',
-        communitySub: 'Listeners and experts - you can be both.',
+        tags: ['branding', 'UX/UI', 'motion', '3D'],
+        slots: ['Mon 10:00', 'Wed 14:30', 'Fri 18:00'],
+        community: 'Two communities.',
+        communitySub: 'Listeners and experts - and soon a third that joins them.',
         claimA: 'let’s talk',            // apostrof jak u teraz („Let’s talk”)
         claimKey: 'here and now',
         listener: 'listener',

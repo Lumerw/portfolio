@@ -64,7 +64,7 @@ const MAX_SHOTS = 80;
 /* ---------- Pomocnicze w przeglądarce (wstrzykiwane przed skryptami strony) ---------- */
 function helpers() {
   if (window.__reel) return;
-  const AMB = /^(aurora|reel-drift-[ab]|reel-swell)$/;
+  const AMB = /^(aurora|reel-drift-[ab]|reel-swell|reel-blob-[a-z])$/;   // tło: wolne, własny okres (min. 14 s)
   // Teksty ze specyfikacji, które nie mogą wejść na znaki ? i !
   const TEXT_SEL = '.reel__pill, .reel__head, .reel__sub, .reel__claim, .reel__title, .reel__cap, .reel__legend';
   // Elementy z własnym tłem: liczy się całe pole, nie tylko litery
@@ -716,7 +716,7 @@ async function langGroup(browser, content) {
       if (state.lang !== lang) bad.push(`html lang="${state.lang}", ma być ${lang}`);
       if (!state.sheet.length) { bad.push(`${lang}: brak .reel`); return; }
       if (!r) { notes.push(`${lang}: brak content.${lang}.projects.teraz.reel - porównuję tylko zmianę`); return; }
-      const want = Object.entries(r).filter(([k]) => k !== 'label').map(([, v]) => norm(v));
+      const want = Object.entries(r).filter(([k]) => k !== 'label').flatMap(([, v]) => [v].flat()).map(norm);   // listy (tags, slots) - każda pozycja osobno
       for (const [where, txt] of state.sheet.map((t, i) => [`panel ${i + 1}`, t])) {
         const miss = want.filter(v => !txt.includes(v));
         if (miss.length) bad.push(`${lang} ${where}: brak „${miss.slice(0, 3).join('”, „')}”${miss.length > 3 ? ` +${miss.length - 3}` : ''}`);

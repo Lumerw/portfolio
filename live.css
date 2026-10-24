@@ -30,27 +30,18 @@
 .live--static, .live--static *, .live--static *::before, .live--static *::after { animation: none !important; }
 .live--static .og-grain { display: none; }   /* ziarno (6%) niewidoczne w planszy, a mocno ją powiększa */
 
-/* ---- teraz: łuna z hero teraz.eu - jasny niebieski łuk u góry dużej elipsy, w środku granat, dół czarny.
-   Trzy warstwy płyną w różnym tempie (14-23 s), więc kształt łuny ciągle się zmienia. ---- */
+/* ---- teraz: czerń z dużą niebieską plamą (Figma: obszar filtra x -358, y -16, 2050 × 1682 w kadrze 1081 × 1350
+   → w cqw: 1 jedn. = 100/1081) i logo na środku. Plama dryfuje, obraca się i zmienia proporcje w nierównych okresach. ---- */
 .live--teraz { background: #000; }
-.tz-light, .tz-core, .tz-shade { position: absolute; border-radius: 50%; pointer-events: none; }
-.tz-light {
-  left: -38%; top: 12%; width: 176%; height: 118%;
-  background: radial-gradient(closest-side, #3b8cff 0%, #2275ff 48%, #1356de 68%, rgb(12 52 160 / .6) 84%, transparent 100%);
-  filter: blur(3.6cqw);
-  animation: tz-light 17s ease-in-out infinite alternate;
+.tz-blob {
+  position: absolute; left: -33.1cqw; top: -1.5cqw; width: 189.6cqw; height: 155.6cqw;
+  background: center / 100% 100% no-repeat;
+  transform-origin: 46% 34%;
+  pointer-events: none;
+  animation: tz-drift 21s ease-in-out infinite alternate, tz-breathe 15s ease-in-out infinite alternate;
 }
-.tz-core {
-  left: -20%; top: 25%; width: 140%; height: 118%;
-  background: radial-gradient(closest-side, #020611 0%, #030b22 48%, rgb(4 16 52 / .9) 70%, transparent 100%);
-  filter: blur(3.5cqw);
-  animation: tz-core 23s ease-in-out infinite alternate;
-}
-/* dół w czerń, lewy górny róg ciemniejszy - łuk najjaśniejszy z prawej */
-.tz-shade { inset: 0; border-radius: 0; background: linear-gradient(180deg, transparent 52%, #000 96%), radial-gradient(70% 46% at 4% 8%, #000 0%, rgb(0 0 0 / .7) 40%, transparent 100%); animation: tz-shade 14s ease-in-out infinite alternate; }
-@keyframes tz-light { 0% { translate: 4cqw 0; scale: 1 1; rotate: -4deg; } 50% { translate: -3cqw 2cqh; scale: 1.06 .96; rotate: 3deg; } 100% { translate: 2cqw -2cqh; scale: .97 1.05; rotate: 6deg; } }
-@keyframes tz-core { 0% { translate: -2cqw 1cqh; scale: 1; } 50% { translate: 3cqw -1.5cqh; scale: 1.04 .98; } 100% { translate: -1cqw 2cqh; scale: .98 1.03; } }
-@keyframes tz-shade { from { opacity: 1; } to { opacity: .82; } }
+@keyframes tz-drift { 0% { translate: 0 0; rotate: 0deg; } 35% { translate: -7cqw 4cqw; rotate: -6deg; } 70% { translate: 5cqw 7cqw; rotate: 5deg; } 100% { translate: -3cqw -4cqw; rotate: 9deg; } }
+@keyframes tz-breathe { 0% { scale: 1; } 50% { scale: 1.08 .94; } 100% { scale: .95 1.07; } }
 .live .tz-logo { position: absolute; left: 50%; top: 48%; width: 46cqw; height: auto; translate: -50% -50%; }   /* (0,2,0) wygrywa z .media img */
 
 /* ---- loom.studio: papier, figury Bauhausu na środku, pas gradientu na dole, pionowe logo, PL / EN ---- */
