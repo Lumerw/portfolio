@@ -21,7 +21,7 @@ const TOPICS = [
   ['tools', /narzedz|program|figm|blender|adobe|adtron|\btools?\b|software|stack/],
   ['education', /studi|eduk|uczeln|uniwersyt|swps|szkol|education|universit|degree|school/],
   ['languages', /jezyk|angielsk|languages?\b|english|speak/],
-  ['brand', /brandbook|\bmark[aiey]\b|\blogo|kolor|font|typograf|kroj|siatk|colou?r|typeface|\bbrand\b|\bgrid\b/],
+  ['brand', /brandbook|generator|\bmark[aiey]\b|\blogo|kolor|font|typograf|kroj|siatk|colou?r|typeface|\bbrand\b|\bgrid\b/],
   ['project', null],                                   // nazwa konkretnego projektu
   ['projects', /projekt|portfolio|realizac|\bprace\b|zrobil|pracuj|pracowal|\bcase|projects?\b|\bwork|built|made/],
   ['about', /\bkim\b|\bkto\b|o nim|o tobie|czym|zajmuj|robi|uslug|oferuj|specjaliz|\bwho\b|about|what does|do you do|services|offer|speciali/],
@@ -85,7 +85,7 @@ export function localAnswer(content, lang, question) {
       return clean(t.about.education) ? { text: `${A.education} ${clean(t.about.education)}.` } : unknown();
     case 'languages':
       return clean(t.about.languages) ? { text: `${A.languages} ${clean(t.about.languages)}.` } : unknown();
-    case 'brand': return { text: t.brandbook.intro, links: [{ label: A.brandLink, href: '#brandbook' }] };
+    case 'brand': return { text: t.brand, links: [{ label: A.brandLink, href: '#generator' }] };
     case 'project': {
       const tp = t.projects[project.id];
       const text = [`${project.title} - ${tp.tagline}.`, tp.lead, clean(tp.solution), clean(tp.result)].filter(Boolean).join(' ');
@@ -140,7 +140,7 @@ export function knowledge(content, lang) {
     line('Languages', t.about.languages),
     line('Tools', t.about.tools.map(clean).filter(Boolean).join(', ')),
     '',
-    `PERSONAL BRAND: ${t.brandbook.intro} ${t.brandbook.rulesNote}`,
+    `PERSONAL BRAND: ${t.brand} On the site (#generator, opened by the marks next to the avatar) there is a mark generator: an algorithm builds new signets from Wojciech's design principles, and Claude can pick the direction from a brand brief.`,
   ];
   return out.filter(l => l !== null).join('\n').trim();
 }

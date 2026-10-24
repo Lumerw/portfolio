@@ -209,7 +209,7 @@ function hero(c, t) {
   return `
   <section id="start" class="hero" aria-labelledby="hero-title">
     <div class="hero__top">${avatar(c, t)}
-      <a class="hero__icons" href="#brandbook" aria-haspopup="dialog" aria-label="${esc(t.ui.brandbook)}">${icons}
+      <a class="hero__icons" href="#generator" aria-haspopup="dialog" aria-label="${esc(t.ui.generator)}">${icons}
       </a>
     </div>
     <p class="hero__name"><span ${reveal(0)}>${liHref !== '#'
@@ -428,77 +428,9 @@ function project(p, i, c, t) {
   return sheet({ id: p.id, cls: 'sheet--project', bar, body, t });
 }
 
-// Brandbook - księga znaku marki osobistej (otwiera ją znak z ikonami w hero). Treść w content.js,
-// wartości kolorów w shared.brandbook. Kolory pokazane dosłownie - te same w obu motywach.
-function brandbook(c, t) {
-  const b = t.brandbook, S = b.sections;
-  const sec = (label, inner) => `
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">${esc(label)}</h3>
-        <div class="bb__body">${inner}
-        </div>
-      </section>`;
-
-  const mark = sec(S.mark, `
-          <div class="bb__tiles">
-            <div class="bb__tile bb__tile--paper">${symbol('personal', { cls: 'bb__mark' })}</div>
-            <div class="bb__tile bb__tile--ink">${symbol('personal', { cls: 'bb__mark' })}</div>
-          </div>
-          <p class="bb__sizes">${[16, 24, 40].map(n => symbol('personal', { cls: `bb__mark bb__mark--${n}`, small: n === 16 })).join('')}<span class="t-meta">${esc(b.markSizes)}</span></p>
-          <p class="t-text t-muted">${esc(b.mark)}</p>`);
-
-  const colors = sec(S.colors, `
-          <ul class="bb__swatches">${c.brandbook.colors.map(k => `
-            <li><span class="bb__chip" style="background:${esc(k.value)}"></span>
-              <span class="bb__name">${esc(b.colors[k.key])}</span>
-              <span class="t-meta">${esc(k.value)}${k.contrast ? ` · ${esc(b.contrast)} ${esc(k.contrast)}` : ''}</span></li>`).join('')}
-          </ul>`);
-
-  const type = sec(S.type, `
-          <p class="t-text t-muted">${esc(b.type.family)}</p>
-          <ul class="bb__type">
-            <li><span class="t-meta">${esc(b.type.title)}</span><span class="t-name">${esc(b.type.sample)}</span></li>
-            <li><span class="t-meta">${esc(b.type.project)}</span><span class="t-project">teraz · loom.studio · reh.ab</span></li>
-            <li><span class="t-meta">${esc(b.type.text)}</span><span class="t-text">${esc(t.hero.line)}</span></li>
-            <li><span class="t-meta">${esc(b.type.meta)}</span><span class="t-meta">01 · 02 · 03 · marketplace · studio · pitch deck</span></li>
-          </ul>`);
-
-  const symbols = sec(S.symbols, `
-          <ul class="bb__symbols">${['personal', ...c.projects.map(p => p.symbol)].map(n => `
-            <li>${symbol(n, { cls: 'bb__sym' })}</li>`).join('')}${c.icons.slice(0, 6).map(src => `
-            <li><img class="bb__icon${mono(src)}" src="${esc(src)}" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>`).join('')}
-          </ul>
-          <p class="t-text t-muted">${esc(b.symbols)}</p>`);
-
-  const grid = sec(S.grid, `
-          <div class="bb__grid" aria-hidden="true">${'<span></span>'.repeat(12)}</div>
-          <p class="t-text t-muted">${esc(b.grid)}</p>`);
-
-  const motion = sec(S.motion, `
-          <ul class="rows">${b.motion.map(m => `
-            <li class="row bb__row"><span class="row__place">${esc(m.name)}</span><span class="row__role t-muted">${esc(m.value)}</span></li>`).join('')}
-          </ul>
-          <p class="t-text t-muted bb__note">${esc(b.motionNote)}</p>`);
-
-  const rules = sec(S.rules, `
-          <div class="bb__rules">
-            <div><p class="t-meta">${esc(b.yes)}</p><ul>${b.rulesYes.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>
-            <div><p class="t-meta">${esc(b.no)}</p><ul class="bb__no">${b.rulesNo.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>
-          </div>
-          <p class="t-text t-muted bb__note">${esc(b.rulesNote)}</p>`);
-
-  const bar = `
-      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
-      <h2 id="brandbook-title" class="t-project">${esc(t.ui.brandbook)}</h2>`;
-  const body = `
-      <div class="bb">${generator(c, t)}
-        <p class="bb__intro t-text">${esc(b.intro)}</p>${mark}${colors}${type}${symbols}${grid}${motion}${rules}
-      </div>`;
-  return sheet({ id: 'brandbook', cls: 'sheet--brandbook', bar, body, t });
-}
-
-// Generator znaków (generator.js) - jak blobmaker.app w stylu strony: pole ze znakiem i pasek: kolor (HEX + próbnik),
-// złożoność (trójkąt → wielokąt), styl (kwadrat → koło), pobierz SVG, kopiuj kod, losuj. Bez JS - samo pole z opisem.
+// Generator znaków (panel #generator, generator.js) - jak blobmaker.app w stylu strony: opis marki dla Claude,
+// pole ze znakiem i pasek: kolor (HEX + paleta próbek), złożoność (trójkąt → wielokąt), styl (kwadrat → koło),
+// pobierz SVG, kopiuj kod, losuj. Bez JS - pole z opisem.
 const genIcon = {
   low: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3 13.5 12.5H2.5Z"/></svg>',
   high: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.2 13.6 6.3 11.5 12.9H4.5L2.4 6.3Z" stroke-dasharray="2 1.6"/></svg>',
@@ -509,25 +441,37 @@ const genIcon = {
   dice: '<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11"/><circle cx="5.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="5.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/></svg>',
 };
 function generator(c, t) {
-  const g = t.brandbook.gen, G = c.generator;
-  if (!G?.bases?.length) return '';
-  return `
-        <section class="gen" aria-labelledby="gen-title" data-generator style="--gen-c:${esc(G.color)}">
-          <h3 id="gen-title" class="t-project gen__title">${esc(g.title)}</h3>
-          <p class="t-text t-muted gen__intro">${esc(g.intro)}</p>
-          <div class="gen__stage" data-gen-stage role="img" aria-label="${esc(g.title)}"></div>
-          <div class="gen__bar">
-            <label class="gen__color"><span class="visually-hidden">${esc(g.hex)}</span><input data-gen="hex" type="text" value="${esc(G.color.toUpperCase())}" maxlength="7" spellcheck="false" autocomplete="off"><span class="gen__swatch"><input data-gen="color" type="color" value="${esc(G.color)}" aria-label="${esc(g.color)}"></span></label>
-            <label class="gen__range">${genIcon.low}<span class="visually-hidden">${esc(g.complexity)}</span><input data-gen="complexity" type="range" min="0" max="100" value="45">${genIcon.high}</label>
-            <label class="gen__range">${genIcon.square}<span class="visually-hidden">${esc(g.style)}</span><input data-gen="style" type="range" min="0" max="100" value="75">${genIcon.round}</label>
-            <div class="gen__actions">
-              <button class="gen__btn" type="button" data-gen="download" aria-label="${esc(g.download)}">${genIcon.download}</button>
-              <button class="gen__btn" type="button" data-gen="code" aria-label="${esc(g.code)}">${genIcon.code}</button>
-              <button class="gen__btn gen__btn--roll" type="button" data-gen="roll">${genIcon.dice}<span>${esc(g.roll)}</span></button>
-            </div>
+  const g = t.generator, G = c.generator;
+  const bar = `
+      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
+      <h2 id="generator-title" class="t-project">${esc(g.title)}</h2>`;
+  const body = `
+      <section class="gen" data-generator style="--gen-c:${esc(G.color)}">
+        <p class="t-text t-muted gen__intro">${esc(g.intro)}</p>
+        <form class="gen__ai" data-gen="ai">
+          <label class="visually-hidden" for="gen-brief">${esc(g.briefLabel)}</label>
+          <input id="gen-brief" data-gen="brief" type="text" maxlength="160" placeholder="${esc(g.brief)}" autocomplete="off">
+          <button class="button button--small" type="submit"><span class="agent-glow-dot" aria-hidden="true"></span>${esc(g.ai)}</button>
+        </form>
+        <div class="gen__stage" data-gen-stage role="img" aria-label="${esc(g.title)}"></div>
+        <p class="t-meta gen__info"><span data-gen="info"></span> <span class="gen__note" data-gen="note" aria-live="polite"></span></p>
+        <div class="gen__bar">
+          <div class="gen__color">
+            <label class="visually-hidden" for="gen-hex">${esc(g.hex)}</label>
+            <input id="gen-hex" data-gen="hex" type="text" value="${esc(G.color.toUpperCase())}" maxlength="7" spellcheck="false" autocomplete="off">
+            <button class="gen__swatch" type="button" data-gen="swatch" aria-label="${esc(g.palette)}" aria-expanded="false" aria-controls="gen-palette"></button>
           </div>
-          <p class="t-meta gen__info" data-gen="info" aria-live="polite"></p>
-        </section>`;
+          <div class="gen__palette" id="gen-palette" data-gen="palette" role="group" aria-label="${esc(g.palette)}" hidden></div>
+          <label class="gen__range">${genIcon.low}<span class="visually-hidden">${esc(g.complexity)}</span><input data-gen="complexity" type="range" min="0" max="100" value="40">${genIcon.high}</label>
+          <label class="gen__range">${genIcon.square}<span class="visually-hidden">${esc(g.style)}</span><input data-gen="style" type="range" min="0" max="100" value="70">${genIcon.round}</label>
+          <div class="gen__actions">
+            <button class="gen__btn" type="button" data-gen="download" aria-label="${esc(g.download)}">${genIcon.download}</button>
+            <button class="gen__btn" type="button" data-gen="code" aria-label="${esc(g.code)}">${genIcon.code}</button>
+            <button class="gen__btn gen__btn--roll" type="button" data-gen="roll">${genIcon.dice}<span>${esc(g.roll)}</span></button>
+          </div>
+        </div>
+      </section>`;
+  return sheet({ id: 'generator', cls: 'sheet--generator', bar, body, t });
 }
 
 // Ikonka kopiowania: dwa przesunięte kwadraty, kreska 1 px — w stylu symboli.
@@ -710,7 +654,7 @@ export function render(content, lang) {
 <main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${process(t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>${scrollnav(c, t)}
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${brandbook(c, t)}${agent(c, t)}${booking(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${generator(c, t)}${agent(c, t)}${booking(c, t)}
 </div>
 `;
 }

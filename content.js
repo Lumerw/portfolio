@@ -44,7 +44,7 @@ export const shared = {
   icons: [
     'assets/icons/01.svg', 'assets/icons/02.svg', 'assets/icons/03.svg',
     'assets/icons/04.svg', 'assets/icons/05.svg', 'assets/icons/06.svg',
-    // znaki pełne (paczka z października 2026) - tylko obok awatara i w brandbooku, sfera bierze 01-06
+    // znaki pełne (paczka z października 2026) - tylko obok awatara (otwierają generator znaków), sfera bierze 01-06
     'assets/icons/07.svg', 'assets/icons/08.svg', 'assets/icons/09.svg', 'assets/icons/10.svg', 'assets/icons/11.svg',
     'assets/icons/12.svg', 'assets/icons/13.svg', 'assets/icons/14.svg', 'assets/icons/15.svg', 'assets/icons/16.svg',
   ],
@@ -76,23 +76,12 @@ export const shared = {
   // Dopóki to placeholder: tryb lokalny - gotowe odpowiedzi z content.js, pytania nie opuszczają strony.
   agent: { endpoint: 'https://portfolio-agent.teraz-platforma.workers.dev' },   // Cloudflare Worker (agent/), Claude Opus 5.5
 
-  // Generator znaków (góra panelu brandbooka, jak blobmaker.app): baza = moje sygnety bez tekstu
-  // (bez znaków z literami: p500, snopy, her, „r”). generator.js - kontury, złożoność, styl, kolor, SVG.
+  // Generator znaków (panel #generator - otwierają go znaki obok awatara): algorytm w generator.js składa nowe
+  // sygnety (domyślnie czarne), kolor do wyboru z palety albo HEX. Moje znaki są tylko wzorem stylu - nie trafiają na stronę.
   generator: {
-    bases: ['assets/icons/07.svg', 'assets/icons/08.svg', 'assets/icons/10.svg', 'assets/icons/13.svg', 'assets/icons/14.svg', 'assets/icons/15.svg', 'assets/loom/sygnet.svg'],
     color: '#111111',
-  },
-
-  // Brandbook (panel pod znakiem w hero): kolory marki osobistej - wartości dosłowne, kontrast z papierem.
-  brandbook: {
-    colors: [
-      { key: 'paper', value: '#FAFAF7' },
-      { key: 'ink', value: '#111111', contrast: '18.1:1' },
-      { key: 'ink2', value: '#6E6E6A', contrast: '4.9:1' },
-      { key: 'ink3', value: '#73736E', contrast: '4.6:1' },
-      { key: 'hair', value: 'rgba(17, 17, 17, .14)' },
-      { key: 'black', value: '#000000' },
-    ],
+    palette: ['#111111', '#6E6E6A', '#ED3434', '#E8590C', '#F0CA42', '#1E7F5C', '#0E7490',
+      '#146EF4', '#4F59DB', '#7C3AED', '#FC8AD3', '#BE185D', '#CA002A', '#8A5A2B'],
   },
 
   // Firmy, z którymi pracowałem - karuzela obok „kontakt”. Logo SVG w jednym kolorze (#111, w trybie ciemnym
@@ -259,7 +248,7 @@ export const pl = {
     skip: 'Przejdź do treści',
     links: 'Profile',
     close: 'zamknij',
-    brandbook: 'Brandbook',
+    generator: 'Generator znaków',
     contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → kalendarz (#rozmowa)
     work: 'Portfolio',               // tytuł sekcji z linkami
     sectionsLabel: 'Sekcje strony',  // nawigator przewijania (desktop)
@@ -268,7 +257,6 @@ export const pl = {
     contactCta: 'kontakt',           // przycisk w hero → sekcja kontakt
     askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
-    brandbookType: 'zasady marki',
     drive: 'Archiwum prac',         // wiersz w Portfolio → folder Google Drive
     driveType: 'Google Drive',
     avatar: 'Zapytaj o mnie - asystent AI',
@@ -361,54 +349,20 @@ export const pl = {
     languages: '[polski - ojczysty · angielski - poziom]',
     tools: ['Figma', 'Adobe CC', 'Claude', 'Magnific', 'Cavalry', 'Blender', 'Adtron', 'ClickUp', 'HTML/CSS'],
   },
-  brandbook: {
-    intro: 'Zasady mojej marki osobistej: czerń, biel, cienka linia i dużo pustej przestrzeni.',
-    gen: {
-      title: 'Generator znaków',
-      intro: 'Wylosuj znak z moich sygnetów i przerób go po swojemu: kolor, złożoność i styl - od kwadratowego do obłego.',
-      color: 'kolor znaku', hex: 'kolor w zapisie HEX',
-      complexity: 'złożoność', style: 'styl: kwadratowy - obły',
-      roll: 'losuj', download: 'pobierz SVG', code: 'kopiuj kod SVG', copied: 'skopiowano kod SVG',
-      base: 'sygnet',
-    },
-    sections: { mark: 'Znak', colors: 'Kolory', type: 'Typografia', symbols: 'Symbole i ikony', grid: 'Siatka', motion: 'Ruch', rules: 'Zasady' },
-    mark: 'Koło z kropką w środku, kreska 1 px. Pole ochronne równe promieniowi koła. Na jasnym tle tusz, na ciemnym papier - zawsze jeden kolor.',
-    markSizes: 'rozmiary: 16, 24 i 40 px',
-    colors: {
-      paper: 'Papier - tło',
-      ink: 'Tusz - tekst, linie, znak',
-      ink2: 'Szarość - tekst pomocniczy',
-      ink3: 'Szarość - metadane',
-      hair: 'Linia - podziały 1 px',
-      black: 'Czerń - tło trybu ciemnego',
-    },
-    contrast: 'kontrast z papierem',
-    type: {
-      family: 'Helvetica Neue - dwie grubości: 400 i 500. Bez wersalików, bez pogrubień w środku zdania.',
-      title: 'nagłówek 28 / 22 px, 500',
-      project: 'tytuł 20 / 18 px, 500',
-      text: 'tekst 15 px, 400, interlinia 1,6',
-      meta: 'metadane 12 px, 400',
-      sample: 'Design to to, jak coś działa.',
-    },
-    symbols: 'Każdy projekt ma własny symbol geometryczny rysowany kreską 1 px, bez wypełnień. Ikony interfejsu w tym samym stylu.',
-    grid: '12 kolumn, maks. 1280 px, margines 6vw (na telefonie 24 px), odstęp 24 px, rytm pionowy co 8 px.',
-    motion: [
-      { name: 'rysowanie znaku', value: '1,8 s' },
-      { name: 'pojawianie się tekstu', value: '600 ms, co 80 ms' },
-      { name: 'kreska pod wierszem', value: '400 ms' },
-      { name: 'auto-przewijanie projektów', value: '3 s (z animacją: 8 s)' },
-      { name: 'wysuwanie panelu', value: '700 ms' },
-      { name: 'ograniczony ruch w systemie', value: 'wszystko stoi' },
-    ],
-    motionNote: 'Ruch wolny i cichy: krzywa cubic-bezier(.65, 0, .35, 1), bez sprężyn, odbić i paralaksy.',
-    yes: 'Tak',
-    no: 'Nie',
-    rulesYes: ['dużo pustej przestrzeni', 'podziały wyłącznie liniami 1 px', 'jeden kolor: tusz albo papier', 'małe stopnie pisma, dwie grubości'],
-    rulesNo: ['kolory akcentu w mojej marce', 'cienie, gradienty i zaokrąglenia', 'wersaliki i pogrubienia w zdaniu', 'ozdobne ikony i emoji'],
-    rulesNote: 'Kolory i gradienty mają tylko marki projektów (np. teraz) - wewnątrz ich ramek. Jedyny wyjątek: tęczowa poświata asystenta AI.',
+  // Marka osobista w jednym zdaniu - asystent AI (pytania o markę, kolory, fonty)
+  brand: 'Moja marka osobista: czerń, biel, cienka linia 1 px, Helvetica i dużo pustej przestrzeni. Kolory i gradienty mają tylko marki projektów, wyjątek - tęczowa poświata asystenta AI.',
+  generator: {
+    title: 'Generator znaków',
+    intro: 'Algorytm składa za każdym razem nowy sygnet - z zasad, na których projektuję: geometria, negatyw, siatka, rytm. Opisz markę, a Claude dobierze kierunek.',
+    brief: 'opis marki, np. kawiarnia, ciepło, rzemiosło', briefLabel: 'opis marki dla Claude',
+    ai: 'zaprojektuj z Claude', thinking: 'Claude projektuje…', aiError: 'Claude nie odpowiada - wylosowałem znak algorytmem.',
+    color: 'kolor znaku', hex: 'kolor w zapisie HEX', palette: 'paleta kolorów',
+    complexity: 'złożoność', style: 'styl: kwadratowy - obły',
+    roll: 'losuj', download: 'pobierz SVG', code: 'kopiuj kod SVG', copied: 'skopiowano kod SVG',
+    no: 'znak nr',
+    kinds: { carrier: 'nośnik z wycięciem', interlock: 'splot', radial: 'promienie', grid: 'moduły', stencil: 'cięcia', blob: 'forma organiczna', line: 'linia ciągła' },
   },
-  // CV 1080 × 1080 do wysyłania (npm run cv → private/, poza repozytorium). Linki klikalne.
+
   cv: {
     file: 'cv-wojciech-lumer-pl.pdf',
     projects: 'Projekty',
@@ -514,7 +468,7 @@ export const pl = {
       experience: 'Doświadczenie:',
       education: 'Wykształcenie:',
       languages: 'Języki:',
-      brandLink: 'otwórz brandbook',
+      brandLink: 'otwórz generator znaków',
       pdf: 'Pełne portfolio jest w PDF:',
       pdfLink: 'pobierz PDF',
       unknown: 'Tego nie ma w portfolio. Zapytaj Wojciecha bezpośrednio:',
@@ -563,7 +517,7 @@ export const en = {
     skip: 'Skip to content',
     links: 'Profiles',
     close: 'close',
-    brandbook: 'Brandbook',
+    generator: 'Mark generator',
     contactButton: 'book a call',
     work: 'Portfolio',
     sectionsLabel: 'Page sections',
@@ -572,7 +526,6 @@ export const en = {
     contactCta: 'contact',
     askAgent: 'ask my assistant',
     recs: 'Kind words',
-    brandbookType: 'brand rules',
     drive: 'Work archive',
     driveType: 'Google Drive',
     avatar: 'Ask about me - AI assistant',
@@ -664,53 +617,19 @@ export const en = {
     languages: '[Polish - native · English - level]',
     tools: ['Figma', 'Adobe CC', 'Claude', 'Magnific', 'Cavalry', 'Blender', 'Adtron', 'ClickUp', 'HTML/CSS'],
   },
-  brandbook: {
-    intro: 'The rules of my personal brand: black, white, a thin line and plenty of empty space.',
-    gen: {
-      title: 'Mark generator',
-      intro: 'Roll a mark from my signets and make it your own: colour, complexity and style - from square to round.',
-      color: 'mark colour', hex: 'colour as HEX',
-      complexity: 'complexity', style: 'style: square - round',
-      roll: 'roll', download: 'download SVG', code: 'copy SVG code', copied: 'SVG code copied',
-      base: 'signet',
-    },
-    sections: { mark: 'Mark', colors: 'Colours', type: 'Typography', symbols: 'Symbols and icons', grid: 'Grid', motion: 'Motion', rules: 'Rules' },
-    mark: 'A circle with a dot in the centre, 1 px stroke. Clear space equals the circle radius. Ink on light backgrounds, paper on dark - always one colour.',
-    markSizes: 'sizes: 16, 24 and 40 px',
-    colors: {
-      paper: 'Paper - background',
-      ink: 'Ink - text, lines, mark',
-      ink2: 'Grey - secondary text',
-      ink3: 'Grey - metadata',
-      hair: 'Line - 1 px dividers',
-      black: 'Black - dark mode background',
-    },
-    contrast: 'contrast on paper',
-    type: {
-      family: 'Helvetica Neue - two weights: 400 and 500. No all caps, no bold inside a sentence.',
-      title: 'heading 28 / 22 px, 500',
-      project: 'title 20 / 18 px, 500',
-      text: 'body 15 px, 400, line height 1.6',
-      meta: 'metadata 12 px, 400',
-      sample: 'Design is how it works.',
-    },
-    symbols: 'Every project has its own geometric symbol drawn with a 1 px stroke, no fills. Interface icons follow the same style.',
-    grid: '12 columns, max 1280 px, 6vw margin (24 px on phones), 24 px gutter, 8 px vertical rhythm.',
-    motion: [
-      { name: 'drawing the mark', value: '1.8 s' },
-      { name: 'text fade-in', value: '600 ms, 80 ms apart' },
-      { name: 'row underline', value: '400 ms' },
-      { name: 'project auto-advance', value: '3 s (with animation: 8 s)' },
-      { name: 'sheet slide-up', value: '700 ms' },
-      { name: 'reduced motion in the system', value: 'everything stops' },
-    ],
-    motionNote: 'Slow and quiet motion: cubic-bezier(.65, 0, .35, 1), no springs, bounces or parallax.',
-    yes: 'Yes',
-    no: 'No',
-    rulesYes: ['plenty of empty space', 'dividers only as 1 px lines', 'one colour: ink or paper', 'small type sizes, two weights'],
-    rulesNo: ['accent colours in my brand', 'shadows, gradients and rounded corners', 'all caps and bold inside a sentence', 'decorative icons and emoji'],
-    rulesNote: 'Colours and gradients belong only to project brands (e.g. teraz) - inside their frames. The one exception: the rainbow glow of the AI assistant.',
+  brand: 'My personal brand: black, white, a 1 px line, Helvetica and plenty of empty space. Colour and gradients belong only to project brands, the one exception being the rainbow glow of the AI assistant.',
+  generator: {
+    title: 'Mark generator',
+    intro: 'An algorithm builds a brand-new signet every time - from the principles I design by: geometry, negative space, grid, rhythm. Describe a brand and Claude picks the direction.',
+    brief: 'brand brief, e.g. café, warmth, craft', briefLabel: 'brand brief for Claude',
+    ai: 'design with Claude', thinking: 'Claude is designing…', aiError: 'Claude is not responding - the algorithm rolled a mark instead.',
+    color: 'mark colour', hex: 'colour as HEX', palette: 'colour palette',
+    complexity: 'complexity', style: 'style: square - round',
+    roll: 'roll', download: 'download SVG', code: 'copy SVG code', copied: 'SVG code copied',
+    no: 'mark no.',
+    kinds: { carrier: 'carrier with a cut', interlock: 'interlock', radial: 'radial', grid: 'modules', stencil: 'cuts', blob: 'organic form', line: 'continuous line' },
   },
+
   cv: {
     file: 'cv-wojciech-lumer-en.pdf',
     projects: 'Projects',
@@ -810,7 +729,7 @@ export const en = {
       experience: 'Experience:',
       education: 'Education:',
       languages: 'Languages:',
-      brandLink: 'open brandbook',
+      brandLink: 'open the mark generator',
       pdf: 'The full portfolio is in the PDF:',
       pdfLink: 'download PDF',
       unknown: 'That is not in the portfolio. Ask Wojciech directly:',

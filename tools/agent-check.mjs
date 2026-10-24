@@ -20,7 +20,7 @@ const CASES = {
     ['co to loom?', /^loom\.studio - /],
     ['reh.ab', /^reh\.ab - /],
     ['Kim jest Wojciech?', /projektant/],
-    ['Jakie kolory ma marka?', /#brandbook/],
+    ['Jakie kolory ma marka?', /#generator/],
     ['Jaka jest pogoda?', /Tego nie ma w portfolio/],
   ],
   en: [

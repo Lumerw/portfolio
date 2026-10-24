@@ -1,196 +1,316 @@
-// Generator znaków (panel #brandbook, otwierają go znaki obok awatara) - jak blobmaker.app, ale z moich sygnetów:
-// losuje sygnet (shared.generator.bases), wyciąga z niego kontury i składa nowy znak. Dwa suwaki:
-//   złożoność - z ilu punktów składa się znak (mało = abstrakcyjny, dużo = blisko oryginału),
-//   styl      - od kwadratowego (punkty na siatce, krawędzie poziomo / pionowo) przez ostre kąty do obłego (krzywe).
-// Kolor dowolny, „losuj” = inny sygnet i drobne przesunięcie punktów, wynik do pobrania jako SVG albo do skopiowania.
-// Kontury: sygnet rysowany na kanwie G × G, piksele „tuszu” (kryjące i nie białe - białe kreski w znaku to dziury),
-// marching squares → pętle (zewnętrzne i dziury, wypełnienie evenodd) → wygładzenie (Chaikin) → próbkowanie po długości.
-// main.js ładuje moduł przy pierwszym otwarciu panelu. Teksty: pl/en.brandbook.gen w content.js.
+// Generator znaków (panel #generator - otwierają go znaki obok awatara). Algorytm składa za każdym razem nowy sygnet
+// z zasad, na których projektuję (i z kanonu znaków: Rand, Pentagram, „Logotype” Evamy'ego, „Logo Design Love”):
+//   - jedna idea, prosta geometria, czytelność od 16 px; czerń na papierze, kolor dopiero potem,
+//   - negatyw: wycięcia, przecięcia (evenodd), brakujące części,
+//   - siatka i moduły, rytm, symetria lustrzana albo obrotowa, nośnik (koło / kwadrat).
+// Siedem typów (kind): nośnik z wycięciem, splot, promienie, moduły, cięcia, forma organiczna, linia ciągła.
+// Numer znaku (seed) wyznacza wszystkie decyzje; dwa suwaki zmieniają go płynnie, bez losowania od nowa:
+//   złożoność - ile elementów (wycięć, ramion, modułów, pasów, zakrętów),
+//   styl      - od kwadratowego (proste kąty, kwadraty, trójkąty) do obłego (koła, łuki, zaokrąglenia).
+// Moje sygnety były tylko wzorem stylu - generator ich nie pokazuje i nie wczytuje.
+// „Zaprojektuj z Claude”: opis marki → Worker (/mark) → Claude dobiera typ, złożoność, styl, obrót i numer;
+// bez odpowiedzi - zwykłe losowanie. Wynik: SVG do pobrania albo skopiowania, kolor z palety albo HEX.
 
-const G = 200;                       // rozdzielczość konturu = viewBox wyniku
-const PAD = 22;                      // margines znaku w polu
+const C = 100;                                   // środek pola 200 × 200
+const KINDS = ['carrier', 'interlock', 'radial', 'grid', 'stencil', 'blob', 'line'];
 
-const loadImg = src => new Promise((res, rej) => {
-  const img = new Image();
-  img.onload = () => res(img);
-  img.onerror = rej;
-  img.src = src;
-});
-
-// Sylwetka sygnetu: maska G × G (1 = tusz)
-async function mask(src) {
-  const img = await loadImg(src);
-  const w = img.naturalWidth || 100, h = img.naturalHeight || 100;
-  const k = (G - 2 * PAD) / Math.max(w, h);
-  const cv = Object.assign(document.createElement('canvas'), { width: G, height: G });
-  const cx = cv.getContext('2d', { willReadFrequently: true });
-  cx.drawImage(img, (G - w * k) / 2, (G - h * k) / 2, w * k, h * k);
-  const { data } = cx.getImageData(0, 0, G, G);
-  const m = new Uint8Array(G * G);
-  for (let i = 0; i < G * G; i++) {
-    const r = data[i * 4], g = data[i * 4 + 1], b = data[i * 4 + 2], a = data[i * 4 + 3];
-    m[i] = a > 128 && (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.92 ? 1 : 0;
-  }
-  return m;
+// Liczby losowe z ziarnem: ten sam numer = ten sam znak (mulberry32)
+function rng(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
+const f = v => +v.toFixed(2);
+const lerp = (a, b, t) => a + (b - a) * t;
+const pick = (r, list) => list[Math.floor(r() * list.length) % list.length];
 
-// Marching squares: odcinki na krawędziach komórek → zamknięte pętle
-function contours(m) {
-  const at = (x, y) => (x < 0 || y < 0 || x >= G || y >= G ? 0 : m[y * G + x]);
-  const segs = [];
-  // punkty na środkach krawędzi komórki (x, y) = rogi pikseli (x-1..x, y-1..y)
-  for (let y = 0; y <= G; y++) {
-    for (let x = 0; x <= G; x++) {
-      const tl = at(x - 1, y - 1), tr = at(x, y - 1), br = at(x, y), bl = at(x - 1, y);
-      const c = tl * 8 + tr * 4 + br * 2 + bl;
-      if (c === 0 || c === 15) continue;
-      const T = [x, y - .5], R = [x + .5, y], B = [x, y + .5], L = [x - .5, y];
-      const add = (a, b) => segs.push([a, b]);
-      switch (c) {
-        case 1: case 14: add(L, B); break;
-        case 2: case 13: add(B, R); break;
-        case 3: case 12: add(L, R); break;
-        case 4: case 11: add(T, R); break;
-        case 6: case 9: add(T, B); break;
-        case 7: case 8: add(L, T); break;
-        case 5: add(L, T); add(B, R); break;
-        case 10: add(T, R); add(L, B); break;
+/* ---------- Kształty (ścieżki SVG) ---------- */
+const circle = (cx, cy, r) => `M${f(cx - r)} ${f(cy)}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0Z`;
+// Wielokąt z zaokrąglonymi narożnikami (rad = 0 → ostre); punkty zgodnie z ruchem wskazówek
+function poly(pts, rad = 0) {
+  if (rad <= .01) return `M${pts.map(p => `${f(p[0])} ${f(p[1])}`).join('L')}Z`;
+  const n = pts.length, out = [];
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p = pts[i], p1 = pts[(i + 1) % n];
+    const d0 = Math.hypot(p0[0] - p[0], p0[1] - p[1]), d1 = Math.hypot(p1[0] - p[0], p1[1] - p[1]);
+    const k = Math.min(rad, d0 / 2, d1 / 2);
+    const a = [p[0] + (p0[0] - p[0]) * k / d0, p[1] + (p0[1] - p[1]) * k / d0];
+    const b = [p[0] + (p1[0] - p[0]) * k / d1, p[1] + (p1[1] - p[1]) * k / d1];
+    out.push(`${i ? 'L' : 'M'}${f(a[0])} ${f(a[1])}Q${f(p[0])} ${f(p[1])} ${f(b[0])} ${f(b[1])}`);
+  }
+  return `${out.join('')}Z`;
+}
+const rect = (x, y, w, h, rad = 0) => poly([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], rad);
+const rot = (pts, deg, cx = C, cy = C) => {
+  const a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+  return pts.map(([x, y]) => [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c]);
+};
+// Ćwiartka koła (wycinek 90°) w kwadracie x, y, s; q = narożnik środka (0 lewy górny, 1 prawy górny, 2 prawy dolny, 3 lewy dolny)
+function quarter(x, y, s, q) {
+  const c = [[x, y], [x + s, y], [x + s, y + s], [x, y + s]][q];
+  const a = [[x + s, y], [x + s, y + s], [x, y + s], [x, y]][q];
+  const b = [[x, y + s], [x, y], [x + s, y], [x + s, y + s]][q];
+  return `M${f(c[0])} ${f(c[1])}L${f(a[0])} ${f(a[1])}A${f(s)} ${f(s)} 0 0 1 ${f(b[0])} ${f(b[1])}Z`;
+}
+// Kształt „nośnika” wg stylu: kwadrat → zaokrąglony kwadrat → koło
+const carrierShape = (cx, cy, r, style) => (style > .82 ? circle(cx, cy, r) : rect(cx - r, cy - r, 2 * r, 2 * r, r * Math.max(0, (style - .12) / .7)));
+
+/* ---------- Typy znaków: zwracają { fill: [ścieżki], cut: [ścieżki wycięć], stroke?: {d, w, round} } ---------- */
+const MAKERS = {
+  // Nośnik (koło / kwadrat) z wycięciami w negatywie: pas, narożnik, przesunięte koło, szczelina od środka
+  carrier(r, c, s) {
+    const R = 66, cuts = [];
+    const n = 1 + Math.round(c * 3);
+    const types = ['band', 'notch', 'moon', 'slit', 'hole'];
+    const order = Array.from({ length: 5 }, () => pick(r, types));
+    for (let i = 0; i < n; i++) {
+      const t = order[i], ang = pick(r, [0, 45, 90, 135]);
+      if (t === 'band') { const w = lerp(10, 18, r()); cuts.push(poly(rot([[C - 90, C - w / 2], [C + 90, C - w / 2], [C + 90, C + w / 2], [C - 90, C + w / 2]], ang), 0)); }
+      if (t === 'notch') { const k = lerp(26, 44, r()); const q = Math.floor(r() * 4); const [x, y] = [[C - R, C - R], [C + R - k, C - R], [C + R - k, C + R - k], [C - R, C + R - k]][q]; cuts.push(s > .5 ? quarter(x, y, k, (q + 2) % 4) : rect(x, y, k, k)); }
+      if (t === 'moon') { const rr = lerp(30, 48, r()), d = lerp(18, 34, r()); const a = ang * Math.PI / 180; cuts.push(carrierShape(C + Math.cos(a) * d, C + Math.sin(a) * d, rr, s)); }
+      if (t === 'slit') { const w = lerp(9, 14, r()); cuts.push(poly(rot([[C - w / 2, C - w / 2], [C + R + 4, C - w / 2], [C + R + 4, C + w / 2], [C - w / 2, C + w / 2]], ang), 0), poly(rot([[C - w / 2, C - w / 2], [C + w / 2, C - w / 2], [C + w / 2, C - R - 4], [C - w / 2, C - R - 4]], ang), 0)); }
+      if (t === 'hole') cuts.push(carrierShape(C, C, lerp(12, 22, r()), s));
+    }
+    return { fill: [carrierShape(C, C, R, s)], cut: cuts };
+  },
+  // Splot: 2-4 pierścienie / ramki zachodzące na siebie - przecięcia w negatywie (evenodd)
+  interlock(r, c, s) {
+    const n = 2 + Math.round(c * 2), R = lerp(34, 44, r()) - n * 2, w = lerp(10, 15, r());
+    const along = r() > .4;                                 // w rzędzie albo wokół środka
+    const parts = [];
+    for (let i = 0; i < n; i++) {
+      const [cx, cy] = along
+        ? [C + (i - (n - 1) / 2) * R * 1.25, C]
+        : [C + Math.cos(i / n * 2 * Math.PI - Math.PI / 2) * R * .72, C + Math.sin(i / n * 2 * Math.PI - Math.PI / 2) * R * .72];
+      parts.push(carrierShape(cx, cy, R, s), carrierShape(cx, cy, R - w, s));
+    }
+    return { fill: [parts.join('')], cut: [], evenodd: true };
+  },
+  // Promienie: 3-10 ramion wokół środka (gwiazdka / śmigło), opcjonalnie otwór w środku
+  radial(r, c, s) {
+    const n = 3 + Math.round(c * 7), L = 70, w = lerp(30, 12, c) * lerp(.9, 1.15, r());
+    const blade = r() > .55;                                 // ostrze (trójkąt) zamiast belki
+    const twist = blade ? pick(r, [0, 18, 30]) : 0;
+    const off = r() * 360 / n;
+    const arms = [];
+    for (let i = 0; i < n; i++) {
+      const a = off + i * 360 / n;
+      const pts = blade ? [[C, C - w * .55], [C + L, C - w * .1 + twist * .3], [C, C + w * .55]] : [[C, C - w / 2], [C + L, C - w / 2], [C + L, C + w / 2], [C, C + w / 2]];
+      arms.push(poly(rot(pts, a), s * w * .5));
+    }
+    const cut = r() > .55 ? [circle(C, C, w * .45)] : [];
+    return { fill: [...arms, circle(C, C, w * .62)], cut };
+  },
+  // Moduły: siatka 2-4 × 2-4, w polach ćwiartki koła, półkola, koła, kwadraty i trójkąty; często lustro
+  grid(r, c, s) {
+    const g = 2 + Math.round(c * 2), size = 136, cell = size / g, x0 = C - size / 2, y0 = C - size / 2;
+    const mirror = r() > .4;
+    const shapes = [];
+    const cellShape = (x, y, t, q) => {
+      if (t === 'quarter') return quarter(x, y, cell, q);
+      if (t === 'circle') return circle(x + cell / 2, y + cell / 2, cell / 2);
+      if (t === 'half') return `M${f(x)} ${f(y + cell)}A${f(cell / 2)} ${f(cell / 2)} 0 0 1 ${f(x + cell)} ${f(y + cell)}Z`;
+      if (t === 'tri') return poly([[[x, y], [x + cell, y], [x, y + cell]], [[x, y], [x + cell, y], [x + cell, y + cell]], [[x + cell, y], [x + cell, y + cell], [x, y + cell]], [[x, y], [x + cell, y + cell], [x, y + cell]]][q], 0);
+      return rect(x, y, cell, cell, cell * s * .35);
+    };
+    const weighted = () => {                                // styl przechyla wybór: obły → łuki, kwadratowy → kąty
+      const round = ['quarter', 'quarter', 'circle', 'half'], square = ['square', 'square', 'tri', 'tri'];
+      return r() < s ? pick(r, round) : pick(r, square);
+    };
+    const plan = [];
+    for (let j = 0; j < g; j++) for (let i = 0; i < g; i++) plan.push({ i, j, t: r() < .18 ? 'empty' : weighted(), q: Math.floor(r() * 4) });
+    for (const p of plan) {
+      let { i, t, q } = p;
+      if (mirror && i >= g / 2) { const m = plan.find(o => o.j === p.j && o.i === g - 1 - i); t = m.t; q = [1, 0, 3, 2][m.q]; }
+      if (t !== 'empty') shapes.push(cellShape(x0 + i * cell, y0 + p.j * cell, t, q));
+    }
+    if (!shapes.length) shapes.push(circle(C, C, 50));
+    return { fill: shapes, cut: [] };
+  },
+  // Cięcia: bryła przecięta równoległymi pasami (jak szablon); czasem jeden pas w poprzek
+  stencil(r, c, s) {
+    const R = 64, n = 2 + Math.round(c * 6), gap = lerp(5, 3, c), ang = pick(r, [0, 0, 90, 45, -45]);
+    const base = r() > .5 ? carrierShape(C, C, R, s) : poly([[C, C - R * 1.05], [C + R * 1.05, C + R * .8], [C - R * 1.05, C + R * .8]], s * 22);
+    const cuts = [];
+    for (let i = 1; i <= n; i++) {
+      const y = C - R + (2 * R) * i / (n + 1);
+      cuts.push(poly(rot([[C - 100, y - gap / 2], [C + 100, y - gap / 2], [C + 100, y + gap / 2], [C - 100, y + gap / 2]], ang), 0));
+    }
+    if (r() > .6) cuts.push(poly(rot([[C - gap / 2, C - 100], [C + gap / 2, C - 100], [C + gap / 2, C + 100], [C - gap / 2, C + 100]], ang), 0));
+    return { fill: [base], cut: cuts };
+  },
+  // Forma organiczna: zamknięta krzywa z kilku fal + 0-2 mniejsze formy (jak kropla, ziarno, kamień)
+  blob(r, c, s) {
+    const waves = 2 + Math.round(c * 4);
+    const amps = Array.from({ length: waves }, (_, k) => ({ k: k + 2, a: lerp(.04, .18, r()) / (1 + k * .4), ph: r() * Math.PI * 2 }));
+    const shape = (cx, cy, R, steps) => {
+      const pts = Array.from({ length: steps }, (_, i) => {
+        const t = i / steps * Math.PI * 2;
+        const rr = R * (1 + amps.reduce((sum, w) => sum + w.a * Math.sin(w.k * t + w.ph), 0));
+        return [cx + Math.cos(t) * rr, cy + Math.sin(t) * rr];
+      });
+      if (s < .45) {                                        // kwadratowy: punkty na siatce, mniej wierzchołków
+        const grid = lerp(16, 4, s / .45);
+        return poly(pts.filter((_, i) => i % 2 === 0).map(([x, y]) => [Math.round(x / grid) * grid, Math.round(y / grid) * grid]), 0);
       }
+      // obły: krzywe Catmull-Rom przez punkty
+      const k = (s - .45) / .55 / 6 + .08;
+      return `M${f(pts[0][0])} ${f(pts[0][1])}${pts.map((p, i) => {
+        const p0 = pts[(i - 1 + steps) % steps], p2 = pts[(i + 1) % steps], p3 = pts[(i + 2) % steps];
+        return `C${f(p[0] + (p2[0] - p0[0]) * k)} ${f(p[1] + (p2[1] - p0[1]) * k)} ${f(p2[0] - (p3[0] - p[0]) * k)} ${f(p2[1] - (p3[1] - p[1]) * k)} ${f(p2[0])} ${f(p2[1])}`;
+      }).join('')}Z`;
+    };
+    const extra = Math.round(r() * 2 * (.4 + c * .6));
+    const fill = [shape(C - (extra ? 10 : 0), C + (extra ? 8 : 0), extra ? 52 : 62, 12 + waves * 2)];
+    for (let i = 0; i < extra; i++) {
+      const a = -Math.PI / 4 + (i ? .9 : 0) + r() * .4, d = lerp(58, 70, r());
+      fill.push(shape(C - 10 + Math.cos(a) * d, C + 8 + Math.sin(a) * d, lerp(12, 20, r()), 10));
     }
-  }
-  const key = p => `${p[0]},${p[1]}`;
-  const ends = new Map();
-  segs.forEach((s, i) => { for (const p of s) { const k = key(p); (ends.get(k) ?? ends.set(k, []).get(k)).push(i); } });
-  const used = new Uint8Array(segs.length);
-  const loops = [];
-  for (let i = 0; i < segs.length; i++) {
-    if (used[i]) continue;
-    used[i] = 1;
-    const loop = [segs[i][0], segs[i][1]];
-    for (;;) {
-      const last = loop[loop.length - 1];
-      const next = (ends.get(key(last)) ?? []).find(j => !used[j]);
-      if (next == null) break;
-      used[next] = 1;
-      const [a, b] = segs[next];
-      loop.push(key(a) === key(last) ? b : a);
-    }
-    if (loop.length > 8) loops.push(loop);
-  }
-  return loops;
-}
-
-const area = pts => pts.reduce((s, p, i) => { const q = pts[(i + 1) % pts.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0) / 2;
-const perimeter = pts => pts.reduce((s, p, i) => s + Math.hypot(...[0, 1].map(k => pts[(i + 1) % pts.length][k] - p[k])), 0);
-// Chaikin: zjada schodki pikseli, kształt zostaje
-const chaikin = pts => pts.flatMap((p, i) => {
-  const q = pts[(i + 1) % pts.length];
-  return [[p[0] * .75 + q[0] * .25, p[1] * .75 + q[1] * .25], [p[0] * .25 + q[0] * .75, p[1] * .25 + q[1] * .75]];
-});
-// n punktów równo po długości pętli
-function resample(pts, n) {
-  const L = perimeter(pts), step = L / n, out = [];
-  let i = 0, t = 0, acc = 0;
-  for (let k = 0; k < n; k++) {
-    const want = k * step;
-    for (;;) {
-      const p = pts[i % pts.length], q = pts[(i + 1) % pts.length], d = Math.hypot(q[0] - p[0], q[1] - p[1]);
-      if (acc + d >= want || i > pts.length * 2) { t = d ? (want - acc) / d : 0; out.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]); break; }
-      acc += d; i++;
-    }
-  }
-  return out;
-}
-
-// Pseudolosowość z ziarnem (ten sam znak dla tych samych ustawień)
-const rand = seed => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
-const f = v => +v.toFixed(1);
-
-// Znak: pętle bazy → ścieżka SVG wg złożoności (0-1) i stylu (0 kwadratowy - .5 ostry - 1 obły)
-function build(loops, complexity, style, seed) {
-  const total = loops.reduce((s, l) => s + perimeter(l), 0);
-  const budget = Math.round(8 + Math.pow(complexity, 1.5) * 150);
-  const r = rand(seed);
-  const jitter = 1.6 * (1 - .75 * complexity);          // drobne przesunięcie punktów (px pola 200); przy dużej złożoności mniej
-  const square = Math.max(0, (.5 - style) * 2);         // 0-1: siła „kwadratowości”
-  const round = Math.max(0, (style - .5) * 2);          // 0-1: siła krzywych
-  const grid = 2 + square * 14;                         // krok siatki przy stylu kwadratowym
-  const parts = [];
-  for (const loop of loops) {
-    const n = Math.max(3, Math.round(budget * perimeter(loop) / total));
-    let pts = resample(loop, n).map(([x, y]) => [x + (r() - .5) * jitter, y + (r() - .5) * jitter]);
-    if (square > 0) {
-      pts = pts.map(([x, y]) => [Math.round(x / grid) * grid, Math.round(y / grid) * grid])
-        .filter((p, i, a) => i === 0 || p[0] !== a[i - 1][0] || p[1] !== a[i - 1][1]);
-      if (pts.length > 1 && pts[0][0] === pts.at(-1)[0] && pts[0][1] === pts.at(-1)[1]) pts.pop();
-      if (square > .55) {                                // krawędzie tylko poziomo i pionowo
-        pts = pts.flatMap((p, i) => { const q = pts[(i + 1) % pts.length]; return p[0] !== q[0] && p[1] !== q[1] ? [p, [q[0], p[1]]] : [p]; });
+    return { fill, cut: [] };
+  },
+  // Linia ciągła: gruba kreska po siatce 5 × 5 bez powrotów (meander, pętla), końce i zakręty wg stylu
+  line(r, c, s) {
+    const steps = 4 + Math.round(c * 7), cell = 30, g = 5, x0 = C - (g - 1) * cell / 2, y0 = x0;
+    let p = [Math.floor(r() * g), Math.floor(r() * g)];
+    const seen = new Set([p.join()]), path = [p];
+    let dir = Math.floor(r() * 4);
+    const D = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+    for (let i = 0; i < steps * 2 && path.length <= steps; i++) {
+      if (r() < .45) dir = (dir + (r() < .5 ? 1 : 3)) % 4;
+      const len = 1 + Math.floor(r() * 2);
+      let q = p;
+      for (let k = 0; k < len; k++) {
+        const n = [q[0] + D[dir][0], q[1] + D[dir][1]];
+        if (n[0] < 0 || n[1] < 0 || n[0] >= g || n[1] >= g || seen.has(n.join())) break;
+        q = n; seen.add(n.join());
       }
-      if (pts.length < 3 || Math.abs(area(pts)) < grid * grid) continue;
+      if (q !== p) { path.push(q); p = q; }
     }
-    if (round > 0) {
-      // Catmull-Rom → Bézier; uchwyty rosną z „obłością”
-      const k = round / 6 * 1.15;
-      const d = pts.map((p, i) => {
-        const p0 = pts[(i - 1 + pts.length) % pts.length], p2 = pts[(i + 1) % pts.length], p3 = pts[(i + 2) % pts.length];
-        const c1 = [p[0] + (p2[0] - p0[0]) * k, p[1] + (p2[1] - p0[1]) * k];
-        const c2 = [p2[0] - (p3[0] - p[0]) * k, p2[1] - (p3[1] - p[1]) * k];
-        return `C${f(c1[0])} ${f(c1[1])} ${f(c2[0])} ${f(c2[1])} ${f(p2[0])} ${f(p2[1])}`;
-      }).join('');
-      parts.push(`M${f(pts[0][0])} ${f(pts[0][1])}${d}Z`);
-    } else {
-      parts.push(`M${pts.map(p => `${f(p[0])} ${f(p[1])}`).join('L')}Z`);
+    if (path.length < 3) path.push([g - 1 - path[0][0], g - 1 - path[0][1]]);
+    // wyśrodkowanie i skala: ścieżka wypełnia pole ~124 px (jak inne typy)
+    const raw = path.map(([i, j]) => [x0 + i * cell, y0 + j * cell]);
+    const xs = raw.map(p => p[0]), ys = raw.map(p => p[1]);
+    const bw = Math.max(...xs) - Math.min(...xs), bh = Math.max(...ys) - Math.min(...ys);
+    const k = 124 / Math.max(bw, bh, 60), mx = (Math.max(...xs) + Math.min(...xs)) / 2, my = (Math.max(...ys) + Math.min(...ys)) / 2;
+    const pts = raw.map(([x, y]) => [C + (x - mx) * k, C + (y - my) * k]);
+    // zaokrąglone zakręty: łuk o promieniu do połowy odcinka
+    const rad = s * cell * k * .55;
+    let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i], n = pts[i + 1];
+      if (!n || rad < 1) { d += `L${f(b[0])} ${f(b[1])}`; continue; }
+      const l1 = Math.hypot(b[0] - a[0], b[1] - a[1]), l2 = Math.hypot(n[0] - b[0], n[1] - b[1]), k = Math.min(rad, l1 / 2, l2 / 2);
+      d += `L${f(b[0] - (b[0] - a[0]) * k / l1)} ${f(b[1] - (b[1] - a[1]) * k / l1)}Q${f(b[0])} ${f(b[1])} ${f(b[0] + (n[0] - b[0]) * k / l2)} ${f(b[1] + (n[1] - b[1]) * k / l2)}`;
     }
-  }
-  return parts.join('');
+    return { fill: [], cut: [], stroke: { d, w: lerp(26, 16, c), round: s > .5 } };
+  },
+};
+
+// Znak → SVG (pole 200 × 200). Wycięcia jako maska, więc plik działa w każdym programie i z każdym kolorem.
+export function markSvg({ kind, seed, complexity, style, rotate = 0 }, color = '#111111', size = 400) {
+  const r = rng(seed * 7 + KINDS.indexOf(kind) * 131);
+  const m = MAKERS[kind](r, complexity, style);
+  const id = `m${seed}`;
+  const g = `transform="rotate(${rotate} ${C} ${C})"`;
+  const fill = m.fill.map(d => `<path d="${d}"${m.evenodd ? ' fill-rule="evenodd"' : ''}/>`).join('');
+  const stroke = m.stroke ? `<path d="${m.stroke.d}" fill="none" stroke="${color}" stroke-width="${f(m.stroke.w)}" stroke-linecap="${m.stroke.round ? 'round' : 'square'}" stroke-linejoin="${m.stroke.round ? 'round' : 'miter'}"/>` : '';
+  const mask = m.cut.length ? `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200"><rect width="200" height="200" fill="#fff"/><g fill="#000">${m.cut.map(d => `<path d="${d}"/>`).join('')}</g></mask></defs>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${mask}<g ${g}><g fill="${color}"${m.cut.length ? ` mask="url(#${id})"` : ''}>${fill}</g>${stroke}</g></svg>`;
 }
 
-export function initGenerator(root, { bases, copy }) {
+export function initGenerator(root, { copy, palette, color: start, endpoint, lang }) {
   const stage = root.querySelector('[data-gen-stage]');
   const $ = s => root.querySelector(`[data-gen="${s}"]`);
-  const color = $('color'), hex = $('hex'), complexity = $('complexity'), style = $('style'), info = $('info');
-  const cache = new Map();
-  let base = -1, seed = 1, loops = [];
+  const hex = $('hex'), swatch = $('swatch'), pal = $('palette'), complexity = $('complexity'), style = $('style'), info = $('info'), note = $('note');
+  let color = start, mark = null, view = '0 0 200 200';
 
-  const svg = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${G} ${G}" width="${G * 2}" height="${G * 2}"><path fill="${color.value}" fill-rule="evenodd" d="${build(loops, complexity.value / 100, style.value / 100, seed)}"/></svg>`;
-  const draw = () => { if (loops.length) stage.innerHTML = svg(); };
-
-  async function roll() {
-    let next = Math.floor(Math.random() * bases.length);
-    if (bases.length > 1 && next === base) next = (next + 1) % bases.length;
-    base = next;
-    seed = 1 + Math.floor(Math.random() * 1e6);
-    if (!cache.has(base)) cache.set(base, contours(await mask(bases[base])).map(l => chaikin(chaikin(chaikin(l)))).filter(l => Math.abs(area(l)) > 40));
-    loops = cache.get(base);
-    info.textContent = `${copy.base} ${String(base + 1).padStart(2, '0')} / ${String(bases.length).padStart(2, '0')}`;
-    draw();
-  }
-
-  const setColor = v => {
-    if (!/^#[0-9a-f]{6}$/i.test(v)) return;
-    color.value = v.toLowerCase();
-    hex.value = v.toUpperCase();
-    root.style.setProperty('--gen-c', v);
+  // Kadr: znak wyśrodkowany względem swojego obrysu (puste moduły, krótka linia), z równym marginesem;
+  // ten sam kadr trafia do pobranego SVG
+  const raw = () => markSvg({ ...mark, complexity: complexity.value / 100, style: style.value / 100 }, color);
+  const svg = () => raw().replace('viewBox="0 0 200 200"', `viewBox="${view}"`);
+  const draw = () => {
+    if (!mark) return;
+    stage.innerHTML = raw();
+    const el = stage.querySelector('svg'), g = el.querySelector('g[transform]');
+    const bb = g.getBBox(), sw = +(el.querySelector('[stroke-width]')?.getAttribute('stroke-width') || 0);
+    const side = Math.max(bb.width, bb.height, 60) + sw + 64, cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
+    view = [cx - side / 2, cy - side / 2, side, side].map(v => +v.toFixed(2)).join(' ');
+    el.setAttribute('viewBox', view);
+    info.textContent = `${copy.kinds[mark.kind]} · ${copy.no} ${mark.seed}`;
+  };
+  const roll = () => {
+    mark = { kind: KINDS[Math.floor(Math.random() * KINDS.length)], seed: 1 + Math.floor(Math.random() * 99999), rotate: 0 };
+    note.textContent = '';
     draw();
   };
-  color.addEventListener('input', () => setColor(color.value));
-  hex.addEventListener('change', () => setColor(hex.value.startsWith('#') ? hex.value : `#${hex.value}`));
+
+  // Kolor: paleta (próbki jak w blobmakerze) albo HEX
+  const setColor = v => {
+    if (!/^#[0-9a-f]{6}$/i.test(v)) { hex.value = color.toUpperCase(); return; }
+    color = v.toLowerCase();
+    hex.value = color.toUpperCase();
+    root.style.setProperty('--gen-c', color);
+    for (const b of pal.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.c === color));
+    draw();
+  };
+  pal.innerHTML = palette.map(c => `<button type="button" data-c="${c.toLowerCase()}" style="--c:${c}" aria-label="${c}" aria-pressed="false"></button>`).join('');
+  const openPal = open => { pal.hidden = !open; swatch.setAttribute('aria-expanded', String(open)); };
+  swatch.addEventListener('click', () => openPal(pal.hidden));
+  pal.addEventListener('click', e => { const b = e.target.closest('button[data-c]'); if (b) { setColor(b.dataset.c); openPal(false); swatch.focus(); } });
+  document.addEventListener('click', e => { if (!pal.hidden && !e.target.closest('.gen__color, .gen__palette')) openPal(false); });
+  root.addEventListener('keydown', e => { if (e.key === 'Escape' && !pal.hidden) { e.stopPropagation(); openPal(false); swatch.focus(); } });
+  hex.addEventListener('change', () => setColor(hex.value.trim().startsWith('#') ? hex.value.trim() : `#${hex.value.trim()}`));
+
   complexity.addEventListener('input', draw);
   style.addEventListener('input', draw);
   $('roll').addEventListener('click', roll);
   $('download').addEventListener('click', () => {
-    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([svg()], { type: 'image/svg+xml' })), download: 'znak-lumerw.svg' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([svg()], { type: 'image/svg+xml' })), download: `znak-${mark.seed}.svg` });
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
   const code = $('code');
   code.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(svg()); } catch { return; }
-    const was = code.getAttribute('aria-label');
-    code.setAttribute('aria-label', copy.copied);
     code.dataset.done = '';
-    info.textContent = copy.copied;
-    setTimeout(() => { code.setAttribute('aria-label', was); delete code.dataset.done; }, 1600);
+    note.textContent = copy.copied;
+    setTimeout(() => { delete code.dataset.done; }, 1600);
   });
+
+  // Claude jako art director: opis marki → typ, złożoność, styl, obrót, numer (Worker /mark); błąd → losowanie
+  const form = $('ai');
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const brief = $('brief').value.trim();
+    if (!brief || form.dataset.busy) return;
+    form.dataset.busy = '1';
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    note.textContent = copy.thinking;
+    try {
+      if (!endpoint) throw new Error('offline');
+      const res = await fetch(`${endpoint.replace(/\/$/, '')}/mark`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ brief, lang }) });
+      const p = await res.json();
+      if (!res.ok || !KINDS.includes(p.kind)) throw new Error(p.error || res.status);
+      mark = { kind: p.kind, seed: p.seed, rotate: p.rotate };
+      complexity.value = p.complexity;
+      style.value = p.style;
+      draw();
+      note.textContent = [p.name, p.why].filter(Boolean).join(' - ');
+    } catch {
+      roll();
+      note.textContent = copy.aiError;
+    } finally {
+      delete form.dataset.busy;
+      btn.disabled = false;
+    }
+  });
+
+  setColor(start);
   roll();
 }

@@ -197,7 +197,7 @@ function syncSheet() {
     // Czat: od razu pole pytania (na dotykowych - krzyżyk, żeby nie wyskakiwała klawiatura).
     if (sheet.id === 'agent') loadAgent();
     if (sheet.id === 'rozmowa') openBooking(sheet);
-    if (sheet.id === 'brandbook') openGenerator(sheet);
+    if (sheet.id === 'generator') openGenerator(sheet);
     const first = sheet.id === 'agent' && matchMedia('(hover: hover)').matches ? sheet.querySelector('#agent-q') : null;
     requestAnimationFrame(() => (first ?? sheet.querySelector('[data-close]')).focus({ preventScroll: true }));
   } else {
@@ -232,14 +232,16 @@ matchMedia('(max-width: 767px) and (orientation: portrait)').addEventListener('c
 
 /* Kalendarz rezerwacji (panel #rozmowa, Cal.com): booking.js ładuje się przy pierwszym otwarciu panelu,
    każde otwarcie odświeża wolne terminy. */
-// Generator znaków (generator.js) - wczytywany przy pierwszym otwarciu panelu brandbooka
+// Generator znaków (generator.js) - wczytywany przy pierwszym otwarciu panelu #generator
 let genMod = null;
 async function openGenerator(sheet) {
   const root = sheet.querySelector('[data-generator]');
   if (!root || root.dataset.ready) return;
   root.dataset.ready = '1';
+  const lang = document.documentElement.lang === 'en' ? 'en' : 'pl';
   const { initGenerator } = await (genMod ??= import('./generator.js'));
-  initGenerator(root, { bases: content.shared.generator.bases.map(abs), copy: content[document.documentElement.lang === 'en' ? 'en' : 'pl'].brandbook.gen });
+  const G = content.shared.generator;
+  initGenerator(root, { copy: content[lang].generator, palette: G.palette, color: G.color, endpoint: content.shared.agent?.endpoint, lang });
 }
 
 async function openBooking(sheet) {
@@ -250,10 +252,9 @@ async function openBooking(sheet) {
   root.__booking = initBooking(root, { lang: root.closest('html')?.lang || 'pl', copy: content[root.closest('html')?.lang || 'pl'].booking, email: content.shared.email, calendly: content.shared.calendly });
 }
 
-/* Ikony (obok awatara i w brandbooku): każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS)
-   i nigdy nie pokazuje tej samej ikony co sąsiad. Hero: w miejscu zbierają się ikony (dokładane przy pierwszym
-   użyciu, pokazywane dopiero po wczytaniu - bez mignięcia), widoczna ma .is-on.
-   Brandbook: jedno <img> na miejsce, zmienia się src. Każdy zestaw rusza tylko, gdy go widać. */
+/* Ikony obok awatara: każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS) i nigdy nie pokazuje tej samej
+   ikony co sąsiad. W miejscu zbierają się ikony (dokładane przy pierwszym użyciu, pokazywane dopiero po wczytaniu -
+   bez mignięcia), widoczna ma .is-on. Ruszają tylko, gdy żaden panel nie jest otwarty. */
 const ICON_MS = [500, 1100];
 const ICON_SETS = [
   {
@@ -269,12 +270,6 @@ const ICON_SETS = [
       const show = () => { for (const img of slot.children) img.classList.toggle('is-on', img === next); };
       if (next.complete) show(); else next.addEventListener('load', show, { once: true });
     },
-  },
-  {
-    sel: '[data-bb-icon]',
-    live: () => openSheet()?.id === 'brandbook',
-    get: img => img.src,
-    set: (img, src) => { img.src = src; img.classList.toggle('mono', src.endsWith('.svg')); },
   },
 ];
 function tickIcon(set, k) {

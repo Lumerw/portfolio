@@ -498,7 +498,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 }
 
 /* ==========================================================================
-   Portfolio: projekty, o mnie (LinkedIn), brandbook, PDF
+   Portfolio: projekty, o mnie (LinkedIn), PDF
    ========================================================================== */
 .work { padding-block: var(--s-4) var(--s-12); }
 .work__title { margin-bottom: var(--s-4); }
@@ -1576,14 +1576,18 @@ html:has(.sheet:target) { overflow: hidden; }
 .print-only { display: none; }
 
 /* ==========================================================================
-   Brandbook - księga znaku marki osobistej (panel #brandbook)
-   Etykieta sekcji w kolumnach 1-3, treść 4-12; na telefonie jedna kolumna.
+   Generator znaków (panel #generator, generator.js) - jak blobmaker.app, w stylu strony: opis marki dla Claude,
+   pole ze znakiem (zawsze jasne, jak kartka), pod nim pasek z kreską 1 px: kolor (HEX + paleta próbek),
+   złożoność, styl, pobierz / kod / losuj. Telefon: pasek w wierszach, suwaki na całą szerokość.
    ========================================================================== */
-.bb { padding-bottom: var(--s-8); }
-/* Generator znaków (generator.js) - jak blobmaker.app, w stylu strony: pole ze znakiem (zawsze jasne, jak kartka),
-   pod nim pasek z kreską 1 px: kolor, złożoność, styl, pobierz / kod / losuj */
-.gen { padding-bottom: var(--s-8); margin-bottom: var(--s-6); border-bottom: var(--hairline) solid var(--hair); }
-.gen__intro { max-width: 34em; margin-top: var(--s-1); }
+.gen { padding-bottom: var(--s-8); --gen-max: 880px; }
+.gen__intro { max-width: 34em; }
+.gen__ai { display: flex; gap: var(--s-1); max-width: var(--gen-max); margin: var(--s-4) auto 0; }
+.gen__ai input { flex: 1; min-width: 0; height: 40px; padding-inline: var(--s-2); border: var(--hairline) solid var(--ink-4); background: none; color: var(--ink); font: inherit; font-size: var(--fs-text); border-radius: 0; }
+.gen__ai input:focus-visible { outline: none; border-color: var(--ink); }
+.gen__ai .button { min-height: 40px; gap: var(--s-1); white-space: nowrap; }
+.gen__ai button:disabled { opacity: .5; cursor: progress; }
+.agent-glow-dot { width: 10px; height: 10px; border-radius: 50%; background: conic-gradient(#FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D); flex: none; }
 .gen__stage {
   width: min(100%, 440px);
   aspect-ratio: 1;
@@ -1593,28 +1597,36 @@ html:has(.sheet:target) { overflow: hidden; }
   outline-offset: -1px;
 }
 .gen__stage svg { display: block; width: 100%; height: 100%; }
+.gen__info { max-width: var(--gen-max); margin: var(--s-2) auto 0; text-align: center; min-height: 1.5em; }
+.gen__note { color: var(--ink-2); }
 .gen__bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--s-2) var(--s-4);
-  max-width: 880px;
-  margin: var(--s-4) auto 0;
+  max-width: var(--gen-max);
+  margin: var(--s-3) auto 0;
   padding: var(--s-2) var(--s-3);
   border: var(--hairline) solid var(--ink-4);
 }
+/* Kolor: HEX + kółko z kolorem; klik w kółko → wiersz próbek w pasku (jak paleta blobmakera), klik obok - zamknięcie */
 .gen__color { display: inline-flex; align-items: center; gap: var(--s-1); padding: 6px 6px 6px var(--s-2); border: var(--hairline) solid var(--hair); }
-.gen__color input[type="text"] { width: 8.5ch; border: 0; background: none; color: var(--ink); font: inherit; font-size: var(--fs-meta); letter-spacing: .04em; text-transform: uppercase; outline: none; }
-.gen__swatch { position: relative; width: 24px; height: 24px; border-radius: 50%; background: var(--gen-c); box-shadow: 0 0 0 var(--hairline) var(--hair); }
-.gen__swatch input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
 .gen__color:focus-within { border-color: var(--ink); }
+.gen__color input { width: 8.5ch; border: 0; background: none; color: var(--ink); font: inherit; font-size: var(--fs-meta); letter-spacing: .04em; text-transform: uppercase; outline: none; }
+.gen__swatch { width: 26px; height: 26px; border-radius: 50%; background: var(--gen-c); box-shadow: 0 0 0 var(--hairline) var(--hair); cursor: pointer; }
+.gen__swatch:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+.gen__palette { order: 1; flex-basis: 100%; display: flex; flex-wrap: wrap; gap: var(--s-1); padding-top: var(--s-2); border-top: var(--hairline) solid var(--hair); }
+.gen__palette[hidden] { display: none; }
+.gen__palette button { width: 32px; height: 32px; background: var(--c); box-shadow: inset 0 0 0 var(--hairline) rgb(0 0 0 / .12); cursor: pointer; }
+.gen__palette button[aria-pressed="true"] { outline: 1px solid var(--ink); outline-offset: 2px; }
+.gen__palette button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .gen__range { flex: 1 1 200px; display: flex; align-items: center; gap: var(--s-1); color: var(--ink-2); }
 .gen__range .icon { width: 18px; height: 18px; flex: none; }
-.gen__range input { flex: 1; min-width: 80px; height: 24px; margin: 0; background: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
+.gen__range input { flex: 1; min-width: 80px; height: 28px; margin: 0; background: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
 .gen__range input::-webkit-slider-runnable-track { height: 1px; background: var(--ink-4); }
 .gen__range input::-moz-range-track { height: 1px; background: var(--ink-4); }
-.gen__range input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -7.5px; border-radius: 50%; background: var(--ink); border: 0; }
-.gen__range input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: 0; }
+.gen__range input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -8.5px; border-radius: 50%; background: var(--ink); border: 0; }
+.gen__range input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--ink); border: 0; }
 .gen__range input:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
 .gen__actions { display: flex; gap: var(--s-1); margin-left: auto; }
 .gen__btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-1); min-width: 40px; height: 40px; padding-inline: 11px; border: var(--hairline) solid var(--ink); color: var(--ink); transition: background-color var(--t-line) var(--ease), color var(--t-line) var(--ease); }
@@ -1625,75 +1637,21 @@ html:has(.sheet:target) { overflow: hidden; }
   .gen__btn:hover { background: var(--ink); color: var(--paper); }
   .gen__btn--roll:hover { background: transparent; color: var(--ink); }
 }
-.gen__info { margin-top: var(--s-2); text-align: center; min-height: 1.5em; }
-.bb__intro { max-width: 34em; margin-bottom: var(--s-6); }
-.bb__sec {
-  row-gap: var(--s-2);
-  padding-block: var(--s-5);
-  border-top: var(--hairline) solid var(--hair);
+/* Telefon: kolor i przyciski w jednym wierszu, pod nimi paleta (gdy otwarta) i suwaki na całą szerokość */
+@media (max-width: 599px) {
+  .gen__bar { padding: var(--s-2); gap: var(--s-2); }
+  .gen__range { flex-basis: 100%; order: 2; }
+  .gen__actions { margin-left: auto; }
+  .gen__palette { gap: 6px; }
+  .gen__palette button { width: 34px; height: 34px; }
+  .gen__ai { flex-wrap: wrap; }
+  .gen__ai input { flex-basis: 100%; }
+  .gen__ai .button { flex: 1; }
 }
-.bb__body { display: grid; gap: var(--s-3); align-content: start; }
-.bb__note { margin-top: var(--s-1); }
-@media (min-width: 768px) {
-  .bb__label { grid-column: 1 / 4; }
-  .bb__body  { grid-column: 4 / -1; }
-}
-
-/* Znak: jasna i ciemna wersja, rozmiary */
-.bb__tiles { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); max-width: 640px; }
-.bb__tile { display: grid; place-items: center; aspect-ratio: 4 / 3; border: var(--hairline) solid var(--hair); }
-.bb__tile--paper { background: #FAFAF7; color: #111111; }
-.bb__tile--ink   { background: #111111; color: #FAFAF7; }
-.bb__tile .bb__mark { --size: 96; }
-.bb__sizes { display: flex; align-items: center; gap: var(--s-3); margin: 0; }
-.bb__mark--16 { --size: 16; }
-.bb__mark--24 { --size: 24; }
-.bb__mark--40 { --size: 40; }
-
-/* Kolory */
-.bb__swatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4) var(--s-3); }
-@media (min-width: 768px)  { .bb__swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .bb__swatches { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
-.bb__swatches li { display: grid; gap: 2px; align-content: start; }
-.bb__chip { display: block; width: 100%; aspect-ratio: 1; margin-bottom: var(--s-1); border: var(--hairline) solid var(--hair); }
-.bb__name { font-size: var(--fs-text); }
-
-/* Typografia - wiersze jak w indeksie */
-.bb__type li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--s-1);
-  padding-block: var(--s-2);
-  border-bottom: var(--hairline) solid var(--hair);
-}
-.bb__type li:first-child { border-top: var(--hairline) solid var(--hair); }
-@media (min-width: 768px) {
-  .bb__type li { grid-template-columns: 220px minmax(0, 1fr); align-items: baseline; gap: var(--s-3); }
-}
-
-/* Symbole i ikony */
-.bb__symbols { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
-.bb__sym { --size: 40; }
-.bb__icon { width: 40px; height: 40px; }
-
-/* Siatka 12 kolumn */
-.bb__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; height: var(--s-8); }
-.bb__grid span { background: var(--hair); }
-
-/* Ruch: wiersze nazwa - wartość */
-.bb__row { grid-template-columns: minmax(0, 1fr) auto; }
-.bb__row .row__role { grid-column: auto; text-align: right; }
-
-/* Zasady: tak / nie */
-.bb__rules { display: grid; grid-template-columns: 1fr; gap: var(--s-4); }
-@media (min-width: 768px) { .bb__rules { grid-template-columns: 1fr 1fr; } }
-.bb__rules ul { display: grid; gap: var(--s-1); margin-top: var(--s-2); }
-.bb__rules li::before { content: "+"; display: inline-block; width: 1.4em; color: var(--ink-3); }
-.bb__no li::before { content: "-"; }
 
 /* ==========================================================================
    Asystent AI - czat w panelu #agent (otwiera go awatar w hero).
-   Jedyny kolor marki osobistej: tęczowa poświata (decyzja właściciela, patrz brandbook).
+   Jedyny kolor marki osobistej: tęczowa poświata (decyzja właściciela).
    Gradient obraca się przez transform (kompozytor, bez przemalowywania); bez ruchu w systemie stoi.
    ========================================================================== */
 :root { --rainbow: conic-gradient(#FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D); }

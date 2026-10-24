@@ -58,7 +58,7 @@
         <span class="avatar__halo" aria-hidden="true"></span>
         <span class="avatar__coin"><img class="avatar__face avatar__face--photo" src="../assets/me/avatar-photo.webp" width="256" height="256" alt="" decoding="async"><img class="avatar__face avatar__face--drawing" src="../assets/me/avatar-drawing.webp" width="256" height="256" alt="" decoding="async"></span>
       </a>
-      <a class="hero__icons" href="#brandbook" aria-haspopup="dialog" aria-label="Brandbook">
+      <a class="hero__icons" href="#generator" aria-haspopup="dialog" aria-label="Mark generator">
           <span class="hero__slot"><img class="hero__icon mono is-on" src="../assets/icons/01.svg" width="40" height="40" alt=""></span>
           <span class="hero__slot"><img class="hero__icon mono is-on" src="../assets/icons/16.svg" width="40" height="40" alt=""></span>
           <span class="hero__slot"><img class="hero__icon mono is-on" src="../assets/icons/15.svg" width="40" height="40" alt=""></span>
@@ -561,132 +561,41 @@
     </div>
   </div>
 </section>
-<section id="brandbook" class="sheet sheet--brandbook" role="dialog" aria-modal="true" aria-labelledby="brandbook-title">
+<section id="generator" class="sheet sheet--generator" role="dialog" aria-modal="true" aria-labelledby="generator-title">
   <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
   <div class="sheet__panel">
     <span class="sheet__grab" aria-hidden="true"></span>
     <div class="sheet__bar wrap">
       <svg class="symbol symbol--personal sheet__symbol" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg>
-      <h2 id="brandbook-title" class="t-project">Brandbook</h2>
+      <h2 id="generator-title" class="t-project">Mark generator</h2>
       <a class="sheet__close" href="#start" data-close aria-label="close"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
     </div>
     <div class="sheet__body wrap">
-      <div class="bb">
-        <section class="gen" aria-labelledby="gen-title" data-generator style="--gen-c:#111111">
-          <h3 id="gen-title" class="t-project gen__title">Mark generator</h3>
-          <p class="t-text t-muted gen__intro">Roll a mark from my signets and make it your own: colour, complexity and style - from square to round.</p>
-          <div class="gen__stage" data-gen-stage role="img" aria-label="Mark generator"></div>
-          <div class="gen__bar">
-            <label class="gen__color"><span class="visually-hidden">colour as HEX</span><input data-gen="hex" type="text" value="#111111" maxlength="7" spellcheck="false" autocomplete="off"><span class="gen__swatch"><input data-gen="color" type="color" value="#111111" aria-label="mark colour"></span></label>
-            <label class="gen__range"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3 13.5 12.5H2.5Z"/></svg><span class="visually-hidden">complexity</span><input data-gen="complexity" type="range" min="0" max="100" value="45"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.2 13.6 6.3 11.5 12.9H4.5L2.4 6.3Z" stroke-dasharray="2 1.6"/></svg></label>
-            <label class="gen__range"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10"/></svg><span class="visually-hidden">style: square - round</span><input data-gen="style" type="range" min="0" max="100" value="75"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/></svg></label>
-            <div class="gen__actions">
-              <button class="gen__btn" type="button" data-gen="download" aria-label="download SVG"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg></button>
-              <button class="gen__btn" type="button" data-gen="code" aria-label="copy SVG code"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5"/></svg></button>
-              <button class="gen__btn gen__btn--roll" type="button" data-gen="roll"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11"/><circle cx="5.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="5.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/></svg><span>roll</span></button>
-            </div>
+      <section class="gen" data-generator style="--gen-c:#111111">
+        <p class="t-text t-muted gen__intro">An algorithm builds a brand-new signet every time - from the principles I design by: geometry, negative space, grid, rhythm. Describe a brand and Claude picks the direction.</p>
+        <form class="gen__ai" data-gen="ai">
+          <label class="visually-hidden" for="gen-brief">brand brief for Claude</label>
+          <input id="gen-brief" data-gen="brief" type="text" maxlength="160" placeholder="brand brief, e.g. café, warmth, craft" autocomplete="off">
+          <button class="button button--small" type="submit"><span class="agent-glow-dot" aria-hidden="true"></span>design with Claude</button>
+        </form>
+        <div class="gen__stage" data-gen-stage role="img" aria-label="Mark generator"></div>
+        <p class="t-meta gen__info"><span data-gen="info"></span> <span class="gen__note" data-gen="note" aria-live="polite"></span></p>
+        <div class="gen__bar">
+          <div class="gen__color">
+            <label class="visually-hidden" for="gen-hex">colour as HEX</label>
+            <input id="gen-hex" data-gen="hex" type="text" value="#111111" maxlength="7" spellcheck="false" autocomplete="off">
+            <button class="gen__swatch" type="button" data-gen="swatch" aria-label="colour palette" aria-expanded="false" aria-controls="gen-palette"></button>
           </div>
-          <p class="t-meta gen__info" data-gen="info" aria-live="polite"></p>
-        </section>
-        <p class="bb__intro t-text">The rules of my personal brand: black, white, a thin line and plenty of empty space.</p>
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">Mark</h3>
-        <div class="bb__body">
-          <div class="bb__tiles">
-            <div class="bb__tile bb__tile--paper"><svg class="symbol symbol--personal bb__mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg></div>
-            <div class="bb__tile bb__tile--ink"><svg class="symbol symbol--personal bb__mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg></div>
+          <div class="gen__palette" id="gen-palette" data-gen="palette" role="group" aria-label="colour palette" hidden></div>
+          <label class="gen__range"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3 13.5 12.5H2.5Z"/></svg><span class="visually-hidden">complexity</span><input data-gen="complexity" type="range" min="0" max="100" value="40"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.2 13.6 6.3 11.5 12.9H4.5L2.4 6.3Z" stroke-dasharray="2 1.6"/></svg></label>
+          <label class="gen__range"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10"/></svg><span class="visually-hidden">style: square - round</span><input data-gen="style" type="range" min="0" max="100" value="70"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/></svg></label>
+          <div class="gen__actions">
+            <button class="gen__btn" type="button" data-gen="download" aria-label="download SVG"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8.5M4.5 7L8 10.5L11.5 7M2.5 13.5h11"/></svg></button>
+            <button class="gen__btn" type="button" data-gen="code" aria-label="copy SVG code"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5"/></svg></button>
+            <button class="gen__btn gen__btn--roll" type="button" data-gen="roll"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11"/><circle cx="5.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="5.5" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="5.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="10.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/></svg><span>roll</span></button>
           </div>
-          <p class="bb__sizes"><svg class="symbol symbol--personal bb__mark bb__mark--16" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg><svg class="symbol symbol--personal bb__mark bb__mark--24" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg><svg class="symbol symbol--personal bb__mark bb__mark--40" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg><span class="t-meta">sizes: 16, 24 and 40 px</span></p>
-          <p class="t-text t-muted">A circle with a dot in the centre, 1 px stroke. Clear space equals the circle radius. Ink on light backgrounds, paper on dark - always one colour.</p>
         </div>
       </section>
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">Colours</h3>
-        <div class="bb__body">
-          <ul class="bb__swatches">
-            <li><span class="bb__chip" style="background:#FAFAF7"></span>
-              <span class="bb__name">Paper - background</span>
-              <span class="t-meta">#FAFAF7</span></li>
-            <li><span class="bb__chip" style="background:#111111"></span>
-              <span class="bb__name">Ink - text, lines, mark</span>
-              <span class="t-meta">#111111 · contrast on paper 18.1:1</span></li>
-            <li><span class="bb__chip" style="background:#6E6E6A"></span>
-              <span class="bb__name">Grey - secondary text</span>
-              <span class="t-meta">#6E6E6A · contrast on paper 4.9:1</span></li>
-            <li><span class="bb__chip" style="background:#73736E"></span>
-              <span class="bb__name">Grey - metadata</span>
-              <span class="t-meta">#73736E · contrast on paper 4.6:1</span></li>
-            <li><span class="bb__chip" style="background:rgba(17, 17, 17, .14)"></span>
-              <span class="bb__name">Line - 1 px dividers</span>
-              <span class="t-meta">rgba(17, 17, 17, .14)</span></li>
-            <li><span class="bb__chip" style="background:#000000"></span>
-              <span class="bb__name">Black - dark mode background</span>
-              <span class="t-meta">#000000</span></li>
-          </ul>
-        </div>
-      </section>
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">Typography</h3>
-        <div class="bb__body">
-          <p class="t-text t-muted">Helvetica Neue - two weights: 400 and 500. No all caps, no bold inside a sentence.</p>
-          <ul class="bb__type">
-            <li><span class="t-meta">heading 28 / 22 px, 500</span><span class="t-name">Design is how it works.</span></li>
-            <li><span class="t-meta">title 20 / 18 px, 500</span><span class="t-project">teraz · loom.studio · reh.ab</span></li>
-            <li><span class="t-meta">body 15 px, 400, line height 1.6</span><span class="t-text">I design identities, websites and digital products - from idea to launch. I run loom.studio.</span></li>
-            <li><span class="t-meta">metadata 12 px, 400</span><span class="t-meta">01 · 02 · 03 · marketplace · studio · pitch deck</span></li>
-          </ul>
-        </div>
-      </section>
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">Symbols and icons</h3>
-        <div class="bb__body">
-          <ul class="bb__symbols">
-            <li><svg class="symbol symbol--personal bb__sym" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg></li>
-            <li><svg class="symbol symbol--teraz bb__sym" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/></svg></li>
-            <li><svg class="symbol symbol--loom bb__sym" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="stroke" style="--i:0" d="M14 8V21.5M14 26.5V40" pathLength="1"/><path class="stroke" style="--i:1" d="M24 8V11.5M24 16.5V31.5M24 36.5V40" pathLength="1"/><path class="stroke" style="--i:2" d="M34 8V21.5M34 26.5V40" pathLength="1"/><path class="stroke" style="--i:3" d="M8 14H11.5M16.5 14H31.5M36.5 14H40" pathLength="1"/><path class="stroke" style="--i:4" d="M8 24H21.5M26.5 24H40" pathLength="1"/><path class="stroke" style="--i:5" d="M8 34H11.5M16.5 34H31.5M36.5 34H40" pathLength="1"/></svg></li>
-            <li><svg class="symbol symbol--rehab bb__sym" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect class="stroke" style="--i:0" x="8" y="8" width="32" height="32" pathLength="1"/><path class="stroke" style="--i:1" d="M24 16V32" pathLength="1"/><path class="stroke" style="--i:2" d="M16 24H32" pathLength="1"/></svg></li>
-            <li><img class="bb__icon mono" src="../assets/icons/01.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
-            <li><img class="bb__icon mono" src="../assets/icons/02.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
-            <li><img class="bb__icon mono" src="../assets/icons/03.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
-            <li><img class="bb__icon mono" src="../assets/icons/04.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
-            <li><img class="bb__icon mono" src="../assets/icons/05.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
-            <li><img class="bb__icon mono" src="../assets/icons/06.svg" width="40" height="40" alt="" loading="lazy" data-bb-icon></li>
-          </ul>
-          <p class="t-text t-muted">Every project has its own geometric symbol drawn with a 1 px stroke, no fills. Interface icons follow the same style.</p>
-        </div>
-      </section>
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">Grid</h3>
-        <div class="bb__body">
-          <div class="bb__grid" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          <p class="t-text t-muted">12 columns, max 1280 px, 6vw margin (24 px on phones), 24 px gutter, 8 px vertical rhythm.</p>
-        </div>
-      </section>
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">Motion</h3>
-        <div class="bb__body">
-          <ul class="rows">
-            <li class="row bb__row"><span class="row__place">drawing the mark</span><span class="row__role t-muted">1.8 s</span></li>
-            <li class="row bb__row"><span class="row__place">text fade-in</span><span class="row__role t-muted">600 ms, 80 ms apart</span></li>
-            <li class="row bb__row"><span class="row__place">row underline</span><span class="row__role t-muted">400 ms</span></li>
-            <li class="row bb__row"><span class="row__place">project auto-advance</span><span class="row__role t-muted">3 s (with animation: 8 s)</span></li>
-            <li class="row bb__row"><span class="row__place">sheet slide-up</span><span class="row__role t-muted">700 ms</span></li>
-            <li class="row bb__row"><span class="row__place">reduced motion in the system</span><span class="row__role t-muted">everything stops</span></li>
-          </ul>
-          <p class="t-text t-muted bb__note">Slow and quiet motion: cubic-bezier(.65, 0, .35, 1), no springs, bounces or parallax.</p>
-        </div>
-      </section>
-      <section class="bb__sec grid">
-        <h3 class="bb__label t-meta">Rules</h3>
-        <div class="bb__body">
-          <div class="bb__rules">
-            <div><p class="t-meta">Yes</p><ul><li>plenty of empty space</li><li>dividers only as 1 px lines</li><li>one colour: ink or paper</li><li>small type sizes, two weights</li></ul></div>
-            <div><p class="t-meta">No</p><ul class="bb__no"><li>accent colours in my brand</li><li>shadows, gradients and rounded corners</li><li>all caps and bold inside a sentence</li><li>decorative icons and emoji</li></ul></div>
-          </div>
-          <p class="t-text t-muted bb__note">Colours and gradients belong only to project brands (e.g. teraz) - inside their frames. The one exception: the rainbow glow of the AI assistant.</p>
-        </div>
-      </section>
-      </div>
     </div>
   </div>
 </section>
