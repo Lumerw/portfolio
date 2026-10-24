@@ -21,7 +21,8 @@
     "covers": "node tools/build-covers.mjs",
     "cv": "node tools/build-cv.mjs",
     "dist": "node tools/build-dist.mjs",
-    "publish-pdf": "node tools/publish-pdf.mjs"
+    "publish-pdf": "node tools/publish-pdf.mjs",
+    "lab": "node tools/mark-lab.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.12",

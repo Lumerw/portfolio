@@ -428,7 +428,8 @@ function project(p, i, c, t) {
   return sheet({ id: p.id, cls: 'sheet--project', bar, body, t });
 }
 
-// Generator znaków (panel #generator, generator.js) - jak blobmaker.app w stylu strony: opis marki dla Claude,
+// Generator znaków (panel #generator, generator.js) - jak blobmaker.app w stylu strony: opis marki („wygeneruj ze mną”
+// - przycisk jak „zapytaj asystenta” w kontakcie: rysunek awatara i tęczowy kontur),
 // pole ze znakiem i pasek: kolor (HEX + paleta próbek), złożoność (trójkąt → wielokąt), styl (kwadrat → koło),
 // pobierz SVG, kopiuj kod, losuj. Bez JS - pole z opisem.
 const genIcon = {
@@ -451,7 +452,7 @@ function generator(c, t) {
         <form class="gen__ai" data-gen="ai">
           <label class="visually-hidden" for="gen-brief">${esc(g.briefLabel)}</label>
           <input id="gen-brief" data-gen="brief" type="text" maxlength="160" placeholder="${esc(g.brief)}" autocomplete="off">
-          <button class="button button--small" type="submit"><span class="agent-glow-dot" aria-hidden="true"></span>${esc(g.ai)}</button>
+          <button class="button site-footer__agent gen__me" type="submit"><span class="agent-glow" aria-hidden="true"></span><img class="agent-btn-face" src="${esc(c.avatar.drawing)}" width="256" height="256" alt="" loading="lazy" decoding="async">${esc(g.ai)}</button>
         </form>
         <div class="gen__stage" data-gen-stage role="img" aria-label="${esc(g.title)}"></div>
         <p class="t-meta gen__info"><span data-gen="info"></span> <span class="gen__note" data-gen="note" aria-live="polite"></span></p>

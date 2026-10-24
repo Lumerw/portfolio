@@ -8,11 +8,22 @@
 //   złożoność - ile elementów (wycięć, ramion, modułów, pasów, zakrętów),
 //   styl      - od kwadratowego (proste kąty, kwadraty, trójkąty) do obłego (koła, łuki, zaokrąglenia).
 // Moje sygnety były tylko wzorem stylu - generator ich nie pokazuje i nie wczytuje.
-// „Zaprojektuj z Claude”: opis marki → Worker (/mark) → Claude dobiera typ, złożoność, styl, obrót i numer;
+// „Wygeneruj ze mną”: opis marki → Worker (/mark) → Claude dobiera typ, złożoność, styl, obrót i numer;
 // bez odpowiedzi - zwykłe losowanie. Wynik: SVG do pobrania albo skopiowania, kolor z palety albo HEX.
 
 const C = 100;                                   // środek pola 200 × 200
-const KINDS = ['carrier', 'interlock', 'radial', 'grid', 'stencil', 'blob', 'line'];
+// Typy znaków: nazwa na stronie (pl / en) i opis dla art directora (Worker /mark buduje z niego prompt i listę typów).
+// Nowy typ = wpis tutaj + funkcja w MAKERS.
+export const KIND_INFO = {
+  carrier: { pl: 'nośnik z wycięciem', en: 'carrier with a cut', brief: 'a circle or square with negative-space cuts (band, notch, crescent, slit, hole) - institutions, stability, finance, law, tech platforms' },
+  interlock: { pl: 'splot', en: 'interlock', brief: '2-4 overlapping rings or frames, overlaps cut out - partnership, community, connection, network' },
+  radial: { pl: 'promienie', en: 'radial', brief: '3-10 arms or blades around a centre (asterisk, star, propeller) - energy, light, growth, events, food, kids' },
+  grid: { pl: 'moduły', en: 'modules', brief: 'modular 2x2-4x4 tiles of quarter circles, half circles, squares and triangles, often mirrored - architecture, design, culture, systems' },
+  stencil: { pl: 'cięcia', en: 'cuts', brief: 'a solid shape sliced by parallel gaps - engineering, industry, speed, sport, media' },
+  blob: { pl: 'forma organiczna', en: 'organic form', brief: 'organic closed forms with 0-2 small companions - health, nature, beauty, food, calm' },
+  line: { pl: 'linia ciągła', en: 'continuous line', brief: 'one thick continuous line on a grid (meander, loop) - journeys, logistics, process, craft, education' },
+};
+export const KINDS = Object.keys(KIND_INFO);
 
 // Liczby losowe z ziarnem: ten sam numer = ten sam znak (mulberry32)
 function rng(seed) {
@@ -223,7 +234,7 @@ export function markSvg({ kind, seed, complexity, style, rotate = 0 }, color = '
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${mask}<g ${g}><g fill="${color}"${m.cut.length ? ` mask="url(#${id})"` : ''}>${fill}</g>${stroke}</g></svg>`;
 }
 
-export function initGenerator(root, { copy, palette, color: start, endpoint, lang }) {
+export function initGenerator(root, { copy, palette, color: start, endpoint, lang = 'pl' }) {
   const stage = root.querySelector('[data-gen-stage]');
   const $ = s => root.querySelector(`[data-gen="${s}"]`);
   const hex = $('hex'), swatch = $('swatch'), pal = $('palette'), complexity = $('complexity'), style = $('style'), info = $('info'), note = $('note');
@@ -241,11 +252,32 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
     const side = Math.max(bb.width, bb.height, 60) + sw + 64, cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
     view = [cx - side / 2, cy - side / 2, side, side].map(v => +v.toFixed(2)).join(' ');
     el.setAttribute('viewBox', view);
-    info.textContent = `${copy.kinds[mark.kind]} · ${copy.no} ${mark.seed}`;
+    info.textContent = `${KIND_INFO[mark.kind][lang === 'en' ? 'en' : 'pl']} · ${copy.no} ${mark.seed}`;
   };
-  const roll = () => {
-    mark = { kind: KINDS[Math.floor(Math.random() * KINDS.length)], seed: 1 + Math.floor(Math.random() * 99999), rotate: 0 };
+  // Selekcja: z ~30 kandydatów (losowe numery) zostaje najlepszy wg kontroli jakości (mark-qa.js: pole, środek,
+  // drzazgi, szczeliny, czytelność przy 32 px, proporcja tuszu). Suwaki potem zmieniają już tylko ten znak.
+  let qa = null, pick = 0;
+  const best = async (kind, rotate = 0, n = 30) => {
+    const ticket = ++pick;
+    qa ??= await import('./mark-qa.js');
+    const c = complexity.value / 100, s = style.value / 100;
+    let top = null;
+    for (let i = 0; i < n; i++) {
+      const seed = 1 + Math.floor(Math.random() * 99999);
+      try {
+        const q = qa.score(qa.analyze(await qa.rasterize(markSvg({ kind, seed, complexity: c, style: s, rotate }, '#000000', 200))));
+        if (!top || q > top.q) top = { seed, q };
+      } catch { /* kandydat bez obrazu - pomijamy */ }
+      if (ticket !== pick) return null;                 // w międzyczasie kliknięto „losuj” jeszcze raz
+    }
+    return top ?? { seed: 1 + Math.floor(Math.random() * 99999) };
+  };
+  const roll = async () => {
+    const kind = KINDS[Math.floor(Math.random() * KINDS.length)];
     note.textContent = '';
+    const top = await best(kind);
+    if (!top) return;
+    mark = { kind, seed: top.seed, rotate: 0 };
     draw();
   };
 
@@ -297,9 +329,11 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
       const res = await fetch(`${endpoint.replace(/\/$/, '')}/mark`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ brief, lang }) });
       const p = await res.json();
       if (!res.ok || !KINDS.includes(p.kind)) throw new Error(p.error || res.status);
-      mark = { kind: p.kind, seed: p.seed, rotate: p.rotate };
       complexity.value = p.complexity;
       style.value = p.style;
+      const top = await best(p.kind, p.rotate);
+      if (!top) return;
+      mark = { kind: p.kind, seed: top.seed, rotate: p.rotate };
       draw();
       note.textContent = [p.name, p.why].filter(Boolean).join(' - ');
     } catch {

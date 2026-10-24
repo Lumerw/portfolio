@@ -37,6 +37,7 @@ export default {
     try { body = await req.json(); } catch { return json({ error: 'json' }, 400); }
     const lang = body?.lang === 'en' ? 'en' : 'pl';
     if (new URL(req.url).pathname === '/mark') return mark(body, lang, env, json);
+    if (new URL(req.url).pathname === '/lab') return lab(body, env, json);
     const messages = validate(body?.messages);
     if (!messages) return json({ error: 'messages' }, 400);
 
@@ -87,19 +88,15 @@ function validate(list) {
    Opis marki → ustawienia algorytmu ze strony (generator.js): typ znaku, złożoność, styl, obrót, nazwa
    i jedno zdanie uzasadnienia. Claude nie rysuje SVG - wybiera kierunek, rysuje algorytm (zawsze poprawny znak
    w stylu strony). Odpowiedź sprawdzana i przycinana do dozwolonych wartości. */
-const KINDS = ['carrier', 'interlock', 'radial', 'grid', 'stencil', 'blob', 'line'];
-const MARK_SYSTEM = `You are the art director of a mark generator on the portfolio of Wojciech Lumer, a designer of identities and digital products.
+// Typy znaków i ich opisy z generator.js (KIND_INFO) - nowy typ w generatorze trafia tu po `wrangler deploy`
+import { KINDS, KIND_INFO } from '../generator.js';
+// Prompt art directora /mark - funkcja, żeby laboratorium (tools/mark-lab.mjs) testowało go na rozwijanej wersji typów
+export const markSystem = (kinds = KINDS, info = KIND_INFO, lang = 'pl') => `You are the art director of a mark generator on the portfolio of Wojciech Lumer, a designer of identities and digital products.
 An algorithm draws the mark; you choose its parameters from the brand brief. Principles: one idea, simple geometry, legible at 16 px, black on paper (colour comes later), negative space, grid and rhythm, symmetry (mirror or rotational), a carrier shape when the brand needs stability. Never imitate an existing trademark.
 Mark kinds:
-- carrier: a circle or square with negative-space cuts (band, notch, crescent, slit, hole) - institutions, stability, finance, law, tech platforms.
-- interlock: 2-4 overlapping rings or frames, overlaps cut out - partnership, community, connection, network.
-- radial: 3-10 arms or blades around a centre (asterisk, star, propeller) - energy, light, growth, events, food, kids.
-- grid: modular 2x2-4x4 tiles of quarter circles, half circles, squares and triangles, often mirrored - architecture, design, culture, systems.
-- stencil: a solid shape sliced by parallel gaps - engineering, industry, speed, sport, media.
-- blob: organic closed forms with 0-2 small companions - health, nature, beauty, food, calm.
-- line: one thick continuous line on a grid (meander, loop) - journeys, logistics, process, craft, education.
+${kinds.map(k => `- ${k}: ${info[k].brief}.`).join('\n')}
 Parameters: complexity 0-100 (low = iconic and minimal, high = more elements), style 0-100 (0 = square, sharp, technical; 50 = sharp geometric; 100 = round, organic, friendly), rotate in degrees (0, 45, 90, 180 or 270; usually 0).
-Reply with ONLY a JSON object, no prose: {"kind": "...", "complexity": 0-100, "style": 0-100, "rotate": 0, "name": "2-4 word concept name", "why": "one short sentence on how the mark answers the brief"}. Write name and why in LANG. Use a plain hyphen "-", never long dashes.`;
+Reply with ONLY a JSON object, no prose: {"kind": "...", "complexity": 0-100, "style": 0-100, "rotate": 0, "name": "2-4 word concept name", "why": "one short sentence on how the mark answers the brief"}. Write name and why in ${lang === 'en' ? 'English' : 'Polish'}. Use a plain hyphen "-", never long dashes.`;
 
 async function mark(body, lang, env, json) {
   const brief = typeof body?.brief === 'string' ? body.brief.trim().slice(0, 160) : '';
@@ -117,7 +114,7 @@ async function mark(body, lang, env, json) {
       max_tokens: 1500,
       output_config: { effort: 'low' },
       fallbacks: 'default',
-      system: [{ type: 'text', text: MARK_SYSTEM.replace('LANG', lang === 'en' ? 'English' : 'Polish'), cache_control: { type: 'ephemeral' } }],
+      system: [{ type: 'text', text: markSystem(KINDS, KIND_INFO, lang), cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: `Brand brief: ${brief}` }],
     }),
   });
@@ -139,4 +136,27 @@ async function mark(body, lang, env, json) {
     name: clean(p.name, 40),
     why: clean(p.why, 180),
   });
+}
+
+/* ---------- Laboratorium znaków (tools/mark-lab.mjs): art director i developer ----------
+   Tylko z tajnym tokenem (sekret LAB_TOKEN, kopia lokalnie w private/lab-token - poza repozytorium).
+   Przekazuje rozmowę do Claude API i zwraca odpowiedź razem ze zużyciem tokenów (licznik kosztów w narzędziu). */
+async function lab(body, env, json) {
+  if (!env.LAB_TOKEN || body?.token !== env.LAB_TOKEN) return json({ error: 'token' }, 403);
+  // Strumień (SSE) prosto do narzędzia: długie odpowiedzi developera (kilka minut) nie zrywają połączenia
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model: body.model || env.MODEL || 'claude-opus-5-5',
+      max_tokens: Math.min(+body.max_tokens || 8000, 64000),
+      stream: true,
+      ...(body.effort && { output_config: { effort: body.effort } }),
+      system: body.system,
+      messages: body.messages,
+    }),
+  });
+  if (!res.ok) return json({ error: 'upstream', status: res.status, detail: (await res.text()).slice(0, 500) }, 502);
+  const cors = Object.fromEntries([...json({}).headers].filter(([k]) => k.startsWith('access-control') || k === 'vary'));
+  return new Response(res.body, { status: 200, headers: { ...cors, 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
 }

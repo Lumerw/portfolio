@@ -1585,9 +1585,9 @@ html:has(.sheet:target) { overflow: hidden; }
 .gen__ai { display: flex; gap: var(--s-1); max-width: var(--gen-max); margin: var(--s-4) auto 0; }
 .gen__ai input { flex: 1; min-width: 0; height: 40px; padding-inline: var(--s-2); border: var(--hairline) solid var(--ink-4); background: none; color: var(--ink); font: inherit; font-size: var(--fs-text); border-radius: 0; }
 .gen__ai input:focus-visible { outline: none; border-color: var(--ink); }
-.gen__ai .button { min-height: 40px; gap: var(--s-1); white-space: nowrap; }
+.gen__ai .button { min-height: 48px; padding-inline: var(--s-3); white-space: nowrap; }   /* jak „zapytaj asystenta” (.site-footer__agent) */
+.gen__ai input { height: 48px; }
 .gen__ai button:disabled { opacity: .5; cursor: progress; }
-.agent-glow-dot { width: 10px; height: 10px; border-radius: 50%; background: conic-gradient(#FF5F6D, #FFB36B, #F4F06A, #5EE6A0, #4FC3F7, #7C6CFF, #F06CFF, #FF5F6D); flex: none; }
 .gen__stage {
   width: min(100%, 440px);
   aspect-ratio: 1;
