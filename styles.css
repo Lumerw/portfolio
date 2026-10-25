@@ -1350,11 +1350,9 @@ html:has(.sheet:target) { overflow: hidden; }
   .sheet--project .sheet__body { overflow: hidden; container-type: size; }
   .pj { height: 100%; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-6); align-items: center; }
   .pj__media .sheet__video { width: min(52cqw, 100cqh * var(--ar)); }
-  /* Opis ma wysokość kadru (4:5: min(52cqw / .8, 100cqh)): nazwa równo z górą grafiki, linki równo z dołem,
-     zapas dzielony po równo nad i pod wierszami - ten sam układ w każdym projekcie */
-  .pj__info { height: min(65cqw, 100cqh); overflow-y: auto; overscroll-behavior: contain; padding-right: var(--s-2); }
-  .pj__info > .pj__title { margin-top: -.18em; }   /* górna krawędź liter = górna krawędź kadru */
-  .pj__rows, .pj__link { margin-top: auto; }
+  /* Opis zwarty (nazwa, wiersze, linki jeden pod drugim), wyśrodkowany w pionie obok kadru - równy margines u góry
+     i na dole; dłuższy niż kadr (4:5: min(52cqw / .8, 100cqh)) przewija się */
+  .pj__info { max-height: min(65cqw, 100cqh); overflow-y: auto; overscroll-behavior: contain; padding-right: var(--s-2); }
 }
 /* Telefon poziomo (niski ekran): cieńszy pasek i mniejszy odstęp od góry - więcej miejsca na kadr */
 @media (orientation: landscape) and (max-height: 500px) {
