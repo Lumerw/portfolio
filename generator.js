@@ -244,7 +244,11 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
   // ten sam kadr trafia do pobranego SVG
   const raw = () => markSvg({ ...mark, complexity: complexity.value / 100, style: style.value / 100 }, color);
   const svg = () => raw().replace('viewBox="0 0 200 200"', `viewBox="${view}"`);
+  // Wersje do wyboru (2-4) na scenie, w bieżących suwakach i kolorze; dopóki art director wybiera, draw() rysuje je
+  let picking = null;
+  const pickGrid = () => `<div class="gen__pick" data-n="${picking.length}" data-wait>${picking.map(m => markSvg({ ...m, complexity: complexity.value / 100, style: style.value / 100 }, color)).join('')}</div>`;
   const draw = () => {
+    if (picking) { stage.innerHTML = pickGrid(); return; }
     if (!mark) return;
     stage.innerHTML = raw();
     const el = stage.querySelector('svg'), g = el.querySelector('g[transform]');
@@ -254,30 +258,30 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
     el.setAttribute('viewBox', view);
     info.textContent = `${KIND_INFO[mark.kind][lang === 'en' ? 'en' : 'pl']} · ${copy.no} ${mark.seed}`;
   };
-  // Selekcja: z ~30 kandydatów (losowe numery) zostaje najlepszy wg kontroli jakości (mark-qa.js: pole, środek,
-  // drzazgi, szczeliny, czytelność przy 32 px, proporcja tuszu). Suwaki potem zmieniają już tylko ten znak.
-  let qa = null, pick = 0;
-  const best = async (kind, rotate = 0, n = 30) => {
-    const ticket = ++pick;
+  // Selekcja: z ~30 kandydatów (losowe numery) zostają najlepsze różne wg kontroli jakości (mark-qa.js: pole, środek,
+  // drzazgi, szczeliny, czytelność przy 32 px, proporcja tuszu). Suwaki potem zmieniają już tylko wybrany znak.
+  let qa = null, turn = 0;
+  const best = async (kind, rotate = 0, keep = 1, n = 30) => {
+    const ticket = ++turn;
     qa ??= await import('./mark-qa.js');
-    const c = complexity.value / 100, s = style.value / 100;
-    let top = null;
+    const c = complexity.value / 100, s = style.value / 100, all = [];
     for (let i = 0; i < n; i++) {
       const seed = 1 + Math.floor(Math.random() * 99999);
       try {
-        const q = qa.score(qa.analyze(await qa.rasterize(markSvg({ kind, seed, complexity: c, style: s, rotate }, '#000000', 200))));
-        if (!top || q > top.q) top = { seed, q };
+        const r = await qa.rasterize(markSvg({ kind, seed, complexity: c, style: s, rotate }, '#000000', 200));
+        all.push({ seed, q: qa.score(qa.analyze(r)), h24: r.h24 });
       } catch { /* kandydat bez obrazu - pomijamy */ }
-      if (ticket !== pick) return null;                 // w międzyczasie kliknięto „losuj” jeszcze raz
+      if (ticket !== turn) return null;                 // w międzyczasie kliknięto „losuj” jeszcze raz
     }
-    return top ?? { seed: 1 + Math.floor(Math.random() * 99999) };
+    const top = qa.top(all, keep).map(t => ({ kind, seed: t.seed, rotate }));
+    return top.length ? top : [{ kind, seed: 1 + Math.floor(Math.random() * 99999), rotate }];
   };
   const roll = async () => {
-    const kind = KINDS[Math.floor(Math.random() * KINDS.length)];
     note.textContent = '';
-    const top = await best(kind);
+    const top = await best(KINDS[Math.floor(Math.random() * KINDS.length)]);
     if (!top) return;
-    mark = { kind, seed: top.seed, rotate: 0 };
+    picking = null;
+    mark = top[0];
     draw();
   };
 
@@ -314,7 +318,42 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
     setTimeout(() => { delete code.dataset.done; }, 1600);
   });
 
-  // Claude jako art director: opis marki → typ, złożoność, styl, obrót, numer (Worker /mark); błąd → losowanie
+  // Claude jako art director, dwa kroki (Worker):
+  //   /mark      - opis marki → typ, złożoność, styl, obrót, robocza nazwa i uzasadnienie,
+  //   /mark/pick - 4 najlepsze różne wersje tego typu (obrazy PNG) → wybór jednej, nazwa i uzasadnienie do tego, co widać.
+  // Wersje stoją na scenie 2 × 2, dopóki art director wybiera. Błąd kroku 1 → losowanie; błąd kroku 2 → najlepsza wg QA.
+  const post = async (path, body) => {
+    const res = await fetch(`${endpoint.replace(/\/$/, '')}${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.status);
+    return data;
+  };
+  const choose = async (brief, p, cands) => {
+    const c = complexity.value / 100, s = style.value / 100, ticket = turn;
+    info.textContent = KIND_INFO[p.kind][lang === 'en' ? 'en' : 'pl'];
+    note.textContent = copy.picking.replace('{n}', cands.length);
+    picking = cands;
+    mark = cands[0];                                    // pobierz / kopiuj w trakcie wyboru: najlepsza wg QA
+    draw();
+    let i = 0, name = p.name, why = p.why;
+    try {
+      const images = await Promise.all(cands.map(m => qa.png(markSvg({ ...m, complexity: c, style: s }, '#111111', 256))));
+      const q = await post('/mark/pick', { brief, lang, kind: p.kind, name: p.name, why: p.why, images });
+      if (q.pick >= 1 && q.pick <= cands.length) { i = q.pick - 1; name = q.name || name; why = q.why || why; }
+    } catch { /* bez wyboru - zostaje najlepsza wg kontroli jakości */ }
+    if (ticket !== turn) return;                        // w międzyczasie kliknięto „losuj” (roll() zdjął wersje)
+    const grid = stage.querySelector('.gen__pick');
+    if (grid) {                                         // wybrana zostaje, reszta gaśnie, potem pełny kadr
+      delete grid.dataset.wait;
+      grid.querySelectorAll('svg').forEach((el, j) => { if (j !== i) el.dataset.out = ''; });
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) await new Promise(r => setTimeout(r, 600));
+      if (ticket !== turn) return;
+    }
+    picking = null;
+    mark = cands[i];
+    draw();
+    note.textContent = [name, why].filter(Boolean).join(' - ');
+  };
   const form = $('ai');
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -326,16 +365,14 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
     note.textContent = copy.thinking;
     try {
       if (!endpoint) throw new Error('offline');
-      const res = await fetch(`${endpoint.replace(/\/$/, '')}/mark`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ brief, lang }) });
-      const p = await res.json();
-      if (!res.ok || !KINDS.includes(p.kind)) throw new Error(p.error || res.status);
+      const p = await post('/mark', { brief, lang });
+      if (!KINDS.includes(p.kind)) throw new Error('kind');
       complexity.value = p.complexity;
       style.value = p.style;
-      const top = await best(p.kind, p.rotate);
-      if (!top) return;
-      mark = { kind: p.kind, seed: top.seed, rotate: p.rotate };
-      draw();
-      note.textContent = [p.name, p.why].filter(Boolean).join(' - ');
+      const cands = await best(p.kind, p.rotate, 4);
+      if (!cands) return;
+      if (cands.length > 1) await choose(brief, p, cands);
+      else { mark = cands[0]; draw(); note.textContent = [p.name, p.why].filter(Boolean).join(' - '); }
     } catch {
       roll();
       note.textContent = copy.aiError;

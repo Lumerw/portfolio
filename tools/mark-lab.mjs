@@ -18,7 +18,8 @@ import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { content } from '../content.js';
-import { markSystem } from '../agent/worker.js';
+import { markSystem, markParams, pickSystem, pickMessage } from '../agent/worker.js';
+import { top } from '../mark-qa.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LAB = join(root, 'private/mark-lab');
@@ -107,6 +108,14 @@ let bust = 0;
 const load = async file => import(`${pathToFileURL(file).href}?v=${++bust}`);
 const algo = src => src.slice(0, src.indexOf(UI));
 const uiPart = src => src.slice(src.indexOf(UI));
+// Kod jednego typu w MAKERS (od „  kind(r, c, s)” do zamykającego „  },”) i jego wiersz w KIND_INFO;
+// swapMaker: kod i opis typu k z `from` w miejsce tych w `src` (null, gdy któregoś brak)
+const makerOf = (src, k) => { const i = src.indexOf(`  ${k}(r, c, s)`); return i < 0 ? null : src.slice(i, src.indexOf('\n  },', i) + 5); };
+const infoOf = (src, k) => src.match(new RegExp(`^  ${k}: \\{ pl:.*$`, 'm'))?.[0] ?? null;
+const swapMaker = (src, from, k) => {
+  const a = makerOf(src, k), b = makerOf(from, k), ia = infoOf(src, k), ib = infoOf(from, k);
+  return a && b && ia && ib ? src.replace(a, () => b).replace(ia, () => ib) : null;
+};
 const VAR = [[.1, .1], [.15, .9], [.5, .5], [.5, .15], [.85, .85], [.9, .35]];    // (złożoność, styl) na arkuszach
 const PANEL_SEEDS = [11, 23, 47, 71];
 const seedOf = (seed, ki) => seed * 97 + ki;
@@ -116,7 +125,7 @@ async function qaPage() {
   if (page) return page;
   page = await browser.newPage();
   await page.setContent('<body></body>');
-  await page.addScriptTag({ type: 'module', content: `${await readFile(join(root, 'mark-qa.js'), 'utf8')}\nwindow.QA = { rasterize, analyze, score };` });
+  await page.addScriptTag({ type: 'module', content: `${await readFile(join(root, 'mark-qa.js'), 'utf8')}\nwindow.QA = { rasterize, analyze, score, png };` });
   await page.waitForFunction(() => window.QA);
   return page;
 }
@@ -214,6 +223,10 @@ async function gates(file, base, focus) {
       if (m.markSvg({ kind: k, seed, complexity: c, style: s }, '#111111', 200) !== b.markSvg({ kind: k, seed, complexity: c, style: s }, '#111111', 200)) { errs.push(`kind ${k} is not in focus (${focus.join(', ')}) but its output changed (seed ${seed} c${c} s${s}) - keep shared helpers backwards compatible`); break outer; }
     }
   }
+  // typy w pracy: zmiana musi być widoczna przynajmniej w jednym (inaczej sędzia porównuje dwie takie same wersje)
+  const live = focus.filter(k => b.KINDS.includes(k) && m.KINDS.includes(k));
+  const same = k => PANEL_SEEDS.every(seed => VAR.every(([c, s]) => m.markSvg({ kind: k, seed, complexity: c, style: s }, '#111111', 200) === b.markSvg({ kind: k, seed, complexity: c, style: s }, '#111111', 200)));
+  if (live.length && live.length === focus.length && live.every(same)) errs.push(`output of ${live.join(', ')} is identical to the current version on every panel cell - the edits did not change any geometry`);
   if (errs.length) return errs;
   // QA twarde: poza polem / krawędź / rozmiar / różnorodność; miękkie: pogorszenie względem mistrza
   for (const k of focus.filter(k => m.KINDS.includes(k))) {
@@ -232,6 +245,8 @@ async function gates(file, base, focus) {
 
 // Edycje SEARCH/REPLACE (każde SEARCH dokładnie raz) albo cały plik w bloku ```js
 function applyEdits(base, text) {
+  // ucięta odpowiedź: kompletne bloki bywają tylko opisami (KIND_INFO), a geometria została w uciętym - całość do poprawki
+  if (lastStop === 'max_tokens') return { error: 'reply was cut at the token limit before the edits were complete - return fewer, smaller SEARCH/REPLACE edits (focus kinds only, no commentary)' };
   const blocks = [...text.matchAll(/<<<<<<< SEARCH\n([\s\S]*?)\n=======\n([\s\S]*?)\n>>>>>>> REPLACE/g)];
   if (blocks.length) {
     let src = base;
@@ -250,7 +265,7 @@ function applyEdits(base, text) {
 /* ---------- Role ---------- */
 const ANCHORS = 'Score anchors (keep them stable across rounds): 1-2 broken or clip-art; 3-4 generic stock icon; 5-6 competent but forgettable; 7-8 portfolio-grade, one clear idea, crafted; 9-10 would sit on a Logo Modernism spread next to the best.';
 const AD_REVIEW = `You are a senior art director (calibre of Paul Rand, Pentagram, the designers in "Logo Modernism") leading the development of an algorithmic mark generator on the portfolio of Wojciech Lumer, a designer of identities and digital products. It must produce NEW abstract signets (no letters, no text), black on paper; users then pick a colour, a complexity slider (0-1, more elements) and a square-to-round style slider (0 sharp/technical - 1 round/organic). Target: every kind at 8/10 or better.
-You get reference pages from modernist logo books (the quality bar - ignore lettermarks, never ask to copy a mark, only principles), a contact sheet of the current generator (rows = kinds; ids explained in the legend), QA numbers measured by code (trust them for things you cannot see at 150 px), and marks the "generate with me" assistant chose for brand briefs (seeds are random, judge whether that kind with those parameters answers the brief).
+You get reference pages from modernist logo books (the quality bar - ignore lettermarks, never ask to copy a mark, only principles), a contact sheet of the current generator (rows = kinds; ids explained in the legend), QA numbers measured by code (trust them for things you cannot see at 150 px), and marks the "generate with me" assistant chose for brand briefs (same flow as the site: kind and sliders from the brief, the best 4 of 30 seeds by QA, then the assistant picks one by eye and writes name/why for it - judge whether the mark answers the brief and whether name/why describe what is actually drawn).
 ${ANCHORS}
 Judge: one clear idea, figure-ground and negative space, optical balance and centre, consistent weights and gaps, no slivers / tangents / near-misses, legible at 16-32 px, distinctive (not clip-art), craft, variety across seeds, sliders that change the mark meaningfully.
 Pick the 1-2 kinds to work on next (lowest score with the clearest path to 8; or a new kind if the system lacks a family - at most ${MAX_KINDS} kinds in total).
@@ -304,9 +319,19 @@ const state = existsSync(stateFile) ? JSON.parse(await readFile(stateFile, 'utf8
 const saveState = () => writeFile(stateFile, JSON.stringify(state, null, 2));
 const log = s => appendFile(join(LAB, 'log.md'), `${s}\n`);
 const refsAll = async () => (await readdir(join(LAB, 'refs'))).filter(f => /\.(jpe?g|png)$/.test(f));
+// Strony wzorcowe do typów w pracy (refs-index.json z bazy wiedzy: strona → typy), reszta losowo
+const REF_KINDS = { carrier: ['carrier', 'split'], interlock: ['interlock', 'weave', 'pair', 'hinge'], radial: ['radial', 'rotor', 'fan', 'mon'], grid: ['grid', 'tangram', 'primitives'], stencil: ['stencil', 'hatch', 'bundle', 'split'], blob: ['blob', 'organic', 'split'], line: ['line', 'concentric', 'meander'] };
+async function refsFor(kinds, n) {
+  const all = await refsAll(), shuffle = a => [...a].sort(() => Math.random() - .5);
+  const f = join(LAB, 'refs-index.json');
+  const index = existsSync(f) ? JSON.parse(await readFile(f, 'utf8')) : [];
+  const words = kinds.flatMap(k => REF_KINDS[k] || [k]);
+  const hit = shuffle(index.filter(x => all.includes(x.img) && x.kinds.some(t => words.some(w => t.includes(w)))).map(x => x.img));
+  return [...new Set([...hit.slice(0, n - 1), ...shuffle(all)])].slice(0, n);
+}
 browser = await chromium.launch();
 
-for (let n = 0; n < ROUNDS && ledger.usd < BUDGET - 1.5; n++) {
+for (let n = 0; n < ROUNDS && ledger.usd < BUDGET - 4; n++) {   // zapas na najdroższą rundę (konstruktor 40k + developer 2 × 48k)
   const r = ++state.round;
   const dir = join(LAB, 'rounds', String(r).padStart(2, '0'));
   await mkdir(dir, { recursive: true });
@@ -324,16 +349,31 @@ for (let n = 0; n < ROUNDS && ledger.usd < BUDGET - 1.5; n++) {
     await sheet(cells, join(dir, 'system.jpg'), 12);
     const stats = {};
     for (const k of m.KINDS) stats[k] = await kindStats(m, k);
-    // asystent „wygeneruj ze mną” - ten sam prompt co Worker /mark
+    // asystent „wygeneruj ze mną” - jak na stronie: /mark (ten sam prompt) → 30 kandydatów → 4 najlepsze różne wg QA
+    // → wybór z obrazów (/mark/pick, ten sam prompt i wiadomość)
     const briefs = [];
     for (const [i, brief] of [...BRIEFS].sort(() => Math.random() - .5).slice(0, 6).entries()) {
       try {
-        const p = json(await claude({ system: markSystem(m.KINDS, m.KIND_INFO, 'pl'), content: `Brand brief: ${brief}`, max_tokens: 1500, effort: 'low', label: `asystent ${i + 1}` }));
-        if (m.KINDS.includes(p.kind)) briefs.push({ id: `B${i + 1}`, brief, ...p, seed: 1 + Math.floor(Math.random() * 99999) });
+        const p = markParams(json(await claude({ system: markSystem(m.KINDS, m.KIND_INFO, 'pl'), content: `Brand brief: ${brief}`, max_tokens: 1500, effort: 'low', label: `asystent ${i + 1}` })));
+        if (!m.KINDS.includes(p.kind)) continue;
+        const cfg = seed => ({ kind: p.kind, seed, complexity: p.complexity / 100, style: p.style / 100, rotate: p.rotate });
+        const seeds = Array.from({ length: 30 }, () => 1 + Math.floor(Math.random() * 99999));
+        const res = await measure(seeds.map(sd => m.markSvg(cfg(sd), '#000000', 200)));
+        const cands = top(seeds.map((seed, j) => ({ seed, q: res[j].q, h24: res[j].h24 })).filter(x => x.h24), 4);
+        let b = { id: `B${i + 1}`, brief, ...p, seed: cands[0]?.seed ?? seeds[0] };
+        if (cands.length > 1) {
+          try {
+            const images = await (await qaPage()).evaluate(svgs => Promise.all(svgs.map(s => QA.png(s))), cands.map(cd => m.markSvg(cfg(cd.seed), '#111111', 256)));
+            const q = json(await claude({ system: pickSystem('pl'), content: pickMessage({ brief, kind: p.kind, name: p.name, why: p.why, images }, m.KIND_INFO), max_tokens: 2000, effort: 'low', label: `asystent ${i + 1} (wybór)` }));
+            const n = Math.round(+q.pick);
+            if (n >= 1 && n <= cands.length) b = { ...b, seed: cands[n - 1].seed, name: q.name || b.name, why: q.why || b.why };
+          } catch { /* bez wyboru - najlepsza wg QA */ }
+        }
+        briefs.push(b);
       } catch { /* pomijamy */ }
     }
     if (briefs.length) await sheet(briefs.map(b => ({ label: `${b.id} ${b.kind} c${b.complexity} s${b.style}: ${b.brief} → ${b.name}`, tall: true, svg: m.markSvg({ kind: b.kind, seed: b.seed, complexity: b.complexity / 100, style: b.style / 100, rotate: +b.rotate || 0 }, '#111111', 150) })), join(dir, 'briefs.jpg'), 6);
-    const refs = [...await refsAll()].sort(() => Math.random() - .5).slice(0, 3);
+    const refs = await refsFor([], 3);
     const t = await claude({
       system: AD_REVIEW + kb, label: 'art director (przegląd)', max_tokens: 14000, effort: 'high',
       content: [
@@ -374,20 +414,21 @@ for (let n = 0; n < ROUNDS && ledger.usd < BUDGET - 1.5; n++) {
   const feedback = k => (m.KINDS.includes(k)
     ? `${k} (current score ${state.kinds[k]?.score ?? '?'}/10): ${(state.kinds[k]?.issues || []).join(' | ')}\nQA: ${statLine(k, stats[k])}`
     : `NEW KIND "${k}": ${JSON.stringify((state.newKinds || []).find(x => x.name?.toLowerCase().replace(/[^a-z]/g, '') === k) || {})}`);
-  const makerSrc = k => { const i = base.indexOf(`  ${k}(r, c, s)`); return i < 0 ? `(${k}: new kind - no code yet)` : base.slice(i, base.indexOf('\n  },', i) + 5); };
-  const refs = [...await refsAll()].sort(() => Math.random() - .5).slice(0, 2);
+  const makerSrc = k => makerOf(base, k) ?? `(${k}: new kind - no code yet)`;
+  const refs = await refsFor(focus, 2);
 
-  // konstruktor: konstrukcja z liczbami + 3 wzorcowe znaki na typ
-  const ct = await claude({
-    system: CONSTRUCTOR + kb, label: 'konstruktor', max_tokens: 24000, effort: 'medium',
-    content: [
-      { type: 'text', text: 'Reference pages (principles only):' }, ...await Promise.all(refs.map(f => img(join(LAB, 'refs', f)))),
-      ...(curCells.length ? [{ type: 'text', text: `Current marks of the focus kinds (legend):\n${curCells.map(c => c.legend).join('\n')}` }, await img(join(dir, 'before.jpg'))] : []),
-      { type: 'text', text: `Focus kinds and art-director feedback:\n${focus.map(feedback).join('\n\n')}\n\nCurrent code of these kinds (context):\n${focus.map(makerSrc).join('\n\n')}` },
-    ],
-  });
-  let spec;
-  try { spec = json(ct); } catch { spec = { kinds: {} }; }
+  // konstruktor: konstrukcja z liczbami + 3 wzorcowe znaki na typ; ucięta odpowiedź (limit zjadło myślenie) → ponownie z niższym wysiłkiem
+  const cMsg = [
+    { type: 'text', text: 'Reference pages (principles only):' }, ...await Promise.all(refs.map(f => img(join(LAB, 'refs', f)))),
+    ...(curCells.length ? [{ type: 'text', text: `Current marks of the focus kinds (legend):\n${curCells.map(c => c.legend).join('\n')}` }, await img(join(dir, 'before.jpg'))] : []),
+    { type: 'text', text: `Focus kinds and art-director feedback:\n${focus.map(feedback).join('\n\n')}\n\nCurrent code of these kinds (context):\n${focus.map(makerSrc).join('\n\n')}` },
+  ];
+  let spec = null;
+  for (const effort of ['medium', 'low']) {
+    const ct = await claude({ system: CONSTRUCTOR + kb, label: effort === 'medium' ? 'konstruktor' : 'konstruktor (ponownie)', max_tokens: 40000, effort, content: cMsg });
+    try { spec = json(ct); break; } catch { if (effort === 'medium') console.log('… konstruktor: niepełna odpowiedź - ponawiam z niższym wysiłkiem'); }
+  }
+  spec ??= { kinds: {} };
   await writeFile(join(dir, 'constructor.json'), JSON.stringify(spec, null, 2));
   const golden = Object.entries(spec.kinds || {}).flatMap(([k, v]) => (v.golden || []).map((g, i) => ({ k, i, ...g })))
     .filter(g => /^<svg[\s\S]*<\/svg>$/.test((g.svg || '').trim()) && !/<script|<text|href|\son\w+=/i.test(g.svg));
@@ -408,7 +449,7 @@ for (let n = 0; n < ROUNDS && ledger.usd < BUDGET - 1.5; n++) {
         ? `Your previous edits FAILED the checks:\n${errs.join('\n')}\n\nYour previous reply was:\n${devText.slice(0, 24000)}\n\nReturn corrected edits against the ORIGINAL current file below (same SEARCH/REPLACE format).\n\nCurrent generator.js:\n\`\`\`js\n${base}\n\`\`\``
         : `Current generator.js:\n\`\`\`js\n${base}\n\`\`\`` },
     ];
-    devText = await claude({ system: DEVELOPER + kb, label: attempt ? 'developer (poprawka)' : 'developer', max_tokens: 32000, effort: 'low', content: msg });
+    devText = await claude({ system: DEVELOPER + kb, label: attempt ? 'developer (poprawka)' : 'developer', max_tokens: 48000, effort: 'low', content: msg });
     await writeFile(join(dir, `developer-raw-${attempt + 1}.md`), devText);
     const ed = applyEdits(base, devText);
     if (ed.error) { errs = [ed.error]; continue; }
@@ -442,15 +483,31 @@ for (let n = 0; n < ROUNDS && ledger.usd < BUDGET - 1.5; n++) {
     const ch = challengerIsB ? 'B' : 'A', champ = challengerIsB ? 'A' : 'B';
     await writeFile(join(dir, 'judge.json'), JSON.stringify({ ...j, challenger: ch }, null, 2));
     const sc = (k, v) => +(j.kinds?.[k]?.[v] ?? 0);
-    const better = kinds.every(k => sc(k, ch) >= sc(k, champ)) && kinds.some(k => sc(k, ch) > sc(k, champ));
-    if (j.winner === ch || (j.winner !== champ && better)) {
-      await copyFile(cand, current);
-      await copyFile(cand, join(LAB, 'versions', `${sha(candSrc)}.js`));
-      for (const k of kinds) state.kinds[k] = { score: sc(k, ch), issues: j.next?.[k] || [] };
-      verdict = `przyjęte (${kinds.map(k => `${k} ${sc(k, champ)}→${sc(k, ch)}`).join(', ')})`;
+    // typ po typie: nowy kod tylko tam, gdzie sędzia ocenił go wyżej (przy remisie - gdy pretendent wygrał całość);
+    // pozostałe typy wracają do kodu mistrza, a bramki sprawdzają, czy wspólne funkcje nie zmieniły ich wyniku
+    // nowy typ (mistrz go nie ma): tylko gdy pretendent wygrał całość albo typ dostał co najmniej 7
+    const take = kinds.filter(k => (m.KINDS.includes(k)
+      ? sc(k, ch) > sc(k, champ) || (j.winner === ch && sc(k, ch) === sc(k, champ))
+      : j.winner === ch || sc(k, ch) >= 7));
+    const keep = kinds.filter(k => !take.includes(k));
+    // typy bez zmian: kod mistrza; nowy typ, którego nie bierzemy, nie ma kodu mistrza - wtedy cała zmiana odpada
+    let src = take.length ? candSrc : null, merged = false;
+    for (const k of keep) src = src && swapMaker(src, base, k);
+    if (src && keep.length) {
+      const hybrid = join(dir, 'hybrid.js');
+      await writeFile(hybrid, src);
+      const e2 = await gates(hybrid, base, take);
+      if (e2.length) { src = null; errs = e2; merged = true; }
+    }
+    if (src) {
+      await writeFile(current, src);
+      await writeFile(join(LAB, 'versions', `${sha(src)}.js`), src);
+      for (const k of take) state.kinds[k] = { score: sc(k, ch), issues: j.next?.[k] || [] };
+      for (const k of keep) if (state.kinds[k]) state.kinds[k] = { score: sc(k, champ), issues: j.next?.[k] || state.kinds[k].issues };
+      verdict = `przyjęte (${take.map(k => `${k} ${sc(k, champ)}→${sc(k, ch)}`).join(', ')})${keep.length ? ` · bez zmian: ${keep.map(k => `${k} mistrz ${sc(k, champ)} / pretendent ${sc(k, ch)}`).join(', ')}` : ''}`;
     } else {
       for (const k of kinds) if (state.kinds[k]) state.kinds[k].issues = j.next?.[k] || state.kinds[k].issues;
-      verdict = `odrzucone przez sędziego (${kinds.map(k => `${k} mistrz ${sc(k, champ)} / pretendent ${sc(k, ch)}`).join(', ')})`;
+      verdict = `${merged ? 'odrzucone (bramki po scaleniu typów)' : 'odrzucone przez sędziego'} (${kinds.map(k => `${k} mistrz ${sc(k, champ)} / pretendent ${sc(k, ch)}`).join(', ')})`;
     }
     await appendFile(join(LAB, 'scores.jsonl'), `${JSON.stringify({ round: r, type: 'judge', focus: kinds, champion: Object.fromEntries(kinds.map(k => [k, sc(k, champ)])), challenger: Object.fromEntries(kinds.map(k => [k, sc(k, ch)])), accepted: verdict.startsWith('przyjęte'), usd: +ledger.usd.toFixed(2) })}\n`);
   }

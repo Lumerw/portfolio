@@ -37,6 +37,7 @@ export default {
     try { body = await req.json(); } catch { return json({ error: 'json' }, 400); }
     const lang = body?.lang === 'en' ? 'en' : 'pl';
     if (new URL(req.url).pathname === '/mark') return mark(body, lang, env, json);
+    if (new URL(req.url).pathname === '/mark/pick') return pickMark(body, lang, env, json);
     if (new URL(req.url).pathname === '/lab') return lab(body, env, json);
     const messages = validate(body?.messages);
     if (!messages) return json({ error: 'messages' }, 400);
@@ -85,9 +86,28 @@ function validate(list) {
 }
 
 /* ---------- Generator znaków: Claude jako art director ----------
-   Opis marki → ustawienia algorytmu ze strony (generator.js): typ znaku, złożoność, styl, obrót, nazwa
-   i jedno zdanie uzasadnienia. Claude nie rysuje SVG - wybiera kierunek, rysuje algorytm (zawsze poprawny znak
-   w stylu strony). Odpowiedź sprawdzana i przycinana do dozwolonych wartości. */
+   1. /mark: opis marki → ustawienia algorytmu ze strony (generator.js): typ znaku, złożoność, styl, obrót, nazwa
+      i jedno zdanie uzasadnienia. Claude nie rysuje SVG - wybiera kierunek, rysuje algorytm (zawsze poprawny znak
+      w stylu strony).
+   2. /mark/pick: przeglądarka rysuje ~30 kandydatów, kontrola jakości (mark-qa.js) zostawia 4 najlepsze różne;
+      art director ogląda je i wybiera jeden, a nazwę i uzasadnienie pisze do tego, co widać na obrazie.
+   Odpowiedzi sprawdzane i przycinane do dozwolonych wartości. */
+const clean = (v, n) => (typeof v === 'string' ? v : '').replace(/[—–]/g, '-').replace(/[<>]/g, '').trim().slice(0, n);
+const anthropic = (env, body) => fetch('https://api.anthropic.com/v1/messages', {
+  method: 'POST',
+  headers: {
+    'x-api-key': env.ANTHROPIC_API_KEY,
+    'anthropic-version': '2023-06-01',
+    'anthropic-beta': 'server-side-fallback-2026-07-01',
+    'content-type': 'application/json',
+  },
+  body: JSON.stringify({ model: env.MODEL || 'claude-opus-5-5', output_config: { effort: 'low' }, fallbacks: 'default', ...body }),
+});
+// Pierwszy obiekt JSON z odpowiedzi modelu (tylko bloki tekstu); null, gdy go nie ma
+const reply = data => {
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+  try { return JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); } catch { return null; }
+};
 // Typy znaków i ich opisy z generator.js (KIND_INFO) - nowy typ w generatorze trafia tu po `wrangler deploy`
 import { KINDS, KIND_INFO } from '../generator.js';
 // Prompt art directora /mark - funkcja, żeby laboratorium (tools/mark-lab.mjs) testowało go na rozwijanej wersji typów
@@ -101,41 +121,66 @@ Reply with ONLY a JSON object, no prose: {"kind": "...", "complexity": 0-100, "s
 async function mark(body, lang, env, json) {
   const brief = typeof body?.brief === 'string' ? body.brief.trim().slice(0, 160) : '';
   if (!brief) return json({ error: 'brief' }, 400);
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'server-side-fallback-2026-07-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: env.MODEL || 'claude-opus-5-5',
-      max_tokens: 1500,
-      output_config: { effort: 'low' },
-      fallbacks: 'default',
-      system: [{ type: 'text', text: markSystem(KINDS, KIND_INFO, lang), cache_control: { type: 'ephemeral' } }],
-      messages: [{ role: 'user', content: `Brand brief: ${brief}` }],
-    }),
+  const res = await anthropic(env, {
+    max_tokens: 1500,
+    system: [{ type: 'text', text: markSystem(KINDS, KIND_INFO, lang), cache_control: { type: 'ephemeral' } }],
+    messages: [{ role: 'user', content: `Brand brief: ${brief}` }],
   });
   if (!res.ok) return json({ error: 'upstream', status: res.status }, 502);
   const data = await res.json();
   if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);
-  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-  let p;
-  try { p = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); } catch { return json({ error: 'parse' }, 502); }
-  if (!KINDS.includes(p?.kind)) return json({ error: 'kind' }, 502);
+  const p = reply(data);
+  if (!p) return json({ error: 'parse' }, 502);
+  if (!KINDS.includes(p.kind)) return json({ error: 'kind' }, 502);
+  return json({ ...markParams(p), seed: 1 + Math.floor(Math.random() * 99999) });   // numer losuje Worker - model powtarza te same liczby
+}
+// Odpowiedź modelu /mark → dozwolone wartości (też w laboratorium, żeby testowało to samo co strona)
+export const markParams = p => {
   const num = (v, lo, hi, d) => (Number.isFinite(+v) ? Math.min(hi, Math.max(lo, Math.round(+v))) : d);
-  const clean = (v, n) => String(v ?? '').replace(/[—–]/g, '-').replace(/[<>]/g, '').trim().slice(0, n);
-  return json({
+  return {
     kind: p.kind,
     complexity: num(p.complexity, 0, 100, 40),
     style: num(p.style, 0, 100, 60),
     rotate: [0, 45, 90, 180, 270].includes(+p.rotate) ? +p.rotate : 0,
-    seed: 1 + Math.floor(Math.random() * 99999),   // numer losuje Worker - model powtarza te same liczby
     name: clean(p.name, 40),
     why: clean(p.why, 180),
+  };
+};
+
+// Prompt i wiadomość wyboru z kandydatów - funkcje, żeby laboratorium testowało asystenta tak samo jak strona
+export const pickSystem = (lang = 'pl') => `You are the art director of a mark generator on the portfolio of Wojciech Lumer, a designer of identities and digital products.
+For a brand brief, the first step chose a mark kind and a working concept; the algorithm then drew the strongest candidates of that kind. Look at the images and choose the single best mark for the brief: one clear idea, balanced and optically centred, confident negative space, legible at 16 px, and no accidental figures (letters, digits, faces, arrows, hearts or known logos the brief did not ask for).
+Then name it and say why, describing only what is visible in the chosen mark (its shape and its one negative-space idea) and how that answers the brief. Never claim details the image does not show; drop the working concept if the drawing does not carry it.
+Reply with ONLY a JSON object, no prose: {"pick": <candidate number>, "name": "2-4 word concept name", "why": "one short sentence"}. Write name and why in ${lang === 'en' ? 'English' : 'Polish'}. Use a plain hyphen "-", never long dashes.`;
+export const pickMessage = ({ brief, kind, name, why, images }, info = KIND_INFO) => [
+  { type: 'text', text: `Brand brief: ${brief}\nMark kind: ${kind} (${info[kind]?.brief ?? ''})\nWorking concept: ${[name, why].filter(Boolean).join(' - ') || '-'}` },
+  ...images.flatMap((data, i) => [{ type: 'text', text: `Candidate ${i + 1}:` }, { type: 'image', source: { type: 'base64', media_type: 'image/png', data } }]),
+];
+
+// Obraz kandydata: PNG 256 × 256 (sygnatura i nagłówek IHDR), do ~40 KB - nic innego nie trafia do modelu
+const MAX_PNG = 54000;      // znaków base64
+function isMarkPng(s) {
+  if (typeof s !== 'string' || s.length < 32 || s.length > MAX_PNG || !/^[A-Za-z0-9+/]+={0,2}$/.test(s)) return false;
+  const b = Uint8Array.from(atob(s.slice(0, 32)), ch => ch.charCodeAt(0));
+  const be = i => ((b[i] << 24) | (b[i + 1] << 16) | (b[i + 2] << 8) | b[i + 3]) >>> 0;
+  return b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 && be(12) === 0x49484452 && be(16) === 256 && be(20) === 256;
+}
+
+async function pickMark(body, lang, env, json) {
+  const brief = typeof body?.brief === 'string' ? body.brief.trim().slice(0, 160) : '';
+  const images = Array.isArray(body?.images) ? body.images : [];
+  if (!brief || !KINDS.includes(body?.kind) || images.length < 2 || images.length > 4 || !images.every(isMarkPng)) return json({ error: 'pick' }, 400);
+  const res = await anthropic(env, {
+    max_tokens: 2000,
+    system: [{ type: 'text', text: pickSystem(lang), cache_control: { type: 'ephemeral' } }],
+    messages: [{ role: 'user', content: pickMessage({ brief, kind: body.kind, name: clean(body.name, 40), why: clean(body.why, 180), images }) }],
   });
+  if (!res.ok) return json({ error: 'upstream', status: res.status }, 502);
+  const data = await res.json();
+  if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);
+  const p = reply(data), n = Math.round(+p?.pick);
+  if (!(n >= 1 && n <= images.length)) return json({ error: 'parse' }, 502);
+  return json({ pick: n, name: clean(p.name, 40), why: clean(p.why, 180) });
 }
 
 /* ---------- Laboratorium znaków (tools/mark-lab.mjs): art director i developer ----------

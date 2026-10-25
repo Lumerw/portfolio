@@ -1,5 +1,6 @@
 // Kontrola jakości znaków (kod, nie AI) - te same miary dla laboratorium (bramki, tools/mark-lab.mjs) i dla strony
-// (generator.js: „losuj” robi w tle ~30 kandydatów i pokazuje najlepszego). Mierzy to, co da się zmierzyć:
+// (generator.js: „losuj” robi w tle ~30 kandydatów i pokazuje najlepszego, „wygeneruj ze mną” pokazuje art directorowi
+// 4 najlepsze różne - top() i png()). Mierzy to, co da się zmierzyć:
 //   pole      - znak w polu 24..176, nie dotyka krawędzi, rozmiar 90-152 px (pole 200 × 200),
 //   środek    - środek ciężkości tuszu blisko środka pola (optycznie wyśrodkowany),
 //   drzazgi   - cienkie elementy i szczeliny (otwarcie morfologiczne promieniem 2 px), okruchy i dziurki < 0,25% pola,
@@ -27,6 +28,34 @@ export async function rasterize(svg) {
     return a;
   };
   return { a200: grab(F), a32: grab(32), h24: [...grab(24)].join('') };
+}
+
+// SVG → PNG n × n na papierze (base64 bez „data:image/png;base64,”) - obrazy kandydatów dla art directora
+// (Worker /mark/pick przyjmuje tylko PNG 256 × 256); tylko w przeglądarce
+export async function png(svg, n = 256) {
+  const img = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  });
+  const c = Object.assign(document.createElement('canvas'), { width: n, height: n });
+  const x = c.getContext('2d');
+  x.fillStyle = '#fafaf7';
+  x.fillRect(0, 0, n, n);
+  x.drawImage(img, 0, 0, n, n);
+  return c.toDataURL('image/png').slice(22);
+}
+
+// Najlepsi kandydaci ({ q, h24 }), ale nie prawie te same znaki: odciski 24 px różnią się w więcej niż `diff` pikselach (z 576)
+export function top(list, keep = 4, diff = 30) {
+  const near = (a, b) => { let d = 0; for (let i = 0; i < a.length && d <= diff; i++) if (a[i] !== b[i]) d++; return d <= diff; };
+  const out = [];
+  for (const c of [...list].sort((a, b) => b.q - a.q)) {
+    if (out.length >= keep) break;
+    if (!out.some(o => near(o.h24, c.h24))) out.push(c);
+  }
+  return out;
 }
 
 // Spójne obszary (4-sąsiedztwo) wartości v; zwraca listę { size, edge } (edge = dotyka krawędzi obrazu)

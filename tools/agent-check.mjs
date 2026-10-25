@@ -1,7 +1,8 @@
 // Testy asystenta AI bez sieci i bez klucza API (npm run check-agent, też w CI):
 //   - tryb lokalny: typowe pytania PL/EN trafiają we właściwy temat, bez [placeholderów] i długich myślników;
 //   - wiedza dla modelu: bez [placeholderów];
-//   - Worker: CORS, limit zapytań, walidacja rozmowy, zapytanie do Claude API (podstawione fetch).
+//   - Worker: CORS, limit zapytań, walidacja rozmowy, zapytanie do Claude API (podstawione fetch);
+//     generator znaków: /mark (ustawienia przycięte do dozwolonych) i /mark/pick (tylko PNG 256 × 256, wybór w zakresie).
 import { content } from '../content.js';
 import { localAnswer, knowledge } from '../agent.js';
 import worker from '../agent/worker.js';
@@ -45,13 +46,13 @@ for (const lang of ['pl', 'en']) {
 }
 
 // Worker z podstawionym Claude API
-let sent = null;
+let sent = null, reply = 'loom.studio — studio w subskrypcji.';
 globalThis.fetch = async (url, init) => {
   sent = { url, body: JSON.parse(init.body), headers: init.headers };
-  return new Response(JSON.stringify({ content: [{ type: 'text', text: 'loom.studio — studio w subskrypcji.' }] }));
+  return new Response(JSON.stringify({ content: [{ type: 'text', text: reply }] }));
 };
 const env = { ANTHROPIC_API_KEY: 'test', LIMITER: { limit: async () => ({ success: true }) } };
-const req = (body, { origin = 'https://lumerw.com', method = 'POST' } = {}) => new Request('https://agent.test/', {
+const req = (body, { origin = 'https://lumerw.com', method = 'POST', path = '/' } = {}) => new Request(`https://agent.test${path}`, {
   method, headers: { Origin: origin, 'content-type': 'application/json' }, body: method === 'POST' ? JSON.stringify(body) : undefined,
 });
 const q = [{ role: 'user', content: 'Co to loom?' }];
@@ -67,6 +68,44 @@ check('Worker: localhost dozwolony', (await worker.fetch(req({ messages: q }, { 
 check('Worker: preflight OPTIONS → 204', (await worker.fetch(req(null, { method: 'OPTIONS' }), env)).status === 204);
 check('Worker: zła kolejność ról → 400', (await worker.fetch(req({ messages: [...q, ...q] }), env)).status === 400);
 check('Worker: limit zapytań → 429', (await worker.fetch(req({ messages: q }), { ...env, LIMITER: { limit: async () => ({ success: false }) } })).status === 429);
+
+// Generator znaków: /mark - odpowiedź modelu przycięta do dozwolonych wartości
+reply = '{"kind": "radial", "complexity": 150, "style": -5, "rotate": 33, "name": "Słońce — piekarni", "why": "<b>Pięć ramion</b>"}';
+const mk = await worker.fetch(req({ brief: 'piekarnia', lang: 'pl' }, { path: '/mark' }), env), mj = await mk.json();
+check('Worker /mark: typ, suwaki 0-100, obrót z listy, czysty tekst',
+  mk.status === 200 && mj.kind === 'radial' && mj.complexity === 100 && mj.style === 0 && mj.rotate === 0 && mj.seed >= 1 && mj.name === 'Słońce - piekarni' && !/[<>]/.test(mj.why) && sent.body.max_tokens === 1500,
+  JSON.stringify(mj));
+reply = '{"kind": "logo"}';
+check('Worker /mark: nieznany typ → 502', (await worker.fetch(req({ brief: 'x' }, { path: '/mark' }), env)).status === 502);
+check('Worker /mark: pusty opis → 400', (await worker.fetch(req({ brief: ' ' }, { path: '/mark' }), env)).status === 400);
+
+// /mark/pick - tylko 2-4 obrazy PNG 256 × 256 (nagłówek), wybór w zakresie
+const png = (w = 256, h = 256, extra = 600) => {
+  const b = new Uint8Array(33 + extra), v = new DataView(b.buffer);
+  b.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52]);
+  v.setUint32(16, w); v.setUint32(20, h);
+  return Buffer.from(b).toString('base64');
+};
+const pick = { brief: 'piekarnia', lang: 'pl', kind: 'radial', name: 'Słońce', why: 'roboczo', images: [png(), png(), png()] };
+const pickStatus = async body => (await worker.fetch(req(body, { path: '/mark/pick' }), env)).status;
+reply = '{"pick": 2, "name": "Słońce", "why": "Pięć ramion — wokół pustego środka."}';
+sent = null;
+const pk = await worker.fetch(req(pick, { path: '/mark/pick' }), env), pj = await pk.json();
+check('Worker /mark/pick: wybór, obrazy jako PNG base64, krótki myślnik',
+  pk.status === 200 && pj.pick === 2 && pj.why === 'Pięć ramion - wokół pustego środka.' && sent?.body.messages[0].content.filter(c => c.type === 'image' && c.source.media_type === 'image/png').length === 3,
+  JSON.stringify(pj));
+sent = null;
+const badPick = [
+  ['1 obraz', { ...pick, images: [png()] }], ['5 obrazów', { ...pick, images: Array(5).fill(png()) }],
+  ['512 px', { ...pick, images: [png(512, 512), png()] }], ['data: URL', { ...pick, images: [`data:image/png;base64,${png()}`, png()] }],
+  ['za duży', { ...pick, images: [png(256, 256, 45000), png()] }], ['nie PNG', { ...pick, images: [Buffer.from('GIF89a'.repeat(8)).toString('base64'), png()] }],
+  ['zły typ', { ...pick, kind: 'logo' }], ['pusty opis', { ...pick, brief: '' }],
+];
+const wrong = [];
+for (const [name, body] of badPick) if (await pickStatus(body) !== 400) wrong.push(name);
+check(`Worker /mark/pick: ${badPick.length} złych zapytań → 400 bez wywołania Claude`, !wrong.length && sent === null, wrong.join(', '));
+reply = '{"pick": 4, "name": "x", "why": "y"}';
+check('Worker /mark/pick: wybór poza zakresem → 502', await pickStatus(pick) === 502);
 
 for (const x of results) console.log(`${x.ok ? '✓' : '✗'} ${x.name}${x.note && !x.ok ? ` - ${x.note}` : ''}`);
 const failed = results.filter(x => !x.ok).length;

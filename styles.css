@@ -1597,6 +1597,18 @@ html:has(.sheet:target) { overflow: hidden; }
   outline-offset: -1px;
 }
 .gen__stage svg { display: block; width: 100%; height: 100%; }
+/* „wygeneruj ze mną”: 4 wersje 2 × 2, dopóki art director wybiera; wybrana zostaje, reszta gaśnie */
+.gen__pick { display: grid; grid-template-columns: repeat(2, 1fr); height: 100%; }
+.gen__pick[data-n="2"] { grid-template-rows: 1fr; }
+.gen__pick svg { min-width: 0; min-height: 0; box-shadow: 0 0 0 .5px rgb(17 17 17 / .14); }   /* scena zawsze jasna - stała linia, nie token motywu */
+.gen__pick svg > g { transition: opacity .4s var(--ease); }          /* gaśnie znak, nie pole */
+.gen__pick[data-wait] svg > g { animation: gen-wait 1.2s var(--ease) infinite alternate; }
+.gen__pick[data-wait] svg:nth-child(2) > g { animation-delay: .3s; }
+.gen__pick[data-wait] svg:nth-child(3) > g { animation-delay: .6s; }
+.gen__pick[data-wait] svg:nth-child(4) > g { animation-delay: .9s; }
+.gen__pick svg[data-out] > g { opacity: .1; }
+@keyframes gen-wait { to { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .gen__pick svg > g { animation: none !important; transition: none; } }
 .gen__info { max-width: var(--gen-max); margin: var(--s-2) auto 0; text-align: center; min-height: 1.5em; }
 .gen__note { color: var(--ink-2); }
 .gen__bar {
