@@ -289,7 +289,7 @@ export const pl = {
   hero: {
     role: 'projektant',                                   // podpis przy imieniu nad hasłem
     title: 'Design to to, jak coś działa.',               // hasło (h1)
-    line: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu, przez ciągłe testowanie, do wdrożenia. Prowadzę loom.studio.',
+    line: 'Od pomysłu, przez ciągłe testowanie, do finalnego wdrożenia.',
   },
   projects: {
     teraz: {
@@ -395,7 +395,7 @@ export const pl = {
     call: 'umów rozmowę ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['identyfikacja wizualna', 'UX/UI i projekt stron', 'front-end: HTML, CSS, JS, Next.js', 'projektowanie i development z AI', 'dostępność WCAG 2.2', 'grafika i motion generowane z AI'],
-    line: ['Projektuję identyfikacje, strony i produkty cyfrowe -', 'od pomysłu, przez ciągłe testowanie, do wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
+    line: ['Od pomysłu, przez ciągłe testowanie, do finalnego wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
   },
   // PDF 1080 × 1080 (npm run deck): karuzela na LinkedIn / Instagram, linki klikalne.
   deck: {
@@ -558,7 +558,7 @@ export const en = {
   hero: {
     role: 'designer',
     title: 'Design is how it works.',
-    line: 'I design identities, websites and digital products - from idea, through continuous testing, to launch. I run loom.studio.',
+    line: 'From idea, through continuous testing, to final launch.',
   },
   projects: {
     teraz: {
@@ -662,7 +662,7 @@ export const en = {
     call: 'book a call ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['visual identity', 'UX/UI and web design', 'front-end: HTML, CSS, JS, Next.js', 'AI-assisted design and development', 'accessibility, WCAG 2.2', 'generative AI visuals and motion'],
-    line: ['I design identities, websites and digital products -', 'from idea, through continuous testing, to launch.'],
+    line: ['From idea, through continuous testing, to final launch.'],
   },
   deck: {
     file: 'Wojciech-Lumer-Portfolio-1080-EN.pdf',
