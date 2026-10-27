@@ -783,7 +783,6 @@ img.recs__avatar { border-color: var(--hair); object-fit: cover; background: var
   pointer-events: none;
 }
 .sphere__mark img { display: block; width: 100%; height: 100%; }
-.sphere__tag { position: absolute; left: 0; top: calc(100% + 6px); white-space: nowrap; color: var(--ink); }
 /* Tryb logo (domyślny; poza sekcją Portfolio): na miejscu kart same logo projektów tuszem, bez ramek.
    Najechanie na logo = w jego miejscu pojawia się karta; klik otwiera panel projektu.
    .home__sphere.is-cards (sekcja Portfolio, main.js) = karty jak dotąd, logo schowane. */
@@ -792,10 +791,9 @@ img.recs__avatar { border-color: var(--hair); object-fit: cover; background: var
    piksele tekstury obrazka (Chromium), a litery przy krawędzi pliku (loom.studio) zostawiały wtedy pionowe „paski” */
 .sphere__logo img { width: calc(var(--ls, .8) * 100%); height: auto; object-fit: contain; }
 .sphere__card { transition: background-color var(--t-swap) var(--ease), outline-color var(--t-swap) var(--ease); }
-.sphere__media, .sphere__tag { transition: opacity var(--t-swap) var(--ease); }
+.sphere__media { transition: opacity var(--t-swap) var(--ease); }
 .home__sphere:not(.is-cards) .sphere__card:not(:hover) { background: transparent; outline-color: transparent; }
-.home__sphere:not(.is-cards) .sphere__card:not(:hover) .sphere__media,
-.home__sphere:not(.is-cards) .sphere__card:not(:hover) .sphere__tag { opacity: 0; }
+.home__sphere:not(.is-cards) .sphere__card:not(:hover) .sphere__media { opacity: 0; }
 .home__sphere:not(.is-cards) .sphere__card:hover .sphere__logo,
 .home__sphere.is-cards .sphere__logo { opacity: 0; }
 .home__sphere:not(.is-cards) .sphere__card:hover .sphere__media::after { opacity: 0; }
@@ -1693,11 +1691,11 @@ html:has(.sheet:target) { overflow: hidden; }
 .agent-face::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: 50%; background: var(--rainbow); filter: blur(6px); opacity: .8; animation: agent-spin 6s linear infinite; }
 .agent-face img { display: block; width: 100%; height: 100%; border-radius: 50%; background: #FFFFFF; }
 
-/* Telefon pionowo: każdy panel tej samej wysokości (od 22% ekranu w dół), u góry kreska-uchwyt - panel można
+/* Telefon pionowo: każdy panel tej samej wysokości (od 8% ekranu w dół), u góry kreska-uchwyt - panel można
    zsunąć palcem za uchwyt albo pasek z tytułem (main.js); klik w przyciemnienie nad panelem też zamyka. */
 .sheet__grab { display: none; }
 @media (max-width: 767px) and (orientation: portrait) {
-  .sheet { --sheet-top: 22svh; }
+  .sheet { --sheet-top: 8svh; }
   .sheet__grab { display: block; position: absolute; z-index: 1; inset: 0 0 auto; height: var(--s-3); touch-action: none; }
   .sheet__grab::before { content: ""; position: absolute; left: 50%; top: 10px; width: 40px; height: 3px; translate: -50% 0; background: var(--ink-4); }
   .sheet__bar { touch-action: none; padding-top: var(--s-3); }

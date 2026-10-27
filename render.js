@@ -292,7 +292,6 @@ function sphere(c, t) {
           <a class="sphere__card${i === 0 ? ' is-active' : ''}" href="#${p.id}" data-project="${p.id}" tabindex="-1" style="--lon:${Math.round((360 / n) * i)}deg;--lat:${CARD_LAT[i % CARD_LAT.length]}deg">
             <span class="sphere__media">${inner}</span>${p.sphereLogo ? `
             <span class="sphere__logo" style="--ls:${p.sphereLogo.size ?? .8}"><img class="mono" src="${esc(p.sphereLogo.src)}" width="${p.sphereLogo.w}" height="${p.sphereLogo.h}" alt="" loading="lazy" decoding="async"></span>` : ''}
-            <span class="sphere__tag t-meta">${esc(p.title)}${betaTag(p)}</span>
           </a>`;
   }).join('');
   return `
