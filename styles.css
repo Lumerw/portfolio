@@ -395,10 +395,8 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .hero__icons {
   display: flex;
   gap: var(--s-3);
-  padding-inline: var(--s-1);           /* miejsce na szerokie logotypy wystające ze slotu - maska przycina do ramki */
+  padding-inline: var(--s-1);           /* miejsce na szerokie logotypy wystające ze slotu */
   margin-inline: calc(-1 * var(--s-1));
-  -webkit-mask-image: linear-gradient(to right, #000 0%, transparent 100%);
-  mask-image: linear-gradient(to right, #000 0%, transparent 100%);
 }
 /* Znaki mają pola o tej samej powierzchni optycznej (viewBox w assets/icons/07-16): kwadratowe 32 px,
    szerokie logotypy szersze (do ~46 px) - na środku slotu, wystają w odstęp między slotami */
@@ -461,8 +459,11 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .hero__name { font-weight: var(--fw-regular); margin-bottom: var(--s-1); }
 /* Imię + oficjalne logo LinkedIn = jeden link do profilu (całe pole klikalne, wysokość 32 px) */
 .hero__li { display: inline-flex; align-items: center; gap: 12px; min-height: 32px; margin-block: -4px; color: var(--ink); }
-.hero__li-logo { width: auto; height: 17px; }
+.li-logo { display: inline-block; flex: none; height: 17px; aspect-ratio: 635 / 540; background: currentColor; -webkit-mask: url("assets/icons/linkedin.png") center / contain no-repeat; mask: url("assets/icons/linkedin.png") center / contain no-repeat; }
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
+/* Hasło i zdanie pod nim: na telefonie zawsze dwie linie (render.js, mobileBreak) */
+.br-m { display: none; }
+@media (max-width: 767px) { .br-m { display: inline; } }
 /* „kontakt” i karuzela logo w jednej linii; karuzela wypełnia resztę z wygaszonymi bokami */
 .hero__row { display: flex; align-items: center; gap: var(--s-4); margin-top: var(--s-4); }
 .hero__cta { flex: none; }
@@ -1692,14 +1693,14 @@ html:has(.sheet:target) { overflow: hidden; }
 .agent-face::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: 50%; background: var(--rainbow); filter: blur(6px); opacity: .8; animation: agent-spin 6s linear infinite; }
 .agent-face img { display: block; width: 100%; height: 100%; border-radius: 50%; background: #FFFFFF; }
 
-/* Telefon: nad asystentem więcej przyciemnienia (klik w nie zamyka), u góry panelu kreska-uchwyt -
-   panel można zsunąć palcem (main.js). Pozostałe panele bez uchwytu. */
+/* Telefon pionowo: każdy panel tej samej wysokości (od 22% ekranu w dół), u góry kreska-uchwyt - panel można
+   zsunąć palcem za uchwyt albo pasek z tytułem (main.js); klik w przyciemnienie nad panelem też zamyka. */
 .sheet__grab { display: none; }
-@media (max-width: 767px) {
-  .sheet--agent { --sheet-top: 22svh; }
-  .sheet--agent .sheet__grab { display: block; position: absolute; z-index: 1; inset: 0 0 auto; height: var(--s-3); touch-action: none; }
-  .sheet--agent .sheet__grab::before { content: ""; position: absolute; left: 50%; top: 10px; width: 40px; height: 3px; translate: -50% 0; background: var(--ink-4); }
-  .sheet--agent .sheet__bar { touch-action: none; padding-top: var(--s-3); }
+@media (max-width: 767px) and (orientation: portrait) {
+  .sheet { --sheet-top: 22svh; }
+  .sheet__grab { display: block; position: absolute; z-index: 1; inset: 0 0 auto; height: var(--s-3); touch-action: none; }
+  .sheet__grab::before { content: ""; position: absolute; left: 50%; top: 10px; width: 40px; height: 3px; translate: -50% 0; background: var(--ink-4); }
+  .sheet__bar { touch-action: none; padding-top: var(--s-3); }
 }
 
 /* Panel: jak wszystkie panele - wysuwa się od dołu na całą szerokość; czat w kolumnie do czytania */
@@ -1788,7 +1789,7 @@ html:has(.sheet:target) { overflow: hidden; }
 }
 @media (max-width: 767px) {
   .site-footer { margin-top: var(--s-5); }
-  .site-footer__in { padding-block: var(--s-6) var(--s-5); }
+  .site-footer__in { padding-block: var(--s-12); }   /* tyle powietrza nad i pod treścią co w pozostałych sekcjach */
 }
 @media (max-width: 1023px) {
   :root[data-theme="dark"] .site-footer, :root[data-theme="dark"] .colophon {

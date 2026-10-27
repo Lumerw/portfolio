@@ -93,7 +93,7 @@ img { display: block; }
 .cover__avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff; }
 .cover__text { position: relative; z-index: 1; margin-block: auto; max-width: calc(560px * var(--k)); }
 .cover__name { margin-top: calc(32px * var(--k)); display: flex; align-items: center; gap: calc(12px * var(--k)); font-size: calc(15px * var(--k)); }
-.cover__name .li { width: auto; height: calc(17px * var(--k)); display: block; }
+.cover__name .li { display: block; height: calc(17px * var(--k)); aspect-ratio: 635 / 540; background: var(--ink); -webkit-mask: url("../assets/icons/linkedin.png") center / contain no-repeat; mask: url("../assets/icons/linkedin.png") center / contain no-repeat; }   /* logo LinkedIn kolorem tekstu */
 .cover__name svg { width: calc(16px * var(--k)); height: calc(16px * var(--k)); fill: none; stroke: var(--ink-2); stroke-width: 1; }
 .cover__title { margin-top: calc(8px * var(--k)); font-size: calc(28px * var(--k)); line-height: 1.2; font-weight: 500; letter-spacing: -.01em; }
 .cover__line { margin-top: calc(16px * var(--k)); font-size: calc(15px * var(--k)); line-height: 1.6; color: var(--ink-2); max-width: 30em; }

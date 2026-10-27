@@ -154,8 +154,9 @@ function indexRow(p, i) {
 // Znacznik „beta” przy nazwie projektu (projects[].beta) - ramka 1 px, mały stopień pisma
 const betaTag = p => (p.beta ? ' <span class="beta">beta</span>' : '');
 
-// Oficjalne logo LinkedIn („in” z ®, assets/icons/linkedin.png) przy imieniu w hero - też w PDF portfolio (tools/build-pdf.mjs).
-const liIcon = `<img class="hero__li-logo" src="assets/icons/linkedin.png" width="635" height="540" alt="" decoding="async">`;
+// Oficjalne logo LinkedIn („in” z ®) jednym kolorem tekstu - czarne albo białe zależnie od motywu: plik
+// assets/icons/linkedin.png służy za maskę (CSS .li-logo). Też w PDF portfolio (tools/build-pdf.mjs).
+const liIcon = `<span class="li-logo" aria-hidden="true"></span>`;
 
 // Ikonki w kolumnie numerów: archiwum (Google Drive) i pobieranie (PDF).
 // Logo Google Drive jednym kolorem (Simple Icons, CC0) - w kolorze pozostałych ikon wiersza
@@ -195,13 +196,22 @@ function avatar(c, t) {
       </a>`;
 }
 
+// Telefon: tekst łamany po fragmencie `after` (<br> widoczny tylko na telefonie; spacja przed nim zostaje,
+// więc szerzej - bez złamania - słowa się nie sklejają)
+const mobileBreak = (text, after) => {
+  const i = after ? text.indexOf(after) : -1;
+  if (i < 0) return esc(text);
+  const k = i + after.length;
+  return `${esc(text.slice(0, k))} <br class="br-m">${esc(text.slice(k).trimStart())}`;
+};
+
 function hero(c, t) {
   const linkedin = c.links.find(l => l.label === 'LinkedIn');
   const liHref = linkedin ? url(linkedin.href) : '#';
-  // Trzy miejsca na ikony obok awatara. W HTML tylko ikona startowa (0, ostatnia, przedostatnia);
-  // kolejne main.js dokłada do miejsca, gdy się wczytają - każde miejsce zmienia się we własnym rytmie.
+  // Jedno miejsce na ikonę obok awatara. W HTML tylko ikona startowa; kolejne main.js dokłada, gdy się
+  // wczytają, i zmienia je w losowym rytmie.
   const L = c.icons.length;
-  const icons = [0, 1, 2].map(slot => {
+  const icons = [0].map(slot => {
     const src = c.icons[(L - slot) % L];
     return `
           <span class="hero__slot"><img class="hero__icon${mono(src)} is-on" src="${esc(src)}" width="40" height="40" alt=""></span>`;
@@ -215,8 +225,8 @@ function hero(c, t) {
     <p class="hero__name"><span ${reveal(0)}>${liHref !== '#'
       ? `<a class="hero__li" href="${esc(liHref)}" target="_blank" rel="me noopener">${esc(c.name)} ${liIcon}<span class="visually-hidden"> - ${esc(t.ui.linkedin)}</span></a>`
       : esc(c.name)}</span></p>
-    <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${esc(t.hero.title)}</span></h1>
-    <p class="hero__line t-text t-muted"><span ${reveal(2)}>${esc(t.hero.line)}</span></p>
+    <h1 id="hero-title" class="t-name hero__title"><span ${reveal(1)}>${mobileBreak(t.hero.title, t.hero.breaks?.title)}</span></h1>
+    <p class="hero__line t-text t-muted"><span ${reveal(2)}>${mobileBreak(t.hero.line, t.hero.breaks?.line)}</span></p>
     <div class="hero__row">
       <p class="hero__cta"><span ${reveal(3)}><a class="button button--primary" href="#kontakt">${esc(t.ui.contactCta)}</a></span></p>${clients(c, t)}
     </div>

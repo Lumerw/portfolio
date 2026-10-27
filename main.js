@@ -325,11 +325,11 @@ function close() {
 
 addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
-/* Telefon: panel asystenta zsuwa się palcem - za kreskę u góry albo pasek z tytułem.
+/* Telefon pionowo: każdy panel zsuwa się palcem - za kreskę u góry albo pasek z tytułem.
    Ponad 80 px albo szybki ruch w dół zamyka; krócej - panel wraca na miejsce. */
 app.addEventListener('pointerdown', e => {
-  const handle = e.target.closest('.sheet--agent .sheet__grab, .sheet--agent .sheet__bar');
-  if (!handle || e.pointerType === 'mouse' || e.target.closest('a, button') || innerWidth >= 768) return;
+  const handle = e.target.closest('.sheet__grab, .sheet__bar');
+  if (!handle || e.pointerType === 'mouse' || e.target.closest('a, button') || !matchMedia('(max-width: 767px) and (orientation: portrait)').matches) return;
   const panel = handle.closest('.sheet__panel');
   const y0 = e.clientY, t0 = performance.now();
   let dy = 0;

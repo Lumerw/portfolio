@@ -61,7 +61,7 @@ function doc(lang, fmt, dark) {
     <header class="bar"><span class="bar__right">${counter(1)}</span></header>
     <div class="cover__text">
       <div class="cover__avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
-      <p class="cover__name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a> <a href="${esc(linkedin)}" aria-label="LinkedIn"><img class="li" src="assets/icons/linkedin.png" alt=""></a>` : esc(c.name)}</p>
+      <p class="cover__name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a> <a href="${esc(linkedin)}" aria-label="LinkedIn"><span class="li"></span></a>` : esc(c.name)}</p>
       <h1 class="cover__title">${esc(t.hero.title)}</h1>
       <p class="cover__line">${esc(t.hero.line)}</p>
       <p class="buttons">

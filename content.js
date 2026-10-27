@@ -289,7 +289,9 @@ export const pl = {
   hero: {
     role: 'projektant',                                   // podpis przy imieniu nad hasłem
     title: 'Design to to, jak coś działa.',               // hasło (h1)
-    line: 'Od pomysłu, przez ciągłe testowanie, do finalnego wdrożenia.',
+    line: 'Od pomysłu, przez ciągłe testowanie, aż do finalnego wdrożenia.',
+    // telefon: hasło i zdanie zawsze w dwóch liniach - złamane po tym fragmencie (render.js, mobileBreak)
+    breaks: { title: 'Design to to,', line: 'przez ciągłe testowanie,' },
   },
   projects: {
     teraz: {
@@ -395,7 +397,7 @@ export const pl = {
     call: 'umów rozmowę ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['identyfikacja wizualna', 'UX/UI i projekt stron', 'front-end: HTML, CSS, JS, Next.js', 'projektowanie i development z AI', 'dostępność WCAG 2.2', 'grafika i motion generowane z AI'],
-    line: ['Od pomysłu, przez ciągłe testowanie, do finalnego wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
+    line: ['Od pomysłu, przez ciągłe testowanie, aż do finalnego wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
   },
   // PDF 1080 × 1080 (npm run deck): karuzela na LinkedIn / Instagram, linki klikalne.
   deck: {
@@ -558,7 +560,8 @@ export const en = {
   hero: {
     role: 'designer',
     title: 'Design is how it works.',
-    line: 'From idea, through continuous testing, to final launch.',
+    line: 'From idea, through continuous testing, all the way to final launch.',
+    breaks: { title: 'Design is how', line: 'through continuous testing,' },
   },
   projects: {
     teraz: {
@@ -662,7 +665,7 @@ export const en = {
     call: 'book a call ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['visual identity', 'UX/UI and web design', 'front-end: HTML, CSS, JS, Next.js', 'AI-assisted design and development', 'accessibility, WCAG 2.2', 'generative AI visuals and motion'],
-    line: ['From idea, through continuous testing, to final launch.'],
+    line: ['From idea, through continuous testing, all the way to final launch.'],
   },
   deck: {
     file: 'Wojciech-Lumer-Portfolio-1080-EN.pdf',
