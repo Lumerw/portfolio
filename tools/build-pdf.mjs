@@ -74,9 +74,9 @@ function doc(lang, fmt, dark) {
     <aside class="about">
       <h2 class="about__title">${esc(t.about.title)}</h2>
       <div class="about__cols">
-        ${col(U.education, `<ul class="entries">${A.education.map(entry).join('')}</ul><h4>${esc(U.certificates)}</h4><ul class="logos">${A.certificates.map(x => `<li>${logo(x)}</li>`).join('')}</ul>`)}
-        ${col(U.experience, `<ul class="entries">${A.work.map(entry).join('')}</ul><ul class="logos">${A.clients.map(x => `<li>${logo(x)}</li>`).join('')}</ul>`)}
-        ${col(t.cv.skills, `<ul class="dash">${t.cv.skillsList.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
+        ${col(U.education, `<ul class="axis">${A.education.map(entry).join('')}<li class="entry entry--group"><span class="entry__label">${esc(U.certificates)}</span><span class="logos">${A.certificates.map(logo).join('')}</span></li></ul>`)}
+        ${col(U.experience, `<ul class="axis">${A.work.map(entry).join('')}</ul>`)}
+        ${col(t.cv.skills, `<ul class="dash">${t.cv.skillsList.filter(x => !A.skipSkills?.includes(x)).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
       </div>
     </aside>
     <footer class="cover__foot"><a href="${esc(site)}/">${esc(site.replace(/^https?:\/\//, ''))}</a> <span>${esc(c.year)}</span></footer>
@@ -110,7 +110,7 @@ function doc(lang, fmt, dark) {
 
   const links = c.links.filter(l => isReal(l.href));
   const contact = `
-  <section class="page">
+  <section class="page last">
     ${globe}
     <header class="bar"><span class="bar__right">${counter(total)}</span></header>
     <div class="contact">

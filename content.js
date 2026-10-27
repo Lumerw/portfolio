@@ -26,15 +26,15 @@ export const shared = {
     certificates: [
       { logo: 'assets/logos/preply.svg', h: 22, name: 'Preply' },
       { logo: 'assets/logos/google.svg', h: 24, name: 'Google' },
-      { name: 'Design Practice' },   // [logo do znalezienia - na razie nazwa]
+      { logo: 'assets/logos/design-practice.png', h: 44, name: 'Design Practice' },   // litery z logo (bez kuli i tła)
     ],
-    work: [{ logo: 'assets/clients/promotrafic.svg', h: 26, name: 'Promotraffic', role: 'AI designer', year: { pl: '2025.05 - teraz', en: '2025.05 - now' } }],
-    clients: [
-      { logo: 'assets/logos/ancy.svg', h: 18, name: 'Ancy' },
+    // Doświadczenie: 3 punkty na osi - Promotraffic (rola i daty), potem same loga
+    work: [
+      { logo: 'assets/clients/promotrafic.svg', h: 26, name: 'Promotraffic', role: 'AI designer', year: { pl: '2025.05 - teraz', en: '2025.05 - now' } },
       { logo: 'assets/clients/youniversity.svg', h: 18, name: 'Youniversity' },
-      { logo: 'assets/logos/depilacja.svg', h: 22, name: 'depilacja.pl' },
-      { logo: 'assets/clients/weedweek.svg', h: 20, name: 'WeedWeek' },
+      { logo: 'assets/logos/ancy.svg', h: 18, name: 'Ancy' },
     ],
+    skipSkills: ['dostępność WCAG 2.2', 'accessibility, WCAG 2.2'],   // w PDF 5 kompetencji
   },
   calendly: 'https://cal.com/wojciech-lumer-sxkqby/30min',  // zewnętrzna strona rezerwacji (Cal.com, 30 min) - zapas, gdy kalendarz na stronie nie działa
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.

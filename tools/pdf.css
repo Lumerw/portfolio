@@ -130,7 +130,7 @@ img { display: block; }
 .contact__drive { margin-top: calc(24px * var(--k)); font-size: calc(15px * var(--k)); }
 .contact__drive a { display: inline-flex; align-items: center; gap: calc(10px * var(--k)); }
 .contact__drive svg { width: calc(15px * var(--k)); height: calc(15px * var(--k)); fill: currentColor; flex: none; }
-.contact__foot { position: relative; z-index: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 32px; font-size: 22px; }
+.contact__foot { display: flex; align-items: baseline; justify-content: space-between; gap: 32px; font-size: 22px; }
 .contact__links { display: flex; flex-wrap: wrap; }
 .contact__links li + li::before { content: "·"; padding-inline: 14px; color: var(--ink-3); }
 .contact__links a { border-bottom: 1px solid var(--hair); }
@@ -141,27 +141,36 @@ img { display: block; }
 /* Okładka: blok „O mnie” na dole pod hasłem i przyciskami (16:9 w lewej kolumnie, poza sferą) */
 .about { position: relative; z-index: 1; }
 .about__title { font-size: 22px; font-weight: 400; color: var(--ink-3); padding-bottom: 14px; border-bottom: 1px solid var(--hair); }
-/* trzy kolumny: wykształcenie (+ certyfikaty), doświadczenie (+ loga firm), kompetencje; na 9:16 jedna pod drugą */
-.about__cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 56px; padding-top: 20px; border-bottom: 1px solid var(--hair); padding-bottom: 24px; font-size: 20px; line-height: 1.5; }
-.about__col h3, .about__col h4 { font-size: 18px; font-weight: 400; color: var(--ink-3); margin-bottom: 14px; }
-.about__col h4 { margin-top: 22px; margin-bottom: 12px; }
+/* trzy kolumny: wykształcenie, doświadczenie (oś z kropkami - linia schodzi niżej i zanika), kompetencje; do ~72% szerokości */
+:root[data-fmt="16x9"] .cover .about { width: 1300px; }
+.about__cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.2fr) minmax(0, .95fr); column-gap: 44px; padding-top: 16px; font-size: 20px; line-height: 1.5; }
+.about__col h3 { font-size: 18px; font-weight: 400; color: var(--ink-3); margin-bottom: 14px; }
 .about .meta { font-size: 17px; }
-.entries { display: grid; gap: 14px; }
-.entry { display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; row-gap: 4px; }
-.logos { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 30px; margin-top: 18px; }
-.about__col h4 + .logos { margin-top: 0; }
+.axis { position: relative; display: grid; gap: 12px; }
+.axis::before { content: ""; position: absolute; left: 5px; top: 16px; bottom: -44px; width: 1.5px; background: linear-gradient(var(--ink) 0 calc(100% - 64px), transparent); }
+.entry { position: relative; display: flex; flex-wrap: nowrap; align-items: center; column-gap: 14px; row-gap: 10px; min-height: 32px; padding-left: 32px; }
+.entry::before { content: ""; position: absolute; left: 0; top: 10.5px; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); }
+.entry--group { flex-direction: column; align-items: flex-start; }
+.entry__label { line-height: 32px; }
+.entry__text { min-width: 0; line-height: 1.35; }   /* logo zawsze obok - łamie się tylko tekst */
+.entry .logo { flex: none; }
+.logos { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; }
 /* loga firm i uczelni w kolorze tekstu (jednolicie, niezależnie od barw marek) */
 .logo { display: block; width: auto; filter: brightness(0); opacity: .82; }
 :root[data-theme="dark"] .logo { filter: brightness(0) invert(1); }
 .logo--text { filter: none; opacity: 1; font-size: 18px; font-weight: 600; letter-spacing: -.01em; color: var(--ink-2); }
-.cover .about { margin-top: 48px; }
-:root[data-fmt="9x16"] .about__cols { grid-template-columns: 1fr; row-gap: 26px; }
-:root[data-fmt="9x16"] .cover .about { zoom: 1.25; margin-top: 32px; }   /* czytane na telefonie - jak reszta okładki 9:16 */
+.cover .about { margin-top: 28px; padding-bottom: 48px; }   /* miejsce na zanikającą linię osi */
+:root[data-fmt="9x16"] .about__cols { grid-template-columns: 1fr; row-gap: 40px; }
+:root[data-fmt="9x16"] .cover .about { zoom: 1.12; margin-top: 28px; }   /* czytane na telefonie - jak reszta okładki 9:16 */
 .cover__drive { margin-top: calc(24px * var(--k)); font-size: calc(15px * var(--k)); }
 .cover__drive a { display: inline-flex; align-items: center; gap: calc(10px * var(--k)); }
 .cover__drive svg { width: calc(15px * var(--k)); height: calc(15px * var(--k)); fill: currentColor; flex: none; }
 /* adres strony i rok w prawym dolnym rogu - jak © na ostatniej stronie */
-.cover__foot { position: relative; z-index: 1; display: flex; justify-content: flex-end; gap: 18px; margin-top: 24px; font-size: 22px; color: var(--ink-3); }
+.cover__foot { display: flex; justify-content: flex-end; gap: 18px; font-size: 22px; color: var(--ink-3); }
+/* stopka w tym samym miejscu na okładce i na ostatniej stronie (adres + rok / ©) */
+.cover__foot, .contact__foot { position: absolute; z-index: 1; left: var(--m); right: var(--m); bottom: var(--m); }
+.page.cover, .page.last { padding-bottom: calc(var(--m) + 64px); }
+.contact { translate: 0 -48px; }   /* wizualnie na środku między górą a stopką */
 
 /* Znacznik „beta” przy nazwie projektu */
 .beta { display: inline-block; margin-left: 20px; padding: 2px 12px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 22px; font-weight: 400; letter-spacing: .02em; vertical-align: .9em; line-height: 1.4; }
