@@ -128,6 +128,14 @@ function restartReel(scope) {
 /* Interaktywne plansze (projects[].live: loom.studio, reh.ab). live.js ładuje się przy pierwszej potrzebie
    i wstawia grafikę nad statyczną planszą (cover): na karcie z przodu sfery i w widocznej ramce otwartego panelu.
    Ponowne pokazanie = pętla od początku. Bez JS i przy ograniczonym ruchu zostaje cover (pierwsza klatka). */
+// Statystyka odwiedzin (Cloudflare Web Analytics, bez ciasteczek) - tylko na stronie produkcyjnej, nie lokalnie i nie w testach
+const stats = content.shared.analytics;
+if (stats?.cloudflare && stats.hosts.includes(location.hostname)) {
+  const s = Object.assign(document.createElement('script'), { defer: true, src: 'https://static.cloudflareinsights.com/beacon.min.js' });
+  s.dataset.cfBeacon = JSON.stringify({ token: stats.cloudflare });
+  document.head.append(s);
+}
+
 const liveIds = new Set(content.shared.projects.filter(p => p.live).map(p => p.id));
 let liveMod = null;
 async function showLive(host, id) {

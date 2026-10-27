@@ -1,9 +1,9 @@
 // PDF portfolio do pobrania ze strony - własny szablon (tools/pdf.css), nie wydruk strony.
 //   npm run pdf  →  pdf/ (poza repozytorium), dla pl i en po 4 pliki; npm run publish-pdf wysyła je do GitHub Releases:
-//     portfolio-lumer-<lang>.pdf            16:9 (1920 × 1080), jasny   - desktop
-//     portfolio-lumer-<lang>-dark.pdf       16:9, ciemny
-//     portfolio-lumer-<lang>-9x16.pdf       9:16 (1080 × 1920), jasny  - telefon
-//     portfolio-lumer-<lang>-9x16-dark.pdf  9:16, ciemny
+//     Wojciech-Lumer-Portfolio-<PL|EN>.pdf            16:9 (1920 × 1080), jasny   - desktop
+//     Wojciech-Lumer-Portfolio-<PL|EN>-dark.pdf       16:9, ciemny
+//     Wojciech-Lumer-Portfolio-<PL|EN>-9x16.pdf       9:16 (1080 × 1920), jasny  - telefon
+//     Wojciech-Lumer-Portfolio-<PL|EN>-9x16-dark.pdf  9:16, ciemny
 // Link „pobierz PDF” wybiera plik po urządzeniu (telefon / pionowo → 9:16) i motywie strony (main.js).
 // Strony: okładka (układ i proporcje hero strony na desktopie: awatar, imię, hasło, akapit, przyciski; „kontakt” → mail,
 // „umów rozmowę” → kalendarz na stronie) · projekty (kadr 4:5 + opis, jak panel projektu) · kontakt (jak sekcja

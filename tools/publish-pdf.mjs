@@ -1,7 +1,7 @@
 // Publikuje PDF-y z pdf/ w GitHub Releases (tag „pdf”) - nie w historii repozytorium.
 //   npm run pdf && npm run deck && npm run publish-pdf
 // Workflow publikacji pobiera je stamtąd do strony, więc na lumerw.com mają te same adresy co wcześniej
-// (np. /portfolio-lumer-pl.pdf). Po wysłaniu uruchamia publikację strony, żeby nowe pliki trafiły na stronę.
+// (np. /Wojciech-Lumer-Portfolio-PL.pdf). Po wysłaniu uruchamia publikację strony, żeby nowe pliki trafiły na stronę.
 import { execFileSync } from 'node:child_process';
 import { readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';

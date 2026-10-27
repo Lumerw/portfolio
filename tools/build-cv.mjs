@@ -1,9 +1,9 @@
 // Uniwersalne CV na jedną stronę 1080 × 1080, w designie strony i PDF portfolio, z klikalnymi linkami.
-//   npm run cv  →  private/cv-wojciech-lumer-pl.pdf, private/cv-wojciech-lumer-en.pdf
+//   npm run cv  →  private/Wojciech-Lumer-CV-PL.pdf, private/Wojciech-Lumer-CV-EN.pdf
 // Folder private/ jest w .gitignore - CV nie trafia do publicznego repozytorium ani na stronę.
 // Układ (4 wielkości tekstu: 40 hasło, 22 imię i zdanie, 18 treść, 15 opisy + znacznik beta): awatar z tęczową obwódką, obok adres strony i imię · hasło z hero, pod nim skrócone zdanie (pl/en.cv.line) · wiersze z cienką linią:
 // doświadczenie, projekty, kompetencje, narzędzia, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
-// (logo firm, bez freshly) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
+// (logo firm, bez freshly i WeedWeek) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
 // Treść z content.js (pl/en.about, pl/en.cv, shared.clients); placeholdery w [nawiasach] są pomijane.
 import { chromium } from 'playwright';
 import { mkdir, readFile, stat } from 'node:fs/promises';
@@ -18,7 +18,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'private');
 const PORT = 8097;
 const SIZE = 1080;
-const CV_SKIP_CLIENTS = ['freshly'];   // logo pominięte w CV (na stronie zostają)
+const CV_SKIP_CLIENTS = ['freshly', 'WeedWeek'];   // logo pominięte w CV (na stronie, w karuzeli klientów, zostają)
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isReal = v => !!v && !String(v).includes('[');

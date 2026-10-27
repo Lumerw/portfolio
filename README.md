@@ -15,12 +15,12 @@ npm run dev        # http://localhost:8080 — index.html renderowany z content.
 | `npm run dev` | serwer podglądu; zmiany w `content.js` widać po odświeżeniu |
 | `npm run build` | wpisuje polską treść z `content.js` do `index.html` (strona działa bez JS, szybciej się ładuje). **Przed wdrożeniem.** |
 | `npm run images` | AVIF/WebP/JPG 640/1280/1920 z obrazów `.jpg`/`.png` wpisanych w `content.js`; portret od razu w duotonie |
-| `npm run pdf` | PDF do pobrania (do `pdf/`, poza repozytorium), po 4 na język: `portfolio-lumer-<pl|en>.pdf` (16:9, jasny), `-dark.pdf` (16:9, ciemny), `-9x16.pdf` i `-9x16-dark.pdf` (telefon); własny szablon `tools/pdf.css`, kadry projektów zrzucane z paneli strony do `private/pdf/`; sprawdza 5 stron, kadr i rozmiar < 8 MB |
+| `npm run pdf` | PDF do pobrania (do `pdf/`, poza repozytorium), po 4 na język: `Wojciech-Lumer-Portfolio-<PL|EN>.pdf` (16:9, jasny), `-dark.pdf` (16:9, ciemny), `-9x16.pdf` i `-9x16-dark.pdf` (telefon); własny szablon `tools/pdf.css`, kadry projektów zrzucane z paneli strony do `private/pdf/`; sprawdza 5 stron, kadr i rozmiar < 8 MB |
 | `npm run publish-pdf` | wysyła PDF-y z `pdf/` do GitHub Releases (tag `pdf`) i uruchamia publikację strony - na lumerw.com mają te same adresy co wcześniej |
 | `npm run dist` | strona do publikacji w `_site/`: kopia plików strony ze zminifikowanym JS i CSS (robi to GitHub Actions) |
 | `npm run covers` | plansze marek na stronę (`cover-4x5/16x9/9x16.webp` dla projektów z polem `cover`) i obrazy case study do PDF A4 (`01-03.jpg` ze zrzutów i planszy); potem `npm run images` |
 | `npm run cv` | CV na jedną stronę 1080 × 1080 (PL i EN) do wysyłania → `private/` (poza repozytorium); projekty, doświadczenie, kompetencje, narzędzia, kontakt z Calendly i QR |
-| `npm run deck` | `portfolio-lumer-1080-pl.pdf` i `-en.pdf`: karuzela 1080 × 1080 na LinkedIn / Instagram (8 slajdów, klikalny spis i linki); sprawdza liczbę stron, kadr i linki |
+| `npm run deck` | `Wojciech-Lumer-Portfolio-1080-PL.pdf` i `-EN.pdf`: karuzela 1080 × 1080 na LinkedIn / Instagram (8 slajdów, klikalny spis i linki); sprawdza liczbę stron, kadr i linki |
 | `npm run og` | `assets/og.jpg` 1200×630 (obraz do linków w mailu / na LinkedInie) |
 | `npm run assets` | symbole, favicony i wektorowe placeholdery |
 | `npm run audit` | Lighthouse (telefon + desktop) i lista kontrolna z briefu (sekcja 10), w tym zero zewnętrznych żądań z otwartym `#loom` i `#teraz`. Testy akceptacyjne planszy teraz: `npm run check-reel` |

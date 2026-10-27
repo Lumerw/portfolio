@@ -9,7 +9,7 @@ import { synced } from './brands.generated.js';
 
 export const shared = {
   name: 'Wojciech Lumer',            // [potwierdź zapis]
-  slug: 'lumer',                     // używane w nazwie PDF: portfolio-lumer-pl.pdf
+  slug: 'lumer',
   year: '2026',
   siteUrl: 'https://lumerw.com', // adres strony (domena z GoDaddy → GitHub Pages) - QR w PDF, Open Graph, sitemap
   email: 'wojciechlumer@gmail.com',
@@ -21,6 +21,8 @@ export const shared = {
   // calUsername = <nazwa> z cal.com/<nazwa>, events = typy spotkań z cal.com/<nazwa>/<slug> (pierwszy domyślny).
   // Klucz API NIE jest potrzebny (i nie może trafić na stronę - byłby publiczny).
   booking: { calUsername: 'wojciech-lumer-sxkqby', events: [{ slug: '30min', minutes: 30 }] },   // tylko rozmowy 30-minutowe
+  // Statystyka odwiedzin: Cloudflare Web Analytics (bez ciasteczek i banera), token strony jest publiczny; ładowana tylko na tych hostach
+  analytics: { cloudflare: '87b049ba426c4d3cb5c4e1ef739d6275', hosts: ['lumerw.com', 'www.lumerw.com'] },
   // Profile: stopka, dane dla Google (sameAs), asystent, PDF. LinkedIn = też wiersz „o mnie” w indeksie.
   links: [
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/wojciechlumer/' },
@@ -220,7 +222,7 @@ export const pl = {
     langSwitch: 'EN',
     langSwitchLabel: 'Switch to English',
     pdf: 'PDF ↓',
-    pdfFile: 'portfolio-lumer-pl.pdf',
+    pdfFile: 'Wojciech-Lumer-Portfolio-PL.pdf',
     indexLabel: 'Projekty',
     about: 'o mnie',
     download: 'pobierz PDF',
@@ -340,13 +342,13 @@ export const pl = {
   about: {
     title: 'O mnie',
     portraitAlt: 'Wojciech Lumer - portret', // [potwierdź po dodaniu zdjęcia]
-    bio: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio, a od 2025 roku pracuję jako AI designer w Promotrafic.',
+    bio: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio, a od 2025 roku pracuję jako AI designer w Promotraffic.',
     experience: [
-      { year: '2025.05 - teraz', place: 'Promotrafic', role: 'AI designer' },
+      { year: '2025.05 - teraz', place: 'Promotraffic', role: 'AI designer' },
       { year: '2023.11 - teraz', place: 'loom.studio', role: 'założyciel, projektant' },
     ],
-    education: '[Uniwersytet SWPS - kierunek, lata]',
-    languages: '[polski - ojczysty · angielski - poziom]',
+    education: '',                   // celowo puste - nie pokazujemy (CV, asystent)
+    languages: '',
     tools: ['Figma', 'Adobe CC', 'Claude', 'Magnific', 'Cavalry', 'Blender', 'Adtron', 'ClickUp', 'HTML/CSS'],
   },
   // Marka osobista w jednym zdaniu - asystent AI (pytania o markę, kolory, fonty)
@@ -363,7 +365,7 @@ export const pl = {
   },
 
   cv: {
-    file: 'cv-wojciech-lumer-pl.pdf',
+    file: 'Wojciech-Lumer-CV-PL.pdf',
     projects: 'Projekty',
     experience: 'Doświadczenie',
     skills: 'Kompetencje',
@@ -376,7 +378,7 @@ export const pl = {
   },
   // PDF 1080 × 1080 (npm run deck): karuzela na LinkedIn / Instagram, linki klikalne.
   deck: {
-    file: 'portfolio-lumer-1080-pl.pdf',
+    file: 'Wojciech-Lumer-Portfolio-1080-PL.pdf',
     label: 'portfolio 2026',
     back: 'spis',                    // link powrotu na każdym slajdzie
     contactRow: 'kontakt',           // ostatni wiersz spisu
@@ -441,7 +443,7 @@ export const pl = {
       { q: 'Jak wygląda współpraca?', a: 'W trzech krokach: discovery (30 minut rozmowy, w czasie której ustalimy, jak rozwiązać Twój problem), projektowanie (moodboard i projekty zgodne z briefem) i wdrożenie (testowanie kreacji w wybranej technologii). Na końcu dostajesz w pełni działający design.' },
       { q: 'Ile kosztuje projekt?', a: 'To zależy od zakresu. Wycenę i plan dostajesz po pierwszej rozmowie.' },
       { q: 'Czy zajmujesz się też wdrożeniem?', a: 'Tak - projektuję od pomysłu do wdrożenia, żeby powstała działająca rzecz, nie tylko makiety.' },
-      { q: 'Jak używasz AI w pracy?', a: 'AI pomaga mi szybko sprawdzić więcej wariantów projektu. Na co dzień pracuję jako AI designer w Promotrafic.' },
+      { q: 'Jak używasz AI w pracy?', a: 'AI pomaga mi szybko sprawdzić więcej wariantów projektu. Na co dzień pracuję jako AI designer w Promotraffic.' },
       { q: 'Co projektujesz?', a: 'Identyfikacje, strony i produkty cyfrowe. Prowadzę też loom.studio - studio projektowe w modelu subskrypcji.' },
       { q: 'Jak się skontaktować?', a: 'Najszybciej mailem albo przez kalendarz na stronie: rozmowa online, 30 minut.' },
     ],
@@ -488,7 +490,7 @@ export const en = {
     langSwitch: 'PL',
     langSwitchLabel: 'Przełącz na polski',
     pdf: 'PDF ↓',
-    pdfFile: 'portfolio-lumer-en.pdf',
+    pdfFile: 'Wojciech-Lumer-Portfolio-EN.pdf',
     indexLabel: 'Projects',
     about: 'about',
     download: 'download PDF',
@@ -607,13 +609,13 @@ export const en = {
   about: {
     title: 'About',
     portraitAlt: 'Wojciech Lumer - portrait',
-    bio: 'I design identities, websites and digital products - from idea to launch. I run loom.studio, and since 2025 I have worked as an AI designer at Promotrafic.',
+    bio: 'I design identities, websites and digital products - from idea to launch. I run loom.studio, and since 2025 I have worked as an AI designer at Promotraffic.',
     experience: [
-      { year: '2025.05 - now', place: 'Promotrafic', role: 'AI designer' },
+      { year: '2025.05 - now', place: 'Promotraffic', role: 'AI designer' },
       { year: '2023.11 - now', place: 'loom.studio', role: 'founder, designer' },
     ],
-    education: '[SWPS University - field, years]',
-    languages: '[Polish - native · English - level]',
+    education: '',                   // intentionally empty
+    languages: '',
     tools: ['Figma', 'Adobe CC', 'Claude', 'Magnific', 'Cavalry', 'Blender', 'Adtron', 'ClickUp', 'HTML/CSS'],
   },
   brand: 'My personal brand: black, white, a 1 px line, Helvetica and plenty of empty space. Colour and gradients belong only to project brands, the one exception being the rainbow glow of the AI assistant.',
@@ -629,7 +631,7 @@ export const en = {
   },
 
   cv: {
-    file: 'cv-wojciech-lumer-en.pdf',
+    file: 'Wojciech-Lumer-CV-EN.pdf',
     projects: 'Projects',
     experience: 'Experience',
     skills: 'Skills',
@@ -641,7 +643,7 @@ export const en = {
     line: ['I design identities, websites', 'and digital products - from idea to launch.'],
   },
   deck: {
-    file: 'portfolio-lumer-1080-en.pdf',
+    file: 'Wojciech-Lumer-Portfolio-1080-EN.pdf',
     label: 'portfolio 2026',
     back: 'contents',
     contactRow: 'contact',
@@ -701,7 +703,7 @@ export const en = {
       { q: 'What does working together look like?', a: 'Three steps: discovery (a 30-minute call where we figure out how to solve your problem), design (a moodboard and designs that follow the brief) and launch (testing the creative in your chosen technology). You end up with a fully working design.' },
       { q: 'How much does a project cost?', a: 'It depends on the scope. You get a quote and a plan after the first call.' },
       { q: 'Do you also build what you design?', a: 'Yes - I design from idea to launch, so you get a working thing, not just mockups.' },
-      { q: 'How do you use AI?', a: 'AI helps me test more design options, faster. Day to day I work as an AI designer at Promotrafic.' },
+      { q: 'How do you use AI?', a: 'AI helps me test more design options, faster. Day to day I work as an AI designer at Promotraffic.' },
       { q: 'What do you design?', a: 'Identities, websites and digital products. I also run loom.studio - a subscription-based design studio.' },
       { q: 'How can I get in touch?', a: 'Email is the fastest, or book a call in the calendar on the site: an online call, 30 minutes.' },
     ],

@@ -1,5 +1,5 @@
 // PDF 1080 × 1080 px - karuzela na LinkedIn / Instagram, z klikalnymi linkami.
-//   npm run deck  →  portfolio-lumer-1080-pl.pdf, portfolio-lumer-1080-en.pdf
+//   npm run deck  →  Wojciech-Lumer-Portfolio-1080-PL.pdf, Wojciech-Lumer-Portfolio-1080-EN.pdf
 // Slajdy: start (hasło + spis) · dla każdego projektu: plansza marki + szczegóły · kontakt.
 // Teksty: content.js (pl/en.deck, projekty), zrzuty: shared.projects[].deck, style: tools/deck.css,
 // plansze marek: tools/covers.mjs + covers.css (te same co na stronie).
