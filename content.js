@@ -236,7 +236,7 @@ export const shared = {
 export const pl = {
   meta: {
     title: 'Wojciech Lumer - portfolio',
-    description: 'Design to to, jak coś działa. Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia.',
+    description: 'Design to to, jak coś działa. Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu, przez ciągłe testowanie, do wdrożenia.',
   },
   ui: {
     langSwitch: 'EN',
@@ -289,7 +289,7 @@ export const pl = {
   hero: {
     role: 'projektant',                                   // podpis przy imieniu nad hasłem
     title: 'Design to to, jak coś działa.',               // hasło (h1)
-    line: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio.',
+    line: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu, przez ciągłe testowanie, do wdrożenia. Prowadzę loom.studio.',
   },
   projects: {
     teraz: {
@@ -363,7 +363,7 @@ export const pl = {
   about: {
     title: 'O mnie',
     portraitAlt: 'Wojciech Lumer - portret', // [potwierdź po dodaniu zdjęcia]
-    bio: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu do wdrożenia. Prowadzę loom.studio, a od 2025 roku pracuję jako AI designer w Promotraffic.',
+    bio: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu, przez ciągłe testowanie, do wdrożenia. Prowadzę loom.studio, a od 2025 roku pracuję jako AI designer w Promotraffic.',
     experience: [
       { year: '2025.05 - teraz', place: 'Promotraffic', role: 'AI designer' },
       { year: '2023.11 - teraz', place: 'loom.studio', role: 'założyciel, projektant' },
@@ -395,7 +395,7 @@ export const pl = {
     call: 'umów rozmowę ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['identyfikacja wizualna', 'UX/UI i projekt stron', 'front-end: HTML, CSS, JS, Next.js', 'projektowanie i development z AI', 'dostępność WCAG 2.2', 'grafika i motion generowane z AI'],
-    line: ['Projektuję identyfikacje, strony', 'i produkty cyfrowe - od pomysłu do wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
+    line: ['Projektuję identyfikacje, strony i produkty cyfrowe -', 'od pomysłu, przez ciągłe testowanie, do wdrożenia.'],   // CV: skrócone zdanie z hero w dwóch liniach
   },
   // PDF 1080 × 1080 (npm run deck): karuzela na LinkedIn / Instagram, linki klikalne.
   deck: {
@@ -505,7 +505,7 @@ export const pl = {
 export const en = {
   meta: {
     title: 'Wojciech Lumer - portfolio',
-    description: 'Design is how it works. I design identities, websites and digital products - from idea to launch.',
+    description: 'Design is how it works. I design identities, websites and digital products - from idea, through continuous testing, to launch.',
   },
   ui: {
     langSwitch: 'PL',
@@ -558,7 +558,7 @@ export const en = {
   hero: {
     role: 'designer',
     title: 'Design is how it works.',
-    line: 'I design identities, websites and digital products - from idea to launch. I run loom.studio.',
+    line: 'I design identities, websites and digital products - from idea, through continuous testing, to launch. I run loom.studio.',
   },
   projects: {
     teraz: {
@@ -631,7 +631,7 @@ export const en = {
   about: {
     title: 'About',
     portraitAlt: 'Wojciech Lumer - portrait',
-    bio: 'I design identities, websites and digital products - from idea to launch. I run loom.studio, and since 2025 I have worked as an AI designer at Promotraffic.',
+    bio: 'I design identities, websites and digital products - from idea, through continuous testing, to launch. I run loom.studio, and since 2025 I have worked as an AI designer at Promotraffic.',
     experience: [
       { year: '2025.05 - now', place: 'Promotraffic', role: 'AI designer' },
       { year: '2023.11 - now', place: 'loom.studio', role: 'founder, designer' },
@@ -662,7 +662,7 @@ export const en = {
     call: 'book a call ↗\uFE0E',
     portfolio: 'portfolio',
     skillsList: ['visual identity', 'UX/UI and web design', 'front-end: HTML, CSS, JS, Next.js', 'AI-assisted design and development', 'accessibility, WCAG 2.2', 'generative AI visuals and motion'],
-    line: ['I design identities, websites', 'and digital products - from idea to launch.'],
+    line: ['I design identities, websites and digital products -', 'from idea, through continuous testing, to launch.'],
   },
   deck: {
     file: 'Wojciech-Lumer-Portfolio-1080-EN.pdf',

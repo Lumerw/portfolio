@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
 import { setMeta } from './pdf-meta.mjs';
+import { typo } from './typo.mjs';
 import { sphere } from './sphere-svg.mjs';
 import { content } from '../content.js';
 import { clean, DRIVE_D } from '../render.js';
@@ -96,7 +97,7 @@ const browser = await chromium.launch().catch(() => chromium.launch({ channel: '
 let failed = false;
 for (const lang of ['pl', 'en']) {
   const page = await browser.newPage({ viewport: { width: SIZE, height: SIZE } });
-  await page.route(`http://localhost:${PORT}/__cv.html`, r => r.fulfill({ contentType: 'text/html; charset=utf-8', body: cv(lang) }));
+  await page.route(`http://localhost:${PORT}/__cv.html`, r => r.fulfill({ contentType: 'text/html; charset=utf-8', body: typo(cv(lang)) }));
   await page.goto(`http://localhost:${PORT}/__cv.html`, { waitUntil: 'networkidle' });
   await page.evaluate(async () => {
     await Promise.all([...document.images].map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; })));

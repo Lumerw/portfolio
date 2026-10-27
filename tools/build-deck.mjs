@@ -15,6 +15,7 @@ import { content } from '../content.js';
 import { clean, coverSrc } from '../render.js';
 import { covers } from './covers.mjs';
 import { setMeta } from './pdf-meta.mjs';
+import { typo } from './typo.mjs';
 import { symbol } from '../symbols.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -122,7 +123,7 @@ let failed = false;
 
 for (const lang of ['pl', 'en']) {
   const page = await browser.newPage();
-  await page.route(`http://localhost:${PORT}/__deck.html`, r => r.fulfill({ contentType: 'text/html; charset=utf-8', body: deck(lang) }));
+  await page.route(`http://localhost:${PORT}/__deck.html`, r => r.fulfill({ contentType: 'text/html; charset=utf-8', body: typo(deck(lang)) }));
   await page.goto(`http://localhost:${PORT}/__deck.html`, { waitUntil: 'networkidle' });
   await page.evaluate(async () => {
     await Promise.all([...document.images].map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; })));

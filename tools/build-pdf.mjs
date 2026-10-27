@@ -16,6 +16,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
 import { setMeta } from './pdf-meta.mjs';
+import { typo } from './typo.mjs';
 import { content } from '../content.js';
 import { clean, DRIVE_D, coverSrc } from '../render.js';
 import { sphere } from './sphere-svg.mjs';
@@ -48,7 +49,7 @@ function doc(lang, fmt, dark) {
   const counter = n => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
   const wide = fmt === '16x9';
   // Sfera: to samo miejsce na okładce i na stronie kontaktu - duża, w prawym górnym rogu, przycięta górą i prawą krawędzią
-  const globe = wide ? sphere(620, `left:${W - 120 - 620}px;top:${170 - 620}px`) : sphere(560, `left:${W - 80 - 560}px;top:${110 - 560}px`);
+  const globe = wide ? sphere(620, `left:${W - 120 - 620}px;top:${170 - 620 - 80}px`) : sphere(560, `left:${W - 80 - 560}px;top:${110 - 560}px`);
 
   // Dół okładki: wykształcenie (+ certyfikaty), doświadczenie (+ loga firm), kompetencje - loga z content.shared.pdfAbout
   const A = c.pdfAbout;
@@ -149,7 +150,7 @@ for (const lang of ['pl', 'en']) {
     for (const dark of [false, true]) {
       const [W, H] = FORMATS[fmt];
       const page = await browser.newPage({ viewport: { width: W, height: H } });
-      await page.route(`http://localhost:${PORT}/__pdf.html`, r => r.fulfill({ contentType: 'text/html; charset=utf-8', body: doc(lang, fmt, dark) }));
+      await page.route(`http://localhost:${PORT}/__pdf.html`, r => r.fulfill({ contentType: 'text/html; charset=utf-8', body: typo(doc(lang, fmt, dark)) }));
       await page.goto(`http://localhost:${PORT}/__pdf.html`, { waitUntil: 'networkidle' });
       await page.evaluate(async () => {
         await Promise.all([...document.images].map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; })));

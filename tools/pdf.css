@@ -161,7 +161,7 @@ img { display: block; }
 .axis::before { content: ""; position: absolute; left: 3px; top: 16px; bottom: -44px; width: 1px; background: linear-gradient(var(--ink-3) 0 calc(100% - 64px), transparent); opacity: .55; }   /* cienka jak linie w całym PDF */
 .entry { position: relative; display: flex; flex-wrap: nowrap; align-items: center; column-gap: 14px; row-gap: 10px; min-height: 32px; padding-left: 26px; }
 .entry::before { content: ""; position: absolute; left: 0; top: 12.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
-.entry--group { flex-direction: column; align-items: flex-start; }
+.entry--group { column-gap: 22px; }   /* certyfikaty: etykieta i loga w jednej linii - kolumna kończy się razem z pozostałymi */
 .entry__label { line-height: 32px; }
 .entry__text { min-width: 0; line-height: 1.35; }
 .entry__text .meta { white-space: nowrap; }   /* data łamie się w całości */   /* logo zawsze obok - łamie się tylko tekst */
@@ -171,7 +171,7 @@ img { display: block; }
 .logo { display: block; width: auto; filter: brightness(0); opacity: .82; }
 :root[data-theme="dark"] .logo { filter: brightness(0) invert(1); }
 .logo--text { filter: none; opacity: 1; font-size: 18px; font-weight: 600; letter-spacing: -.01em; color: var(--ink-2); }
-.cover .about { margin-top: 28px; padding-bottom: 48px; }   /* miejsce na zanikającą linię osi */
+.cover .about { margin-top: 56px; padding-bottom: 48px; }   /* miejsce na zanikającą linię osi */
 :root[data-fmt="9x16"] .about__cols { grid-template-columns: 1fr; row-gap: 40px; }
 :root[data-fmt="9x16"] .cover .about { zoom: 1.12; margin-top: 28px; }   /* czytane na telefonie - jak reszta okładki 9:16 */
 .cover__drive { margin-top: calc(24px * var(--k)); font-size: calc(15px * var(--k)); }
