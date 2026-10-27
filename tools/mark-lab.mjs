@@ -424,9 +424,10 @@ for (let n = 0; n < ROUNDS && ledger.usd < BUDGET - 4; n++) {   // zapas na najd
     { type: 'text', text: `Focus kinds and art-director feedback:\n${focus.map(feedback).join('\n\n')}\n\nCurrent code of these kinds (context):\n${focus.map(makerSrc).join('\n\n')}` },
   ];
   let spec = null;
-  for (const effort of ['medium', 'low']) {
-    const ct = await claude({ system: CONSTRUCTOR + kb, label: effort === 'medium' ? 'konstruktor' : 'konstruktor (ponownie)', max_tokens: 40000, effort, content: cMsg });
-    try { spec = json(ct); break; } catch { if (effort === 'medium') console.log('… konstruktor: niepełna odpowiedź - ponawiam z niższym wysiłkiem'); }
+  // niski wysiłek: przy średnim myślenie zjadało cały limit w każdej rundzie (rundy 4-6, ~$0,87 na darmo)
+  for (const attempt of [1, 2]) {
+    const ct = await claude({ system: CONSTRUCTOR + kb, label: attempt === 1 ? 'konstruktor' : 'konstruktor (ponownie)', max_tokens: 40000, effort: 'low', content: cMsg });
+    try { spec = json(ct); break; } catch { if (attempt === 1) console.log('… konstruktor: niepełna odpowiedź - ponawiam'); }
   }
   spec ??= { kinds: {} };
   await writeFile(join(dir, 'constructor.json'), JSON.stringify(spec, null, 2));
