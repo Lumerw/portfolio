@@ -12,7 +12,7 @@ export const shared = {
   slug: 'lumer',
   year: '2026',
   siteUrl: 'https://lumerw.com', // adres strony (domena z GoDaddy → GitHub Pages) - QR w PDF, Open Graph, sitemap
-  email: 'wojciechlumer@gmail.com',
+  email: 'kontakt@lumerw.com',         // przekierowanie Cloudflare Email Routing → gmail
   // Zewnętrzna strona rezerwacji rozmowy (zapas dla kalendarza na stronie, CV i deck)
   // Archiwum prac (kampanie, KV, wideo) - publiczny folder Google Drive; wiersz w sekcji Portfolio
   drive: 'https://drive.google.com/drive/folders/1oHAvj983Vswnud6h8LEDwE2bzd2_Og__?usp=sharing',
