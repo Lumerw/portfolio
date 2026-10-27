@@ -373,10 +373,13 @@ if (steps.length && pLine) {
   queue();
 }
 
-/* PDF do pobrania (indeks i czat): telefon albo ekran pionowy z dotykiem → 9:16, inaczej 16:9;
-   motyw strony (jasny / ciemny) → plik z białym albo czarnym tłem. Nazwy jak w tools/build-pdf.mjs (pdfName).
-   Bez JS zostaje adres bazowy: 16:9, jasny. */
-const pdfVariant = base => base.replace(/\.pdf$/, `${matchMedia('(max-width: 767px), (orientation: portrait) and (pointer: coarse)').matches ? '-9x16' : ''}${isDark() ? '-dark' : ''}.pdf`);
+/* PDF do pobrania (indeks i czat): motyw strony (jasny / ciemny) → plik z białym albo czarnym tłem.
+   Nazwy jak w tools/build-pdf.mjs (pdfName). Bez JS zostaje adres bazowy: 16:9, jasny.
+   Wybór orientacji (telefon albo ekran pionowy z dotykiem → 9:16) jest na razie wyłączony - każdy dostaje 16:9.
+   Pliki 9:16 nadal się budują (npm run pdf); żeby włączyć z powrotem, ustaw PDF_PORTRAIT = true. */
+const PDF_PORTRAIT = false;
+const portrait = () => PDF_PORTRAIT && matchMedia('(max-width: 767px), (orientation: portrait) and (pointer: coarse)').matches;
+const pdfVariant = base => base.replace(/\.pdf$/, `${portrait() ? '-9x16' : ''}${isDark() ? '-dark' : ''}.pdf`);
 app.addEventListener('click', e => {
   const a = e.target.closest('a[download][href$=".pdf"]');
   if (!a) return;

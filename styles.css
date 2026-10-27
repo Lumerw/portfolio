@@ -546,7 +546,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 .index__no { display: flex; align-self: center; }
 .index__glyph { width: 14px; height: 14px; color: var(--ink-3); }
 .index__mark { --size: 14; }
-.index__glyph--fill { fill: currentColor; stroke: none; }   /* logo Google Drive: wypełnione, nie kreską */
+.icon.index__glyph--fill { fill: currentColor; stroke: none; color: var(--ink); }   /* logo Google Drive: wypełnione kolorem tekstu, jak w PDF (.icon niżej ustawia fill: none) */
 
 /* ==========================================================================
    Kalendarz rezerwacji (panel #rozmowa): dni i godziny jako przyciski kreską 1 px, formularz jak czat

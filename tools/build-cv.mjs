@@ -2,7 +2,7 @@
 //   npm run cv  →  private/Wojciech-Lumer-CV-PL.pdf, private/Wojciech-Lumer-CV-EN.pdf
 // Folder private/ jest w .gitignore - CV nie trafia do publicznego repozytorium ani na stronę.
 // Układ (4 wielkości tekstu: 40 hasło, 22 imię i zdanie, 18 treść, 15 opisy + znacznik beta): awatar z tęczową obwódką, obok adres strony i imię · hasło z hero, pod nim skrócone zdanie (pl/en.cv.line) · wiersze z cienką linią:
-// doświadczenie, projekty, kompetencje, narzędzia, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
+// doświadczenie, kompetencje, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
 // (logo firm, bez freshly i WeedWeek) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
 // Treść z content.js (pl/en.about, pl/en.cv, shared.clients); placeholdery w [nawiasach] są pomijane.
 import { chromium } from 'playwright';
@@ -14,7 +14,7 @@ import { setMeta } from './pdf-meta.mjs';
 import { typo } from './typo.mjs';
 import { sphere } from './sphere-svg.mjs';
 import { content } from '../content.js';
-import { clean, DRIVE_D } from '../render.js';
+import { clean } from '../render.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'private');
@@ -39,12 +39,6 @@ function cv(lang) {
 
   const experience = t.about.experience.filter(e => isReal(e.place)).map(e => `
           <li><span class="meta">${esc(clean(e.year))}</span><span><b>${esc(clean(e.place))}</b><span class="muted">, ${esc(clean(e.role))}</span></span></li>`).join('');
-  const projects = c.projects.map(p => {
-    const href = isReal(p.href) ? p.href : `${site}/${lang === 'en' ? 'en/' : ''}#${p.id}`;
-    return `<li><a class="link-u" href="${esc(href)}"><b>${esc(p.title)}</b></a>${p.beta ? '<span class="beta">beta</span>' : ''}</li>`;
-  }).join('');
-  const archive = isReal(c.drive) ? `<li><a class="link-u drive" href="${esc(c.drive)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)} ↗\uFE0E</a></li>` : '';
-  const tools = t.about.tools.filter(isReal).map(clean);
   const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.85)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
@@ -72,9 +66,7 @@ function cv(lang) {
     </section>
     <dl class="rows">
       ${row(V.experience, `<ul class="list">${experience}</ul>`)}
-      ${row(V.projects, `<ul class="projs">${projects}${archive}</ul>`)}
       ${row(V.skills, `<ul class="dash">${V.skillsList.map(s => `<li>${esc(s)}</li>`).join('')}</ul>`)}
-      ${row(V.tools, tools.length ? `<p class="tools">${esc(tools.join(' · '))}</p>` : '')}
       ${isReal(t.about.education) ? row(V.education ?? (lang === 'pl' ? 'Wykształcenie' : 'Education'), esc(t.about.education)) : ''}
       ${isReal(t.about.languages) ? row(V.languages ?? (lang === 'pl' ? 'Języki' : 'Languages'), esc(t.about.languages)) : ''}
       ${row(U.clients, clients ? `<p class="clients">${clients}</p>` : '')}
@@ -106,8 +98,7 @@ for (const lang of ['pl', 'en']) {
   // ile pikseli treść wychodzi poza stronę (dół stopki, prawa krawędź)
   const over = await page.evaluate(S => {
     const els = [...document.querySelectorAll('.intro, .rows, .foot')];
-    const tools = document.querySelector('.tools');   // narzędzia w jednej linii
-    return Math.max(0, tools ? tools.scrollWidth - tools.clientWidth : 0, ...els.map(el => { const r = el.getBoundingClientRect(); return Math.max(r.bottom - (S - 64), r.right - S); }));
+    return Math.max(0, ...els.map(el => { const r = el.getBoundingClientRect(); return Math.max(r.bottom - (S - 64), r.right - S); }));
   }, SIZE);
   if (process.env.CV_PNG) await page.screenshot({ path: join(process.env.CV_PNG, `cv-${lang}.png`) });
   const file = join(out, content[lang].cv.file);
