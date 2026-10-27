@@ -154,8 +154,8 @@ function indexRow(p, i) {
 // Znacznik „beta” przy nazwie projektu (projects[].beta) - ramka 1 px, mały stopień pisma
 const betaTag = p => (p.beta ? ' <span class="beta">beta</span>' : '');
 
-// Ikonka LinkedIn kreską 1 px: ramka + „in” (przy imieniu w hero).
-const liIcon = `<svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>`;
+// Oficjalne logo LinkedIn („in” z ®, assets/icons/linkedin.png) przy imieniu w hero - też w PDF portfolio (tools/build-pdf.mjs).
+const liIcon = `<img class="hero__li-logo" src="assets/icons/linkedin.png" width="635" height="540" alt="" decoding="async">`;
 
 // Ikonki w kolumnie numerów: archiwum (Google Drive) i pobieranie (PDF).
 // Logo Google Drive jednym kolorem (Simple Icons, CC0) - w kolorze pozostałych ikon wiersza

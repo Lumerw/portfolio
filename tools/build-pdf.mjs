@@ -36,7 +36,6 @@ export const pdfName = (base, fmt, dark) => base.replace(/\.pdf$/, `${fmt === '9
 const icon = {
   calendar: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3M5 9h1.5M7.25 9h1.5M9.5 9H11M5 11h1.5M7.25 11h1.5"/></svg>',
   mail: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3.5" width="12" height="9"/><path d="M2 4l6 5 6-5"/></svg>',
-  linkedin: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x=".5" y=".5" width="15" height="15"/><path d="M4.5 7v5M7.5 12V7M7.5 9.2c0-1.5.9-2.2 2-2.2s2 .7 2 2.2V12"/><circle cx="4.5" cy="4.6" r=".5" fill="currentColor" stroke="none"/></svg>',
 };
 
 function doc(lang, fmt, dark) {
@@ -62,7 +61,7 @@ function doc(lang, fmt, dark) {
     <header class="bar"><span class="bar__right">${counter(1)}</span></header>
     <div class="cover__text">
       <div class="cover__avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
-      <p class="cover__name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a> <a href="${esc(linkedin)}" aria-label="LinkedIn">${icon.linkedin}</a>` : esc(c.name)}</p>
+      <p class="cover__name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a> <a href="${esc(linkedin)}" aria-label="LinkedIn"><img class="li" src="assets/icons/linkedin.png" alt=""></a>` : esc(c.name)}</p>
       <h1 class="cover__title">${esc(t.hero.title)}</h1>
       <p class="cover__line">${esc(t.hero.line)}</p>
       <p class="buttons">

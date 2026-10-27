@@ -45,7 +45,7 @@ b { font-weight: 500; }
 :root { --fs-xl: 40px; --fs-l: 22px; --fs-m: 18px; --fs-s: 15px; }
 
 /* Awatar z adresem strony i imieniem obok, hasło i zdanie - jak hero na stronie */
-.intro { position: relative; z-index: 1; max-width: 760px; }
+.intro { position: relative; z-index: 1; max-width: 760px; margin-top: auto; }   /* intro + wiersze wyśrodkowane w pionie nad stopką */
 .who { display: flex; align-items: center; gap: 22px; }
 .site { font-size: var(--fs-s); color: var(--ink-3); }
 .site a { border-bottom: 1px solid var(--hair); }
@@ -60,7 +60,7 @@ b { font-weight: 500; }
 .line { margin-top: 12px; font-size: var(--fs-l); line-height: 1.35; color: var(--ink-2); }
 
 /* Wiersze z cienką linią - jak opis projektu w panelu */
-.rows { position: relative; z-index: 1; margin-top: 64px; border-top: 1px solid var(--hair); font-size: var(--fs-m); line-height: 1.5; }
+.rows { position: relative; z-index: 1; margin-top: 64px; margin-bottom: auto; border-top: 1px solid var(--hair); font-size: var(--fs-m); line-height: 1.5; }
 .row { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 24px; padding-block: 21px; border-bottom: 1px solid var(--hair); }
 .row dt { color: var(--ink-3); font-size: var(--fs-s); padding-top: 2px; }
 .list li { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 16px; }
@@ -75,7 +75,7 @@ b { font-weight: 500; }
 .clients img { width: auto; opacity: .6; }
 
 /* Kontakt: przyciski jak na stronie, profile */
-.foot { position: relative; z-index: 1; margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.foot { position: relative; z-index: 1; margin-top: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .buttons { display: flex; gap: 16px; }
 .button {
   display: inline-flex;

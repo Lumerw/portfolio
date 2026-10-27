@@ -459,11 +459,9 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 /* Tytuły sekcji (Portfolio, Rekomendacje, Kontakt) - ta sama wielkość co hasło w hero */
 .section-title { font-size: 28px; }
 .hero__name { font-weight: var(--fw-regular); margin-bottom: var(--s-1); }
-/* LinkedIn przy imieniu: ikonka kreską, pole kliknięcia 32 × 32 */
-/* Imię + ikona LinkedIn = jeden link do profilu (całe pole klikalne, ikona ciemnieje po najechaniu) */
+/* Imię + oficjalne logo LinkedIn = jeden link do profilu (całe pole klikalne, wysokość 32 px) */
 .hero__li { display: inline-flex; align-items: center; gap: 12px; min-height: 32px; margin-block: -4px; color: var(--ink); }
-.hero__li .icon { width: 16px; height: 16px; color: var(--ink-2); transition: color var(--t-line) var(--ease); }
-.hero__li:hover .icon, .hero__li:focus-visible .icon { color: var(--ink); }
+.hero__li-logo { width: auto; height: 17px; }
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
 /* „kontakt” i karuzela logo w jednej linii; karuzela wypełnia resztę z wygaszonymi bokami */
 .hero__row { display: flex; align-items: center; gap: var(--s-4); margin-top: var(--s-4); }
