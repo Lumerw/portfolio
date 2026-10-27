@@ -68,6 +68,17 @@ img { display: block; }
 .button { white-space: nowrap; }
 :root[data-fmt="9x16"] .button { padding-inline: calc(20px * var(--k)); }   /* dwa przyciski obok siebie w 936 px */
 .button svg { width: calc(16px * var(--k)); height: calc(16px * var(--k)); fill: none; stroke: currentColor; stroke-width: 1.2; }
+.button svg.fill { fill: currentColor; stroke: none; width: calc(15px * var(--k)); height: calc(15px * var(--k)); }
+/* „zapytaj asystenta” jak na stronie: rysunek kreską w kółku i tęczowy kontur z poświatą w dwóch rogach */
+.agent { position: relative; isolation: isolate; }
+.agent::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--paper); }
+.agent-face { flex: none; width: calc(24px * var(--k)); height: calc(24px * var(--k)); border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 1px var(--hair); }
+.agent-glow { --g: calc(20px * var(--k)); position: absolute; z-index: -1; inset: calc(var(--g) * -1); pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom right, #000 0, #000 28%, transparent 48%), linear-gradient(to top left, #000 0, #000 28%, transparent 48%);
+  mask-image: linear-gradient(to bottom right, #000 0, #000 28%, transparent 48%), linear-gradient(to top left, #000 0, #000 28%, transparent 48%); }
+.agent-glow::before, .agent-glow::after { content: ""; position: absolute; inset: calc(var(--g) - 1px); background: var(--rainbow); }
+.agent-glow::before { padding: 2px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.agent-glow::after { inset: calc(var(--g) - 4px); filter: blur(calc(9px * var(--k))); opacity: .65; }
 .dot { width: calc(12px * var(--k)); height: calc(12px * var(--k)); border-radius: 50%; background: var(--rainbow); flex: none; }
 
 /* ---------- Okładka: układ i proporcje hero strony na desktopie (awatar 58, imię 15, hasło 28, akapit 15,
@@ -147,12 +158,13 @@ img { display: block; }
 .about__col h3 { font-size: 18px; font-weight: 400; color: var(--ink-3); margin-bottom: 14px; }
 .about .meta { font-size: 17px; }
 .axis { position: relative; display: grid; gap: 12px; }
-.axis::before { content: ""; position: absolute; left: 5px; top: 16px; bottom: -44px; width: 1.5px; background: linear-gradient(var(--ink) 0 calc(100% - 64px), transparent); }
-.entry { position: relative; display: flex; flex-wrap: nowrap; align-items: center; column-gap: 14px; row-gap: 10px; min-height: 32px; padding-left: 32px; }
-.entry::before { content: ""; position: absolute; left: 0; top: 10.5px; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); }
+.axis::before { content: ""; position: absolute; left: 3px; top: 16px; bottom: -44px; width: 1px; background: linear-gradient(var(--ink-3) 0 calc(100% - 64px), transparent); opacity: .55; }   /* cienka jak linie w całym PDF */
+.entry { position: relative; display: flex; flex-wrap: nowrap; align-items: center; column-gap: 14px; row-gap: 10px; min-height: 32px; padding-left: 26px; }
+.entry::before { content: ""; position: absolute; left: 0; top: 12.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
 .entry--group { flex-direction: column; align-items: flex-start; }
 .entry__label { line-height: 32px; }
-.entry__text { min-width: 0; line-height: 1.35; }   /* logo zawsze obok - łamie się tylko tekst */
+.entry__text { min-width: 0; line-height: 1.35; }
+.entry__text .meta { white-space: nowrap; }   /* data łamie się w całości */   /* logo zawsze obok - łamie się tylko tekst */
 .entry .logo { flex: none; }
 .logos { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; }
 /* loga firm i uczelni w kolorze tekstu (jednolicie, niezależnie od barw marek) */
@@ -170,7 +182,7 @@ img { display: block; }
 /* stopka w tym samym miejscu na okładce i na ostatniej stronie (adres + rok / ©) */
 .cover__foot, .contact__foot { position: absolute; z-index: 1; left: var(--m); right: var(--m); bottom: var(--m); }
 .page.cover, .page.last { padding-bottom: calc(var(--m) + 64px); }
-.contact { translate: 0 -48px; }   /* wizualnie na środku między górą a stopką */
+.contact { translate: 0 -24px; padding-bottom: calc(24px * var(--k)); }   /* wizualnie na środku; dół = miejsce na poświatę przycisku asystenta */
 
 /* Znacznik „beta” przy nazwie projektu */
 .beta { display: inline-block; margin-left: 20px; padding: 2px 12px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 22px; font-weight: 400; letter-spacing: .02em; vertical-align: .9em; line-height: 1.4; }

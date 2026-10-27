@@ -55,7 +55,6 @@ function doc(lang, fmt, dark) {
   const logo = x => (x.logo ? `<img class="logo" src="${esc(x.logo)}" alt="${esc(x.name)}" style="height:${x.h}px">` : `<span class="logo logo--text">${esc(x.name)}</span>`);
   const entry = x => `<li class="entry">${logo(x)}${x.text || x.role ? `<span class="entry__text">${esc(x.text?.[lang] ?? x.role)}${x.year ? ` <span class="meta">${esc(x.year[lang])}</span>` : ''}</span>` : ''}</li>`;
   const col = (label, body) => `<div class="about__col"><h3>${esc(label)}</h3>${body}</div>`;
-  const drive = isReal(c.drive) ? `<p class="cover__drive"><a class="link-u" href="${esc(c.drive)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)} - ${esc(U.driveType)} ↗</a></p>` : '';
   const cover = `
   <section class="page cover">
     ${globe}
@@ -67,9 +66,8 @@ function doc(lang, fmt, dark) {
       <p class="cover__line">${esc(t.hero.line)}</p>
       <p class="buttons">
         <a class="button button--primary" href="mailto:${esc(c.email)}">${icon.mail}${esc(U.contactCta)}</a>
-        <a class="button" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>
+        ${isReal(c.drive) ? `<a class="button" href="${esc(c.drive)}"><svg class="fill" viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)}</a>` : ''}
       </p>
-      ${drive}
     </div>
     <aside class="about">
       <h2 class="about__title">${esc(t.about.title)}</h2>
@@ -118,7 +116,7 @@ function doc(lang, fmt, dark) {
       <p class="contact__mail"><a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
       <p class="buttons">
         <a class="button button--primary" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>
-        <a class="button" href="${esc(site)}/#agent"><span class="dot"></span>${esc(U.askAgent)}</a>
+        <a class="button agent" href="${esc(site)}/#agent"><span class="agent-glow" aria-hidden="true"></span><img class="agent-face" src="${esc(c.avatar.drawing)}" alt="">${esc(U.askAgent)}</a>
       </p>
     </div>
     <footer class="contact__foot">

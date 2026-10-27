@@ -159,7 +159,7 @@ export const shared = {
       live: true,
       cover: { card: 'assets/teraz/cover-card.webp', '4x5': 'assets/teraz/cover-4x5.webp' },
       // Narzędzia i technologie (panel projektu) - z repozytorium projektu
-      tools: ['Claude', 'React', 'TypeScript', 'Tailwind CSS', 'Supabase', 'Stripe', 'Daily.co', 'Cloudflare'],
+      tools: ['Claude', 'React', 'TypeScript', 'Supabase', 'Stripe'],
       href: 'https://teraz.eu',      // testowo
       brandbook: 'https://teraz.eu/marka',   // księga marki projektu (panel i PDF)
       images: {
@@ -184,7 +184,7 @@ export const shared = {
       // Okładka (live.js): papier, trzy figury Bauhausu na środku (fizyka z loom.studio), na dole pas gradientu
       // z hero, z boku pionowe logo, u góry PL / EN (język strony) i znak trybu. perLang: osobna klatka PL i EN.
       live: { perLang: true },
-      tools: ['Figma', 'Next.js', 'TypeScript', 'Tailwind CSS', 'WebGL', 'Stripe', 'Claude API'],
+      tools: ['Figma', 'Next.js', 'TypeScript', 'Stripe', 'Claude API'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
       cover: { card: 'assets/loom/cover-card.webp', '4x5': 'assets/loom/cover-4x5.webp' },
       video: {
@@ -215,7 +215,7 @@ export const shared = {
         title: ['Make an', 'impact', 'toget', 'her', '.'],   // „impact” i „toget” przygasają, za „her” poświata
         ticker: ['data.', 'vision.', 'tools - put to use.'],
       },
-      tools: ['HTML', 'CSS', 'JavaScript', 'GitHub Pages', 'Claude', 'Figma'],
+      tools: ['HTML', 'CSS', 'JavaScript', 'Claude', 'Figma'],
       // Pierwsza klatka tej grafiki (bez JS / ograniczony ruch): podgląd na stronie głównej i panel. npm run covers
       cover: { card: 'assets/rehab/cover-card.webp', '4x5': 'assets/rehab/cover-4x5.webp' },
       video: {
@@ -410,9 +410,9 @@ export const pl = {
     contactTitle: 'Porozmawiajmy.',
     site: 'portfolio online',
     projects: {
-      teraz: { facts: ['rozmowy wideo 1:1, 30 albo 60 minut', 'eksperci z 5+ lat praktyki', 'darmowe konto, płatność przez Escrow', '0% prowizji w becie'] },
-      loom: { facts: ['jedno zadanie naraz, średnio 48 godzin', 'płatności i panel klienta na Stripe', 'rezerwacje rozmów przez Calendly', 'asystent AI na stronie, wersje PL i EN'] },
-      rehab: { facts: ['wsparcie psychiczne tam, gdzie są gracze', 'serwery z psychologiem, który sam gra', '12-tygodniowy pilotaż z 4 miarami sukcesu', 'WCAG 2.2 AA, każda liczba ze źródłem'] },
+      teraz: { facts: ['rozmowy wideo 1:1, 30 albo 60 minut', 'eksperci z 5+ lat praktyki', '0% prowizji w becie'] },
+      loom: { facts: ['jedno zadanie naraz, średnio 48 godzin', 'płatności i panel klienta na Stripe', 'asystent AI na stronie, wersje PL i EN'] },
+      rehab: { facts: ['wsparcie psychiczne tam, gdzie są gracze', 'serwery z psychologiem, który sam gra', '12-tygodniowy pilotaż z 4 miarami sukcesu'] },
     },
   },
 
@@ -598,7 +598,7 @@ export const en = {
       },
     },
     loom: {
-      meta: ['founder', 'identity', 'website design in Figma', 'build'],
+      meta: ['founder', 'identity', 'website', 'build'],
       tagline: 'a design studio running on subscription', // krótki opis pod podglądem
       lead: 'One flat monthly fee, design tasks one after another with no separate quotes. Website, identity and a client portal on Stripe.',
       problem: '[Problem: 2-3 sentences.]',
@@ -676,9 +676,9 @@ export const en = {
     contactTitle: 'Let’s talk.',
     site: 'portfolio online',
     projects: {
-      teraz: { facts: ['1:1 video calls, 30 or 60 minutes', 'experts with 5+ years of practice', 'free account, payment via Escrow', '0% commission in beta'] },
-      loom: { facts: ['one task at a time, 48 hours on average', 'Stripe payments and client portal', 'calls booked through Calendly', 'AI assistant on the site, PL and EN versions'] },
-      rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist who plays', 'a 12-week pilot with 4 success measures', 'WCAG 2.2 AA, every number sourced'] },
+      teraz: { facts: ['1:1 video calls, 30 or 60 minutes', 'experts with 5+ years of practice', '0% commission in beta'] },
+      loom: { facts: ['one task at a time, 48 hours on average', 'Stripe payments and client portal', 'AI assistant on the site, PL and EN versions'] },
+      rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist who plays', 'a 12-week pilot with 4 success measures'] },
     },
   },
 
