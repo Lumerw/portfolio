@@ -15,6 +15,7 @@ import { mkdir, readFile, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
+import { setMeta } from './pdf-meta.mjs';
 import { content } from '../content.js';
 import { clean, DRIVE_D, coverSrc } from '../render.js';
 import { sphere } from './sphere-svg.mjs';
@@ -162,6 +163,7 @@ for (const lang of ['pl', 'en']) {
       const file = join(root, 'pdf', name);   // poza repozytorium; publikacja: npm run publish-pdf (GitHub Releases)
       await page.pdf({ path: file, preferCSSPageSize: true, printBackground: true, tagged: true, outline: false });
       await page.close();
+      await setMeta(file, { lang, title: `${content.shared.name} - Portfolio` });
 
       const raw = (await readFile(file)).toString('latin1');
       const pages = (raw.match(/\/Type\s*\/Page(?!s)/g) || []).length;

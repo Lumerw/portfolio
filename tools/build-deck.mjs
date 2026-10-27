@@ -14,6 +14,7 @@ import { buildQr } from './build-qr.mjs';
 import { content } from '../content.js';
 import { clean, coverSrc } from '../render.js';
 import { covers } from './covers.mjs';
+import { setMeta } from './pdf-meta.mjs';
 import { symbol } from '../symbols.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -133,6 +134,7 @@ for (const lang of ['pl', 'en']) {
   const file = join(root, 'pdf', content[lang].deck.file);   // poza repozytorium (npm run publish-pdf)
   await page.pdf({ path: file, preferCSSPageSize: true, printBackground: true, tagged: true });
   await page.close();
+  await setMeta(file, { lang, title: `${content.shared.name} - Portfolio` });
 
   const raw = (await readFile(file)).toString('latin1');
   const pages = (raw.match(/\/Type\s*\/Page(?!s)/g) || []).length;
