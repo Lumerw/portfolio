@@ -16,6 +16,26 @@ export const shared = {
   // Zewnętrzna strona rezerwacji rozmowy (zapas dla kalendarza na stronie, CV i deck)
   // Archiwum prac (kampanie, KV, wideo) - publiczny folder Google Drive; wiersz w sekcji Portfolio
   drive: 'https://drive.google.com/drive/folders/1oHAvj983Vswnud6h8LEDwE2bzd2_Og__?usp=sharing',
+  // PDF portfolio, okładka na dole: wykształcenie, certyfikaty i firmy (tylko PDF; w CV i na stronie bez wykształcenia).
+  // Loga przefarbowane w PDF na kolor tekstu; h = wysokość w px przy 16:9 (optycznie równe loga).
+  pdfAbout: {
+    education: [
+      { logo: 'assets/logos/swps.svg', h: 30, name: 'Uniwersytet SWPS', text: { pl: 'psychologia i informatyka', en: 'Psychology and Computer Science' }, year: { pl: '2026.10 - teraz', en: '2026.10 - now' } },
+      { logo: 'assets/logos/asp-lodz.svg', h: 26, name: 'ASP w Łodzi' },
+    ],
+    certificates: [
+      { logo: 'assets/logos/preply.svg', h: 22, name: 'Preply' },
+      { logo: 'assets/logos/google.svg', h: 24, name: 'Google' },
+      { name: 'Design Practice' },   // [logo do znalezienia - na razie nazwa]
+    ],
+    work: [{ logo: 'assets/clients/promotrafic.svg', h: 26, name: 'Promotraffic', role: 'AI designer', year: { pl: '2025.05 - teraz', en: '2025.05 - now' } }],
+    clients: [
+      { logo: 'assets/logos/ancy.svg', h: 18, name: 'Ancy' },
+      { logo: 'assets/clients/youniversity.svg', h: 18, name: 'Youniversity' },
+      { logo: 'assets/logos/depilacja.svg', h: 22, name: 'depilacja.pl' },
+      { logo: 'assets/clients/weedweek.svg', h: 20, name: 'WeedWeek' },
+    ],
+  },
   calendly: 'https://cal.com/wojciech-lumer-sxkqby/30min',  // zewnętrzna strona rezerwacji (Cal.com, 30 min) - zapas, gdy kalendarz na stronie nie działa
   // Własny kalendarz rezerwacji (panel #rozmowa) na darmowym API Cal.com - bez serwera i klucza.
   // calUsername = <nazwa> z cal.com/<nazwa>, events = typy spotkań z cal.com/<nazwa>/<slug> (pierwszy domyślny).
@@ -260,6 +280,7 @@ export const pl = {
     askAgent: 'zapytaj asystenta',  // przycisk obok „umów rozmowę” → panel asystenta
     recs: 'Rekomendacje',
     drive: 'Archiwum prac',         // wiersz w Portfolio → folder Google Drive
+    education: 'Wykształcenie', certificates: 'Certyfikaty',   // PDF portfolio, okładka
     driveType: 'Google Drive',
     avatar: 'Zapytaj o mnie - asystent AI',
     sphereHint: 'przeciągnij, żeby obrócić',
@@ -528,6 +549,7 @@ export const en = {
     askAgent: 'ask my assistant',
     recs: 'Kind words',
     drive: 'Work archive',
+    education: 'Education', certificates: 'Certificates',
     driveType: 'Google Drive',
     avatar: 'Ask about me - AI assistant',
     sphereHint: 'drag to rotate',

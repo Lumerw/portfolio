@@ -50,11 +50,16 @@ function doc(lang, fmt, dark) {
   // Sfera: to samo miejsce na okładce i na stronie kontaktu - duża, w prawym górnym rogu, przycięta górą i prawą krawędzią
   const globe = wide ? sphere(620, `left:${W - 120 - 620}px;top:${170 - 620}px`) : sphere(560, `left:${W - 80 - 560}px;top:${110 - 560}px`);
 
-  const exp = t.about.experience.map(e => ({ year: clean(e.year), place: clean(e.place), role: clean(e.role) })).filter(e => e.place);
+  // Dół okładki: wykształcenie (+ certyfikaty), doświadczenie (+ loga firm), kompetencje - loga z content.shared.pdfAbout
+  const A = c.pdfAbout;
+  const logo = x => (x.logo ? `<img class="logo" src="${esc(x.logo)}" alt="${esc(x.name)}" style="height:${x.h}px">` : `<span class="logo logo--text">${esc(x.name)}</span>`);
+  const entry = x => `<li class="entry">${logo(x)}${x.text || x.role ? `<span class="entry__text">${esc(x.text?.[lang] ?? x.role)}${x.year ? ` <span class="meta">${esc(x.year[lang])}</span>` : ''}</span>` : ''}</li>`;
+  const col = (label, body) => `<div class="about__col"><h3>${esc(label)}</h3>${body}</div>`;
+  const drive = isReal(c.drive) ? `<p class="cover__drive"><a class="link-u" href="${esc(c.drive)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)} - ${esc(U.driveType)} ↗</a></p>` : '';
   const cover = `
   <section class="page cover">
     ${globe}
-    <header class="bar"><a href="${esc(site)}/">${esc(site.replace(/^https?:\/\//, ''))}</a><span>${esc(c.year)}</span><span class="bar__right">${counter(1)}</span></header>
+    <header class="bar"><span class="bar__right">${counter(1)}</span></header>
     <div class="cover__text">
       <div class="cover__avatar"><img src="${esc(c.avatar.photo)}" alt=""></div>
       <p class="cover__name">${linkedin ? `<a href="${esc(linkedin)}">${esc(c.name)}</a> <a href="${esc(linkedin)}" aria-label="LinkedIn">${icon.linkedin}</a>` : esc(c.name)}</p>
@@ -64,14 +69,17 @@ function doc(lang, fmt, dark) {
         <a class="button button--primary" href="mailto:${esc(c.email)}">${icon.mail}${esc(U.contactCta)}</a>
         <a class="button" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>
       </p>
+      ${drive}
     </div>
     <aside class="about">
       <h2 class="about__title">${esc(t.about.title)}</h2>
-      <dl class="about__rows">
-        <div class="about__row"><dt>${esc(U.experience)}</dt><dd><ul>${exp.map(e => `<li><span class="meta">${esc(e.year)}</span> ${esc(e.place)}, ${esc(e.role)}</li>`).join('')}</ul></dd></div>
-        <div class="about__row"><dt>${esc(t.cv.skills)}</dt><dd><ul class="dash">${t.cv.skillsList.map(x => `<li>${esc(x)}</li>`).join('')}</ul></dd></div>
-      </dl>
+      <div class="about__cols">
+        ${col(U.education, `<ul class="entries">${A.education.map(entry).join('')}</ul><h4>${esc(U.certificates)}</h4><ul class="logos">${A.certificates.map(x => `<li>${logo(x)}</li>`).join('')}</ul>`)}
+        ${col(U.experience, `<ul class="entries">${A.work.map(entry).join('')}</ul><ul class="logos">${A.clients.map(x => `<li>${logo(x)}</li>`).join('')}</ul>`)}
+        ${col(t.cv.skills, `<ul class="dash">${t.cv.skillsList.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
+      </div>
     </aside>
+    <footer class="cover__foot"><a href="${esc(site)}/">${esc(site.replace(/^https?:\/\//, ''))}</a> <span>${esc(c.year)}</span></footer>
   </section>`;
 
   // Linki projektu: strona i brandbook; bez adresu - nazwa z „wkrótce”, bez linku
@@ -112,7 +120,6 @@ function doc(lang, fmt, dark) {
         <a class="button button--primary" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>
         <a class="button" href="${esc(site)}/#agent"><span class="dot"></span>${esc(U.askAgent)}</a>
       </p>
-      ${isReal(c.drive) ? `<p class="contact__drive"><a class="link-u" href="${esc(c.drive)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)} - ${esc(U.driveType)} ↗</a></p>` : ''}
     </div>
     <footer class="contact__foot">
       <ul class="contact__links">${links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('')}</ul>
@@ -153,7 +160,7 @@ for (const lang of ['pl', 'en']) {
       // Każda strona dokładnie W × H, treść w kadrze
       const over = await page.evaluate(([W, H]) => [...document.querySelectorAll('.page')].map((s, i) => {
         // ile pikseli treść wychodzi poza stronę (dół, prawa krawędź, przewijanie w bloku)
-        const px = Math.max(0, ...[...s.querySelectorAll('.pj__info, .cover__text, .about, .contact, .contact__foot, .bar')].map(el => {
+        const px = Math.max(0, ...[...s.querySelectorAll('.pj__info, .cover__text, .about, .contact, .contact__foot, .cover__foot, .bar')].map(el => {
           const r = el.getBoundingClientRect(), b = s.getBoundingClientRect();
           return Math.max(r.bottom - b.bottom, r.right - b.right, el.scrollHeight - el.clientHeight - .5);
         }));
