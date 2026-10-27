@@ -252,10 +252,20 @@ async function openGenerator(sheet) {
   initGenerator(root, { copy: content[lang].generator, palette: G.palette, color: G.color, endpoint: content.shared.agent?.endpoint, lang });
 }
 
+// Zamiar otwarcia (najechanie, fokus, dotyk przycisku „umów rozmowę”) - moduł i wolne terminy pobierają się
+// wcześniej, więc panel zwykle od razu pokazuje kalendarz, a gdy nie - szkielet z animacją wczytywania.
+let bookMod = null;
+const warmBooking = e => {
+  if (!e.target.closest?.('a[href="#rozmowa"]')) return;
+  const root = document.querySelector('[data-booking]');
+  if (root) (bookMod ??= import('./booking.js')).then(m => m.warm(root));
+};
+for (const type of ['pointerover', 'focusin', 'touchstart']) document.addEventListener(type, warmBooking, { passive: true });
+
 async function openBooking(sheet) {
   const root = sheet.querySelector('[data-booking]');
   if (!root) return;
-  const { initBooking } = await import('./booking.js');
+  const { initBooking } = await (bookMod ??= import('./booking.js'));
   if (root.__booking) { root.__booking.reload(); return; }
   root.__booking = initBooking(root, { lang: root.closest('html')?.lang || 'pl', copy: content[root.closest('html')?.lang || 'pl'].booking, email: content.shared.email, calendly: content.shared.calendly });
 }

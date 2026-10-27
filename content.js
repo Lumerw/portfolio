@@ -433,7 +433,7 @@ export const pl = {
     // kolumna informacji obok kalendarza (desktop: po lewej, telefon: nad kalendarzem)
     facts: ['30 minut', 'online - potwierdzenie i link do spotkania od razu na e-mail'],
     length: 'Długość rozmowy',
-    loading: 'Wczytuję wolne terminy…',
+    loading: 'sprawdzam wolne terminy',
     empty: 'Brak wolnych terminów w najbliższych tygodniach. Napisz do mnie:',
     day: 'Dzień',
     time: 'Godzina',
@@ -696,7 +696,7 @@ export const en = {
     intro: 'Let’s talk about your project. Pick a day and time.',
     facts: ['30 minutes', 'online - confirmation and meeting link sent to your e-mail right away'],
     length: 'Call length',
-    loading: 'Loading free slots…',
+    loading: 'checking free slots',
     empty: 'No free slots in the coming weeks. Write to me:',
     day: 'Day',
     time: 'Time',

@@ -597,6 +597,27 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
   .book__col--side .book__times { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .book__col--side .book__form { margin-top: 0; padding-top: 0; border-top: 0; }
 }
+/* Wczytywanie: od razu pełny układ - przyszłe dni i godziny jako puste pola z cienką linią, przez które po skosie
+   przechodzi fala (dzień po dniu), a obok etykiety kropki jak u asystenta. Po wczytaniu kalendarz delikatnie się pojawia. */
+.book__date.is-ghost, .book__time.is-ghost {
+  border: var(--hairline) solid var(--hair);
+  color: var(--ink-4);
+  animation: book-scan 1.6s var(--ease) calc(var(--i) * 70ms) infinite;
+}
+.book__time.is-ghost { display: block; min-height: 40px; }
+@keyframes book-scan {
+  0%, 60%, 100% { border-color: var(--hair); background-color: transparent; color: var(--ink-4); }
+  20% { border-color: var(--ink-3); background-color: color-mix(in srgb, var(--ink) 5%, transparent); color: var(--ink-2); }
+}
+.book__wait { display: flex; align-items: center; gap: var(--s-1); }
+.book__dots { padding-block: 0; }
+.book__dots i:nth-child(2) { animation-delay: .2s; }
+.book__dots i:nth-child(3) { animation-delay: .4s; }
+.book__pick.is-in { animation: appear .4s var(--ease) both; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .book__date.is-ghost, .book__time.is-ghost { animation: none; }
+  .book__pick.is-in { animation: none; opacity: 1; }
+}
 .book__form { display: grid; gap: var(--s-2); margin-top: var(--s-4); padding-top: var(--s-3); border-top: var(--hairline) solid var(--hair); }
 .book__when { display: grid; gap: 4px; font-weight: var(--fw-medium); }
 .book__back { justify-self: start; font-weight: var(--fw-regular); background: none; border-width: 0 0 var(--hairline); cursor: pointer; }
