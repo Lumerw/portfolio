@@ -130,13 +130,14 @@
   -webkit-font-smoothing: antialiased;
 }
 /* „Make an impact toget” = 10,17 em (Helvetica / Arial Bold) + 3 spacje × .1 em; przy 12,2cqw i odstępie
-   --rh-ls ostatnie „t” kończy się na prawej krawędzi kadru (lekko przycięte, jak we wzorze) */
-.rh-h { --rh-ls: -.132em; position: absolute; left: 4cqw; top: 15cqh; margin: 0; white-space: nowrap; font-size: 12.2cqw; font-weight: 700; line-height: 1; letter-spacing: var(--rh-ls); word-spacing: .1em; }
+   --rh-ls i szerszych spacjach ostatnie „t” wchodzi pod prawą krawędź kadru (przycięte, bez szpary - jak we wzorze) */
+.rh-h { --rh-ls: -.132em; position: absolute; left: 4cqw; top: 15cqh; margin: 0; white-space: nowrap; font-size: 12.2cqw; font-weight: 700; line-height: 1; letter-spacing: var(--rh-ls); word-spacing: .125em; }
 .rh-h .ch { display: inline-block; font-style: normal; animation: rh-ch var(--rh-loop) linear calc(var(--i) * 26ms) infinite both; }
 @keyframes rh-ch { 0% { opacity: 0; } 1.14% { opacity: 1; } 96% { opacity: 1; } 97.2%, 100% { opacity: 0; } }
 /* „impact toget”: maska 200% - lewa połowa pełna, prawa gaśnie do .38; po napisaniu przesuwa się na prawą połowę */
 .rh-dim {
   display: inline-block;
+  padding-bottom: .3em; margin-bottom: -.3em;   /* maska obejmuje też ogonek „g” (bez tego jest ucięty) */
   -webkit-mask-image: linear-gradient(90deg, #000 0 50%, rgba(0, 0, 0, .9) 55%, rgba(0, 0, 0, .38) 100%);
   mask-image: linear-gradient(90deg, #000 0 50%, rgba(0, 0, 0, .9) 55%, rgba(0, 0, 0, .38) 100%);
   -webkit-mask-size: 200% 100%;
@@ -146,7 +147,7 @@
   animation: rh-fade var(--rh-loop) var(--rh-ease) infinite both;
 }
 @keyframes rh-fade { 0%, 4.1% { -webkit-mask-position: 0 0; mask-position: 0 0; } 11.7%, 100% { -webkit-mask-position: 100% 0; mask-position: 100% 0; } }
-.rh-her { position: absolute; left: -2.2cqw; bottom: 16.5cqh; margin: 0; font-size: 26cqw; font-weight: 700; line-height: .8; letter-spacing: -.08em; white-space: nowrap; }
+.rh-her { position: absolute; left: -2.2cqw; bottom: 16.5cqh; margin: 0; font-size: 26cqw; font-weight: 700; line-height: .8; letter-spacing: -.12em; white-space: nowrap; }   /* ciasno jak logo „her” na sferze */
 .her-word { position: relative; z-index: 1; }
 .her-word .ch { display: inline-block; font-style: normal; animation: rh-her var(--rh-loop) var(--rh-ease) 400ms infinite both; }
 @keyframes rh-her { 0%, 2% { opacity: 0; translate: 0 6%; } 6%, 96% { opacity: 1; translate: 0 0; } 98.5%, 100% { opacity: 0; translate: 0 0; } }
