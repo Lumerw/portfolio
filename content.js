@@ -368,7 +368,7 @@ export const pl = {
     bio: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu, przez ciągłe testowanie, do wdrożenia. Prowadzę loom.studio, a od 2025 roku pracuję jako AI designer w Promotraffic.',
     experience: [
       { year: '2025.05 - teraz', place: 'Promotraffic', role: 'AI designer' },
-      { year: '2023.11 - teraz', place: 'loom.studio', role: 'założyciel, projektant' },
+      { year: '2023.11 - teraz', place: 'loom.studio', role: 'projektant' },
     ],
     education: '',                   // celowo puste - nie pokazujemy (CV, asystent)
     languages: '',
@@ -413,7 +413,7 @@ export const pl = {
     site: 'portfolio online',
     projects: {
       teraz: { facts: ['rozmowy wideo 1:1', 'doświadczeni eksperci', '0% prowizji w becie'] },
-      loom: { facts: ['jedno zadanie naraz, średnio 48 godzin', 'elastyczne płatności', 'asystent AI na stronie, wersje PL i EN'] },
+      loom: { facts: ['panel klienta z tablicą zadań', 'elastyczne płatności', 'asystent AI na stronie, wersje PL i EN'] },
       rehab: { facts: ['wsparcie psychiczne tam, gdzie są gracze', 'serwery z psychologiem, który sam gra', '12-tygodniowy pilotaż z 4 miarami sukcesu'] },
     },
   },
@@ -637,7 +637,7 @@ export const en = {
     bio: 'I design identities, websites and digital products - from idea, through continuous testing, to launch. I run loom.studio, and since 2025 I have worked as an AI designer at Promotraffic.',
     experience: [
       { year: '2025.05 - now', place: 'Promotraffic', role: 'AI designer' },
-      { year: '2023.11 - now', place: 'loom.studio', role: 'founder, designer' },
+      { year: '2023.11 - now', place: 'loom.studio', role: 'designer' },
     ],
     education: '',                   // intentionally empty
     languages: '',
@@ -680,7 +680,7 @@ export const en = {
     site: 'portfolio online',
     projects: {
       teraz: { facts: ['1:1 video calls', 'experienced experts', '0% commission in beta'] },
-      loom: { facts: ['one task at a time, 48 hours on average', 'flexible payments', 'AI assistant on the site, PL and EN versions'] },
+      loom: { facts: ['client portal with a task board', 'flexible payments', 'AI assistant on the site, PL and EN versions'] },
       rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist who plays', 'a 12-week pilot with 4 success measures'] },
     },
   },
