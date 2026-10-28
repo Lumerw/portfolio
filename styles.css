@@ -460,6 +460,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
 /* Imię + oficjalne logo LinkedIn = jeden link do profilu (całe pole klikalne, wysokość 32 px) */
 .hero__li { display: inline-flex; align-items: center; gap: 12px; min-height: 32px; margin-block: -4px; color: var(--ink); }
 .li-logo { display: inline-block; flex: none; height: 17px; aspect-ratio: 635 / 540; background: currentColor; -webkit-mask: url("assets/icons/linkedin.png") center / contain no-repeat; mask: url("assets/icons/linkedin.png") center / contain no-repeat; }
+@media (min-width: 768px) { .li-logo { height: 13.6px; } }   /* desktop: o 20% mniejsze niż na telefonie */
 .hero__line { margin-top: var(--s-2); max-width: 30em; }
 /* Hasło i zdanie pod nim: na telefonie zawsze dwie linie (render.js, mobileBreak) */
 .br-m { display: none; }
