@@ -1656,6 +1656,8 @@ html:has(.sheet:target) { overflow: hidden; }
 .gen__range input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -8.5px; border-radius: 50%; background: var(--ink); border: 0; }
 .gen__range input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--ink); border: 0; }
 .gen__range input:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+.gen__range:has(input:disabled) { opacity: .35; }   /* znak autorski: suwaki sterują tylko algorytmem */
+.gen__range input:disabled { cursor: default; }
 .gen__actions { display: flex; gap: var(--s-1); margin-left: auto; }
 .gen__btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-1); min-width: 40px; height: 40px; padding-inline: 11px; border: var(--hairline) solid var(--ink); color: var(--ink); transition: background-color var(--t-line) var(--ease), color var(--t-line) var(--ease); }
 .gen__btn .icon { width: 16px; height: 16px; }

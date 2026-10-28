@@ -380,13 +380,13 @@ export const pl = {
   brand: 'Moja marka osobista: czerń, biel, cienka linia 1 px, Helvetica i dużo pustej przestrzeni. Kolory i gradienty mają tylko marki projektów, wyjątek - tęczowa poświata asystenta AI.',
   generator: {
     title: 'Generator znaków',
-    intro: 'Algorytm składa za każdym razem nowy sygnet - z zasad, na których projektuję: geometria, negatyw, siatka, rytm. Opisz markę, a dobiorę kierunek.',
+    intro: 'Algorytm składa za każdym razem nowy sygnet - z zasad, na których projektuję: geometria, negatyw, siatka, rytm. Opisz markę, a zaprojektuję znak od zera.',
     brief: 'opisz markę, np. kawiarnia, ciepło, rzemiosło', briefLabel: 'opis marki',
     ai: 'wygeneruj ze mną', thinking: 'projektuję…', picking: 'wybieram z {n} wersji…', aiError: 'nie mogę teraz odpowiedzieć - wylosowałem znak algorytmem.',
     color: 'kolor znaku', hex: 'kolor w zapisie HEX', palette: 'paleta kolorów',
     complexity: 'złożoność', style: 'styl: kwadratowy - obły',
     roll: 'losuj', download: 'pobierz SVG', code: 'kopiuj kod SVG', copied: 'skopiowano kod SVG',
-    no: 'znak nr',
+    no: 'znak nr', custom: 'znak autorski',
   },
 
   cv: {
@@ -648,13 +648,13 @@ export const en = {
   brand: 'My personal brand: black, white, a 1 px line, Helvetica and plenty of empty space. Colour and gradients belong only to project brands, the one exception being the rainbow glow of the AI assistant.',
   generator: {
     title: 'Mark generator',
-    intro: 'An algorithm builds a brand-new signet every time - from the principles I design by: geometry, negative space, grid, rhythm. Describe a brand and I will pick the direction.',
+    intro: 'An algorithm builds a brand-new signet every time - from the principles I design by: geometry, negative space, grid, rhythm. Describe a brand and I will design a mark from scratch.',
     brief: 'describe a brand, e.g. café, warmth, craft', briefLabel: 'brand brief',
     ai: 'generate with me', thinking: 'designing…', picking: 'choosing from {n} versions…', aiError: 'I cannot answer right now - the algorithm rolled a mark instead.',
     color: 'mark colour', hex: 'colour as HEX', palette: 'colour palette',
     complexity: 'complexity', style: 'style: square - round',
     roll: 'roll', download: 'download SVG', code: 'copy SVG code', copied: 'SVG code copied',
-    no: 'mark no.',
+    no: 'mark no.', custom: 'custom mark',
   },
 
   cv: {

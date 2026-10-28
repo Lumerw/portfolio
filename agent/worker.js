@@ -38,6 +38,7 @@ export default {
     const lang = body?.lang === 'en' ? 'en' : 'pl';
     if (new URL(req.url).pathname === '/mark') return mark(body, lang, env, json);
     if (new URL(req.url).pathname === '/mark/pick') return pickMark(body, lang, env, json);
+    if (new URL(req.url).pathname === '/mark/draw') return drawMark(body, lang, env, json);
     if (new URL(req.url).pathname === '/lab') return lab(body, env, json);
     const messages = validate(body?.messages);
     if (!messages) return json({ error: 'messages' }, 400);
@@ -115,7 +116,7 @@ const reply = data => {
   try { return JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); } catch { return null; }
 };
 // Typy znaków i ich opisy z generator.js (KIND_INFO) - nowy typ w generatorze trafia tu po `wrangler deploy`
-import { KINDS, KIND_INFO } from '../generator.js';
+import { KINDS, KIND_INFO, customMark } from '../generator.js';
 // Prompt art directora /mark - funkcja, żeby laboratorium (tools/mark-lab.mjs) testowało go na rozwijanej wersji typów
 export const markSystem = (kinds = KINDS, info = KIND_INFO, lang = 'pl') => `You are the art director of a mark generator on the portfolio of Wojciech Lumer, a designer of identities and digital products.
 An algorithm draws the mark; you choose its parameters from the brand brief. Principles: one idea, simple geometry, legible at 16 px, black on paper (colour comes later), negative space, grid and rhythm, symmetry (mirror or rotational), a carrier shape when the brand needs stability. Never imitate an existing trademark.
@@ -155,11 +156,11 @@ export const markParams = p => {
 
 // Prompt i wiadomość wyboru z kandydatów - funkcje, żeby laboratorium testowało asystenta tak samo jak strona
 export const pickSystem = (lang = 'pl') => `You are the art director of a mark generator on the portfolio of Wojciech Lumer, a designer of identities and digital products.
-For a brand brief, the first step chose a mark kind and a working concept; the algorithm then drew the strongest candidates of that kind. Look at the images and choose the single best mark for the brief: one clear idea, balanced and optically centred, confident negative space, legible at 16 px, and no accidental figures (letters, digits, faces, arrows, hearts or known logos the brief did not ask for).
+For a brand brief, several candidate marks were drawn (bespoke concepts, or an algorithm's strongest candidates of one kind). Look at the images and choose the single best mark for the brief: one clear idea, balanced and optically centred, confident negative space, legible at 16 px, and no accidental figures (letters, digits, faces, arrows, hearts or known logos the brief did not ask for).
 Then name it and say why, describing only what is visible in the chosen mark (its shape and its one negative-space idea) and how that answers the brief. Never claim details the image does not show; drop the working concept if the drawing does not carry it.
 Reply with ONLY a JSON object, no prose: {"pick": <candidate number>, "name": "2-4 word concept name", "why": "one short sentence"}. Write name and why in ${lang === 'en' ? 'English' : 'Polish'}. Use a plain hyphen "-", never long dashes.`;
 export const pickMessage = ({ brief, kind, name, why, images }, info = KIND_INFO) => [
-  { type: 'text', text: `Brand brief: ${brief}\nMark kind: ${kind} (${info[kind]?.brief ?? ''})\nWorking concept: ${[name, why].filter(Boolean).join(' - ') || '-'}` },
+  { type: 'text', text: `Brand brief: ${brief}\nMark kind: ${kind === 'custom' ? 'custom - drawn from scratch for this brief' : `${kind} (${info[kind]?.brief ?? ''})`}\nWorking concept: ${[name, why].filter(Boolean).join(' - ') || '-'}` },
   ...images.flatMap((data, i) => [{ type: 'text', text: `Candidate ${i + 1}:` }, { type: 'image', source: { type: 'base64', media_type: 'image/png', data } }]),
 ];
 
@@ -175,7 +176,7 @@ function isMarkPng(s) {
 async function pickMark(body, lang, env, json) {
   const brief = typeof body?.brief === 'string' ? body.brief.trim().slice(0, 160) : '';
   const images = Array.isArray(body?.images) ? body.images : [];
-  if (!brief || !KINDS.includes(body?.kind) || images.length < 2 || images.length > 4 || !images.every(isMarkPng)) return json({ error: 'pick' }, 400);
+  if (!brief || !(KINDS.includes(body?.kind) || body?.kind === 'custom') || images.length < 2 || images.length > 4 || !images.every(isMarkPng)) return json({ error: 'pick' }, 400);
   const res = await anthropic(env, {
     max_tokens: 2000,
     system: [{ type: 'text', text: pickSystem(lang), cache_control: { type: 'ephemeral' } }],
@@ -187,6 +188,38 @@ async function pickMark(body, lang, env, json) {
   const p = reply(data), n = Math.round(+p?.pick);
   if (!(n >= 1 && n <= images.length)) return json({ error: 'parse' }, 502);
   return json({ pick: n, name: clean(p.name, 40), why: clean(p.why, 180) });
+}
+
+/* ---------- Znak autorski (/mark/draw): Claude projektuje od zera 4 różne koncepcje pod opis marki ----------
+   Odpowiedź to geometria (koła, prostokąty, wielokąty, ścieżki, linie, wycięcia) w polu 200 × 200; customMark()
+   z generator.js przepuszcza tylko liczby z zakresu i polecenia ścieżek. Rysuje i ocenia przeglądarka. */
+export const drawSystem = (lang = 'pl') => `You are a senior identity designer on the portfolio of Wojciech Lumer. For a brand brief, design 4 bespoke brand marks (symbols, no lettering) from scratch.
+Process: pull 4 different ideas out of the brief itself (what the brand makes, its origin, its inspirations, its character) - each mark carries one idea, and the 4 must differ in idea and construction. Do not fall back on generic templates (plain circle with a slice, generic star, random tiles) unless the brief truly points there. Think in negative space, figure-ground, a clever double reading, grid and rhythm, symmetry where it helps.
+Craft: one clear silhouette, simple geometry, legible at 16 px, black on paper, optically centred, filling about 110-140 px of the 200 x 200 field (keep it inside 30-170), no parts thinner than 8 px, no gaps narrower than 6 px, no tiny crumbs. Never imitate an existing trademark, no letters or digits unless the brief asks.
+Geometry (coordinates in the 200 x 200 field, y down). Each shape has "op": "add" (ink), "cut" (removes ink below - negative space) or "line" (a thick stroke):
+- {"op": "add|cut", "t": "circle", "cx": 100, "cy": 100, "r": 40}
+- {"op": "add|cut", "t": "rect", "x": 60, "y": 60, "w": 80, "h": 80, "rx": 0}
+- {"op": "add|cut", "t": "poly", "pts": [[100, 40], [160, 150], [40, 150]], "rx": 0}   (rx rounds corners)
+- {"op": "add|cut", "t": "path", "d": "M... C... Z"}   (SVG path commands M L H V C S Q T A Z, absolute coordinates preferred; use it for organic curves)
+- {"op": "line", "t": "line", "d": "M... L...", "w": 14, "cap": "round|square"}
+Cuts apply to all ink. Up to 24 shapes per mark; prefer few. Optional "evenodd": true on a mark makes overlapping "add" shapes cancel out.
+Reply with ONLY a JSON object, no prose: {"marks": [{"name": "2-4 word concept name", "why": "one short sentence on the idea", "shapes": [...]}, ...4 marks]}. Write name and why in ${lang === 'en' ? 'English' : 'Polish'}. Use a plain hyphen "-", never long dashes.`;
+
+async function drawMark(body, lang, env, json) {
+  const brief = typeof body?.brief === 'string' ? body.brief.trim().slice(0, 160) : '';
+  if (!brief) return json({ error: 'brief' }, 400);
+  const res = await anthropic(env, {
+    max_tokens: 16000,
+    output_config: { effort: 'medium' },   // projekt od zera - więcej myślenia niż wybór parametrów
+    system: [{ type: 'text', text: drawSystem(lang), cache_control: { type: 'ephemeral' } }],
+    messages: [{ role: 'user', content: `Brand brief: ${brief}` }],
+  });
+  if (!res.ok) return json({ error: 'upstream', status: res.status }, 502);
+  const data = await res.json();
+  if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);
+  const marks = (reply(data)?.marks || []).slice(0, 6).map(customMark).filter(Boolean);
+  if (!marks.length) return json({ error: 'parse' }, 502);
+  return json({ marks });
 }
 
 /* ---------- Laboratorium znaków (tools/mark-lab.mjs): art director i developer ----------

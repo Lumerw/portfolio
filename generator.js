@@ -8,8 +8,8 @@
 //   złożoność - ile elementów (wycięć, ramion, modułów, pasów, zakrętów),
 //   styl      - od kwadratowego (proste kąty, kwadraty, trójkąty) do obłego (koła, łuki, zaokrąglenia).
 // Moje sygnety były tylko wzorem stylu - generator ich nie pokazuje i nie wczytuje.
-// „Wygeneruj ze mną”: opis marki → Worker (/mark) → Claude dobiera typ, złożoność, styl, obrót i numer;
-// bez odpowiedzi - zwykłe losowanie. Wynik: SVG do pobrania albo skopiowania, kolor z palety albo HEX.
+// „Wygeneruj ze mną”: opis marki → Worker (/mark/draw) → Claude projektuje od zera 4 znaki autorskie, kontrola jakości
+// odrzuca słabe, art director wybiera; bez odpowiedzi - algorytm z ustawieniami od Claude (/mark), potem zwykłe losowanie. Wynik: SVG do pobrania albo skopiowania, kolor z palety albo HEX.
 
 const C = 100;                                   // środek pola 200 × 200
 // Typy znaków: nazwa na stronie (pl / en) i opis dla art directora (Worker /mark buduje z niego prompt i listę typów).
@@ -234,6 +234,57 @@ export function markSvg({ kind, seed, complexity, style, rotate = 0 }, color = '
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${mask}<g ${g}><g fill="${color}"${m.cut.length ? ` mask="url(#${id})"` : ''}>${fill}</g>${stroke}</g></svg>`;
 }
 
+/* ---------- Znak autorski: projekt Claude (Worker /mark/draw) jako geometria w polu 200 × 200 ----------
+   Model opisuje kształty (koło, prostokąt, wielokąt, ścieżka, linia), każdy dodaje tusz albo wycina negatyw.
+   customShape() przepuszcza tylko liczby z zakresu i polecenia ścieżek SVG - nic innego nie trafia do SVG.
+   Ten sam kod sprawdza odpowiedź w Workerze i rysuje znak na stronie. */
+const num = (v, lo = -60, hi = 260) => (Number.isFinite(+v) ? f(Math.min(hi, Math.max(lo, +v))) : null);
+const PATH = /^[MLHVCSQTAZmlhvcsqtaz0-9.,\s-]{3,1600}$/;
+export function customShape(s) {
+  if (!s || typeof s !== 'object') return null;
+  const op = s.op === 'cut' ? 'cut' : s.op === 'line' || s.t === 'line' ? 'line' : 'add';
+  let d = null;
+  if (s.t === 'circle') { const [cx, cy, r] = [num(s.cx), num(s.cy), num(s.r, 1, 120)]; if (cx !== null && cy !== null && r !== null) d = circle(cx, cy, r); }
+  else if (s.t === 'rect') {
+    const [x, y, w, h] = [num(s.x), num(s.y), num(s.w, 1, 240), num(s.h, 1, 240)];
+    if ([x, y, w, h].every(v => v !== null)) d = rect(x, y, w, h, num(s.rx, 0, 120) ?? 0);
+  } else if (s.t === 'poly' && Array.isArray(s.pts) && s.pts.length >= 3 && s.pts.length <= 40) {
+    const pts = s.pts.map(p => (Array.isArray(p) ? [num(p[0]), num(p[1])] : [null, null]));
+    if (pts.every(p => p[0] !== null && p[1] !== null)) d = poly(pts, num(s.rx, 0, 60) ?? 0);
+  } else if ((s.t === 'path' || s.t === 'line') && typeof s.d === 'string' && PATH.test(s.d.trim())) d = s.d.trim().replace(/\s+/g, ' ');
+  if (!d) return null;
+  if (op === 'line') return { op, d, w: num(s.w, 2, 40) ?? 12, round: s.cap !== 'square' };
+  return { op, d };
+}
+// Lista kształtów → znak { custom, name, why, fill, cut, lines, evenodd }; null, gdy nic się nie narysuje
+export function customMark(m) {
+  const shapes = (Array.isArray(m?.shapes) ? m.shapes : []).slice(0, 32).map(customShape).filter(Boolean);
+  const fill = shapes.filter(s => s.op === 'add').map(s => s.d), cut = shapes.filter(s => s.op === 'cut').map(s => s.d);
+  const lines = shapes.filter(s => s.op === 'line').map(({ d, w, round }) => ({ d, w, round }));
+  if (!fill.length && !lines.length) return null;
+  const txt = (v, n) => (typeof v === 'string' ? v : '').replace(/[—–]/g, '-').replace(/[<>&"]/g, '').trim().slice(0, n);
+  return { custom: true, name: txt(m.name, 40), why: txt(m.why, 180), fill, cut, lines, evenodd: !!m.evenodd };
+}
+// Znak z odpowiedzi Workera (już po customMark) - na stronie jeszcze raz tylko ścieżki i liczby
+export function workerMark(m) {
+  const ok = d => typeof d === 'string' && PATH.test(d);
+  const fill = (m?.fill || []).filter(ok), cut = (m?.cut || []).filter(ok);
+  const lines = (m?.lines || []).filter(l => ok(l?.d)).map(l => ({ d: l.d, w: num(l.w, 2, 40) ?? 12, round: !!l.round }));
+  if (!fill.length && !lines.length) return null;
+  const txt = (v, n) => String(v || '').replace(/[<>&"]/g, '').slice(0, n);
+  return { custom: true, name: txt(m.name, 40), why: txt(m.why, 180), fill, cut, lines, evenodd: !!m.evenodd };
+}
+let uid = 0;
+export function customSvg(m, color = '#111111', size = 400) {
+  const id = `c${++uid}`;
+  const fill = m.fill.map(d => `<path d="${d}"${m.evenodd ? ' fill-rule="evenodd"' : ''}/>`).join('');
+  const lines = m.lines.map(l => `<path d="${l.d}" fill="none" stroke="${color}" stroke-width="${l.w}" stroke-linecap="${l.round ? 'round' : 'square'}" stroke-linejoin="${l.round ? 'round' : 'miter'}"/>`).join('');
+  const mask = m.cut.length ? `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-60" y="-60" width="320" height="320"><rect x="-60" y="-60" width="320" height="320" fill="#fff"/><g fill="#000">${m.cut.map(d => `<path d="${d}"/>`).join('')}</g></mask></defs>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${mask}<g transform="rotate(0 ${C} ${C})"><g fill="${color}"${m.cut.length ? ` mask="url(#${id})"` : ''}>${fill}${lines}</g></g></svg>`;
+}
+// Znak algorytmu albo autorski → SVG
+export const anySvg = (m, color, size) => (m.custom ? customSvg(m, color, size) : markSvg(m, color, size));
+
 export function initGenerator(root, { copy, palette, color: start, endpoint, lang = 'pl' }) {
   const stage = root.querySelector('[data-gen-stage]');
   const $ = s => root.querySelector(`[data-gen="${s}"]`);
@@ -242,21 +293,22 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
 
   // Kadr: znak wyśrodkowany względem swojego obrysu (puste moduły, krótka linia), z równym marginesem;
   // ten sam kadr trafia do pobranego SVG
-  const raw = () => markSvg({ ...mark, complexity: complexity.value / 100, style: style.value / 100 }, color);
+  const raw = () => anySvg({ ...mark, complexity: complexity.value / 100, style: style.value / 100 }, color);
   const svg = () => raw().replace('viewBox="0 0 200 200"', `viewBox="${view}"`);
   // Wersje do wyboru (2-4) na scenie, w bieżących suwakach i kolorze; dopóki art director wybiera, draw() rysuje je
   let picking = null;
-  const pickGrid = () => `<div class="gen__pick" data-n="${picking.length}" data-wait>${picking.map(m => markSvg({ ...m, complexity: complexity.value / 100, style: style.value / 100 }, color)).join('')}</div>`;
+  const pickGrid = () => `<div class="gen__pick" data-n="${picking.length}" data-wait>${picking.map(m => anySvg({ ...m, complexity: complexity.value / 100, style: style.value / 100 }, color)).join('')}</div>`;
   const draw = () => {
     if (picking) { stage.innerHTML = pickGrid(); return; }
     if (!mark) return;
+    complexity.disabled = style.disabled = !!mark.custom;   // suwaki sterują algorytmem - znak autorski ma własną geometrię
     stage.innerHTML = raw();
     const el = stage.querySelector('svg'), g = el.querySelector('g[transform]');
     const bb = g.getBBox(), sw = +(el.querySelector('[stroke-width]')?.getAttribute('stroke-width') || 0);
     const side = Math.max(bb.width, bb.height, 60) + sw + 64, cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
     view = [cx - side / 2, cy - side / 2, side, side].map(v => +v.toFixed(2)).join(' ');
     el.setAttribute('viewBox', view);
-    info.textContent = `${KIND_INFO[mark.kind][lang === 'en' ? 'en' : 'pl']} · ${copy.no} ${mark.seed}`;
+    info.textContent = mark.custom ? copy.custom : `${KIND_INFO[mark.kind][lang === 'en' ? 'en' : 'pl']} · ${copy.no} ${mark.seed}`;
   };
   // Selekcja: z ~30 kandydatów (losowe numery) zostają najlepsze różne wg kontroli jakości (mark-qa.js: pole, środek,
   // drzazgi, szczeliny, czytelność przy 32 px, proporcja tuszu). Suwaki potem zmieniają już tylko wybrany znak.
@@ -306,7 +358,7 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
   style.addEventListener('input', draw);
   $('roll').addEventListener('click', roll);
   $('download').addEventListener('click', () => {
-    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([svg()], { type: 'image/svg+xml' })), download: `znak-${mark.seed}.svg` });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([svg()], { type: 'image/svg+xml' })), download: `znak-${mark.custom ? (mark.name || 'autorski').toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/g, '-').replace(/^-|-$/g, '') : mark.seed}.svg` });
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
@@ -330,16 +382,17 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
   };
   const choose = async (brief, p, cands) => {
     const c = complexity.value / 100, s = style.value / 100, ticket = turn;
-    info.textContent = KIND_INFO[p.kind][lang === 'en' ? 'en' : 'pl'];
+    info.textContent = p.kind === 'custom' ? copy.custom : KIND_INFO[p.kind][lang === 'en' ? 'en' : 'pl'];
     note.textContent = copy.picking.replace('{n}', cands.length);
     picking = cands;
     mark = cands[0];                                    // pobierz / kopiuj w trakcie wyboru: najlepsza wg QA
     draw();
     let i = 0, name = p.name, why = p.why;
     try {
-      const images = await Promise.all(cands.map(m => qa.png(markSvg({ ...m, complexity: c, style: s }, '#111111', 256))));
+      const images = await Promise.all(cands.map(m => qa.png(anySvg({ ...m, complexity: c, style: s }, '#111111', 256))));
       const q = await post('/mark/pick', { brief, lang, kind: p.kind, name: p.name, why: p.why, images });
-      if (q.pick >= 1 && q.pick <= cands.length) { i = q.pick - 1; name = q.name || name; why = q.why || why; }
+      if (q.pick >= 1 && q.pick <= cands.length) { i = q.pick - 1; name = q.name || cands[i].name || name; why = q.why || cands[i].why || why; }
+      else if (cands[0].custom) { name = cands[0].name; why = cands[0].why; }
     } catch { /* bez wyboru - zostaje najlepsza wg kontroli jakości */ }
     if (ticket !== turn) return;                        // w międzyczasie kliknięto „losuj” (roll() zdjął wersje)
     const grid = stage.querySelector('.gen__pick');
@@ -350,9 +403,25 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
       if (ticket !== turn) return;
     }
     picking = null;
-    mark = cands[i];
+    mark = cands[i].custom ? { ...cands[i], name } : cands[i];
     draw();
     note.textContent = [name, why].filter(Boolean).join(' - ');
+  };
+  // Znaki autorskie z /mark/draw → oceny kontroli jakości (te same miary co algorytm) → do 4 najlepszych różnych
+  const drawOwn = async brief => {
+    const ticket = ++turn;
+    const d = await post('/mark/draw', { brief, lang });
+    qa ??= await import('./mark-qa.js');
+    if (ticket !== turn) return false;
+    const all = [];
+    for (const m of (d.marks || []).map(workerMark).filter(Boolean)) {
+      try {
+        const r = await qa.rasterize(customSvg(m, '#000000', 200));
+        all.push({ m, q: qa.score(qa.analyze(r)), h24: r.h24 });
+      } catch { /* znak bez obrazu - pomijamy */ }
+    }
+    if (ticket !== turn) return false;
+    return qa.top(all.filter(a => a.q >= .3), 4).map(a => a.m);
   };
   const form = $('ai');
   form.addEventListener('submit', async e => {
@@ -365,6 +434,15 @@ export function initGenerator(root, { copy, palette, color: start, endpoint, lan
     note.textContent = copy.thinking;
     try {
       if (!endpoint) throw new Error('offline');
+      // 1. znak autorski: Claude projektuje od zera kilka koncepcji pod opis, kontrola jakości odrzuca słabe
+      const own = await drawOwn(brief).catch(() => null);
+      if (own === false) return;                        // w międzyczasie kliknięto „losuj”
+      if (own?.length) {
+        if (own.length > 1) await choose(brief, { kind: 'custom', name: '', why: '' }, own);
+        else { picking = null; mark = own[0]; draw(); note.textContent = [mark.name, mark.why].filter(Boolean).join(' - '); }
+        return;
+      }
+      // 2. zapas: algorytm z ustawieniami od art directora
       const p = await post('/mark', { brief, lang });
       if (!KINDS.includes(p.kind)) throw new Error('kind');
       complexity.value = p.complexity;

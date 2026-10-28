@@ -107,6 +107,28 @@ check(`Worker /mark/pick: ${badPick.length} złych zapytań → 400 bez wywołan
 reply = '{"pick": 4, "name": "x", "why": "y"}';
 check('Worker /mark/pick: wybór poza zakresem → 502', await pickStatus(pick) === 502);
 
+// /mark/draw - znaki autorskie: tylko bezpieczna geometria (liczby w zakresie, polecenia ścieżek), tekst bez znaczników
+reply = JSON.stringify({ marks: [
+  { name: 'Fala — alg', why: '<i>Ramen</i> i alga', shapes: [
+    { op: 'add', t: 'circle', cx: 100, cy: 100, r: 999 }, { op: 'cut', t: 'rect', x: 60, y: 90, w: 80, h: 20 },
+    { op: 'add', t: 'path', d: 'M40 100 C 60 40 140 40 160 100 Z' }, { op: 'add', t: 'path', d: 'M0 0"/><script>alert(1)</script>' },
+    { op: 'line', t: 'line', d: 'M50 150 L150 150', w: 99, cap: 'round' }, { op: 'add', t: 'poly', pts: [[1, 2], ['x', 3], [4, 5]] },
+  ] },
+  { name: 'pusty', shapes: [{ op: 'cut', t: 'circle', cx: 1, cy: 1, r: 5 }] },
+] });
+sent = null;
+const dr = await worker.fetch(req({ brief: 'vegan ramen bar', lang: 'pl' }, { path: '/mark/draw' }), env), dj = await dr.json();
+const m0 = dj.marks?.[0];
+check('Worker /mark/draw: geometria przycięta, skrypt odrzucony, znak bez tuszu pominięty',
+  dr.status === 200 && dj.marks.length === 1 && m0.fill.length === 2 && m0.cut.length === 1 && m0.lines[0].w === 40
+  && !JSON.stringify(dj).includes('script') && m0.name === 'Fala - alg' && !/[<>]/.test(m0.why) && m0.fill[0].includes('120') && sent?.body.output_config.effort === 'medium',
+  JSON.stringify(dj).slice(0, 300));
+reply = '{"marks": []}';
+check('Worker /mark/draw: brak znaków → 502', (await worker.fetch(req({ brief: 'x' }, { path: '/mark/draw' }), env)).status === 502);
+check('Worker /mark/draw: pusty opis → 400', (await worker.fetch(req({ brief: '' }, { path: '/mark/draw' }), env)).status === 400);
+reply = '{"pick": 1, "name": "Fala", "why": "y"}';
+check('Worker /mark/pick: znaki autorskie (kind custom) → 200', await pickStatus({ ...pick, kind: 'custom' }) === 200);
+
 for (const x of results) console.log(`${x.ok ? '✓' : '✗'} ${x.name}${x.note && !x.ok ? ` - ${x.note}` : ''}`);
 const failed = results.filter(x => !x.ok).length;
 console.log(`\n${results.length - failed}/${results.length} ok`);
