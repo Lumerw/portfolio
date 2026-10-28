@@ -30,9 +30,9 @@ export const shared = {
     ],
     // Doświadczenie: 3 punkty na osi - Promotraffic (rola i daty), potem same loga
     work: [
-      { logo: 'assets/clients/promotrafic.svg', h: 26, name: 'Promotraffic', role: 'AI designer', year: { pl: '2025.05 - teraz', en: '2025.05 - now' } },
-      { logo: 'assets/clients/youniversity.svg', h: 18, name: 'Youniversity' },
-      { logo: 'assets/logos/ancy.svg', h: 18, name: 'Ancy' },
+      { href: 'https://promotraffic.pl/', logo: 'assets/clients/promotrafic.svg', h: 26, name: 'Promotraffic', role: 'AI designer', year: { pl: '2025.05 - teraz', en: '2025.05 - now' } },
+      { href: 'https://youniversity.be/', logo: 'assets/clients/youniversity.svg', h: 18, name: 'Youniversity' },
+      { href: 'https://www.ancy.pl/', logo: 'assets/logos/ancy.svg', h: 18, name: 'Ancy' },
     ],
     skipSkills: ['dostępność WCAG 2.2', 'accessibility, WCAG 2.2'],   // w PDF 5 kompetencji
   },
@@ -110,13 +110,13 @@ export const shared = {
   // odwracane), przycięte do krawędzi znaku. h = wysokość w px dobrana na oko, żeby znaki ważyły podobnie
   // (napisy niżej, sygnety wyżej); w = h × proporcje pliku.
   clients: [
-    { name: 'promotraffic', logo: 'assets/clients/promotrafic.svg', w: 96, h: 28 },
-    { name: 'Youniversity', logo: 'assets/clients/youniversity.svg', w: 146, h: 22 },   // logo ze strony youniversity.be
-    { name: 'Ancy', logo: 'assets/clients/ancy.svg', w: 68, h: 18 },
-    { name: 'forkflow', logo: 'assets/clients/forkflow.svg', w: 133, h: 21 },
-    { name: '[firma - trzepaczka]', logo: 'assets/clients/whisk.svg', w: 28, h: 30 },
-    { name: 'depilacja.pl', logo: 'assets/clients/depilacja.svg', w: 120, h: 28 },   // fala + napis i podpis „depilacja laserowa”
-    { name: 'WeedWeek', logo: 'assets/clients/weedweek.svg', w: 126, h: 26 },
+    { name: 'promotraffic', logo: 'assets/clients/promotrafic.svg', href: 'https://promotraffic.pl/', w: 96, h: 28 },
+    { name: 'Youniversity', logo: 'assets/clients/youniversity.svg', href: 'https://youniversity.be/', w: 146, h: 22 },   // logo ze strony youniversity.be
+    { name: 'Ancy', logo: 'assets/clients/ancy.svg', href: 'https://www.ancy.pl/', w: 68, h: 18 },
+    { name: 'forkflow', logo: 'assets/clients/forkflow.svg', href: 'https://forkflow.io/', w: 133, h: 21 },
+    { name: 'Whisk', logo: 'assets/clients/whisk.svg', href: 'https://trywhisk.com/', w: 28, h: 30 },
+    { name: 'depilacja.pl', logo: 'assets/clients/depilacja.svg', href: 'https://depilacja.pl/', w: 120, h: 28 },   // fala + napis i podpis „depilacja laserowa”
+    { name: 'WeedWeek', logo: 'assets/clients/weedweek.svg', href: 'https://www.weedweek.pl/', w: 126, h: 26 },
     { name: 'freshly', logo: 'assets/clients/freshly.svg', w: 92, h: 28 },
   ],
 

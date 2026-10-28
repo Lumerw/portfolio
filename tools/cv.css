@@ -76,6 +76,7 @@ b { font-weight: 500; }
   -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
 .clients img { width: auto; opacity: .6; }
 .clients img.ink { opacity: 1; }
+.clients a { display: flex; border: 0; text-decoration: none; }
 
 /* Kontakt: przyciski jak na stronie, profile */
 .foot { position: relative; z-index: 1; margin-top: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }

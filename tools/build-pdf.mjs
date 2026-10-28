@@ -52,7 +52,10 @@ function doc(lang, fmt, dark) {
 
   // Dół okładki: wykształcenie (+ certyfikaty), doświadczenie (+ loga firm), kompetencje - loga z content.shared.pdfAbout
   const A = c.pdfAbout;
-  const logo = x => (x.logo ? `<img class="logo" src="${esc(x.logo)}" alt="${esc(x.name)}" style="height:${x.h}px">` : `<span class="logo logo--text">${esc(x.name)}</span>`);
+  const logo = x => {
+    const el = x.logo ? `<img class="logo" src="${esc(x.logo)}" alt="${esc(x.name)}" style="height:${x.h}px">` : `<span class="logo logo--text">${esc(x.name)}</span>`;
+    return x.href ? `<a href="${esc(x.href)}">${el}</a>` : el;   // logo firmy klikalne - prowadzi na jej stronę
+  };
   const entry = x => `<li class="entry">${logo(x)}${x.text || x.role ? `<span class="entry__text">${esc(x.text?.[lang] ?? x.role)}${x.year ? ` <span class="meta">${esc(x.year[lang])}</span>` : ''}</span>` : ''}</li>`;
   const col = (label, body) => `<div class="about__col"><h3>${esc(label)}</h3>${body}</div>`;
   const cover = `

@@ -40,7 +40,10 @@ function cv(lang) {
 
   const experience = t.about.experience.filter(e => isReal(e.place)).map(e => `
           <li><span class="meta">${esc(clean(e.year))}</span><span><b>${esc(clean(e.place))}</b><span class="muted">, ${esc(clean(e.role))}</span></span></li>`).join('');
-  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img${x.name === CV_INK ? ' class="ink"' : ''} src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.8)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
+  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => {
+    const img = `<img${x.name === CV_INK ? ' class="ink"' : ''} src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.8)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`;
+    return x.href ? `<a href="${esc(x.href)}">${img}</a>` : img;   // logo klikalne - strona firmy
+  }).join('');
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
   return `<!doctype html>
