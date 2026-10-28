@@ -71,7 +71,9 @@ b { font-weight: 500; }
 .dash li { padding-left: 1.1em; text-indent: -1.1em; break-inside: avoid; }
 .dash li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
 .beta { display: inline-block; padding: 0 7px; border: 1px solid var(--ink-3); color: var(--ink-2); font-size: 13px; line-height: 1.5; }
-.clients { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; padding-block: 4px; }
+.clients { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; padding-block: 4px; width: fit-content;
+  /* od lewej w pełni widoczne, do prawej krawędzi ostatniego logo wygasa do zera */
+  -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
 .clients img { width: auto; opacity: .6; }
 
 /* Kontakt: przyciski jak na stronie, profile */

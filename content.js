@@ -114,6 +114,7 @@ export const shared = {
     { name: 'forkflow', logo: 'assets/clients/forkflow.svg', w: 133, h: 21 },
     { name: '[firma - trzepaczka]', logo: 'assets/clients/whisk.svg', w: 28, h: 30 },
     { name: 'Youniversity', logo: 'assets/clients/youniversity.svg', w: 146, h: 22 },   // logo ze strony youniversity.be
+    { name: 'depilacja.pl', logo: 'assets/clients/depilacja.svg', w: 120, h: 28 },   // fala + napis i podpis „depilacja laserowa”
     { name: 'WeedWeek', logo: 'assets/clients/weedweek.svg', w: 126, h: 26 },
     { name: 'freshly', logo: 'assets/clients/freshly.svg', w: 92, h: 28 },
   ],
