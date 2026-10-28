@@ -111,9 +111,10 @@ export const shared = {
   // (napisy niżej, sygnety wyżej); w = h × proporcje pliku.
   clients: [
     { name: 'promotraffic', logo: 'assets/clients/promotrafic.svg', w: 96, h: 28 },
+    { name: 'Youniversity', logo: 'assets/clients/youniversity.svg', w: 146, h: 22 },   // logo ze strony youniversity.be
+    { name: 'Ancy', logo: 'assets/clients/ancy.svg', w: 68, h: 18 },
     { name: 'forkflow', logo: 'assets/clients/forkflow.svg', w: 133, h: 21 },
     { name: '[firma - trzepaczka]', logo: 'assets/clients/whisk.svg', w: 28, h: 30 },
-    { name: 'Youniversity', logo: 'assets/clients/youniversity.svg', w: 146, h: 22 },   // logo ze strony youniversity.be
     { name: 'depilacja.pl', logo: 'assets/clients/depilacja.svg', w: 120, h: 28 },   // fala + napis i podpis „depilacja laserowa”
     { name: 'WeedWeek', logo: 'assets/clients/weedweek.svg', w: 126, h: 26 },
     { name: 'freshly', logo: 'assets/clients/freshly.svg', w: 92, h: 28 },

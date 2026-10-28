@@ -3,7 +3,7 @@
 // Folder private/ jest w .gitignore - CV nie trafia do publicznego repozytorium ani na stronę.
 // Układ (4 wielkości tekstu: 40 hasło, 22 imię i zdanie, 18 treść, 15 opisy + znacznik beta): awatar z tęczową obwódką, obok adres strony i imię · hasło z hero, pod nim skrócone zdanie (pl/en.cv.line) · wiersze z cienką linią:
 // doświadczenie, kompetencje, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
-// (logo firm, bez freshly; WeedWeek ostatnie, wygasa w gradiencie) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
+// (logo firm w kolejności z content.js, bez freshly; rząd wygasa gradientem w prawo) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
 // Treść z content.js (pl/en.about, pl/en.cv, shared.clients); placeholdery w [nawiasach] są pomijane.
 import { chromium } from 'playwright';
 import { mkdir, readFile, stat } from 'node:fs/promises';
@@ -21,7 +21,6 @@ const out = join(root, 'private');
 const PORT = 8097;
 const SIZE = 1080;
 const CV_SKIP_CLIENTS = ['freshly'];   // logo pominięte w CV (na stronie, w karuzeli klientów, zostają)
-const CV_FIRST = 'depilacja.pl', CV_LAST = 'WeedWeek';   // kolejność w CV: depilacja.pl pierwsza, WeedWeek ostatnie (wygasa w gradiencie)
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isReal = v => !!v && !String(v).includes('[');
@@ -40,8 +39,7 @@ function cv(lang) {
 
   const experience = t.about.experience.filter(e => isReal(e.place)).map(e => `
           <li><span class="meta">${esc(clean(e.year))}</span><span><b>${esc(clean(e.place))}</b><span class="muted">, ${esc(clean(e.role))}</span></span></li>`).join('');
-  const rank = x => (x.name === CV_FIRST ? -1 : x.name === CV_LAST ? 1 : 0);
-  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).sort((a, b) => rank(a) - rank(b)).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.85)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
+  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.8)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
   return `<!doctype html>
