@@ -20,6 +20,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'private');
 const PORT = 8097;
 const SIZE = 1080;
+const CV_INK = 'promotraffic';   // aktualny pracodawca: logo w pełnej czerni, reszta przygaszona
 const CV_SKIP_CLIENTS = ['freshly'];   // logo pominięte w CV (na stronie, w karuzeli klientów, zostają)
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -39,7 +40,7 @@ function cv(lang) {
 
   const experience = t.about.experience.filter(e => isReal(e.place)).map(e => `
           <li><span class="meta">${esc(clean(e.year))}</span><span><b>${esc(clean(e.place))}</b><span class="muted">, ${esc(clean(e.role))}</span></span></li>`).join('');
-  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.8)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
+  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => `<img${x.name === CV_INK ? ' class="ink"' : ''} src="${esc(x.logo)}" style="height:${Math.round(x.h * 0.8)}px" alt="${esc(isReal(x.name) ? x.name : '')}">`).join('');
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
   return `<!doctype html>

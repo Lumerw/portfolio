@@ -42,7 +42,7 @@ export default {
     const messages = validate(body?.messages);
     if (!messages) return json({ error: 'messages' }, 400);
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await logged(fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'x-api-key': env.ANTHROPIC_API_KEY,
@@ -60,7 +60,7 @@ export default {
         system: [{ type: 'text', text: systemPrompt(content, lang), cache_control: { type: 'ephemeral' } }],
         messages,
       }),
-    });
+    }));
     if (!res.ok) return json({ error: 'upstream', status: res.status }, 502);
     const data = await res.json();
     if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);   // czat przejdzie na tryb lokalny
@@ -93,7 +93,13 @@ function validate(list) {
       art director ogląda je i wybiera jeden, a nazwę i uzasadnienie pisze do tego, co widać na obrazie.
    Odpowiedzi sprawdzane i przycinane do dozwolonych wartości. */
 const clean = (v, n) => (typeof v === 'string' ? v : '').replace(/[—–]/g, '-').replace(/[<>]/g, '').trim().slice(0, n);
-const anthropic = (env, body) => fetch('https://api.anthropic.com/v1/messages', {
+// Błąd API do logów Workera (wrangler tail): status i treść odpowiedzi, bez nagłówków i klucza
+const logged = async req => {
+  const res = await req;
+  if (!res.ok) console.error('anthropic', res.status, (await res.clone().text()).slice(0, 600));
+  return res;
+};
+const anthropic = (env, body) => logged(fetch('https://api.anthropic.com/v1/messages', {
   method: 'POST',
   headers: {
     'x-api-key': env.ANTHROPIC_API_KEY,
@@ -102,7 +108,7 @@ const anthropic = (env, body) => fetch('https://api.anthropic.com/v1/messages', 
     'content-type': 'application/json',
   },
   body: JSON.stringify({ model: env.MODEL || 'claude-opus-5-5', output_config: { effort: 'low' }, fallbacks: 'default', ...body }),
-});
+}));
 // Pierwszy obiekt JSON z odpowiedzi modelu (tylko bloki tekstu); null, gdy go nie ma
 const reply = data => {
   const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');

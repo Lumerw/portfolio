@@ -75,6 +75,7 @@ b { font-weight: 500; }
   /* od lewej w pełni widoczne, do prawej krawędzi ostatniego logo wygasa do zera */
   -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
 .clients img { width: auto; opacity: .6; }
+.clients img.ink { opacity: 1; }
 
 /* Kontakt: przyciski jak na stronie, profile */
 .foot { position: relative; z-index: 1; margin-top: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }

@@ -299,7 +299,7 @@ export const pl = {
     teraz: {
       meta: ['produkt', 'UX/UI', 'identyfikacja', 'kod z AI'], // [potwierdź] - zakres w jednej linii panelu
       tagline: 'marketplace dla ekspertów z branży kreatywnej', // krótki opis pod podglądem
-      lead: 'Tu i teraz znajdziesz eksperta z Twojej branży.',
+      lead: 'Tu i teraz znajdziesz eksperta z Twojej branży. Feedback do portfolio, alternatywa dla drogich kursów i realny zarobek dla ekspertów.',
       // Plansza animowana (reel, 15 s): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat.
       // Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
       reel: {
@@ -351,7 +351,7 @@ export const pl = {
     rehab: {
       meta: ['koncepcja', 'narracja', 'projekt', 'development'], // [potwierdź]
       tagline: 'platforma łącząca gaming z psychologami i psychiatrami', // krótki opis pod podglądem
-      lead: 'Pitch deck w formie strony: gracze dostają wsparcie psychologów i psychiatrów tam, gdzie już są - na serwerach gier.',
+      lead: 'Pitch deck w formie strony z interaktywnym prototypem. Gracze dostają wsparcie psychologów i psychiatrów bezpośrednio na serwerach, na których rozmawiają ze swoją społecznością.',
       problem: '[Problem: 2-3 zdania.]',
       solution: 'Prezentacja inwestorska w formie strony www, bez ciasteczek i zbierania danych. [Dopisz 1-2 zdania.]',
       result: '[Efekt: 1-2 zdania lub liczby.]',
@@ -569,7 +569,7 @@ export const en = {
     teraz: {
       meta: ['product', 'UX/UI', 'identity', 'AI-assisted build'],   // zakres w jednej linii panelu
       tagline: 'a marketplace for experts from the creative industry', // krótki opis pod podglądem
-      lead: 'Find an expert from your industry, here and now.',
+      lead: 'Find an expert from your industry, here and now. Portfolio feedback, an alternative to expensive courses and real earnings for experts.',
       // Plansza animowana (reel, 15 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
         label: 'teraz - a base of creative industry experts. Looking for an expert? Find one here, with 5+ years of practice. Or become one yourself: share what you know and earn from your calls. Two communities - listeners and experts - and soon a third that joins them. A 1:1 call with an expert, video, 30 or 60 minutes. Let’s talk here and now.',
@@ -620,7 +620,7 @@ export const en = {
     rehab: {
       meta: ['concept', 'narrative', 'design', 'development'],
       tagline: 'a platform connecting gaming with psychologists and psychiatrists', // krótki opis pod podglądem
-      lead: 'A pitch deck as a website: players get support from psychologists and psychiatrists where they already are - on game servers.',
+      lead: 'A pitch deck as a website with an interactive prototype. Players get support from psychologists and psychiatrists right on the servers where they talk with their community.',
       problem: '[Problem: 2-3 sentences.]',
       solution: 'An investor presentation built as a website, with no cookies and no data collection. [Add 1-2 sentences.]',
       result: '[Result: 1-2 sentences or numbers.]',
