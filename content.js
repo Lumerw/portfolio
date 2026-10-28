@@ -297,7 +297,7 @@ export const pl = {
     teraz: {
       meta: ['produkt', 'UX/UI', 'identyfikacja', 'kod z AI'], // [potwierdź] - zakres w jednej linii panelu
       tagline: 'marketplace dla ekspertów z branży kreatywnej', // krótki opis pod podglądem
-      lead: 'Tu i teraz znajdziesz eksperta z Twojej branży. MVP platformy: rozmowy wideo 1:1, płatność przez Escrow i społeczność.',
+      lead: 'Tu i teraz znajdziesz eksperta z Twojej branży.',
       // Plansza animowana (reel, 15 s): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat.
       // Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
       reel: {
@@ -332,11 +332,11 @@ export const pl = {
       },
     },
     loom: {
-      meta: ['założyciel', 'identyfikacja', 'strona', 'wdrożenie'], // [potwierdź] - zakres w jednej linii panelu
-      tagline: 'studio projektowe w systemie subskrypcji', // krótki opis pod podglądem
-      lead: 'Jedna stała opłata miesięczna, kolejne zadania projektowe bez osobnych wycen. Strona, identyfikacja i panel klienta na Stripe.',
+      meta: ['identyfikacja', 'strona', 'wdrożenie'], // [potwierdź] - zakres w jednej linii panelu
+      tagline: 'zautomatyzowane studio projektowe z AI', // krótki opis pod podglądem
+      lead: 'Projektowanie wspierane przez AI i automatyzacje. Klient ma własny panel z tablicą zadań, statusami i plikami w jednym miejscu.',
       problem: '[Problem: 2-3 zdania.]',
-      solution: 'Styl inspirowany Bauhausem, font Haus, wersje PL/EN, subskrypcje i panel klienta na Stripe. [Dopisz 1-2 zdania.]',
+      solution: 'Styl inspirowany Bauhausem, font Haus, wersje PL/EN, elastyczne płatności i panel klienta z tablicą zadań. [Dopisz 1-2 zdania.]',
       result: '[Efekt: 1-2 zdania lub liczby.]',
       alt: {
         video: 'loom.studio - plansza marki: logo na osi czerni i papieru, trzy figury Bauhausu',
@@ -412,8 +412,8 @@ export const pl = {
     contactTitle: 'Porozmawiajmy.',
     site: 'portfolio online',
     projects: {
-      teraz: { facts: ['rozmowy wideo 1:1, 30 albo 60 minut', 'eksperci z 5+ lat praktyki', '0% prowizji w becie'] },
-      loom: { facts: ['jedno zadanie naraz, średnio 48 godzin', 'płatności i panel klienta na Stripe', 'asystent AI na stronie, wersje PL i EN'] },
+      teraz: { facts: ['rozmowy wideo 1:1', 'doświadczeni eksperci', '0% prowizji w becie'] },
+      loom: { facts: ['jedno zadanie naraz, średnio 48 godzin', 'elastyczne płatności', 'asystent AI na stronie, wersje PL i EN'] },
       rehab: { facts: ['wsparcie psychiczne tam, gdzie są gracze', 'serwery z psychologiem, który sam gra', '12-tygodniowy pilotaż z 4 miarami sukcesu'] },
     },
   },
@@ -467,7 +467,7 @@ export const pl = {
       { q: 'Ile kosztuje projekt?', a: 'To zależy od zakresu. Wycenę i plan dostajesz po pierwszej rozmowie.' },
       { q: 'Czy zajmujesz się też wdrożeniem?', a: 'Tak - projektuję od pomysłu do wdrożenia, żeby powstała działająca rzecz, nie tylko makiety.' },
       { q: 'Jak używasz AI w pracy?', a: 'AI pomaga mi szybko sprawdzić więcej wariantów projektu. Na co dzień pracuję jako AI designer w Promotraffic.' },
-      { q: 'Co projektujesz?', a: 'Identyfikacje, strony i produkty cyfrowe. Prowadzę też loom.studio - studio projektowe w modelu subskrypcji.' },
+      { q: 'Co projektujesz?', a: 'Identyfikacje, strony i produkty cyfrowe. Prowadzę też loom.studio - zautomatyzowane studio projektowe z AI.' },
       { q: 'Jak się skontaktować?', a: 'Najszybciej mailem albo przez kalendarz na stronie: rozmowa online, 30 minut.' },
     ],
     label: 'Twoje pytanie',
@@ -567,7 +567,7 @@ export const en = {
     teraz: {
       meta: ['product', 'UX/UI', 'identity', 'AI-assisted build'],   // zakres w jednej linii panelu
       tagline: 'a marketplace for experts from the creative industry', // krótki opis pod podglądem
-      lead: 'Find an expert from your industry, here and now. The platform MVP: 1:1 video calls, Escrow payments and a community.',
+      lead: 'Find an expert from your industry, here and now.',
       // Plansza animowana (reel, 15 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
         label: 'teraz - a base of creative industry experts. Looking for an expert? Find one here, with 5+ years of practice. Or become one yourself: share what you know and earn from your calls. Two communities - listeners and experts - and soon a third that joins them. A 1:1 call with an expert, video, 30 or 60 minutes. Let’s talk here and now.',
@@ -601,11 +601,11 @@ export const en = {
       },
     },
     loom: {
-      meta: ['founder', 'identity', 'website', 'build'],
-      tagline: 'a design studio running on subscription', // krótki opis pod podglądem
-      lead: 'One flat monthly fee, design tasks one after another with no separate quotes. Website, identity and a client portal on Stripe.',
+      meta: ['identity', 'website', 'build'],
+      tagline: 'an automated, AI-driven design studio', // krótki opis pod podglądem
+      lead: 'Design powered by AI and automation. Each client gets their own portal with a task board, statuses and files in one place.',
       problem: '[Problem: 2-3 sentences.]',
-      solution: 'Bauhaus-inspired style, the Haus typeface, PL/EN versions, subscriptions and a client panel on Stripe. [Add 1-2 sentences.]',
+      solution: 'Bauhaus-inspired style, the Haus typeface, PL/EN versions, flexible payments and a client portal with a task board. [Add 1-2 sentences.]',
       result: '[Result: 1-2 sentences or numbers.]',
       alt: {
         video: 'loom.studio - brand board: logo on the black and paper axis, three Bauhaus figures',
@@ -679,8 +679,8 @@ export const en = {
     contactTitle: 'Let’s talk.',
     site: 'portfolio online',
     projects: {
-      teraz: { facts: ['1:1 video calls, 30 or 60 minutes', 'experts with 5+ years of practice', '0% commission in beta'] },
-      loom: { facts: ['one task at a time, 48 hours on average', 'Stripe payments and client portal', 'AI assistant on the site, PL and EN versions'] },
+      teraz: { facts: ['1:1 video calls', 'experienced experts', '0% commission in beta'] },
+      loom: { facts: ['one task at a time, 48 hours on average', 'flexible payments', 'AI assistant on the site, PL and EN versions'] },
       rehab: { facts: ['mental-health support where players already are', 'servers with a psychologist who plays', 'a 12-week pilot with 4 success measures'] },
     },
   },
@@ -729,7 +729,7 @@ export const en = {
       { q: 'How much does a project cost?', a: 'It depends on the scope. You get a quote and a plan after the first call.' },
       { q: 'Do you also build what you design?', a: 'Yes - I design from idea to launch, so you get a working thing, not just mockups.' },
       { q: 'How do you use AI?', a: 'AI helps me test more design options, faster. Day to day I work as an AI designer at Promotraffic.' },
-      { q: 'What do you design?', a: 'Identities, websites and digital products. I also run loom.studio - a subscription-based design studio.' },
+      { q: 'What do you design?', a: 'Identities, websites and digital products. I also run loom.studio - an automated, AI-driven design studio.' },
       { q: 'How can I get in touch?', a: 'Email is the fastest, or book a call in the calendar on the site: an online call, 30 minutes.' },
     ],
     label: 'Your question',
