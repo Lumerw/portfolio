@@ -116,6 +116,8 @@ img { display: block; }
 .dash li { padding-left: 1.1em; text-indent: -1.1em; }
 .dash li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
 .pj__link { margin-top: 36px; font-size: 24px; display: flex; flex-wrap: wrap; gap: 12px 40px; }
+.pj__go--site { font-weight: 500; }   /* strona projektu odrobinę grubsza, brandbook cieńszy */
+.pj__go--book { font-weight: 300; }
 .pj__soon { color: var(--ink-2); }
 .pj__soon .meta { font-size: .8em; }
 

@@ -84,9 +84,9 @@ function doc(lang, fmt, dark) {
   </section>`;
 
   // Linki projektu: strona i brandbook; bez adresu - nazwa z „wkrótce”, bez linku
-  const pjLink = (href, label) => (isReal(href)
-    ? `<a class="link-u" href="${esc(href)}">${esc(label)} ↗</a>`
-    : `<span class="pj__soon">${esc(label)} <span class="meta">${esc(U.soon)}</span></span>`);
+  const pjLink = (href, label, kind) => (isReal(href)
+    ? `<a class="link-u pj__go--${kind}" href="${esc(href)}">${esc(label)} ↗</a>`
+    : `<span class="pj__soon pj__go--${kind}">${esc(label)} <span class="meta">${esc(U.soon)}</span></span>`);
   const projects = c.projects.map((p, i) => {
     const tp = t.projects[p.id];
     const scope = (tp.meta ?? []).map(clean).filter(Boolean);
@@ -103,7 +103,7 @@ function doc(lang, fmt, dark) {
         <p class="pj__tagline">${esc(tp.tagline)}</p>
         <p class="pj__lead">${esc(tp.lead)}</p>
         <dl class="pj__rows">${row(U.scope, esc(scope.join(' · ')))}${row(U.tools, esc(tools.join(' · ')))}${points.length ? row(U.highlights, `<ul class="dash">${points.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : ''}</dl>
-        <p class="pj__link">${[pjLink(p.href, U.projectSite), ...(p.brandbook ? [pjLink(p.brandbook, U.projectBrandbook)] : [])].join('')}</p>
+        <p class="pj__link">${[pjLink(p.href, U.projectSite, 'site'), ...(p.brandbook ? [pjLink(p.brandbook, U.projectBrandbook, 'book')] : [])].join('')}</p>
       </div>
     </div>
   </section>`;

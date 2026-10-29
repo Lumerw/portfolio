@@ -393,11 +393,14 @@ function project(p, i, c, t) {
   const row = (label, value) => value ? `
             <div class="pj__row"><dt class="t-meta">${esc(label)}</dt><dd>${value}</dd></div>` : '';
   // Linki projektu: strona i brandbook. Bez prawdziwego adresu - sama nazwa z dopiskiem „wkrótce” (nieklikalna).
-  const pjLink = (href, label) => (url(href) !== '#'
-    ? `<a class="link-u" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} ↗\uFE0E</a>`
-    : `<span class="pj__soon">${esc(label)} <span class="t-meta">${esc(t.ui.soon)}</span></span>`);
+  // Strona projektu odrobinę grubsza, brandbook odrobinę cieńszy (pj__go--site / --book). Telefon i tablet pionowo:
+  // linki zaraz pod kadrem (pj__link--top), ekran poziomy: na dole opisu - widoczna tylko jedna kopia (styles.css).
+  const pjLink = (href, label, kind) => (url(href) !== '#'
+    ? `<a class="link-u pj__go--${kind}" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} ↗\uFE0E</a>`
+    : `<span class="pj__soon pj__go--${kind}">${esc(label)} <span class="t-meta">${esc(t.ui.soon)}</span></span>`);
+  const links = [pjLink(p.href, t.ui.projectSite, 'site'), ...(p.brandbook ? [pjLink(p.brandbook, t.ui.projectBrandbook, 'book')] : [])].join('');
   const link = `
-          <p class="pj__link">${[pjLink(p.href, t.ui.projectSite), ...(p.brandbook ? [pjLink(p.brandbook, t.ui.projectBrandbook)] : [])].join('')}</p>`;
+          <p class="pj__link pj__link--end">${links}</p>`;
 
   const bar = `
       <img class="sygnet sheet__sygnet${mono(p.sygnet)}" src="${esc(p.sygnet.src)}" width="20" height="20" alt="">
@@ -407,6 +410,7 @@ function project(p, i, c, t) {
   const body = `
       <div class="pj">
         <div class="pj__media">${promo(p, tp, t)}
+          <p class="pj__link pj__link--top">${links}</p>
         </div>
         <div class="pj__info">
           <h2 id="${p.id}-title" class="t-name pj__title">${esc(p.title)}${betaTag(p)}</h2>

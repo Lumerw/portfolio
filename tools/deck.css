@@ -88,3 +88,4 @@ ul { list-style: none; }
 
 /* Znacznik „beta” przy nazwie projektu */
 .beta { display: inline-block; margin-left: 16px; padding: 2px 10px; border: 1px solid #73736E; color: #6E6E6A; font-size: 18px; font-weight: 400; vertical-align: .8em; line-height: 1.4; }
+.pj__go--site { font-weight: 500; }   /* link do projektu odrobinę grubszy */

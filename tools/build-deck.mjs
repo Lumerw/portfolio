@@ -39,7 +39,7 @@ function deck(lang) {
   const projectTop = (p, i, n, extra = '') => top(n,
     `${symbol(p.symbol, { cls: 'top__symbol' })}<span class="t-meta">${String(i + 1).padStart(2, '0')}</span><span class="top__title">${esc(p.title)}</span><span class="t-meta">${esc(p.type)}</span>`,
     `${extra}${back}`);
-  const visit = p => (isReal(p.href) ? ext(p.href, D.visit) : `<span class="t-meta">${esc(D.soon)}</span>`);
+  const visit = p => (isReal(p.href) ? ext(p.href, D.visit, "link-u pj__go--site") : `<span class="t-meta">${esc(D.soon)}</span>`);
 
   const start = `
     <section class="slide slide--start" id="s-start">
@@ -63,7 +63,7 @@ function deck(lang) {
     <section class="slide" id="s-${p.id}">
       ${projectTop(p, i, n)}
       <figure class="frame${p.cover ? ' frame--cover' : ''}">${p.cover ? `<img src="${esc(coverSrc(p, '4x5', lang))}" alt="">` : covers[p.id](p, tp)}</figure>
-      <p class="caption"><span>${esc(p.title)} - ${esc(tp.tagline)}</span>${visit(p)}</p>
+      <p class="caption"><span>${esc(p.title)} - ${esc(tp.tagline.charAt(0).toLowerCase() + tp.tagline.slice(1))}</span>${visit(p)}</p>
     </section>
     <section class="slide" id="s-${p.id}-o">
       ${projectTop(p, i, n + 1, `${visit(p)}`)}

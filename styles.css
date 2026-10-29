@@ -1364,6 +1364,15 @@ html:has(.sheet:target) { overflow: hidden; }
 .pj__points li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
 .pj__link { margin-top: var(--s-1); display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); }
 .pj__soon { color: var(--ink-2); }
+.pj__go--site { font-weight: var(--fw-medium); }   /* link do projektu odrobinę grubszy */
+.pj__go--book { font-weight: 300; }                /* brandbook odrobinę cieńszy (Helvetica Neue Light) */
+/* Linki pod kadrem tylko przy kadrze nad opisem (telefon, tablet pionowo); obok kadru - na dole opisu */
+.pj__link--top { margin-top: var(--s-3); }
+.pj__link--end { display: none; }
+@media screen and (min-width: 560px) and (orientation: landscape) {
+  .pj__link--top { display: none; }
+  .pj__link--end { display: flex; }
+}
 @media screen and (min-width: 560px) and (orientation: landscape) {
   .sheet--project .sheet__body { overflow: hidden; container-type: size; }
   .pj { height: 100%; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-6); align-items: center; }

@@ -298,7 +298,7 @@ export const pl = {
   projects: {
     teraz: {
       meta: ['produkt', 'UX/UI', 'identyfikacja', 'kod z AI'], // [potwierdź] - zakres w jednej linii panelu
-      tagline: 'marketplace dla ekspertów z branży kreatywnej', // krótki opis pod podglądem
+      tagline: 'Marketplace dla ekspertów z branży kreatywnej', // krótki opis pod podglądem
       lead: 'Tu i teraz znajdziesz eksperta z Twojej branży. Feedback do portfolio, alternatywa dla drogich kursów i realny zarobek dla ekspertów.',
       // Plansza animowana (reel, 15 s): plakat → słuchacz → ekspert → społeczność → rozmowa 1:1 → plakat.
       // Te same klucze w pl i en; limity znaków sprawdza `npm run build`.
@@ -335,7 +335,7 @@ export const pl = {
     },
     loom: {
       meta: ['identyfikacja', 'strona', 'wdrożenie'], // [potwierdź] - zakres w jednej linii panelu
-      tagline: 'zautomatyzowane studio projektowe z AI', // krótki opis pod podglądem
+      tagline: 'Zautomatyzowane studio projektowe z AI', // krótki opis pod podglądem
       lead: 'Projektowanie wspierane przez AI i automatyzacje. Klient ma własny panel z tablicą zadań, statusami i plikami w jednym miejscu.',
       problem: '[Problem: 2-3 zdania.]',
       solution: 'Styl inspirowany Bauhausem, font Haus, wersje PL/EN, elastyczne płatności i panel klienta z tablicą zadań. [Dopisz 1-2 zdania.]',
@@ -350,7 +350,7 @@ export const pl = {
     },
     rehab: {
       meta: ['koncepcja', 'narracja', 'projekt', 'development'], // [potwierdź]
-      tagline: 'platforma łącząca gaming z psychologami i psychiatrami', // krótki opis pod podglądem
+      tagline: 'Platforma łącząca gaming z psychologami i psychiatrami', // krótki opis pod podglądem
       lead: 'Pitch deck w formie strony z interaktywnym prototypem. Gracze dostają wsparcie psychologów i psychiatrów bezpośrednio na serwerach, na których rozmawiają ze swoją społecznością.',
       problem: '[Problem: 2-3 zdania.]',
       solution: 'Prezentacja inwestorska w formie strony www, bez ciasteczek i zbierania danych. [Dopisz 1-2 zdania.]',
@@ -568,7 +568,7 @@ export const en = {
   projects: {
     teraz: {
       meta: ['product', 'UX/UI', 'identity', 'AI-assisted build'],   // zakres w jednej linii panelu
-      tagline: 'a marketplace for experts from the creative industry', // krótki opis pod podglądem
+      tagline: 'A marketplace for experts from the creative industry', // krótki opis pod podglądem
       lead: 'Find an expert from your industry, here and now. Portfolio feedback, an alternative to expensive courses and real earnings for experts.',
       // Plansza animowana (reel, 15 s). Słuchacz po angielsku: „listener” (decyzja właściciela; teraz.eu używa „learner”).
       reel: {
@@ -604,7 +604,7 @@ export const en = {
     },
     loom: {
       meta: ['identity', 'website', 'build'],
-      tagline: 'an automated, AI-driven design studio', // krótki opis pod podglądem
+      tagline: 'An automated, AI-driven design studio', // krótki opis pod podglądem
       lead: 'Design powered by AI and automation. Each client gets their own portal with a task board, statuses and files in one place.',
       problem: '[Problem: 2-3 sentences.]',
       solution: 'Bauhaus-inspired style, the Haus typeface, PL/EN versions, flexible payments and a client portal with a task board. [Add 1-2 sentences.]',
@@ -619,7 +619,7 @@ export const en = {
     },
     rehab: {
       meta: ['concept', 'narrative', 'design', 'development'],
-      tagline: 'a platform connecting gaming with psychologists and psychiatrists', // krótki opis pod podglądem
+      tagline: 'A platform connecting gaming with psychologists and psychiatrists', // krótki opis pod podglądem
       lead: 'A pitch deck as a website with an interactive prototype. Players get support from psychologists and psychiatrists right on the servers where they talk with their community.',
       problem: '[Problem: 2-3 sentences.]',
       solution: 'An investor presentation built as a website, with no cookies and no data collection. [Add 1-2 sentences.]',
