@@ -461,7 +461,6 @@ function generator(c, t) {
       <h2 id="generator-title" class="t-project">${esc(g.title)}</h2>`;
   const body = `
       <section class="gen" data-generator style="--gen-c:${esc(G.color)}">
-        <p class="t-text t-muted gen__intro">${esc(g.intro)}</p>
         <form class="gen__ai" data-gen="ai">
           <label class="visually-hidden" for="gen-brief">${esc(g.briefLabel)}</label>
           <input id="gen-brief" data-gen="brief" type="text" maxlength="160" placeholder="${esc(g.brief)}" autocomplete="off">

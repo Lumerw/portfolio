@@ -1606,7 +1606,6 @@ html:has(.sheet:target) { overflow: hidden; }
    złożoność, styl, pobierz / kod / losuj. Telefon: pasek w wierszach, suwaki na całą szerokość.
    ========================================================================== */
 .gen { padding-bottom: var(--s-8); --gen-max: 880px; }
-.gen__intro { max-width: 34em; }
 .gen__ai { display: flex; gap: var(--s-1); max-width: var(--gen-max); margin: var(--s-4) auto 0; }
 .gen__ai input { flex: 1; min-width: 0; height: 40px; padding-inline: var(--s-2); border: var(--hairline) solid var(--ink-4); background: none; color: var(--ink); font: inherit; font-size: var(--fs-text); border-radius: 0; }
 .gen__ai input:focus-visible { outline: none; border-color: var(--ink); }
