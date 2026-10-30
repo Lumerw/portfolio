@@ -3,7 +3,7 @@
 // Folder private/ jest w .gitignore - CV nie trafia do publicznego repozytorium ani na stronę.
 // Układ (4 wielkości tekstu: 40 hasło, 22 imię i zdanie, 18 treść, 15 opisy + znacznik beta): awatar z tęczową obwódką, obok adres strony i imię · hasło z hero, pod nim skrócone zdanie (pl/en.cv.line) · wiersze z cienką linią:
 // doświadczenie (3 wiersze z klikalnymi logo firm, pl/en.cv.jobs), kompetencje, wykształcenie i języki (gdy uzupełnione), „współpracowałem z”
-// (logo firm w kolejności z content.js, bez freshly; rząd wygasa gradientem w prawo) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
+// (logo firm spoza doświadczenia, bez freshly, plus CV_EXTRA_CLIENTS; jeden kolor, ostatnie wygasa gradientem w prawo) · kontakt (mail, kalendarz na stronie, profile). Zarys sfery w prawym górnym rogu, przycięty krawędzią.
 // Treść z content.js (pl/en.about, pl/en.cv, shared.clients); placeholdery w [nawiasach] są pomijane.
 import { chromium } from 'playwright';
 import { mkdir, readFile, stat } from 'node:fs/promises';
@@ -23,6 +23,11 @@ const SIZE = 1080;
 const CV_INK = 'promotraffic';   // aktualny pracodawca: logo w pełnej czerni, reszta przygaszona
 const CV_SKIP_CLIENTS = ['freshly'];   // logo pominięte w CV (na stronie, w karuzeli klientów, zostają)
 const CV_LOGOS = [{ name: 'loom.studio', logo: 'assets/loom/logo.svg', href: 'https://loomstudio.pl/', h: 18 }];   // logo spoza listy klientów (doświadczenie)
+const CV_EXTRA_CLIENTS = [   // tylko w CV, przed ostatnim (WeedWeek): jednolity kolor #111 z kanałem alfa
+  { name: 'Hrabia', logo: 'assets/clients/hrabia.png', h: 28 },
+  { name: 'LeanPassion', logo: 'assets/clients/leanpassion.png', href: 'https://leanpassion.pl/', h: 26 },
+  { name: 'Yasumi', logo: 'assets/clients/yasumi.png', href: 'https://yasumi.pl/', h: 26 },
+];
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isReal = v => !!v && !String(v).includes('[');
@@ -40,13 +45,16 @@ function cv(lang) {
   const row = (label, value) => (value ? `<div class="row"><dt>${esc(label)}</dt><dd>${value}</dd></div>` : '');
 
   const logoOf = name => [...c.clients, ...CV_LOGOS].find(x => x.name === name);
-  const logoLink = (x, h) => {
-    const img = `<img${x.name === CV_INK ? ' class="ink"' : ''} src="${esc(x.logo)}" style="height:${h}px" alt="${esc(isReal(x.name) ? x.name : '')}">`;
+  const logoLink = (x, h, ink = x.name === CV_INK) => {
+    const img = `<img${ink ? ' class="ink"' : ''} src="${esc(x.logo)}" style="height:${h}px" alt="${esc(isReal(x.name) ? x.name : '')}">`;
     return x.href ? `<a href="${esc(x.href)}">${img}</a>` : img;   // logo klikalne - strona firmy
   };
   const experience = V.jobs.map(j => `
-          <li><span class="meta">${esc(j.year)}</span><span class="job">${j.logos.map(logoOf).filter(Boolean).map(x => logoLink(x, Math.round(x.h * 0.8))).join('')}<span class="muted">${esc(j.role)}</span></span></li>`).join('');
-  const clients = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name)).map(x => logoLink(x, Math.round(x.h * 0.8))).join('');
+          <li><span class="meta">${esc(j.year)}</span><span class="job">${j.logos.map(logoOf).filter(Boolean).map(x => logoLink(x, Math.round(x.h * 0.8))).join('<span class="sep" aria-hidden="true">|</span>')}</span></li>`).join('');
+  // „współpracowałem z”: bez firm z doświadczenia, wszystkie logo w jednym kolorze; ostatnie (WeedWeek) wygasa
+  const inJobs = new Set(V.jobs.flatMap(j => j.logos));
+  const listed = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name) && !inJobs.has(x.name));
+  const clients = [...listed.slice(0, -1), ...CV_EXTRA_CLIENTS, ...listed.slice(-1)].map(x => logoLink(x, Math.round(x.h * 0.8), false)).join('');
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
   return `<!doctype html>

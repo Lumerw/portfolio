@@ -392,9 +392,9 @@ export const pl = {
     file: 'Wojciech-Lumer-CV-PL.pdf',
     // Doświadczenie w CV: logo firm (nazwy z shared.clients albo cvLogos), klikalne
     jobs: [
-      { year: '2025.05 - teraz', logos: ['promotraffic'], role: 'AI designer' },
-      { year: '2024.01 - 2025.05', logos: ['Ancy', 'Youniversity', 'depilacja.pl'], role: 'projektant' },
-      { year: '2022.01 - teraz', logos: ['loom.studio'], role: 'projektant' },
+      { year: '2025.05 - teraz', logos: ['promotraffic'] },
+      { year: '2024.01 - 2025.05', logos: ['Ancy', 'Youniversity', 'depilacja.pl'] },
+      { year: '2022.01 - teraz', logos: ['loom.studio'] },
     ],
     projects: 'Projekty',
     experience: 'Doświadczenie',
@@ -664,9 +664,9 @@ export const en = {
   cv: {
     file: 'Wojciech-Lumer-CV-EN.pdf',
     jobs: [
-      { year: '2025.05 - now', logos: ['promotraffic'], role: 'AI designer' },
-      { year: '2024.01 - 2025.05', logos: ['Ancy', 'Youniversity', 'depilacja.pl'], role: 'designer' },
-      { year: '2022.01 - now', logos: ['loom.studio'], role: 'designer' },
+      { year: '2025.05 - now', logos: ['promotraffic'] },
+      { year: '2024.01 - 2025.05', logos: ['Ancy', 'Youniversity', 'depilacja.pl'] },
+      { year: '2022.01 - now', logos: ['loom.studio'] },
     ],
     projects: 'Projects',
     experience: 'Experience',
