@@ -188,12 +188,38 @@ function clients(c, t) {
 
 // Awatar-moneta: zdjęcie, co kilka sekund obraca się na drugą stronę - rysunek kreską.
 // Tęczowa poświata jak dawny przycisk „zapytaj AI”; klik otwiera panel asystenta (#agent).
+// Rysunek awatara jako SVG z animacją (SMIL, cykl 9 s zgrany z obrotem monety - uśmiech, gdy widać rysunek):
+// poważna mina → uśmiech z dołeczkami, okulary z brwiami unoszą się i lekko przechylają, loki cały czas lekko
+// „gotują się” jak w animacji rysowanej. Warstwy to wycięte fragmenty bitmapy rysunku, usta są wektorowe.
+// Bez ruchu w systemie main.js zatrzymuje animację na poważnej minie.
+const AV_EASE = '.4 0 .2 1;.3 0 .3 1;.4 0 .6 1;.4 0 .6 1;.4 0 .2 1;.4 0 .6 1';
+const AV_EASE5 = '.4 0 .2 1;.3 0 .3 1;.4 0 .6 1;.4 0 .2 1;.4 0 .6 1';
+const avMouth = (rest, smile) => `<animate attributeName="d" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.55;.61;.8;.87;1" values="${rest};${rest};${smile};${smile};${rest};${rest}" keySplines="${AV_EASE5}"/>`;
+const avatarDrawing = src => `<svg class="avatar__face avatar__face--drawing avatar__anim" viewBox="0 0 256 256" aria-hidden="true">
+          <defs>
+            <image id="av-art" href="${esc(src)}" width="256" height="256"/>
+            <clipPath id="av-glasses"><polygon points="85,97 180,97 180,161 85,161"/></clipPath>
+            <clipPath id="av-hair"><path d="M0 0H256V97H180V256H256V0ZM0 97H86V256H0Z" clip-rule="evenodd"/></clipPath>
+            <mask id="av-face" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256"><rect width="256" height="256" fill="#fff"/><polygon points="85,97 180,97 180,161 85,161"/><rect x="121" y="158" width="45" height="12"/><rect x="131" y="175" width="30" height="14"/><path d="M0 0H256V97H180V256H256V0ZM0 97H86V256H0Z"/></mask>
+            <filter id="av-boil" filterUnits="userSpaceOnUse" x="-10" y="-10" width="276" height="276"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="3" result="n"><animate attributeName="baseFrequency" dur="2.4s" repeatCount="indefinite" values="0.045;0.052;0.043;0.045" calcMode="spline" keyTimes="0;0.33;0.66;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+          </defs>
+          <circle cx="128" cy="128" r="128" fill="#fff"/>
+          <use href="#av-art" mask="url(#av-face)"/>
+          <g><animateTransform attributeName="transform" type="translate" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.55;.59;.62;.8;.87;1" values="0 0;0 0;0 -2.2;0 -1.2;0 -1.2;0 0;0 0" keySplines="${AV_EASE}"/><g clip-path="url(#av-hair)"><use href="#av-art" filter="url(#av-boil)"/></g></g>
+          <g><animateTransform attributeName="transform" type="translate" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.55;.59;.62;.8;.87;1" values="0 0;0 0;0 -4.2;0 -3;0 -3;0 0;0 0" keySplines="${AV_EASE}"/><g><animateTransform attributeName="transform" type="rotate" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.55;.61;.8;.87;1" values="0 131 130;0 131 130;-2.2 131 130;-2.2 131 130;0 131 130;0 131 130" keySplines="${AV_EASE5}"/><use href="#av-art" clip-path="url(#av-glasses)"/></g></g>
+          <g fill="none" stroke="#111" stroke-width="2.25" stroke-linecap="round">
+            <path d="M125 167 C134 163 150 165 165 162">${avMouth('M125 167 C134 163 150 165 165 162', 'M122 160 C131 172 155 173 167 157')}</path>
+            <path d="M135 186 C140 180 150 179 157 183">${avMouth('M135 186 C140 180 150 179 157 183', 'M137 179 C142 185 151 185 156 179')}</path>
+            <g stroke-width="2.2" opacity="0"><animate attributeName="opacity" dur="9s" repeatCount="indefinite" keyTimes="0;.57;.62;.79;.84;1" values="0;0;1;1;0;0"/><path d="M118 157 C119 160 120 162 122 163"/><path d="M171 153 C171 156 170 158 168 160"/></g>
+          </g>
+        </svg>`;
+
 function avatar(c, t) {
   const face = (src, cls) => `<img class="avatar__face ${cls}" src="${esc(src)}" width="256" height="256" alt="" decoding="async">`;
   return `
       <a class="avatar" href="#agent" aria-haspopup="dialog" aria-label="${esc(t.ui.avatar)}">
         <span class="avatar__halo" aria-hidden="true"></span>
-        <span class="avatar__coin">${face(c.avatar.photo, 'avatar__face--photo')}${face(c.avatar.drawing, 'avatar__face--drawing')}</span>
+        <span class="avatar__coin">${face(c.avatar.photo, 'avatar__face--photo')}${avatarDrawing(c.avatar.drawing)}</span>
       </a>`;
 }
 
@@ -454,7 +480,7 @@ const toolLogo = {
   legal: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6.5h17l7 7v28H12Z"/><path d="M29 6.5v7h7"/><path d="M18 30l4.5 4.5L31 25"/><text x="18" y="22" font-size="8" font-family="inherit" fill="currentColor" stroke="none">AI</text></svg>',
   next: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>',
   // „Aa” na pół jasnym, pół ciemnym polu - kontrast tekstu z tłem
-  contrast: () => '<svg class="tool__logo tool__contrast" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17.5"/><path class="tool__contrast-half" d="M24 6.5a17.5 17.5 0 0 1 0 35Z"/><text x="24" y="28.5" text-anchor="middle" font-size="13" font-family="inherit">Aa</text></svg>',
+  contrast: () => '<svg class="tool__logo tool__contrast" viewBox="0 0 48 48" aria-hidden="true"><defs><clipPath id="tool-cl"><rect width="24" height="48"/></clipPath><clipPath id="tool-cr"><rect x="24" width="24" height="48"/></clipPath></defs><circle cx="24" cy="24" r="17.5"/><path class="tool__contrast-half" d="M24 6.5a17.5 17.5 0 0 1 0 35Z"/><text clip-path="url(#tool-cl)" x="24" y="28.5" text-anchor="middle" font-size="13" font-family="inherit">Aa</text><text class="tool__contrast-inv" clip-path="url(#tool-cr)" x="24" y="28.5" text-anchor="middle" font-size="13" font-family="inherit">Aa</text></svg>',
 };
 function tools(c, t) {
   const T = t.tools;

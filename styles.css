@@ -1745,7 +1745,9 @@ a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset
 .ct__item:not(.is-ok) .ct__verdict { text-decoration: underline; text-decoration-color: #FF3B30; text-underline-offset: 4px; }
 .tool__contrast circle { fill: none; }
 .tool__contrast-half { fill: currentColor; stroke: none; }
-.tool__contrast text { fill: currentColor; stroke: none; mix-blend-mode: difference; font-weight: 500; }
+.tool__contrast text { fill: currentColor; stroke: none; font-weight: 500; }
+.tool__contrast .tool__contrast-inv { fill: var(--paper); }   /* na czarnej połowie - napis w kolorze tła */
+@media (hover: hover) { a.tool:hover .tool__contrast .tool__contrast-inv { fill: var(--ink); } }
 
 /* ==========================================================================
    Generator znaków (panel #generator, generator.js) - jak blobmaker.app, w stylu strony: opis marki dla Claude,

@@ -319,6 +319,9 @@ function tickIcon(set, k) {
   }
   setTimeout(() => tickIcon(set, k), ICON_MS[0] + Math.random() * (ICON_MS[1] - ICON_MS[0]));
 }
+// Animacja rysunku awatara (SMIL): bez ruchu w systemie stoi na poważnej minie
+if (reduceMotion.matches) for (const svg of app.querySelectorAll('svg.avatar__anim')) { svg.pauseAnimations(); svg.setCurrentTime(0); }
+
 // Kropki (dots.js, shared.effects.dots): wczytywane tylko, gdy są na stronie; stoją, gdy otwarty jest panel
 if (app.querySelector('canvas[data-dots]')) {
   import('./dots.js').then(m => m.initDots(app, { reduce: reduceMotion.matches, paused: () => !!openSheet() }));
