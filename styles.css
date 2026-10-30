@@ -686,6 +686,10 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
    Rekomendacje z LinkedIna: karty z krótkim cytatem, przewijane w bok
    ========================================================================== */
 .recs { padding-block: var(--s-4) var(--s-12); }
+/* telefon i tablet: pod kartami tyle samo powietrza co nad tytułem (koniec procesu → „Rekomendacje”, 130 px),
+   liczone do czarnego kontaktu; na telefonie kontakt ma jeszcze własny margines 40 px */
+@media (max-width: 1023px) { .recs { padding-bottom: 130px; } }
+@media (max-width: 767px) { .recs { padding-bottom: calc(130px - var(--s-5)); } }
 .recs__title { margin-bottom: var(--s-4); }
 /* Pętla bez końca: lista + kopia przesuwane o połowę (jak karuzela logo), pauza po najechaniu */
 .recs__marquee {

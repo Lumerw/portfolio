@@ -53,11 +53,13 @@ function pulse(canvas) {
   return { layout, draw };
 }
 
-// Pasek nad czarnym kontaktem (telefon, tablet): te same komórki i ten sam puls co przy awatarze, na całą szerokość.
-// Fala idzie od czarnej krawędzi w górę; kropki na dole w pełni czarne (kolor kontaktu), wyżej coraz bledsze.
+// Pasek nad czarnym kontaktem (telefon, tablet): te same komórki Braille'a co przy awatarze, na całą szerokość.
+// Organicznie jak przy awatarze, ale z kilku miejsc naraz: po pasku powoli wędrują źródła pulsu (każde we własnym
+// tempie i fazie), ich fale się nakładają, do tego wolny rytm każdej kropki - wzór się nie powtarza.
+// Przy czarnej krawędzi gęsto i w pełni czarno, wyżej rzadziej i bledziej.
 function band(canvas) {
   const STEP = 6, R = 1.6, CELL = 2 * STEP + 6, ROW = 3 * STEP + 8;
-  let g, dots = [];
+  let g, dots = [], seeds = [];
   const layout = () => {
     g = setup(canvas);
     dots = [];
@@ -69,20 +71,31 @@ function band(canvas) {
       const x = left + cx * CELL + i * STEP, y = top + cy * ROW + j * STEP;
       dots.push({ x, y, n: hash(x, y), v: 0 });
     }
+    // jedno źródło pulsu na ~220 px szerokości, każde z innym torem, tempem i fazą
+    const count = Math.max(2, Math.round(g.w / 220));
+    seeds = Array.from({ length: count }, (_, k) => {
+      const r = q => hash(k * 17.3 + q, q * 3.1 + k);
+      return { base: (k + 0.5) / count, drift: 0.35 / count + r(1) * 0.4 / count, period: 7000 + r(2) * 9000, speed: 300 + r(3) * 220, phase: r(4) * TAU, reach: 70 + r(5) * 70 };
+    });
   };
   const draw = (t, still) => {
     const { ctx, w, h } = g;
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = getComputedStyle(canvas.parentElement).backgroundColor;
+    const src = seeds.map(e => ({ x: (e.base + Math.sin(t / e.period + e.phase) * e.drift) * w, y: h + 6, e }));
     for (const d of dots) {
-      const up = h - d.y;                                    // odległość od czarnej krawędzi
-      const wave = Math.sin(t / 380 - up / 9 - Math.sin(d.x / 90) * 1.2);
+      let wave = 0, weight = 0;
+      for (const { x, y, e } of src) {
+        const dist = Math.hypot(d.x - x, d.y - y), f = Math.exp(-dist / e.reach);
+        wave += Math.sin(t / e.speed - dist / 9 + e.phase) * f; weight += f;
+      }
+      wave /= weight || 1;
       const own = Math.sin(t / (900 + d.n * 1400) + d.n * TAU);
-      const near = 1 - up / h;
-      const on = wave * 0.6 + own * 0.4 + (d.n - 0.5) * 0.5 + near * 1.1 > 0.55 ? 1 : 0;   // przy krawędzi gęsto, wyżej rzadziej
-      d.v = still ? on : d.v + (on - d.v) * 0.18;
+      const near = 1 - (h - d.y) / h;
+      const on = wave * 0.75 + own * 0.45 + (d.n - 0.5) * 0.8 + near * 0.55 > 0.4 ? 1 : 0;
+      d.v = still ? on : d.v + (on - d.v) * 0.18;               // miękkie zapalanie i gaszenie
       if (d.v < 0.05) continue;
-      ctx.globalAlpha = 0.12 + 0.88 * (d.y / h) ** 1.5;      // na dole pełne krycie, wyżej coraz mniej
+      ctx.globalAlpha = 0.12 + 0.88 * (d.y / h) ** 1.5;          // na dole pełne krycie, wyżej coraz mniej
       ctx.beginPath(); dot(ctx, d.x, d.y, R * d.v); ctx.fill();
     }
     ctx.globalAlpha = 1;
