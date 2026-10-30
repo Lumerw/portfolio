@@ -5,6 +5,7 @@
 // dzięki czemu index.html ma gotową treść także bez JS.
 
 import { symbol } from './symbols.js';
+import { RULESET_VERSION } from './checker-rules.js';
 
 // Plansza animowana teraz (reel): jedna pętla. Trafia do --t-reel oraz do data-dwell / --t-auto wiersza indeksu.
 export const REEL_MS = 15000;
@@ -471,6 +472,33 @@ function tools(c, t) {
   return sheet({ id: 'narzedzia', cls: 'sheet--tools', bar, body, t });
 }
 
+// AI Act checker (panel #ai-act, checker.js): kanały publikacji, pole na pliki, wynik projektu, karty plików.
+// Treść kart (pytania, werdykt, jak oznaczyć, flagi) dokłada checker.js; bez JS - samo pole i opis.
+function checker(c, t) {
+  const C = t.checker;
+  const bar = `
+      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
+      <h2 id="ai-act-title" class="t-project">${esc(C.title)}</h2>`;
+  const body = `
+      <section class="ck" data-checker>
+        <p class="tools__line t-text t-muted">${esc(C.line)}</p>
+        <fieldset class="ck__channels" data-ck="channels">
+          <legend class="t-meta">${esc(C.channels)}</legend>${Object.entries(C.platforms).map(([id, name]) => `
+          <label class="ck__chip"><input type="checkbox" data-channel="${id}"><span>${esc(name)}</span></label>`).join('')}
+        </fieldset>
+        <label class="ck__zone" data-ck="zone">
+          <input class="visually-hidden" type="file" multiple data-ck="input" accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.tif,.tiff,.gif,.psd,.svg,.pdf,.mp4,.mov,.webm,.mp3,.wav,.m4a,.txt,.md,.docx">
+          <span class="ck__zone-dots" aria-hidden="true"></span>
+          <span>${esc(C.drop)}</span>
+          <span class="t-meta">${esc(C.dropMeta)}</span>
+        </label>
+        <div class="ck__summary" data-ck="summary" aria-live="polite" hidden></div>
+        <ul class="ck__items" data-ck="list"></ul>
+        <p class="ck__note t-meta">${esc(C.privacy)}<br><span data-ck="version">${esc(C.disclaimer.replace('{v}', RULESET_VERSION))}</span></p>
+      </section>`;
+  return sheet({ id: 'ai-act', cls: 'sheet--checker', bar, body, t });
+}
+
 // Generator znaków (panel #generator, generator.js) - jak blobmaker.app w stylu strony: opis marki („wygeneruj ze mną”
 // - przycisk jak „zapytaj asystenta” w kontakcie: rysunek awatara i tęczowy kontur),
 // pole ze znakiem i pasek: kolor (HEX + paleta próbek), złożoność (trójkąt → wielokąt), styl (kwadrat → koło),
@@ -697,7 +725,7 @@ export function render(content, lang) {
 <main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${process(t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>${scrollnav(c, t)}
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${tools(c, t)}${generator(c, t)}${agent(c, t)}${booking(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${tools(c, t)}${checker(c, t)}${generator(c, t)}${agent(c, t)}${booking(c, t)}
 </div>
 `;
 }

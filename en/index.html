@@ -579,15 +579,47 @@
           <span class="tool__name">Mark generator</span>
           <span class="tool__text t-muted">Describe a brand - I will design a mark with you from scratch or roll one with the algorithm. You download a ready SVG.</span>
           <span class="tool__state t-meta">open →</span></a></li>
-        <li><div class="tool tool--soon"><svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6.5h17l7 7v28H12Z"/><path d="M29 6.5v7h7"/><path d="M18 30l4.5 4.5L31 25"/><text x="18" y="22" font-size="8" font-family="inherit" fill="currentColor" stroke="none">AI</text></svg>
+        <li><a class="tool" href="#ai-act"><svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6.5h17l7 7v28H12Z"/><path d="M29 6.5v7h7"/><path d="M18 30l4.5 4.5L31 25"/><text x="18" y="22" font-size="8" font-family="inherit" fill="currentColor" stroke="none">AI</text></svg>
           <span class="tool__name">AI Act checker</span>
-          <span class="tool__text t-muted">Upload videos, graphics and key visuals - the tool checks them against the AI Act and EU law and tells you whether AI content labelling is required. Add the official label right from the panel.</span>
-          <span class="tool__state t-meta">soon</span></div></li>
+          <span class="tool__text t-muted">Upload videos, graphics and key visuals - the tool checks them against the AI Act and EU law and tells you whether AI content labelling is required. Apply the label right from the panel.</span>
+          <span class="tool__state t-meta">open →</span></a></li>
         <li><div class="tool tool--soon"><svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>
           <span class="tool__name">Next tool</span>
           <span class="tool__text t-muted">I am working on the next tool for creative teams.</span>
           <span class="tool__state t-meta">soon</span></div></li>
       </ul>
+    </div>
+  </div>
+</section>
+<section id="ai-act" class="sheet sheet--checker" role="dialog" aria-modal="true" aria-labelledby="ai-act-title">
+  <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
+  <div class="sheet__panel">
+    <span class="sheet__grab" aria-hidden="true"></span>
+    <div class="sheet__bar wrap">
+      <svg class="symbol symbol--personal sheet__symbol" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg>
+      <h2 id="ai-act-title" class="t-project">AI Act checker</h2>
+      <a class="sheet__close" href="#start" data-close aria-label="close"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
+    </div>
+    <div class="sheet__body wrap">
+      <section class="ck" data-checker>
+        <p class="tools__line t-text t-muted">Check before publishing whether a creative needs an “AI” label under Article 50 of the AI Act - in what form and where.</p>
+        <fieldset class="ck__channels" data-ck="channels">
+          <legend class="t-meta">Where will you publish?</legend>
+          <label class="ck__chip"><input type="checkbox" data-channel="meta"><span>Facebook, Instagram</span></label>
+          <label class="ck__chip"><input type="checkbox" data-channel="tiktok"><span>TikTok</span></label>
+          <label class="ck__chip"><input type="checkbox" data-channel="youtube"><span>YouTube</span></label>
+          <label class="ck__chip"><input type="checkbox" data-channel="linkedin"><span>LinkedIn</span></label>
+        </fieldset>
+        <label class="ck__zone" data-ck="zone">
+          <input class="visually-hidden" type="file" multiple data-ck="input" accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.tif,.tiff,.gif,.psd,.svg,.pdf,.mp4,.mov,.webm,.mp3,.wav,.m4a,.txt,.md,.docx">
+          <span class="ck__zone-dots" aria-hidden="true"></span>
+          <span>Drop files or click to choose</span>
+          <span class="t-meta">graphics and key visuals, PDF, video, audio, text</span>
+        </label>
+        <div class="ck__summary" data-ck="summary" aria-live="polite" hidden></div>
+        <ul class="ck__items" data-ck="list"></ul>
+        <p class="ck__note t-meta">Files are analysed in your browser and are never uploaded anywhere.<br><span data-ck="version">The tool supports a decision, it is not legal advice. Ruleset 1.0.0 is awaiting legal review.</span></p>
+      </section>
     </div>
   </div>
 </section>

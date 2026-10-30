@@ -1623,6 +1623,72 @@ html:has(.sheet:target) { overflow: hidden; }
 a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
 
 /* ==========================================================================
+   AI Act checker (panel #ai-act, checker.js): kanały jako chipy, pole na pliki z kreską przerywaną,
+   wynik projektu, karty plików (miniatura, metadane, jedno pytanie naraz, werdykt). Werdykty w czerni i bieli:
+   wymagane - pełna czerń, forma ograniczona i zalecane - ramka, do konsultacji - ramka przerywana.
+   ========================================================================== */
+.ck { --ck-max: 880px; padding-bottom: var(--s-8); }
+.ck > * { max-width: var(--ck-max); }
+.ck__channels { margin: var(--s-4) 0 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.ck__channels legend { padding: 0; margin-bottom: var(--s-1); float: left; width: 100%; }
+.ck__chip, .ck__check { position: relative; display: inline-flex; align-items: center; gap: var(--s-1); cursor: pointer; }
+.ck__chip input { position: absolute; opacity: 0; pointer-events: none; }
+.ck__chip span { display: inline-block; padding: 6px 14px; border: var(--hairline) solid var(--ink-4); font-size: var(--fs-text); transition: background-color .2s, color .2s, border-color .2s; }
+.ck__chip input:checked + span { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ck__chip input:focus-visible + span { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
+.ck__check input { accent-color: var(--ink); width: 16px; height: 16px; margin: 0; }
+.ck__zone { display: grid; justify-items: center; gap: var(--s-1); margin-top: var(--s-4); padding: var(--s-6) var(--s-3); border: var(--hairline) dashed var(--ink-4); text-align: center; cursor: pointer; transition: border-color .2s, background-color .2s; }
+.ck__zone:hover, .ck__zone.is-over, .ck__zone:focus-within { border-color: var(--ink); }
+.ck__zone.is-over { background: var(--hair); }
+/* sześć kropek jak komórka Braille'a */
+.ck__zone-dots { width: 14px; height: 22px; margin-bottom: var(--s-1); background: radial-gradient(circle, var(--ink) 1.6px, transparent 2px) 0 0 / 7px 7.5px; }
+.ck__summary { margin-top: var(--s-4); padding: var(--s-3) 0; border-block: var(--hairline) solid var(--hair); display: grid; gap: var(--s-1); justify-items: start; }
+.ck__total { font-size: var(--fs-name); line-height: var(--lh-tight); }
+.ck__items { list-style: none; margin: 0; padding: 0; }
+.ck__item { padding: var(--s-4) 0; border-bottom: var(--hairline) solid var(--hair); display: grid; gap: var(--s-2); }
+.ck__head { display: flex; align-items: center; gap: var(--s-2); }
+.ck__thumb { flex: none; width: 64px; height: 64px; object-fit: cover; border: var(--hairline) solid var(--hair); background: var(--hair); }
+.ck__thumb--kind { display: grid; place-items: center; font-size: var(--fs-meta); color: var(--ink-2); background: none; }
+.ck__name { flex: 1; min-width: 0; }
+.ck__name p:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ck__meta span { color: var(--ink); }
+.ck__answers { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: var(--fs-meta); }
+.ck__ask { display: grid; gap: var(--s-1); padding: var(--s-3); border: var(--hairline) solid var(--ink); }
+.ck__q { font-size: var(--fs-project); line-height: var(--lh-tight); }
+.ck__opts { display: flex; flex-wrap: wrap; gap: var(--s-1); margin-top: var(--s-1); }
+.ck__opts--multi { display: grid; gap: var(--s-1); }
+.ck__opt { min-height: 40px; padding: 0 var(--s-2); border: var(--hairline) solid var(--ink); background: none; color: var(--ink); font: inherit; font-size: var(--fs-text); cursor: pointer; transition: background-color .2s, color .2s; }
+.ck__opt:disabled { opacity: .35; cursor: default; }
+.ck__opt--go { background: var(--ink); color: var(--paper); }
+@media (hover: hover) { .ck__opt:not(:disabled):hover { background: var(--ink); color: var(--paper); } .ck__opt--go:not(:disabled):hover { background: none; color: var(--ink); } }
+.ck__opt:focus-visible, .ck__link:focus-visible, .ck__corner:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
+.ck__link { padding: 0; border: 0; border-bottom: var(--hairline) solid var(--ink-4); background: none; color: var(--ink-2); font: inherit; font-size: var(--fs-meta); cursor: pointer; }
+.ck__link:hover { color: var(--ink); border-color: var(--ink); }
+.ck__row { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-3); }
+.ck__verdict { display: grid; gap: var(--s-1); padding: var(--s-3); border: var(--hairline) solid var(--ink); }
+.ck__badge { font-size: var(--fs-name); line-height: var(--lh-tight); }
+.ck__rules, .ck__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-1); }
+.ck__list li { padding-left: 1.1em; text-indent: -1.1em; }
+.ck__list li::before { content: "-"; display: inline-block; width: 1.1em; text-indent: 0; color: var(--ink-3); }
+.ck__verdict--required { background: var(--ink); color: var(--paper); }
+.ck__verdict--required .t-meta { color: inherit; opacity: .7; }
+.ck__verdict--unresolved { border-style: dashed; }
+.ck__verdict--not-required { border-color: var(--ink-4); }
+.ck__total.ck__verdict--required, .ck__total.ck__verdict--not-required, .ck__total.ck__verdict--unresolved { background: none; color: var(--ink); border: 0; padding: 0; }
+.ck__total.ck__verdict--pending { color: var(--ink-2); }
+.ck__block { display: grid; gap: var(--s-1); }
+.ck__overlay { justify-items: start; }
+.ck__ovbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-2); }
+.ck__corner { width: 32px; height: 32px; padding: 6px; border: var(--hairline) solid var(--ink-4); background: none; cursor: pointer; }
+.ck__corner.is-on { border-color: var(--ink); }
+.ck__corner i { position: relative; display: block; width: 100%; height: 100%; border: var(--hairline) solid var(--ink-4); }
+.ck__corner i::after { content: ""; position: absolute; width: 6px; height: 6px; background: var(--ink); }
+.ck__corner-tl::after { top: 1px; left: 1px; } .ck__corner-tr::after { top: 1px; right: 1px; }
+.ck__corner-bl::after { bottom: 1px; left: 1px; } .ck__corner-br::after { bottom: 1px; right: 1px; }
+.ck__canvas { display: block; max-width: 100%; max-height: 480px; width: auto; height: auto; border: var(--hairline) solid var(--hair); }
+.ck__note { margin-top: var(--s-4); }
+
+/* ==========================================================================
    Generator znaków (panel #generator, generator.js) - jak blobmaker.app, w stylu strony: opis marki dla Claude,
    pole ze znakiem (zawsze jasne, jak kartka), pod nim pasek z kreską 1 px: kolor (HEX + paleta próbek),
    złożoność, styl, pobierz / kod / losuj. Telefon: pasek w wierszach, suwaki na całą szerokość.

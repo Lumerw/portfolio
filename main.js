@@ -206,6 +206,7 @@ function syncSheet() {
     if (sheet.id === 'agent') loadAgent();
     if (sheet.id === 'rozmowa') openBooking(sheet);
     if (sheet.id === 'generator') openGenerator(sheet);
+    if (sheet.id === 'ai-act') openChecker(sheet);
     const first = sheet.id === 'agent' && matchMedia('(hover: hover)').matches ? sheet.querySelector('#agent-q') : null;
     requestAnimationFrame(() => (first ?? sheet.querySelector('[data-close]')).focus({ preventScroll: true }));
   } else {
@@ -240,6 +241,15 @@ matchMedia('(max-width: 767px) and (orientation: portrait)').addEventListener('c
 
 /* Kalendarz rezerwacji (panel #rozmowa, Cal.com): booking.js ładuje się przy pierwszym otwarciu panelu,
    każde otwarcie odświeża wolne terminy. */
+// AI Act checker (checker.js) - wczytywany przy pierwszym otwarciu panelu #ai-act
+async function openChecker(sheet) {
+  const root = sheet.querySelector('[data-checker]');
+  if (!root || root.__checker) return;
+  const { initChecker } = await import('./checker.js');
+  const lang = document.documentElement.lang === 'en' ? 'en' : 'pl';
+  initChecker(root, { copy: content[lang].checker, lang });
+}
+
 // Generator znaków (generator.js) - wczytywany przy pierwszym otwarciu panelu #generator
 let genMod = null;
 async function openGenerator(sheet) {
