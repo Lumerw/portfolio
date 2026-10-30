@@ -583,10 +583,10 @@
           <span class="tool__name">AI Act checker</span>
           <span class="tool__text t-muted">Wgrywasz wideo, grafiki i KV - narzędzie sprawdza je pod kątem AI Act i prawa UE i mówi, czy potrzebne jest oznaczenie treści AI. Oznaczenie nałożysz z poziomu panelu.</span>
           <span class="tool__state t-meta">otwórz →</span></a></li>
-        <li><div class="tool tool--soon"><svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>
-          <span class="tool__name">Kolejne narzędzie</span>
-          <span class="tool__text t-muted">Pracuję nad następnym narzędziem dla zespołów kreatywnych.</span>
-          <span class="tool__state t-meta">wkrótce</span></div></li>
+        <li><a class="tool" href="#kontrast"><svg class="tool__logo tool__contrast" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17.5"/><path class="tool__contrast-half" d="M24 6.5a17.5 17.5 0 0 1 0 35Z"/><text x="24" y="28.5" text-anchor="middle" font-size="13" font-family="inherit">Aa</text></svg>
+          <span class="tool__name">Kontrast checker</span>
+          <span class="tool__text t-muted">Sprawdza czytelność typografii na grafikach: kontrast z tłem, cienie pod literami, wielkość tekstu - i od razu pokazuje poprawioną wersję.</span>
+          <span class="tool__state t-meta">otwórz →</span></a></li>
       </ul>
     </div>
   </div>
@@ -619,6 +619,30 @@
         <div class="ck__summary" data-ck="summary" aria-live="polite" hidden></div>
         <ul class="ck__items" data-ck="list"></ul>
         <p class="ck__note t-meta">Pliki są analizowane w Twojej przeglądarce i nigdzie nie są wysyłane.<br><span data-ck="version">Narzędzie wspiera decyzję, nie jest poradą prawną. Reguły w wersji 1.0.0 czekają na przegląd prawnika.</span></p>
+      </section>
+    </div>
+  </div>
+</section>
+<section id="kontrast" class="sheet sheet--contrast" role="dialog" aria-modal="true" aria-labelledby="kontrast-title">
+  <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
+  <div class="sheet__panel">
+    <span class="sheet__grab" aria-hidden="true"></span>
+    <div class="sheet__bar wrap">
+      <svg class="symbol symbol--personal sheet__symbol" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg>
+      <h2 id="kontrast-title" class="t-project">Kontrast checker</h2>
+      <a class="sheet__close" href="#start" data-close aria-label="zamknij"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
+    </div>
+    <div class="sheet__body wrap">
+      <section class="ct" data-contrast>
+        <p class="tools__line t-text t-muted">Sprawdź, czy tekst na grafice jest czytelny - kontrast z tłem, cienie pod literami, wielkość - i pobierz poprawioną wersję.</p>
+        <label class="ck__zone" data-ct="zone">
+          <input class="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/gif" data-ct="input">
+          <span class="ck__zone-dots" aria-hidden="true"></span>
+          <span>Upuść grafikę, wklej zrzut ekranu (⌘V) albo kliknij, żeby wybrać</span>
+          <span class="t-meta">KV, banery, posty, zrzuty stron - JPG, PNG, WebP</span>
+        </label>
+        <div class="ct__work" data-ct="work" hidden></div>
+        <p class="ck__note t-meta">Grafika jest analizowana w Twojej przeglądarce i nigdzie nie jest wysyłana.<br>Kontrast liczony wzorem WCAG 2.2. Wielkość tekstu szacowana z wysokości liter w pikselach grafiki.</p>
       </section>
     </div>
   </div>

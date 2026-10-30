@@ -207,6 +207,7 @@ function syncSheet() {
     if (sheet.id === 'rozmowa') openBooking(sheet);
     if (sheet.id === 'generator') openGenerator(sheet);
     if (sheet.id === 'ai-act') openChecker(sheet);
+    if (sheet.id === 'kontrast') openContrast(sheet);
     const first = sheet.id === 'agent' && matchMedia('(hover: hover)').matches ? sheet.querySelector('#agent-q') : null;
     requestAnimationFrame(() => (first ?? sheet.querySelector('[data-close]')).focus({ preventScroll: true }));
   } else {
@@ -241,6 +242,15 @@ matchMedia('(max-width: 767px) and (orientation: portrait)').addEventListener('c
 
 /* Kalendarz rezerwacji (panel #rozmowa, Cal.com): booking.js ładuje się przy pierwszym otwarciu panelu,
    każde otwarcie odświeża wolne terminy. */
+// Kontrast checker (contrast.js) - wczytywany przy pierwszym otwarciu panelu #kontrast
+async function openContrast(sheet) {
+  const root = sheet.querySelector('[data-contrast]');
+  if (!root || root.__contrast) return;
+  const { initContrast } = await import('./contrast.js');
+  const lang = document.documentElement.lang === 'en' ? 'en' : 'pl';
+  initContrast(root, { copy: content[lang].contrast });
+}
+
 // AI Act checker (checker.js) - wczytywany przy pierwszym otwarciu panelu #ai-act
 async function openChecker(sheet) {
   const root = sheet.querySelector('[data-checker]');

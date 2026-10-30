@@ -1652,6 +1652,7 @@ a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset
 .ck__chip input:focus-visible + span { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
 .ck__check input { accent-color: var(--ink); width: 16px; height: 16px; margin: 0; }
 .ck__zone { display: grid; justify-items: center; gap: var(--s-1); margin-top: var(--s-4); padding: var(--s-6) var(--s-3); border: var(--hairline) dashed var(--ink-4); text-align: center; cursor: pointer; transition: border-color .2s, background-color .2s; }
+.ck__zone[hidden] { display: none; }
 .ck__zone:hover, .ck__zone.is-over, .ck__zone:focus-within { border-color: var(--ink); }
 .ck__zone.is-over { background: var(--hair); }
 /* sześć kropek jak komórka Braille'a */
@@ -1701,6 +1702,42 @@ a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset
 .ck__corner-bl::after { bottom: 1px; left: 1px; } .ck__corner-br::after { bottom: 1px; right: 1px; }
 .ck__canvas { display: block; max-width: 100%; max-height: 480px; width: auto; height: auto; border: var(--hairline) solid var(--hair); }
 .ck__note { margin-top: var(--s-4); }
+
+/* ==========================================================================
+   Kontrast checker (panel #kontrast, contrast.js): pasek ustawień (przełączniki jak chipy), scena z grafiką
+   i ramkami zaznaczeń (numer, kreska przerywana = nie spełnia, ciągła = spełnia), karty tekstów z wycinkami
+   przed/po i liczbami. Pole na plik dzieli styl z AI Act checkerem (.ck__zone).
+   ========================================================================== */
+.ct { padding-bottom: var(--s-8); }
+.ct > * { max-width: 880px; }
+.ct__work { display: grid; gap: var(--s-2); margin-top: var(--s-4); }
+.ct__bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-2); }
+.ct__seg { display: inline-flex; }
+.ck__chip-btn { min-height: 32px; padding: 0 12px; border: var(--hairline) solid var(--ink-4); margin-left: -1px; background: none; color: var(--ink); font: inherit; font-size: var(--fs-text); cursor: pointer; }
+.ck__chip-btn.is-on { background: var(--ink); color: var(--paper); border-color: var(--ink); position: relative; }
+.ck__chip-btn:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; position: relative; }
+.ct__stage { position: relative; touch-action: none; cursor: crosshair; user-select: none; line-height: 0; border: var(--hairline) solid var(--hair); }
+.ct__canvas { display: block; width: 100%; height: auto; }
+.ct__boxes { position: absolute; inset: 0; pointer-events: none; }
+.ct__box { position: absolute; border: 1.5px dashed #FF3B30; box-shadow: 0 0 0 1px rgba(255,255,255,.6); }
+.ct__box.is-ok { border: 1.5px solid #22C55E; }
+.ct__box--draw { border: 1.5px solid var(--ink); }
+.ct__box i { position: absolute; top: -1px; left: -1px; translate: 0 -100%; padding: 2px 6px; background: #111; color: #FAFAF7; font-style: normal; font-size: 11px; line-height: 1.4; }
+.ct__list { list-style: none; margin: var(--s-2) 0 0; padding: 0; }
+.ct__item { display: grid; gap: var(--s-2); padding: var(--s-4) 0; border-top: var(--hairline) solid var(--hair); }
+.ct__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-2); }
+.ct__no { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-right: 4px; background: var(--ink); color: var(--paper); font-size: 11px; }
+.ct__sw { display: inline-block; width: 10px; height: 10px; margin: 0 2px 0 4px; border: var(--hairline) solid var(--ink-4); vertical-align: -1px; }
+.ct__crops { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2); margin: 0; }
+.ct__crops figure { margin: 0; display: grid; gap: 4px; }
+.ct__crops canvas { width: 100%; height: auto; max-height: 220px; object-fit: contain; border: var(--hairline) solid var(--hair); background: var(--hair); }
+.ct__nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-2); margin: 0; }
+.ct__nums dd { margin: 2px 0 0; font-size: var(--fs-name); line-height: var(--lh-tight); }
+.ct__verdict { font-size: var(--fs-project); }
+.ct__item:not(.is-ok) .ct__verdict { text-decoration: underline; text-decoration-color: #FF3B30; text-underline-offset: 4px; }
+.tool__contrast circle { fill: none; }
+.tool__contrast-half { fill: currentColor; stroke: none; }
+.tool__contrast text { fill: currentColor; stroke: none; mix-blend-mode: difference; font-weight: 500; }
 
 /* ==========================================================================
    Generator znaków (panel #generator, generator.js) - jak blobmaker.app, w stylu strony: opis marki dla Claude,

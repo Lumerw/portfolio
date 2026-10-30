@@ -583,10 +583,10 @@
           <span class="tool__name">AI Act checker</span>
           <span class="tool__text t-muted">Upload videos, graphics and key visuals - the tool checks them against the AI Act and EU law and tells you whether AI content labelling is required. Apply the label right from the panel.</span>
           <span class="tool__state t-meta">open →</span></a></li>
-        <li><div class="tool tool--soon"><svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>
-          <span class="tool__name">Next tool</span>
-          <span class="tool__text t-muted">I am working on the next tool for creative teams.</span>
-          <span class="tool__state t-meta">soon</span></div></li>
+        <li><a class="tool" href="#kontrast"><svg class="tool__logo tool__contrast" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17.5"/><path class="tool__contrast-half" d="M24 6.5a17.5 17.5 0 0 1 0 35Z"/><text x="24" y="28.5" text-anchor="middle" font-size="13" font-family="inherit">Aa</text></svg>
+          <span class="tool__name">Contrast checker</span>
+          <span class="tool__text t-muted">Checks typography legibility on graphics: contrast with the background, shadows under the letters, text size - and shows a fixed version right away.</span>
+          <span class="tool__state t-meta">open →</span></a></li>
       </ul>
     </div>
   </div>
@@ -619,6 +619,30 @@
         <div class="ck__summary" data-ck="summary" aria-live="polite" hidden></div>
         <ul class="ck__items" data-ck="list"></ul>
         <p class="ck__note t-meta">Files are analysed in your browser and are never uploaded anywhere.<br><span data-ck="version">The tool supports a decision, it is not legal advice. Ruleset 1.0.0 is awaiting legal review.</span></p>
+      </section>
+    </div>
+  </div>
+</section>
+<section id="kontrast" class="sheet sheet--contrast" role="dialog" aria-modal="true" aria-labelledby="kontrast-title">
+  <a class="sheet__backdrop" href="#start" tabindex="-1" aria-hidden="true"></a>
+  <div class="sheet__panel">
+    <span class="sheet__grab" aria-hidden="true"></span>
+    <div class="sheet__bar wrap">
+      <svg class="symbol symbol--personal sheet__symbol" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="stroke" style="--i:0" cx="24" cy="24" r="18" pathLength="1"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg>
+      <h2 id="kontrast-title" class="t-project">Contrast checker</h2>
+      <a class="sheet__close" href="#start" data-close aria-label="close"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11"/></svg></a>
+    </div>
+    <div class="sheet__body wrap">
+      <section class="ct" data-contrast>
+        <p class="tools__line t-text t-muted">Check whether text on a graphic is legible - contrast with the background, shadows under the letters, size - and download a fixed version.</p>
+        <label class="ck__zone" data-ct="zone">
+          <input class="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/gif" data-ct="input">
+          <span class="ck__zone-dots" aria-hidden="true"></span>
+          <span>Drop a graphic, paste a screenshot (⌘V) or click to choose</span>
+          <span class="t-meta">key visuals, banners, posts, page screenshots - JPG, PNG, WebP</span>
+        </label>
+        <div class="ct__work" data-ct="work" hidden></div>
+        <p class="ck__note t-meta">The graphic is analysed in your browser and never uploaded anywhere.<br>Contrast uses the WCAG 2.2 formula. Text size is estimated from letter height in the graphic’s pixels.</p>
       </section>
     </div>
   </div>

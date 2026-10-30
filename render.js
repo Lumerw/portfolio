@@ -449,6 +449,8 @@ const toolLogo = {
   generator: () => '<svg class="tool__logo tool__eye" viewBox="-37.43 -37.43 417.87 417.87" aria-hidden="true"><rect class="tool__eye-ball" x="4.356" y="4.356" width="334.297" height="334.297" rx="167.148"/><path class="tool__eye-lid" d="M74.0527 118.227H222.832V264.85"/><rect class="tool__eye-pupil" x="129.398" y="116.785" width="94.8737" height="94.8737"/></svg>',
   legal: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6.5h17l7 7v28H12Z"/><path d="M29 6.5v7h7"/><path d="M18 30l4.5 4.5L31 25"/><text x="18" y="22" font-size="8" font-family="inherit" fill="currentColor" stroke="none">AI</text></svg>',
   next: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>',
+  // „Aa” na pół jasnym, pół ciemnym polu - kontrast tekstu z tłem
+  contrast: () => '<svg class="tool__logo tool__contrast" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17.5"/><path class="tool__contrast-half" d="M24 6.5a17.5 17.5 0 0 1 0 35Z"/><text x="24" y="28.5" text-anchor="middle" font-size="13" font-family="inherit">Aa</text></svg>',
 };
 function tools(c, t) {
   const T = t.tools;
@@ -498,6 +500,27 @@ function checker(c, t) {
         <p class="ck__note t-meta">${esc(C.privacy)}<br><span data-ck="version">${esc(C.disclaimer.replace('{v}', RULESET_VERSION))}</span></p>
       </section>`;
   return sheet({ id: 'ai-act', cls: 'sheet--checker', bar, body, t });
+}
+
+// Kontrast checker (panel #kontrast, contrast.js): pole na grafikę, potem scena z zaznaczeniami i karty tekstów.
+function contrast(c, t) {
+  const C = t.contrast;
+  const bar = `
+      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
+      <h2 id="kontrast-title" class="t-project">${esc(C.title)}</h2>`;
+  const body = `
+      <section class="ct" data-contrast>
+        <p class="tools__line t-text t-muted">${esc(C.line)}</p>
+        <label class="ck__zone" data-ct="zone">
+          <input class="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/gif" data-ct="input">
+          <span class="ck__zone-dots" aria-hidden="true"></span>
+          <span>${esc(C.drop)}</span>
+          <span class="t-meta">${esc(C.dropMeta)}</span>
+        </label>
+        <div class="ct__work" data-ct="work" hidden></div>
+        <p class="ck__note t-meta">${esc(C.privacy)}<br>${esc(C.method)}</p>
+      </section>`;
+  return sheet({ id: 'kontrast', cls: 'sheet--contrast', bar, body, t });
 }
 
 // Generator znaków (panel #generator, generator.js) - jak blobmaker.app w stylu strony: opis marki („wygeneruj ze mną”
@@ -726,7 +749,7 @@ export function render(content, lang) {
 <main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${process(t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>${scrollnav(c, t)}
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${tools(c, t)}${checker(c, t)}${generator(c, t)}${agent(c, t)}${booking(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${tools(c, t)}${checker(c, t)}${contrast(c, t)}${generator(c, t)}${agent(c, t)}${booking(c, t)}
 </div>
 `;
 }
