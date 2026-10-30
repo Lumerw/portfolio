@@ -1621,6 +1621,20 @@ html:has(.sheet:target) { overflow: hidden; }
   a.tool:hover img.tool__logo { filter: invert(1); }
 }
 a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
+/* Oko generatora mruga: co ~6 s pojedynczo, raz na cykl podwójnie. Kolory z motywu (odwrócone po najechaniu). */
+.tool__eye { --eye-bg: var(--ink); --eye-fg: var(--paper); stroke: none; }
+.tool__eye-ball { fill: var(--eye-bg); }
+.tool__eye-lid { fill: none; stroke: var(--eye-fg); stroke-width: 9.5832; }
+.tool__eye-pupil { fill: var(--eye-fg); transform-box: fill-box; transform-origin: 50% 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .tool__eye-pupil { animation: eye-blink 6.4s infinite; }
+}
+@keyframes eye-blink {
+  0%, 58%, 63%, 86%, 89.5%, 93%, 100% { transform: scaleY(1); }
+  60.5% { transform: scaleY(.06); }
+  87.5%, 91.5% { transform: scaleY(.06); }
+}
+@media (hover: hover) { a.tool:hover .tool__eye { --eye-bg: var(--paper); --eye-fg: var(--ink); } }
 
 /* ==========================================================================
    AI Act checker (panel #ai-act, checker.js): kanały jako chipy, pole na pliki z kreską przerywaną,
