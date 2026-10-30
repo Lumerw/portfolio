@@ -217,10 +217,14 @@ function hero(c, t) {
     return `
           <span class="hero__slot"><img class="hero__icon${mono(src)} is-on" src="${esc(src)}" width="40" height="40" alt=""></span>`;
   }).join('');
+  const field = c.effects?.dots
+    ? `
+          <canvas class="dots dots--pulse" data-dots="pulse" aria-hidden="true"></canvas>`   // kropki (dots.js) zamiast ikon
+    : icons;
   return `
   <section id="start" class="hero" aria-labelledby="hero-title">
     <div class="hero__top">${avatar(c, t)}
-      <a class="hero__icons" href="#narzedzia" aria-haspopup="dialog" aria-label="${esc(t.ui.tools)}">${icons}
+      <a class="hero__icons${c.effects?.dots ? ' hero__icons--dots' : ''}" href="#narzedzia" aria-haspopup="dialog" aria-label="${esc(t.ui.tools)}">${field}
       </a>
     </div>
     <p class="hero__name"><span ${reveal(0)}>${liHref !== '#'

@@ -403,6 +403,14 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 .hero__icon { position: absolute; top: 0; left: 50%; translate: -50% 0; width: auto; height: 32px; max-width: none; visibility: hidden; }
 .hero__icon.is-on { visibility: visible; }
 
+/* Kropki jak alfabet Braille'a (dots.js, shared.effects.dots): pole zaczyna się pod awatarem (od jego środka,
+   awatar leży nad nim), pulsuje falą od awatara i wygasa w prawo. */
+.hero__icons--dots { gap: 0; padding: 0; margin: 0 0 0 calc(-29px - var(--s-2)); }
+.hero__top:has(.hero__icons--dots) .avatar { z-index: 1; }
+.dots--pulse { display: block; width: 168px; height: 58px; color: var(--ink);
+  -webkit-mask-image: linear-gradient(to right, #000 50%, transparent); mask-image: linear-gradient(to right, #000 50%, transparent); }
+@media print { .dots { display: none !important; } }
+
 /* Awatar-moneta: zdjęcie ↔ rysunek kreską, obrót co ~4,5 s. Tęczowy pierścień i poświata
    (wyjątek kolorystyczny marki - asystent AI); klik → panel asystenta. Bez ruchu w systemie stoi zdjęcie. */
 .avatar {
