@@ -219,7 +219,7 @@ function hero(c, t) {
   return `
   <section id="start" class="hero" aria-labelledby="hero-title">
     <div class="hero__top">${avatar(c, t)}
-      <a class="hero__icons" href="#generator" aria-haspopup="dialog" aria-label="${esc(t.ui.generator)}">${icons}
+      <a class="hero__icons" href="#narzedzia" aria-haspopup="dialog" aria-label="${esc(t.ui.tools)}">${icons}
       </a>
     </div>
     <p class="hero__name"><span ${reveal(0)}>${liHref !== '#'
@@ -439,6 +439,36 @@ function project(p, i, c, t) {
       </div>`;
 
   return sheet({ id: p.id, cls: 'sheet--project', bar, body, t });
+}
+
+// Narzędzia (panel #narzedzia, otwierany znakiem obok awatara): kafelki z logo narzędzia, opisem i stanem.
+// Narzędzie z href otwiera swój panel, bez href - kafelek „wkrótce” (nieklikalny).
+const toolLogo = {
+  generator: c => `<img class="tool__logo${mono(c.icons[6])}" src="${esc(c.icons[6])}" width="48" height="48" alt="">`,
+  legal: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6.5h17l7 7v28H12Z"/><path d="M29 6.5v7h7"/><path d="M18 30l4.5 4.5L31 25"/><text x="18" y="22" font-size="8" font-family="inherit" fill="currentColor" stroke="none">AI</text></svg>',
+  next: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>',
+};
+function tools(c, t) {
+  const T = t.tools;
+  const bar = `
+      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
+      <h2 id="narzedzia-title" class="t-project">${esc(T.title)}</h2>`;
+  const card = x => {
+    const inner = `${(toolLogo[x.id] ?? toolLogo.next)(c)}
+          <span class="tool__name">${esc(x.name)}</span>
+          <span class="tool__text t-muted">${esc(x.text)}</span>
+          <span class="tool__state t-meta">${esc(x.href ? `${T.open} →` : T.soon)}</span>`;
+    return x.href
+      ? `
+        <li><a class="tool" href="${esc(x.href)}">${inner}</a></li>`
+      : `
+        <li><div class="tool tool--soon">${inner}</div></li>`;
+  };
+  const body = `
+      <p class="tools__line t-text t-muted">${esc(T.line)}</p>
+      <ul class="tools">${T.items.map(card).join('')}
+      </ul>`;
+  return sheet({ id: 'narzedzia', cls: 'sheet--tools', bar, body, t });
 }
 
 // Generator znaków (panel #generator, generator.js) - jak blobmaker.app w stylu strony: opis marki („wygeneruj ze mną”
@@ -667,7 +697,7 @@ export function render(content, lang) {
 <main id="tresc" class="home__main">${hero(c, t)}${work(c, t)}${process(t)}${recommendations(c, t, lang)}
 </main>${footer(c, t)}${sphere(c, t)}${colophon(c, t)}
 </div>${scrollnav(c, t)}
-<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${generator(c, t)}${agent(c, t)}${booking(c, t)}
+<div class="sheets">${c.projects.map((p, i) => project(p, i, c, t)).join('')}${tools(c, t)}${generator(c, t)}${agent(c, t)}${booking(c, t)}
 </div>
 `;
 }

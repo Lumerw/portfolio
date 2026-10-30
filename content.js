@@ -273,6 +273,7 @@ export const pl = {
     links: 'Profile',
     close: 'zamknij',
     generator: 'Generator znaków',
+    tools: 'Narzędzia',
     contactButton: 'umów rozmowę',   // przycisk w sekcji kontakt → kalendarz (#rozmowa)
     work: 'Portfolio',               // tytuł sekcji z linkami
     sectionsLabel: 'Sekcje strony',  // nawigator przewijania (desktop)
@@ -378,6 +379,19 @@ export const pl = {
   },
   // Marka osobista w jednym zdaniu - asystent AI (pytania o markę, kolory, fonty)
   brand: 'Moja marka osobista: czerń, biel, cienka linia 1 px, Helvetica i dużo pustej przestrzeni. Kolory i gradienty mają tylko marki projektów, wyjątek - tęczowa poświata asystenta AI.',
+  // Narzędzia (panel #narzedzia, otwierany znakiem obok awatara): to, czego używam w pracy i co oddaję klientom.
+  // href - narzędzie działa (otwiera panel), bez href - kafelek „wkrótce”.
+  tools: {
+    title: 'Narzędzia',
+    line: 'Narzędzia, których używam na co dzień i które dostajesz przy współpracy ze mną.',
+    soon: 'wkrótce',
+    open: 'otwórz',
+    items: [
+      { id: 'generator', name: 'Generator znaków', text: 'Opisz markę - zaprojektuję z Tobą znak od zera albo wylosuję go algorytmem. Pobierasz gotowy SVG.', href: '#generator' },
+      { id: 'legal', name: 'AI Act checker', text: 'Wgrywasz wideo, grafiki i KV - narzędzie sprawdza je pod kątem AI Act i prawa UE i mówi, czy potrzebne jest oznaczenie treści AI. Oficjalny label dodasz z poziomu panelu.' },
+      { id: 'next', name: 'Kolejne narzędzie', text: 'Pracuję nad następnym narzędziem dla zespołów kreatywnych.' },
+    ],
+  },
   generator: {
     title: 'Generator znaków',
     brief: 'opisz markę, np. kawiarnia, ciepło, rzemiosło', briefLabel: 'opis marki',
@@ -549,6 +563,7 @@ export const en = {
     links: 'Profiles',
     close: 'close',
     generator: 'Mark generator',
+    tools: 'Tools',
     contactButton: 'book a call',
     work: 'Portfolio',
     sectionsLabel: 'Page sections',
@@ -651,6 +666,17 @@ export const en = {
     tools: ['Figma', 'Adobe CC', 'Claude', 'Magnific', 'Cavalry', 'Blender', 'Adtron', 'ClickUp', 'HTML/CSS'],
   },
   brand: 'My personal brand: black, white, a 1 px line, Helvetica and plenty of empty space. Colour and gradients belong only to project brands, the one exception being the rainbow glow of the AI assistant.',
+  tools: {
+    title: 'Tools',
+    line: 'Tools I use every day and that you get when we work together.',
+    soon: 'soon',
+    open: 'open',
+    items: [
+      { id: 'generator', name: 'Mark generator', text: 'Describe a brand - I will design a mark with you from scratch or roll one with the algorithm. You download a ready SVG.', href: '#generator' },
+      { id: 'legal', name: 'AI Act checker', text: 'Upload videos, graphics and key visuals - the tool checks them against the AI Act and EU law and tells you whether AI content labelling is required. Add the official label right from the panel.' },
+      { id: 'next', name: 'Next tool', text: 'I am working on the next tool for creative teams.' },
+    ],
+  },
   generator: {
     title: 'Mark generator',
     brief: 'describe a brand, e.g. café, warmth, craft', briefLabel: 'brand brief',

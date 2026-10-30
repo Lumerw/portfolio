@@ -1601,6 +1601,28 @@ html:has(.sheet:target) { overflow: hidden; }
 .print-only { display: none; }
 
 /* ==========================================================================
+   Narzędzia (panel #narzedzia): kafelki z kreską 1 px - logo, nazwa, opis, stan. Działające narzędzie
+   odwraca kolory po najechaniu (jak przyciski), „wkrótce” przygaszone. Telefon: kafelki jeden pod drugim.
+   ========================================================================== */
+.tools__line { max-width: 40em; margin-top: var(--s-4); }
+.tools { display: grid; gap: var(--s-2); margin-top: var(--s-5); padding: 0 0 var(--s-8); list-style: none; }
+@media (min-width: 768px) { .tools { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tools li { display: flex; }
+.tool { flex: 1; display: grid; grid-template-rows: auto auto 1fr auto; gap: var(--s-2); padding: var(--s-3); border: var(--hairline) solid var(--ink); color: inherit; text-decoration: none; transition: background-color .2s, color .2s; }
+.tool__logo { width: 48px; height: 48px; margin-bottom: var(--s-2); fill: none; stroke: currentColor; stroke-width: 1; }
+.tool__name { font-size: var(--fs-project); font-weight: var(--fw-medium); }
+.tool__text { font-size: var(--fs-text); line-height: var(--lh-text); }
+.tool__state { margin-top: var(--s-2); }
+.tool--soon { border-style: dashed; border-color: var(--ink-4); }
+.tool--soon .tool__logo, .tool--soon .tool__name { opacity: .5; }
+@media (hover: hover) {
+  a.tool:hover { background: var(--ink); color: var(--paper); }
+  a.tool:hover .t-muted, a.tool:hover .t-meta { color: inherit; }
+  a.tool:hover img.tool__logo { filter: invert(1); }
+}
+a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
+
+/* ==========================================================================
    Generator znaków (panel #generator, generator.js) - jak blobmaker.app, w stylu strony: opis marki dla Claude,
    pole ze znakiem (zawsze jasne, jak kartka), pod nim pasek z kreską 1 px: kolor (HEX + paleta próbek),
    złożoność, styl, pobierz / kod / losuj. Telefon: pasek w wierszach, suwaki na całą szerokość.
