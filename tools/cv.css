@@ -65,6 +65,10 @@ b { font-weight: 500; }
 .row dt { color: var(--ink-3); font-size: var(--fs-s); padding-top: 2px; }
 .list li { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 16px; }
 .list .meta { font-size: var(--fs-s); padding-top: 2px; }
+.list { display: grid; gap: 10px; }
+.job { display: flex; align-items: center; gap: 22px; min-height: 27px; }
+.job img { width: auto; opacity: .6; } .job img.ink { opacity: 1; }
+.job a { display: flex; border: 0; text-decoration: none; }
 .projs { display: flex; flex-wrap: wrap; gap: 8px 40px; }
 .projs li { display: flex; align-items: center; gap: 10px; }
 .dash { columns: 2; column-gap: 32px; }

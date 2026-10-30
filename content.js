@@ -370,7 +370,7 @@ export const pl = {
     bio: 'Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu, przez ciągłe testowanie, do wdrożenia. Prowadzę loom.studio, a od 2025 roku pracuję jako AI designer w Promotraffic.',
     experience: [
       { year: '2025.05 - teraz', place: 'Promotraffic', role: 'AI designer' },
-      { year: '2023.11 - teraz', place: 'loom.studio', role: 'projektant' },
+      { year: '2022.01 - teraz', place: 'loom.studio', role: 'projektant' },
     ],
     education: '',                   // celowo puste - nie pokazujemy (CV, asystent)
     languages: '',
@@ -390,6 +390,12 @@ export const pl = {
 
   cv: {
     file: 'Wojciech-Lumer-CV-PL.pdf',
+    // Doświadczenie w CV: logo firm (nazwy z shared.clients albo cvLogos), klikalne
+    jobs: [
+      { year: '2025.05 - teraz', logos: ['promotraffic'], role: 'AI designer' },
+      { year: '2024.01 - 2025.05', logos: ['Ancy', 'Youniversity', 'depilacja.pl'], role: 'projektant' },
+      { year: '2022.01 - teraz', logos: ['loom.studio'], role: 'projektant' },
+    ],
     projects: 'Projekty',
     experience: 'Doświadczenie',
     skills: 'Kompetencje',
@@ -638,7 +644,7 @@ export const en = {
     bio: 'I design identities, websites and digital products - from idea, through continuous testing, to launch. I run loom.studio, and since 2025 I have worked as an AI designer at Promotraffic.',
     experience: [
       { year: '2025.05 - now', place: 'Promotraffic', role: 'AI designer' },
-      { year: '2023.11 - now', place: 'loom.studio', role: 'designer' },
+      { year: '2022.01 - now', place: 'loom.studio', role: 'designer' },
     ],
     education: '',                   // intentionally empty
     languages: '',
@@ -657,6 +663,11 @@ export const en = {
 
   cv: {
     file: 'Wojciech-Lumer-CV-EN.pdf',
+    jobs: [
+      { year: '2025.05 - now', logos: ['promotraffic'], role: 'AI designer' },
+      { year: '2024.01 - 2025.05', logos: ['Ancy', 'Youniversity', 'depilacja.pl'], role: 'designer' },
+      { year: '2022.01 - now', logos: ['loom.studio'], role: 'designer' },
+    ],
     projects: 'Projects',
     experience: 'Experience',
     skills: 'Skills',
