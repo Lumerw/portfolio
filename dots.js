@@ -1,6 +1,7 @@
 // Kropki jak alfabet Braille'a (shared.effects.dots w content.js - false = poprzednia wersja strony).
 //   pulse - pole komórek 2 × 3 spod awatara w prawo: kropki zapalają się i gasną falą, która wychodzi od awatara
 //           (jak puls), z lekkim szumem na każdą kropkę, więc wzór nigdy się nie powtarza.
+//   band  - pasek nad czarnym kontaktem (telefon, tablet): ten sam puls na całą szerokość, wygasa w górę.
 // Rysuje na <canvas> (ostro na ekranach retina), stoi, gdy element jest poza ekranem albo otwarty jest panel.
 // Bez ruchu w systemie (prefers-reduced-motion) - jedna nieruchoma klatka.
 
@@ -52,8 +53,45 @@ function pulse(canvas) {
   return { layout, draw };
 }
 
+// Pasek nad czarnym kontaktem (telefon, tablet): te same komórki i ten sam puls co przy awatarze, na całą szerokość.
+// Fala idzie od czarnej krawędzi w górę; kropki na dole w pełni czarne (kolor kontaktu), wyżej coraz bledsze.
+function band(canvas) {
+  const STEP = 6, R = 1.6, CELL = 2 * STEP + 6, ROW = 3 * STEP + 8;
+  let g, dots = [];
+  const layout = () => {
+    g = setup(canvas);
+    dots = [];
+    const rows = Math.max(1, Math.floor((g.h + 8) / ROW));
+    const top = g.h - R - 1.5 - (rows - 1) * ROW - 2 * STEP;   // ostatni rząd kropek tuż nad czarną krawędzią
+    const cols = Math.ceil(g.w / CELL);
+    const left = (g.w - (cols * CELL - 6 - STEP)) / 2;
+    for (let cx = 0; cx < cols; cx++) for (let cy = 0; cy < rows; cy++) for (let i = 0; i < 2; i++) for (let j = 0; j < 3; j++) {
+      const x = left + cx * CELL + i * STEP, y = top + cy * ROW + j * STEP;
+      dots.push({ x, y, n: hash(x, y), v: 0 });
+    }
+  };
+  const draw = (t, still) => {
+    const { ctx, w, h } = g;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = getComputedStyle(canvas.parentElement).backgroundColor;
+    for (const d of dots) {
+      const up = h - d.y;                                    // odległość od czarnej krawędzi
+      const wave = Math.sin(t / 380 - up / 9 - Math.sin(d.x / 90) * 1.2);
+      const own = Math.sin(t / (900 + d.n * 1400) + d.n * TAU);
+      const near = 1 - up / h;
+      const on = wave * 0.6 + own * 0.4 + (d.n - 0.5) * 0.5 + near * 1.1 > 0.55 ? 1 : 0;   // przy krawędzi gęsto, wyżej rzadziej
+      d.v = still ? on : d.v + (on - d.v) * 0.18;
+      if (d.v < 0.05) continue;
+      ctx.globalAlpha = 0.12 + 0.88 * (d.y / h) ** 1.5;      // na dole pełne krycie, wyżej coraz mniej
+      ctx.beginPath(); dot(ctx, d.x, d.y, R * d.v); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+  return { layout, draw };
+}
+
 export function initDots(root, { reduce = false, paused = () => false } = {}) {
-  const kinds = { pulse };
+  const kinds = { pulse, band };
   for (const canvas of root.querySelectorAll('canvas[data-dots]')) {
     const fx = kinds[canvas.dataset.dots]?.(canvas);
     if (!fx) continue;

@@ -409,6 +409,12 @@ html[lang="en"] .lang [data-lang="en"] { color: var(--ink); }
 .hero__top:has(.hero__icons--dots) .avatar { z-index: 1; }
 .dots--pulse { display: block; width: 168px; height: 58px; color: var(--ink);
   -webkit-mask-image: linear-gradient(to right, #000 50%, transparent); mask-image: linear-gradient(to right, #000 50%, transparent); }
+.dots--band { display: none; }
+/* telefon i tablet: pasek kropek tuż nad czarnym kontaktem, na całą szerokość */
+@media (max-width: 1023px) {
+  .site-footer:has(.dots--band) { position: relative; }
+  .dots--band { display: block; position: absolute; left: 0; bottom: 100%; width: 100%; height: 58px; pointer-events: none; }
+}
 @media print { .dots { display: none !important; } }
 
 /* Awatar-moneta: zdjęcie ↔ rysunek kreską, obrót co ~4,5 s. Tęczowy pierścień i poświata
@@ -1748,11 +1754,7 @@ a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset
 .ct__nums dd { margin: 2px 0 0; font-size: var(--fs-name); line-height: var(--lh-tight); }
 .ct__verdict { font-size: var(--fs-project); }
 .ct__item:not(.is-ok) .ct__verdict { text-decoration: underline; text-decoration-color: #FF3B30; text-underline-offset: 4px; }
-.tool__contrast circle { fill: none; }
-.tool__contrast-half { fill: currentColor; stroke: none; }
-.tool__contrast text { fill: currentColor; stroke: none; font-weight: 500; }
-.tool__contrast .tool__contrast-inv { fill: var(--paper); }   /* na czarnej połowie - napis w kolorze tła */
-@media (hover: hover) { a.tool:hover .tool__contrast .tool__contrast-inv { fill: var(--ink); } }
+.tool__mark { fill: currentColor; stroke: none; }   /* znaki narzędzi wypełnione kolorem tekstu - odwracają się z kafelkiem */
 
 /* ==========================================================================
    Generator znaków (panel #generator, generator.js) - jak blobmaker.app, w stylu strony: opis marki dla Claude,
