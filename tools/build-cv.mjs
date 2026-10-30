@@ -44,17 +44,18 @@ function cv(lang) {
   const linkedin = c.links.find(l => l.label === 'LinkedIn')?.href;
   const row = (label, value) => (value ? `<div class="row"><dt>${esc(label)}</dt><dd>${value}</dd></div>` : '');
 
+  const SEP = '<span class="sep" aria-hidden="true">|</span>';   // szara kreska między logo
   const logoOf = name => [...c.clients, ...CV_LOGOS].find(x => x.name === name);
   const logoLink = (x, h, ink = x.name === CV_INK) => {
     const img = `<img${ink ? ' class="ink"' : ''} src="${esc(x.logo)}" style="height:${h}px" alt="${esc(isReal(x.name) ? x.name : '')}">`;
     return x.href ? `<a href="${esc(x.href)}">${img}</a>` : img;   // logo klikalne - strona firmy
   };
   const experience = V.jobs.map(j => `
-          <li><span class="meta">${esc(j.year)}</span><span class="job">${j.logos.map(logoOf).filter(Boolean).map(x => logoLink(x, Math.round(x.h * 0.8))).join('<span class="sep" aria-hidden="true">|</span>')}</span></li>`).join('');
+          <li><span class="meta">${esc(j.year)}</span><span class="job">${j.logos.map(logoOf).filter(Boolean).map(x => logoLink(x, Math.round(x.h * 0.8))).join(SEP)}</span></li>`).join('');
   // „współpracowałem z”: bez firm z doświadczenia, wszystkie logo w jednym kolorze; ostatnie (WeedWeek) wygasa
   const inJobs = new Set(V.jobs.flatMap(j => j.logos));
   const listed = c.clients.filter(x => x.logo && !CV_SKIP_CLIENTS.includes(x.name) && !inJobs.has(x.name));
-  const clients = [...listed.slice(0, -1), ...CV_EXTRA_CLIENTS, ...listed.slice(-1)].map(x => logoLink(x, Math.round(x.h * 0.8), false)).join('');
+  const clients = [...listed.slice(0, -1), ...CV_EXTRA_CLIENTS, ...listed.slice(-1)].map(x => logoLink(x, Math.round(x.h * 0.8), false)).join(SEP);
   const profiles = c.links.filter(l => isReal(l.href) && ['LinkedIn', 'GitHub', 'Behance'].includes(l.label));
 
   return `<!doctype html>
