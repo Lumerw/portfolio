@@ -216,10 +216,14 @@ function hero(c, t) {
     return `
           <span class="hero__slot"><img class="hero__icon${mono(src)} is-on" src="${esc(src)}" width="40" height="40" alt=""></span>`;
   }).join('');
+  const field = c.effects?.dots
+    ? `
+          <canvas class="dots dots--pulse" data-dots="pulse" aria-hidden="true"></canvas>`   // kropki (dots.js) zamiast ikon
+    : icons;
   return `
   <section id="start" class="hero" aria-labelledby="hero-title">
     <div class="hero__top">${avatar(c, t)}
-      <a class="hero__icons" href="#narzedzia" aria-haspopup="dialog" aria-label="${esc(t.ui.tools)}">${icons}
+      <a class="hero__icons${c.effects?.dots ? ' hero__icons--dots' : ''}" href="#narzedzia" aria-haspopup="dialog" aria-label="${esc(t.ui.tools)}">${field}
       </a>
     </div>
     <p class="hero__name"><span ${reveal(0)}>${liHref !== '#'
@@ -599,7 +603,8 @@ function footer(c, t) {
   const book = hasBooking(c);
   const links = c.links.filter(l => url(l.href) !== '#');
   return `
-<footer id="kontakt" class="site-footer" aria-labelledby="contact-title">
+<footer id="kontakt" class="site-footer" aria-labelledby="contact-title">${c.effects?.dots ? `
+ <canvas class="dots dots--edge" data-dots="edge" aria-hidden="true"></canvas>` : ''}
  <div class="site-footer__in">
   <h2 id="contact-title" class="site-footer__title t-name section-title">${esc(t.contact.title)}</h2>
   ${clean(t.contact.line) ? `<p class="site-footer__line t-text t-muted print-only">${esc(clean(t.contact.line))}</p>` : ''}

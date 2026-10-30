@@ -299,6 +299,10 @@ function tickIcon(set, k) {
   }
   setTimeout(() => tickIcon(set, k), ICON_MS[0] + Math.random() * (ICON_MS[1] - ICON_MS[0]));
 }
+// Kropki (dots.js, shared.effects.dots): wczytywane tylko, gdy są na stronie; stoją, gdy otwarty jest panel
+if (app.querySelector('canvas[data-dots]')) {
+  import('./dots.js').then(m => m.initDots(app, { reduce: reduceMotion.matches, paused: () => !!openSheet() }));
+}
 if (!reduceMotion.matches && content.shared.icons.length > 3) {
   for (const set of ICON_SETS) app.querySelectorAll(set.sel).forEach((_, k) => tickIcon(set, k));
 }
