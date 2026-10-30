@@ -1629,6 +1629,11 @@ html:has(.sheet:target) { overflow: hidden; }
   a.tool:hover img.tool__logo { filter: invert(1); }
 }
 a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
+/* Panel narzędzi: opis i kafelki na środku wysokości panelu (marginesy auto - przy niskim oknie bez ucinania,
+   zwykłe przewijanie) */
+.sheet--tools .sheet__body { display: flex; flex-direction: column; }
+.sheet--tools .tools__line { margin-top: auto; }
+.sheet--tools .tools { margin-bottom: auto; padding-bottom: var(--s-5); }
 /* Oko generatora mruga: co ~6 s pojedynczo, raz na cykl podwójnie. Kolory z motywu (odwrócone po najechaniu). */
 .tool__eye { --eye-bg: var(--ink); --eye-fg: var(--paper); stroke: none; }
 .tool__eye-ball { fill: var(--eye-bg); }
