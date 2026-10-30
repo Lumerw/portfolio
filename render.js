@@ -189,7 +189,7 @@ function clients(c, t) {
 // Awatar-moneta: zdjęcie, co kilka sekund obraca się na drugą stronę - rysunek kreską.
 // Tęczowa poświata jak dawny przycisk „zapytaj AI”; klik otwiera panel asystenta (#agent).
 // Rysunek awatara jako SVG z animacją (SMIL, cykl 9 s zgrany z obrotem monety - uśmiech, gdy widać rysunek):
-// poważna mina → uśmiech z dołeczkami, okulary z brwiami unoszą się i lekko przechylają, loki cały czas lekko
+// poważna mina → uśmiech z dołeczkami (o 30% węższy niż twarz w prototypie), okulary z brwiami unoszą się i lekko przechylają, loki cały czas lekko
 // „gotują się” jak w animacji rysowanej. Warstwy to wycięte fragmenty bitmapy rysunku, usta są wektorowe.
 // Bez ruchu w systemie main.js zatrzymuje animację na poważnej minie.
 const AV_EASE = '.4 0 .2 1;.3 0 .3 1;.4 0 .6 1;.4 0 .6 1;.4 0 .2 1;.4 0 .6 1';
@@ -208,9 +208,9 @@ const avatarDrawing = src => `<svg class="avatar__face avatar__face--drawing ava
           <g><animateTransform attributeName="transform" type="translate" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.55;.59;.62;.8;.87;1" values="0 0;0 0;0 -2.2;0 -1.2;0 -1.2;0 0;0 0" keySplines="${AV_EASE}"/><g clip-path="url(#av-hair)"><use href="#av-art" filter="url(#av-boil)"/></g></g>
           <g><animateTransform attributeName="transform" type="translate" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.55;.59;.62;.8;.87;1" values="0 0;0 0;0 -4.2;0 -3;0 -3;0 0;0 0" keySplines="${AV_EASE}"/><g><animateTransform attributeName="transform" type="rotate" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.55;.61;.8;.87;1" values="0 131 130;0 131 130;-2.2 131 130;-2.2 131 130;0 131 130;0 131 130" keySplines="${AV_EASE5}"/><use href="#av-art" clip-path="url(#av-glasses)"/></g></g>
           <g fill="none" stroke="#111" stroke-width="2.25" stroke-linecap="round">
-            <path d="M125 167 C134 163 150 165 165 162">${avMouth('M125 167 C134 163 150 165 165 162', 'M122 160 C131 172 155 173 167 157')}</path>
-            <path d="M135 186 C140 180 150 179 157 183">${avMouth('M135 186 C140 180 150 179 157 183', 'M137 179 C142 185 151 185 156 179')}</path>
-            <g stroke-width="2.2" opacity="0"><animate attributeName="opacity" dur="9s" repeatCount="indefinite" keyTimes="0;.57;.62;.79;.84;1" values="0;0;1;1;0;0"/><path d="M118 157 C119 160 120 162 122 163"/><path d="M171 153 C171 156 170 158 168 160"/></g>
+            <path d="M125 167 C134 163 150 165 165 162">${avMouth('M125 167 C134 163 150 165 165 162', 'M128.8 161.5 C135.1 170 151.9 170.7 160.3 159.5')}</path>
+            <path d="M135 186 C140 180 150 179 157 183">${avMouth('M135 186 C140 180 150 179 157 183', 'M139.9 180 C143.4 184.2 149.7 184.2 153.2 180')}</path>
+            <g stroke-width="2.2" opacity="0"><animate attributeName="opacity" dur="9s" repeatCount="indefinite" keyTimes="0;.57;.62;.79;.84;1" values="0;0;1;1;0;0"/><path d="M126 158.5 C126.7 160.6 127.4 162 128.8 162.7"/><path d="M163 155.5 C163 157.6 162.3 159 160.9 160.4"/></g>
           </g>
         </svg>`;
 
