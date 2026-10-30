@@ -448,7 +448,8 @@ function project(p, i, c, t) {
 // Narzędzia (panel #narzedzia, otwierany znakiem obok awatara): kafelki z logo narzędzia, opisem i stanem.
 // Narzędzie z href otwiera swój panel, bez href - kafelek „wkrótce” (nieklikalny).
 const toolLogo = {
-  generator: c => `<img class="tool__logo${mono(c.icons[6])}" src="${esc(c.icons[6])}" width="48" height="48" alt="">`,
+  // Bauhausowe oko (znak 07) w treści strony, żeby mrugało: źrenica spłaszcza się pod kreskę powieki
+  generator: () => '<svg class="tool__logo tool__eye" viewBox="-37.43 -37.43 417.87 417.87" aria-hidden="true"><rect class="tool__eye-ball" x="4.356" y="4.356" width="334.297" height="334.297" rx="167.148"/><path class="tool__eye-lid" d="M74.0527 118.227H222.832V264.85"/><rect class="tool__eye-pupil" x="129.398" y="116.785" width="94.8737" height="94.8737"/></svg>',
   legal: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6.5h17l7 7v28H12Z"/><path d="M29 6.5v7h7"/><path d="M18 30l4.5 4.5L31 25"/><text x="18" y="22" font-size="8" font-family="inherit" fill="currentColor" stroke="none">AI</text></svg>',
   next: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>',
 };
