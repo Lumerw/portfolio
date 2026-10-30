@@ -604,8 +604,7 @@ function footer(c, t) {
   const book = hasBooking(c);
   const links = c.links.filter(l => url(l.href) !== '#');
   return `
-<footer id="kontakt" class="site-footer" aria-labelledby="contact-title">${c.effects?.dots ? `
- <canvas class="dots dots--edge" data-dots="edge" aria-hidden="true"></canvas>` : ''}
+<footer id="kontakt" class="site-footer" aria-labelledby="contact-title">
  <div class="site-footer__in">
   <h2 id="contact-title" class="site-footer__title t-name section-title">${esc(t.contact.title)}</h2>
   ${clean(t.contact.line) ? `<p class="site-footer__line t-text t-muted print-only">${esc(clean(t.contact.line))}</p>` : ''}

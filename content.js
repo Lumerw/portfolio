@@ -64,7 +64,7 @@ export const shared = {
   // Ikony obok znaku w hero - zmieniają się szybko, każda kolejna w prawo bardziej przezroczysta.
   // Dowolna liczba plików (SVG/PNG, kwadrat). 01-06: znaki kreską 1 px.
   // Kropki jak alfabet Braille'a (dots.js): pulsujące pole obok awatara zamiast zmieniających się ikon
-  // i półton z kropek nad czarnym kontaktem (telefon, tablet). false = poprzednia wersja (ikony, twarda krawędź).
+  // false = poprzednia wersja (zmieniające się ikony).
   effects: { dots: true },
 
   icons: [

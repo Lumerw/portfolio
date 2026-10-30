@@ -1,8 +1,6 @@
 // Kropki jak alfabet Braille'a (shared.effects.dots w content.js - false = poprzednia wersja strony).
-//   pulse - pole komórek 2 × 3 obok awatara: kropki zapalają się i gasną falą, która wychodzi od awatara
-//           (jak puls), z lekkim szumem na każdą kropkę, więc wzór nigdy się nie powtarza;
-//   edge  - pas nad czarnym kontaktem (telefon, tablet): półton z kropek rosnących w dół, aż zlewają się
-//           w czerń - zamiast twardej krawędzi. Kropki powoli oddychają.
+//   pulse - pole komórek 2 × 3 spod awatara w prawo: kropki zapalają się i gasną falą, która wychodzi od awatara
+//           (jak puls), z lekkim szumem na każdą kropkę, więc wzór nigdy się nie powtarza.
 // Rysuje na <canvas> (ostro na ekranach retina), stoi, gdy element jest poza ekranem albo otwarty jest panel.
 // Bez ruchu w systemie (prefers-reduced-motion) - jedna nieruchoma klatka.
 
@@ -41,7 +39,7 @@ function pulse(canvas) {
     ctx.beginPath();
     for (const d of dots) {
       // fala od awatara (lewa krawędź, środek wysokości) co ~2,4 s + własny, wolny rytm kropki
-      const dist = Math.hypot(d.x + 29, d.y - h / 2);
+      const dist = Math.hypot(d.x, d.y - h / 2);             // środek awatara = lewa krawędź pola
       const wave = Math.sin(t / 380 - dist / 9);
       const own = Math.sin(t / (900 + d.n * 1400) + d.n * TAU);
       const near = 1 - Math.min(1, (d.x) / g.w);              // gęściej przy awatarze
@@ -54,32 +52,8 @@ function pulse(canvas) {
   return { layout, draw };
 }
 
-// Pas nad kontaktem: półton na siatce Braille'a, promień kropki rośnie w dół do zlania się w kolor kontaktu.
-function edge(canvas) {
-  const STEP = 6;
-  let g;
-  const layout = () => { g = setup(canvas); };
-  const draw = t => {
-    const { ctx, w, h } = g;
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = getComputedStyle(canvas.parentElement).backgroundColor;
-    ctx.beginPath();
-    for (let y = STEP / 2; y < h + STEP; y += STEP) {
-      const k = Math.min(1, y / h);                      // 0 u góry → 1 przy krawędzi kontaktu
-      for (let x = STEP / 2; x < w + STEP; x += STEP) {
-        const n = hash(x, y);
-        const breath = Math.sin(t / 1600 + n * TAU) * 0.12;
-        const r = (k * k * 1.15 + (n - 0.5) * 0.35 + breath) * STEP * 0.62;   // przy k = 1 kropki zachodzą na siebie
-        if (k * k + (n - 0.5) * 0.5 > 0.04) dot(ctx, x, y, Math.min(r, STEP * 0.75));
-      }
-    }
-    ctx.fill();
-  };
-  return { layout, draw };
-}
-
 export function initDots(root, { reduce = false, paused = () => false } = {}) {
-  const kinds = { pulse, edge };
+  const kinds = { pulse };
   for (const canvas of root.querySelectorAll('canvas[data-dots]')) {
     const fx = kinds[canvas.dataset.dots]?.(canvas);
     if (!fx) continue;
