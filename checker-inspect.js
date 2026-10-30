@@ -119,7 +119,7 @@ export async function inspect(file) {
       software,
       ai_signals: signals,
       camera_exif_present: camera,
-      metadata_stripped: rasterImage && !exif && !xmp && !c2paPresent && iptcTerm === null,
+      metadata_stripped: rasterImage && !exif && !xmp && !c2paPresent && iptcTerm === null && signals.length === 0,
       detector_score: null,
     },
   };

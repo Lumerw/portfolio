@@ -1689,7 +1689,7 @@ a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset
 .ck__verdict--unresolved { border-style: dashed; }
 .ck__verdict--not-required { border-color: var(--ink-4); }
 .ck__total.ck__verdict--required, .ck__total.ck__verdict--not-required, .ck__total.ck__verdict--unresolved { background: none; color: var(--ink); border: 0; padding: 0; }
-.ck__total.ck__verdict--pending { color: var(--ink-2); }
+.ck__total.ck__verdict--pending { color: var(--ink-2); font-size: var(--fs-text); line-height: var(--lh-text); }
 .ck__block { display: grid; gap: var(--s-1); }
 .ck__overlay { justify-items: start; }
 .ck__ovbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-2); }
