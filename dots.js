@@ -3,7 +3,7 @@
 //           (jak puls), z lekkim szumem na każdą kropkę, więc wzór nigdy się nie powtarza. W środku pola te same
 //           kropki (ten sam rozmiar i odstępy) tworzą logo Figmy jak hologram: puls przez nie przepływa, ale w obrysie
 //           logo kropki zapalają się w jego kolorach z przesuwającym się połyskiem - logo stoi, kropki żyją.
-//   figma - duże logo Figmy z kropek na planszy pluginu w panelu Narzędzia: stoi, kropki lekko migoczą.
+//   figma - duże logo Figmy z kropek na planszy pluginu w panelu Narzędzia: stoi, kropki żyją jak puls.
 //   band  - pasek nad czarnym kontaktem (telefon, tablet): ten sam puls na całą szerokość, wygasa w górę.
 // Siatka: w poziomie pary kolumn (jak komórki Braille'a), w pionie rzędy co 6 px bez przerw.
 // Rysuje na <canvas> (ostro na ekranach retina), stoi, gdy element jest poza ekranem albo otwarty jest panel.
@@ -157,24 +157,39 @@ function band(canvas) {
   return { layout, draw };
 }
 
-// Plansza pluginu: duże logo Figmy z kropek na środku płótna, kropki lekko „oddychają” (każda we własnym rytmie).
+// Plansza pluginu: duże logo Figmy z kropek, żywe jak puls przy awatarze - kropki zapalają się i gasną falą od
+// źródła, które powoli wędruje po logo, każda we własnym rytmie i z szumem; większość świeci, więc logo stoi.
+// Do tego połysk hologramu z góry na dół (jak logo przy awatarze).
 function figma(canvas) {
-  let g, logo = [];
+  let g, logo = [], u = 0, ox = 0, oy = 0, s = 1;
   const layout = () => {
     g = setup(canvas);
-    const u = Math.min(g.w / 2.2, g.h / 3.3), k = Math.max(4, Math.min(7, Math.round(u / 11)));
-    logo = figmaDots((g.w - 2 * u) / 2, (g.h - 3 * u) / 2, u, k);
-    logo.forEach(d => { d.r = (u / k) * 0.36; });
+    u = Math.min(g.w / 2.2, g.h / 3.3);
+    const k = Math.max(4, Math.min(7, Math.round(u / 11)));
+    s = u / k; ox = (g.w - 2 * u) / 2; oy = (g.h - 3 * u) / 2;
+    logo = figmaDots(ox, oy, u, k);
+    logo.forEach(d => { d.r = s * 0.36; d.v = 1; });
   };
   const draw = (t, still) => {
     const { ctx, w, h } = g;
     ctx.clearRect(0, 0, w, h);
+    // źródło fali krąży powoli po logo (pętla ~19 s), fala co ~2,4 s jak przy awatarze
+    const sx = ox + u * (1 + 0.8 * Math.sin(t / 3100)), sy = oy + u * (1.5 + 1.2 * Math.sin(t / 4300 + 1.3));
     for (let c = 0; c < FIGMA.length; c++) {
       ctx.fillStyle = FIGMA[c];
-      ctx.beginPath();
-      for (const d of logo) if (d.c === c) dot(ctx, d.x, d.y, d.r * (still ? 1 : 0.82 + 0.18 * Math.sin(t / (700 + d.n * 900) + d.n * TAU)));
-      ctx.fill();
+      for (const d of logo) {
+        if (d.c !== c) continue;
+        const dist = Math.hypot(d.x - sx, d.y - sy) / s;
+        const wave = Math.sin(t / 380 - dist / 1.5), own = Math.sin(t / (900 + d.n * 1400) + d.n * TAU);
+        const on = wave * 0.8 + own * 0.45 + (d.n - 0.5) * 0.5 + 0.85 > 0.2 ? 1 : 0;
+        d.v = still ? 1 : d.v + (on - d.v) * 0.18;          // miękkie zapalanie i gaszenie
+        if (d.v < 0.05) continue;
+        const scan = 0.5 + 0.5 * Math.sin(t / 520 - (d.y - oy) / (s * 1.2));
+        ctx.globalAlpha = still ? 1 : 0.7 + 0.3 * scan;
+        ctx.beginPath(); dot(ctx, d.x, d.y, d.r * d.v); ctx.fill();
+      }
     }
+    ctx.globalAlpha = 1;
   };
   return { layout, draw };
 }
@@ -184,11 +199,13 @@ export function initDots(root, { reduce = false, paused = () => false } = {}) {
   for (const canvas of root.querySelectorAll('canvas[data-dots]')) {
     const fx = kinds[canvas.dataset.dots]?.(canvas);
     if (!fx) continue;
+    // pauza przy otwartym panelu dotyczy kropek pod panelem; kropki w samym panelu (plansza pluginu) żyją dalej
+    const inSheet = !!canvas.closest('.sheet');
     let visible = true, raf = 0;
     const frame = t => {
       raf = 0;
       if (!visible || canvas.offsetParent === null) return;
-      if (!paused()) fx.draw(t, false);
+      if (inSheet || !paused()) fx.draw(t, false);
       raf = requestAnimationFrame(frame);
     };
     const start = () => { if (!reduce && !raf) raf = requestAnimationFrame(frame); };
