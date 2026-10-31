@@ -1,7 +1,8 @@
 // Kropki jak alfabet Braille'a (shared.effects.dots w content.js - false = poprzednia wersja strony).
 //   pulse - pole komórek 2 × 3 spod awatara w prawo: kropki zapalają się i gasną falą, która wychodzi od awatara
-//           (jak puls), z lekkim szumem na każdą kropkę, więc wzór nigdy się nie powtarza. Co kilkanaście sekund
-//           w środku pola wyłania się z kropek logo Figmy (plugin lumerw) i znów się rozpływa.
+//           (jak puls), z lekkim szumem na każdą kropkę, więc wzór nigdy się nie powtarza. W środku pola te same
+//           kropki (ten sam rozmiar i odstępy) tworzą logo Figmy jak hologram: puls przez nie przepływa, ale w obrysie
+//           logo kropki zapalają się w jego kolorach z przesuwającym się połyskiem - logo stoi, kropki żyją.
 //   figma - duże logo Figmy z kropek na planszy pluginu w panelu Narzędzia: stoi, kropki lekko migoczą.
 //   band  - pasek nad czarnym kontaktem (telefon, tablet): ten sam puls na całą szerokość, wygasa w górę.
 // Rysuje na <canvas> (ostro na ekranach retina), stoi, gdy element jest poza ekranem albo otwarty jest panel.
@@ -39,40 +40,44 @@ function figmaDots(ox, oy, u, k) {
   }
   return out;
 }
-// obwiednia pojawiania się logo: cykl 14 s - wyłania się (1,6 s), stoi (3,4 s), rozpływa (1,6 s), potem sam puls
-const LOGO_CYCLE = 14000, LOGO_DELAY = 2500;
-function logoEnvelope(t) {
-  const p = ((t - LOGO_DELAY) % LOGO_CYCLE + LOGO_CYCLE) % LOGO_CYCLE, ease = q => q * q * (3 - 2 * q);
-  if (t < LOGO_DELAY) return 0;
-  if (p < 1600) return ease(p / 1600);
-  if (p < 5000) return 1;
-  if (p < 6600) return 1 - ease((p - 5000) / 1600);
-  return 0;
+// pokrycie kształtem Figmy kwadratu (x0..x1, y0..y1) w jednostkach logo - próbkowanie 6 × 6, do rozmiaru kropki
+function figmaCover(x0, y0, x1, y1) {
+  const hits = new Map();
+  for (let a = 0; a < 6; a++) for (let b = 0; b < 6; b++) {
+    const c = figmaShape(x0 + (x1 - x0) * (a + 0.5) / 6, y0 + (y1 - y0) * (b + 0.5) / 6);
+    if (c >= 0) hits.set(c, (hits.get(c) ?? 0) + 1);
+  }
+  const [c, n] = [...hits].sort((p, q) => q[1] - p[1])[0] ?? [-1, 0];
+  return { c, cov: n / 36 };
 }
 
 // Pole przy awatarze: komórki Braille'a (2 kolumny × 3 rzędy), dwa rzędy komórek.
 function pulse(canvas) {
-  const STEP = 6, R = 1.6, CELL = 2 * STEP + 6;
-  let g, dots = [], logo = [], box = null;
+  const STEP = 6, R = 1.6, CELL = 2 * STEP + 6, LOGO_COL = 3;   // logo w 4. i 5. kolumnie komórek - tuż za awatarem
+  let g, dots = [];
   const layout = () => {
     g = setup(canvas);
     dots = [];
-    // logo Figmy w środku widocznej części pola (za awatarem, przed wygaszeniem w prawo), drobniejsza siatka kropek
-    const u = Math.min(18, (g.h - 4) / 3), ox = Math.round(g.w * 0.4 - u), oy = Math.round((g.h - 3 * u) / 2);
-    logo = figmaDots(ox, oy, u, 4);
-    box = { x0: ox - 12, x1: ox + 2 * u + 12, y0: -1, y1: g.h + 1 };   // pas przez całą wysokość pola
     const rows = Math.floor((g.h + 8) / (3 * STEP + 8));
     const top = (g.h - (rows * (3 * STEP + 8) - 8 - STEP)) / 2;
     for (let cx = 0; cx * CELL < g.w; cx++) for (let cy = 0; cy < rows; cy++) for (let i = 0; i < 2; i++) for (let j = 0; j < 3; j++) {
       const x = R + 1 + cx * CELL + i * STEP, y = top + cy * (3 * STEP + 8) + j * STEP;
-      dots.push({ x, y, n: hash(x, y), v: 0 });
+      const d = { x, y, n: hash(x, y), v: 0, c: -1 };
+      // logo na tej samej siatce: 2 komórki szerokości × wszystkie rzędy (2 × 3 jednostki logo), każda kropka
+      // dostaje kolor kształtu, który pokrywa jej pole, i rozmiar wg pokrycia (zaokrąglenia kół i pigułek)
+      if (cx >= LOGO_COL && cx < LOGO_COL + 2) {
+        const col = (cx - LOGO_COL) * 2 + i, row = cy * 3 + j, cols = 4, rws = rows * 3;
+        const f = figmaCover((col / cols) * 2, (row / rws) * 3, ((col + 1) / cols) * 2, ((row + 1) / rws) * 3);
+        if (f.cov >= 0.2) { d.c = f.c; d.cov = 0.45 + 0.55 * f.cov; }
+      }
+      dots.push(d);
     }
   };
   const draw = (t, still) => {
     const { ctx, w, h } = g;
     ctx.clearRect(0, 0, w, h);
+    const lit = [];
     ctx.fillStyle = getComputedStyle(canvas).color;
-    const env = still ? 1 : logoEnvelope(t);
     ctx.beginPath();
     for (const d of dots) {
       // fala od awatara (lewa krawędź, środek wysokości) co ~2,4 s + własny, wolny rytm kropki
@@ -80,26 +85,21 @@ function pulse(canvas) {
       const wave = Math.sin(t / 380 - dist / 9);
       const own = Math.sin(t / (900 + d.n * 1400) + d.n * TAU);
       const near = 1 - Math.min(1, (d.x) / g.w);              // gęściej przy awatarze
-      const under = d.x > box.x0 && d.x < box.x1 && d.y > box.y0 && d.y < box.y1;   // pod logo puls przygasa
-      const on = wave * 0.8 + own * 0.45 + (d.n - 0.5) * 0.5 + near * 0.35 > 0.2 && !(under && env > d.n * 0.8) ? 1 : 0;
+      // w logo kropki palą się częściej (kształt stoi), ale puls dalej przez nie przechodzi
+      const on = wave * 0.8 + own * 0.45 + (d.n - 0.5) * 0.5 + near * 0.35 + (d.c >= 0 ? 0.75 : 0) > 0.2 ? 1 : 0;
       d.v = still ? on : d.v + (on - d.v) * 0.18;      // miękkie zapalanie i gaszenie
-      dot(ctx, d.x, d.y, R * d.v);
+      if (d.c >= 0) lit.push(d); else dot(ctx, d.x, d.y, R * d.v);
     }
     ctx.fill();
-    // logo: kropka zapala się, gdy obwiednia przekroczy jej próg (od środka na zewnątrz, z szumem) - wyłania się
-    // i rozpływa organicznie, nie od razu całe
-    if (!env && logo.every(d => d.v < 0.02)) return;
-    for (let c = 0; c < FIGMA.length; c++) {
-      ctx.fillStyle = FIGMA[c];
-      ctx.beginPath();
-      for (const d of logo) {
-        if (d.c !== c) continue;
-        const on = env > d.d * 0.55 + d.n * 0.4 + 0.02 ? 1 : 0;
-        d.v = still ? on : d.v + (on - d.v) * 0.14;
-        dot(ctx, d.x, d.y, R * d.v);
-      }
-      ctx.fill();
+    // hologram: kolor Figmy z połyskiem, który przesuwa się po logo z góry na dół, i lekkim migotaniem kropek
+    for (const d of lit) {
+      if (d.v < 0.05) continue;
+      const scan = 0.5 + 0.5 * Math.sin(t / 520 - d.y / 7), flick = 0.85 + 0.15 * Math.sin(t / (160 + d.n * 240) + d.n * TAU);
+      ctx.globalAlpha = still ? 1 : (0.7 + 0.3 * scan) * flick;
+      ctx.fillStyle = FIGMA[d.c];
+      ctx.beginPath(); dot(ctx, d.x, d.y, R * d.v * d.cov * (still ? 1 : 0.9 + 0.2 * scan)); ctx.fill();
     }
+    ctx.globalAlpha = 1;
   };
   return { layout, draw };
 }
