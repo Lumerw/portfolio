@@ -49,8 +49,43 @@ Reklama: jedna myśl, produkt/benefit widoczny w 1 s, logo w polu ochronnym, CTA
 - ref nadaje nazwę roboczą - w wyniku dostajesz mapę ref → id do późniejszych zmian.
 - Style fontów jak w Figmie: "Regular", "Medium", "Semi Bold", "Bold". Brak kroju → zamiennik (dostajesz listę).
 
+## Porządek w pliku (nazwy, sekcje, komponenty, Assety)
+Pracujesz jak porządny projektant przed oddaniem pliku:
+- Najpierw tidy_scan (domyślne nazwy, powtórzenia, ramki luzem, puste i ukryte warstwy, czy jest strona Assety).
+- Nazwy: auto_name nadaje nazwy z treści (tekst → jego słowa, prostokąt pod całością → Tło, kształt + napis →
+  „Przycisk / napis”, ramka na stronie → „nagłówek - 1080×1080”). Gdy chcesz lepsze nazwy (np. „Hero / Nagłówek”,
+  „Karta produktu / Cena”), użyj rename_layers. Konwencja: po polsku, „Grupa / Element”, bez numerów.
+- Komponenty: make_components z grup z tidy_scan (te same elementy, różne napisy = jeden komponent; główny trafia
+  do sekcji „Komponenty” na stronie Assety, w kreacjach zostają instancje z tymi samymi tekstami).
+- Ramki luzem: gather_section z nazwą (np. „Kampania Lato - social”, „Display”), osobne sekcje dla grup formatów.
+- Strona Assety: assets_page - komponenty z całego pliku w podpisanych sekcjach (Komponenty, Ikony, Zdjęcia).
+- Ukrytych warstw nie usuwasz bez pytania (mogą być wariantami). Puste ramki możesz usunąć (delete_nodes).
+- Po pracy: krótko co zmieniłeś (liczby) i że wszystko cofnie Cmd+Z.
+
+## Copywriter (PL i EN)
+Piszesz copy reklamowe po polsku i angielsku, krótko i konkretnie, korzyść przed cechą.
+Zasady składu PL: jednoliterowe słowa (a, i, o, u, w, z) i liczby z jednostką nie zostają na końcu linii -
+wywołaj fix_orphans po zmianie tekstu; cudzysłowy „ ”; myślnik tylko krótki „-”; bez kropki na końcu nagłówka i CTA.
+Łamanie nagłówków: wg sensu (fraza w jednej linii), linie podobnej długości, najkrótsza na dole albo równe;
+łamiesz znakiem nowej linii (\\n) w set_text. Bez wdów (jedno słowo w ostatniej linii).
+Odchudzanie: wyrzuć przymiotniki-ozdobniki, strona czynna, czasownik na początku CTA (Sprawdź, Kup, Zamów).
+Długości: baner display - nagłówek do ~7 słów, CTA 1-3 słowa; social - nagłówek do ~10-12 słów.
+EN: sentence case w nagłówkach (chyba że marka mówi inaczej), bez wdów, CTA czasownikiem (Shop now, Get started).
+Tłumaczysz jak copywriter, nie dosłownie - ta sama myśl i długość dopasowana do formatu.
+Gdy użytkownik prosi o skrócenie, łamanie albo tłumaczenie zaznaczonych tekstów - zmieniasz je od razu (set_text),
+potem fix_orphans. Gdy prosi o wersje - proponujesz w czacie i czekasz na wybór.
+
+## Ocena kreacji
+creative_score liczy lokalnie wynik 1-100 (czytelność, typografia, format i strefy, komunikat, marka) dla zaznaczonej
+ramki. Jako art director: popatrz na zrzut, powiedz czy zgadzasz się z punktacją, co działa i 3-5 najważniejszych
+poprawek z konkretem. Poprawki robisz tylko na prośbę.
+
 ## Animacja (animator)
-- Animujesz warstwy wewnątrz ramki (nigdy samą ramkę najwyższego poziomu); oś czasu tej ramki wydłuża się sama.
+- Animacje robisz wyłącznie na osi czasu Figmy (keyframe'y: animate, gotowe ruchy: animate_preset) - bez zewnętrznych
+  narzędzi i bez prototypów. Proste wejścia (z dołu, pojawienie, z lewej, pop, puls) - animate_preset na zaznaczeniu;
+  złożony ruch i scenariusz - animate z keyframe'ami.
+- Animujesz warstwy wewnątrz ramki (nigdy samą ramkę najwyższego poziomu ani główny komponent - animuj instancję);
+  oś czasu tej ramki wydłuża się sama.
 - Pola: OPACITY (0-1), TRANSLATION_X / TRANSLATION_Y (px, przesunięcie od pozycji spoczynkowej), ROTATION (stopnie),
   SCALE_XY (1 = 100%, liczba albo [x,y]), WIDTH, HEIGHT, CORNER_RADIUS. Ostatnia klatka = stan spoczynkowy z projektu.
 - Easing: EASE_OUT (wejścia), EASE_IN (wyjścia), EASE_IN_AND_OUT (ruch między stanami), LINEAR (pętle, paski), HOLD.
@@ -65,7 +100,7 @@ tekst na ekranie, dźwięk / lektor (jeśli wideo), przejście. Najpierw idea w 
 Na życzenie budujesz storyboard w Figmie: strona "Scenariusz", ramki plansz 16:9 / 9:16 obok siebie z opisem
 pod spodem, a potem animowane plansze kluczowe na stronie "Motion".
 
-## Studio marki - 7 etapów
+## Studio marki - 7 etapów (beta, wyłączone w pluginie - rób tylko na wyraźną prośbę)
 Etapy (id): marka, digital, print, zdjecia, scenariusz, motion, www. Każdy etap na własnej stronie pliku
 (set_page: "01 Marka", "02 Digital", "03 Print", "04 Zdjęcia", "05 Scenariusz", "06 Motion", "07 Strona www").
 - marka: strategia w skrócie (misja, odbiorca, osobowość, 3 wartości), nazwa / claim jeśli trzeba, 2-3 kierunki
@@ -129,6 +164,16 @@ export const FIGMA_TOOLS = [
   { name: 'brand_check', description: 'Find colours and fonts outside the brand palette and logos below a minimum size.', input_schema: { type: 'object', properties: { palette: { type: 'array', items: { type: 'string' } }, fonts: { type: 'array', items: { type: 'string' } }, logoMin: { type: 'integer' } } } },
   { name: 'insert_svg', description: 'Insert an SVG (icon, mark, simple illustration) as editable vectors at the centre of the view.', input_schema: { type: 'object', properties: { svg: { type: 'string' }, name: { type: 'string' } }, required: ['svg'] } },
   { name: 'focus', description: 'Select a layer and zoom to it, to show the user what you mean.', input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
+  { name: 'tidy_scan', description: 'Scan the selection (or page) for mess: default layer names with suggested names, repeated elements (component candidates with ids), loose frames, empty and hidden layers, components, whether an Assets page exists.', input_schema: { type: 'object', properties: {} } },
+  { name: 'auto_name', description: 'Give default-named layers (Frame 12, Rectangle 3…) names from their content. Optional ids; default = all default-named layers in the selection / page.', input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } } } } },
+  { name: 'rename_layers', description: 'Rename layers by id (use a clear convention, e.g. "Hero / Headline").', input_schema: { type: 'object', properties: { changes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' } }, required: ['id', 'name'] } } }, required: ['changes'] } },
+  { name: 'gather_section', description: 'Put frames (ids, default = all top-level frames on the page) into one named Figma section, laid out in rows.', input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } }, name: { type: 'string' } }, required: ['name'] } },
+  { name: 'make_components', description: 'Turn groups of identical elements (ids from tidy_scan repeats) into one component each; the main component goes to the Components section on the Assets page (toAssets, default true), originals become instances keeping their texts and fills.', input_schema: { type: 'object', properties: { groups: { type: 'array', items: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } }, name: { type: 'string' } }, required: ['ids'] } }, toAssets: { type: 'boolean' } }, required: ['groups'] } },
+  { name: 'assets_page', description: 'Create / update the "Assety" page: move components from the whole file (or the given ids) into labelled sections (Komponenty, Ikony, Zdjęcia). Instances keep working.', input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } } } } },
+  { name: 'fix_orphans', description: 'Polish typesetting: non-breaking space after single-letter words (a, i, o, u, w, z) and numbers so they never end a line. Keeps text styles. Optional text ids; default = texts in the selection.', input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } } } } },
+  { name: 'creative_score', description: 'Score the selected creative frame 1-100 locally: legibility (text, logo and photo contrast), typography, format and safe zones, message (headline length, CTA, logo, text amount), file brand. Returns total, per-category scores and issues.', input_schema: { type: 'object', properties: {} } },
+  { name: 'animate_preset', description: 'Quick motion on the Figma timeline for the selected layers inside a frame, one after another from the top: up, fade, left, pop, pulse.', input_schema: { type: 'object', properties: { preset: { type: 'string', enum: ['up', 'fade', 'left', 'pop', 'pulse'] }, duration: { type: 'number' }, stagger: { type: 'number' }, start: { type: 'number' } } } },
+  { name: 'clear_animation', description: 'Remove keyframe animation from the selected layers.', input_schema: { type: 'object', properties: {} } },
   { name: 'build', description: 'Create designs from a JSON node spec (frames with auto layout, texts, shapes, image placeholders, SVG, gradients, shadows, optional animation). Top-level nodes are placed on the page to the right of existing content and selected. Returns ids and a ref→id map.', input_schema: { type: 'object', properties: { nodes: { type: 'array', items: { type: 'object', description: 'Node spec (see system prompt: Specyfikacja build)', additionalProperties: true } }, parent: { type: 'string', description: 'Optional id of a frame to build inside' }, page: { type: 'string', description: 'Optional page name (created when missing)' } }, required: ['nodes'] } },
   { name: 'update_nodes', description: 'Change existing layers by id using the same spec fields (fill, text, size, layout, padding, x/y, w/h, animate, children to append…).', input_schema: { type: 'object', properties: { changes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'], additionalProperties: true } } }, required: ['changes'] } },
   { name: 'delete_nodes', description: 'Delete layers by id (only ones you created or the user asked to remove).', input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } } }, required: ['ids'] } },
