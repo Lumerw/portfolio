@@ -62,6 +62,15 @@ Pracujesz jak porządny projektant przed oddaniem pliku:
 - Ukrytych warstw nie usuwasz bez pytania (mogą być wariantami). Puste ramki możesz usunąć (delete_nodes).
 - Po pracy: krótko co zmieniłeś (liczby) i że wszystko cofnie Cmd+Z.
 
+## Dokument, biblioteka, fonty, ikony (sekcje systemowe pluginu)
+- Porządek całego pliku: doc_overview → powiedz, które strony są najgorsze (wynik) → tidy_page na prośbę albo
+  tidy_document (zapytaj przy dużym pliku); struktura: doc_structure (okładka z miniaturą, Assety, Archiwum).
+- Komponenty: library_list (co już jest - używaj zamiast rysować od nowa), insert_component, add_as_component
+  (kategoria: Przyciski, Karty, Ikony, Logo, Formularze, Nawigacja, Inne), organize_library.
+- Fonty: fonts_in_file, replace_font (ujednolicenie krojów), apply_font. Google Fonts są w Figmie; dobieraj kroje z
+  polskimi znakami (np. Inter, Manrope, DM Sans, Space Grotesk, Fraunces, Playfair Display, Lora, Syne).
+- Ikony: insert_icon z nazwą Lucide (po angielsku) zamiast rysowania ikon wektorami w build.
+
 ## Copywriter (PL i EN)
 Piszesz copy reklamowe po polsku i angielsku, krótko i konkretnie, korzyść przed cechą.
 Zasady składu PL: jednoliterowe słowa (a, i, o, u, w, z) i liczby z jednostką nie zostają na końcu linii -
@@ -174,6 +183,18 @@ export const FIGMA_TOOLS = [
   { name: 'creative_score', description: 'Score the selected creative frame 1-100 locally: legibility (text, logo and photo contrast), typography, format and safe zones, message (headline length, CTA, logo, text amount), file brand. Returns total, per-category scores and issues.', input_schema: { type: 'object', properties: {} } },
   { name: 'animate_preset', description: 'Quick motion on the Figma timeline for the selected layers inside a frame, one after another from the top: up, fade, left, pop, pulse.', input_schema: { type: 'object', properties: { preset: { type: 'string', enum: ['up', 'fade', 'left', 'pop', 'pulse'] }, duration: { type: 'number' }, stagger: { type: 'number' }, start: { type: 'number' } } } },
   { name: 'clear_animation', description: 'Remove keyframe animation from the selected layers.', input_schema: { type: 'object', properties: {} } },
+  { name: 'doc_overview', description: 'All pages of the document with a tidiness score (0-100), layer count, unnamed layers, loose frames, sections, components, empty and hidden layers.', input_schema: { type: 'object', properties: {} } },
+  { name: 'tidy_page', description: 'Tidy one page (id from doc_overview, default current): names from content, repeated elements → components (main ones to the Assets page), empty layers removed, top-level frames into Social / Display / Print / Inne sections.', input_schema: { type: 'object', properties: { id: { type: 'string' } } } },
+  { name: 'tidy_document', description: 'Tidy every page except Okładka / Assety / Archiwum (as tidy_page). Ask before running on a big file.', input_schema: { type: 'object', properties: {} } },
+  { name: 'doc_structure', description: 'Add missing structure pages: Okładka (cover frame with project name, date, status - set as file thumbnail), Assety, Archiwum. Existing pages untouched.', input_schema: { type: 'object', properties: { status: { type: 'string' } } } },
+  { name: 'library_list', description: 'Components of the whole file with category (Przyciski, Karty, Ikony, Logo, Formularze, Nawigacja, Inne), page and size.', input_schema: { type: 'object', properties: {} } },
+  { name: 'insert_component', description: 'Insert an instance of a component (id from library_list) into the selected frame (centred) or the middle of the view.', input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
+  { name: 'add_as_component', description: 'Turn the selected layers into components in a category; main components go to that section on the Assets page, instances stay in place.', input_schema: { type: 'object', properties: { category: { type: 'string' } }, required: ['category'] } },
+  { name: 'organize_library', description: 'Name all components "Category / Name" and lay them out in category sections on the Assets page.', input_schema: { type: 'object', properties: {} } },
+  { name: 'fonts_in_file', description: 'Typefaces used on the current page (or whole document with all=true): styles, text counts, missing fonts.', input_schema: { type: 'object', properties: { all: { type: 'boolean' } } } },
+  { name: 'replace_font', description: 'Replace a typeface everywhere on the page (or document with all=true); styles are matched (Bold stays Bold).', input_schema: { type: 'object', properties: { from: { type: 'string' }, to: { type: 'string' }, all: { type: 'boolean' } }, required: ['from', 'to'] } },
+  { name: 'apply_font', description: 'Set the typeface of the selected texts (styles matched). Google Fonts are built into Figma.', input_schema: { type: 'object', properties: { family: { type: 'string' } }, required: ['family'] } },
+  { name: 'insert_icon', description: 'Insert a Lucide icon (English name, e.g. shopping-cart, arrow-right, heart, user) as vectors into the selected frame or the middle of the view.', input_schema: { type: 'object', properties: { name: { type: 'string' }, size: { type: 'integer' }, color: { type: 'string' }, stroke: { type: 'number' } }, required: ['name'] } },
   { name: 'build', description: 'Create designs from a JSON node spec (frames with auto layout, texts, shapes, image placeholders, SVG, gradients, shadows, optional animation). Top-level nodes are placed on the page to the right of existing content and selected. Returns ids and a ref→id map.', input_schema: { type: 'object', properties: { nodes: { type: 'array', items: { type: 'object', description: 'Node spec (see system prompt: Specyfikacja build)', additionalProperties: true } }, parent: { type: 'string', description: 'Optional id of a frame to build inside' }, page: { type: 'string', description: 'Optional page name (created when missing)' } }, required: ['nodes'] } },
   { name: 'update_nodes', description: 'Change existing layers by id using the same spec fields (fill, text, size, layout, padding, x/y, w/h, animate, children to append…).', input_schema: { type: 'object', properties: { changes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'], additionalProperties: true } } }, required: ['changes'] } },
   { name: 'delete_nodes', description: 'Delete layers by id (only ones you created or the user asked to remove).', input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } } }, required: ['ids'] } },

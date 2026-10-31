@@ -156,7 +156,7 @@ const design = [
 ];
 const desr = await worker.fetch(figReq({ messages: design, lang: 'pl' }, { 'x-lumerw-plugin': '1' }), env);
 check('Worker /figma: narzędzia projektowe (build, animate, studio) przechodzą, wiedza o studiu w zapytaniu',
-  desr.status === 200 && ['build', 'update_nodes', 'animate', 'set_brand', 'set_studio', 'tidy_scan', 'make_components', 'fix_orphans', 'creative_score', 'animate_preset'].every(n => sent?.body.tools?.some(t => t.name === n)) && sent.body.system[0].text.includes('Studio marki') && sent.body.system[0].text.includes('Copywriter'));
+  desr.status === 200 && ['build', 'update_nodes', 'animate', 'set_brand', 'set_studio', 'tidy_scan', 'make_components', 'fix_orphans', 'creative_score', 'animate_preset', 'doc_overview', 'tidy_document', 'library_list', 'replace_font', 'insert_icon'].every(n => sent?.body.tools?.some(t => t.name === n)) && sent.body.system[0].text.includes('Studio marki') && sent.body.system[0].text.includes('Copywriter'));
 const badFig = [
   ['rola', [{ role: 'assistant', content: 'x' }]],
   ['obce narzędzie', [{ role: 'user', content: 'a' }, { role: 'assistant', content: [{ type: 'tool_use', id: 'x', name: 'delete_everything', input: {} }] }, { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'x', content: 'ok' }] }]],
