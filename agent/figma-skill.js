@@ -10,7 +10,8 @@ reformaty, strony. Mówisz krótko, konkretnie i po ludzku, jak senior przy biur
 ## Jak pracujesz
 - Zanim ocenisz projekt, popatrz na niego: wywołaj screenshot_selection (obraz) i get_selection (warstwy, teksty,
   fonty, kolory, rozmiary). Nie zgaduj, czego nie widzisz. Gdy nic nie jest zaznaczone, poproś o zaznaczenie ramki.
-- Liczby (kontrast, rozmiary) bierz z narzędzi, nie z oka: contrast_scan liczy WCAG dokładnie.
+- Liczby (kontrast, rozmiary) bierz z narzędzi, nie z oka: contrast_scan liczy WCAG dokładnie - teksty, a także
+  logo, ikony i zdjęcia (czy odcinają się od tła; zdjęcie zlewające się z tłem z jednej strony = słaba strona).
 - Ocena i rada: niczego nie zmieniasz. Gdy użytkownik prosi o zaprojektowanie, poprawienie, animację albo etap
   studia - działasz od razu narzędziami (to jest zgoda). Po pracy krótko: co powstało / co zmieniłeś i gdzie.
   Każdą zmianę można cofnąć w Figmie (Cmd+Z).
@@ -119,7 +120,7 @@ konkretem (co, gdzie, na ile). Jeśli możesz poprawić to narzędziem - zapropo
 export const FIGMA_TOOLS = [
   { name: 'get_selection', description: 'Structure of the current selection (or the page when nothing is selected): layers with id, type, name, size, position, text content, fonts, fill colours. Call before judging a design.', input_schema: { type: 'object', properties: { depth: { type: 'integer', description: 'How deep to walk the layer tree (1-6, default 4)' } } } },
   { name: 'screenshot_selection', description: 'Image of the selected frame/layer (PNG, max 1024 px). Use to see the design before giving feedback.', input_schema: { type: 'object', properties: {} } },
-  { name: 'contrast_scan', description: 'WCAG 2.2 contrast of every text in the selection (or whole frame). Returns ratio, target, pass and a suggested text colour per text.', input_schema: { type: 'object', properties: { level: { type: 'string', enum: ['AA', 'AAA'] } } } },
+  { name: 'contrast_scan', description: 'WCAG 2.2 contrast of every text in the selection (or whole frame): ratio, target, pass, suggested text colour. With graphics (default true) also logos, icons and vectors (WCAG 1.4.11, 3:1 along the outline) and photos / product cut-outs (share of the outline that stands out from what is around it, weakest side, colour ΔE).', input_schema: { type: 'object', properties: { level: { type: 'string', enum: ['AA', 'AAA'] }, graphics: { type: 'boolean' } } } },
   { name: 'set_text_color', description: 'Change the colour of a text layer.', input_schema: { type: 'object', properties: { id: { type: 'string' }, color: { type: 'string', description: '#RRGGBB' } }, required: ['id', 'color'] } },
   { name: 'set_fill', description: 'Set a solid fill colour on a layer (frame, shape, text).', input_schema: { type: 'object', properties: { id: { type: 'string' }, color: { type: 'string', description: '#RRGGBB' } }, required: ['id', 'color'] } },
   { name: 'set_text', description: 'Replace the characters of a text layer (keeps its style).', input_schema: { type: 'object', properties: { id: { type: 'string' }, text: { type: 'string' } }, required: ['id', 'text'] } },
