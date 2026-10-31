@@ -4,6 +4,7 @@
 // Wdrożenie i ustawienia: README → „Asystent AI”.
 import { content } from '../content.js';
 import { systemPrompt } from '../agent.js';
+import { FIGMA_TOOLS, figmaSystem } from './figma-skill.js';
 
 const MAX_MESSAGES = 12;     // ostatnie wiadomości rozmowy wysyłane do modelu
 const MAX_CHARS = 500;       // = maxlength pola na stronie
@@ -13,11 +14,14 @@ export default {
   async fetch(req, env) {
     const origin = req.headers.get('Origin') || '';
     const allowed = (env.ALLOWED_ORIGINS || 'https://lumerw.com').split(',').map(s => s.trim());
-    const ok = allowed.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin);
+    const path = new URL(req.url).pathname;
+    // plugin lumerw w Figmie: okno pluginu ma origin "null" - dopuszczony tylko na /figma
+    const plugin = path === '/figma' && origin === 'null';
+    const ok = allowed.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin) || plugin;
     const cors = {
       'Access-Control-Allow-Origin': ok ? origin : allowed[0],
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'content-type',
+      'Access-Control-Allow-Headers': 'content-type, x-lumerw-plugin',
       'Vary': 'Origin',
     };
     const json = (body, status = 200) =>
@@ -27,6 +31,16 @@ export default {
     if (req.method !== 'POST') return json({ error: 'method' }, 405);
     if (!ok) return json({ error: 'origin' }, 403);
 
+    // Asystent w pluginie: własny, większy limit (jedna odpowiedź to kilka kroków z narzędziami)
+    if (path === '/figma') {
+      if (plugin && req.headers.get('x-lumerw-plugin') !== '1') return json({ error: 'origin' }, 403);
+      const lim = env.FIGMA_LIMITER ?? env.LIMITER;
+      if (lim && !(await lim.limit({ key: `figma:${req.headers.get('CF-Connecting-IP') || 'anon'}` })).success) return json({ error: 'rate' }, 429);
+      if (+(req.headers.get('content-length') || 0) > FIGMA_MAX_BYTES) return json({ error: 'size' }, 413);
+      let body;
+      try { body = await req.json(); } catch { return json({ error: 'json' }, 400); }
+      return figma(body, body?.lang === 'en' ? 'en' : 'pl', env, json);
+    }
     // Limit zapytań na adres IP (wiązanie LIMITER w wrangler.toml).
     if (env.LIMITER) {
       const { success } = await env.LIMITER.limit({ key: req.headers.get('CF-Connecting-IP') || 'anon' });
@@ -243,4 +257,50 @@ async function lab(body, env, json) {
   if (!res.ok) return json({ error: 'upstream', status: res.status, detail: (await res.text()).slice(0, 500) }, 502);
   const cors = Object.fromEntries([...json({}).headers].filter(([k]) => k.startsWith('access-control') || k === 'vary'));
   return new Response(res.body, { status: 200, headers: { ...cors, 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
+}
+
+// ---------- /figma: asystent projektowy w pluginie lumerw ----------
+// Plugin prowadzi pętlę: wysyła rozmowę (tekst, zrzuty, wyniki narzędzi), dostaje odpowiedź modelu z blokami
+// tool_use, wykonuje je w Figmie i odsyła tool_result. Worker tylko sprawdza rozmowę i dokleja wiedzę i narzędzia.
+const FIGMA_MAX_BYTES = 6_000_000;
+const FIGMA_MAX_MESSAGES = 60;
+const FIGMA_TOOL_NAMES = new Set(FIGMA_TOOLS.map(t => t.name));
+const isImage = b => b?.type === 'image' && b.source?.type === 'base64' && ['image/png', 'image/jpeg'].includes(b.source.media_type)
+  && typeof b.source.data === 'string' && b.source.data.length < 2_000_000 && /^[A-Za-z0-9+/=]+$/.test(b.source.data);
+const isText = b => b?.type === 'text' && typeof b.text === 'string' && b.text.length <= 20_000;
+export function validateFigma(list) {
+  if (!Array.isArray(list) || !list.length || list.length > FIGMA_MAX_MESSAGES) return null;
+  for (const [i, m] of list.entries()) {
+    if (m?.role !== (i % 2 ? 'assistant' : 'user')) return null;
+    const blocks = typeof m.content === 'string' ? [{ type: 'text', text: m.content }] : m.content;
+    if (!Array.isArray(blocks) || !blocks.length) return null;
+    for (const b of blocks) {
+      const okUser = isText(b) || isImage(b) || (b?.type === 'tool_result' && typeof b.tool_use_id === 'string'
+        && (typeof b.content === 'string' ? b.content.length <= 60_000 : Array.isArray(b.content) && b.content.every(c => isText(c) || isImage(c))));
+      const okAssistant = isText(b) || (b?.type === 'tool_use' && FIGMA_TOOL_NAMES.has(b.name) && typeof b.id === 'string')
+        || ['thinking', 'redacted_thinking'].includes(b?.type);
+      if (m.role === 'user' ? !okUser : !okAssistant) return null;
+    }
+  }
+  return list[list.length - 1].role === 'user' ? list : null;
+}
+async function figma(body, lang, env, json) {
+  const messages = validateFigma(body?.messages);
+  if (!messages) return json({ error: 'messages' }, 400);
+  const res = await anthropic(env, {
+    max_tokens: 6000,
+    output_config: { effort: 'medium' },
+    // wiedza i narzędzia stałe między pytaniami - cache
+    system: [{ type: 'text', text: figmaSystem(lang), cache_control: { type: 'ephemeral' } }],
+    tools: FIGMA_TOOLS.map((t, i) => (i === FIGMA_TOOLS.length - 1 ? { ...t, cache_control: { type: 'ephemeral' } } : t)),
+    messages,
+  });
+  if (!res.ok) {
+    const detail = (await res.text().catch(() => '')).slice(0, 300);
+    return json({ error: 'upstream', status: res.status, credit: /credit balance/i.test(detail) }, 502);
+  }
+  const data = await res.json();
+  if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);
+  const content = (data.content || []).map(b => (b.type === 'text' ? { ...b, text: b.text.replace(/[—–]/g, '-') } : b));
+  return json({ content, stop_reason: data.stop_reason });
 }

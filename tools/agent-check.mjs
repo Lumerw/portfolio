@@ -129,6 +129,34 @@ check('Worker /mark/draw: pusty opis → 400', (await worker.fetch(req({ brief: 
 reply = '{"pick": 1, "name": "Fala", "why": "y"}';
 check('Worker /mark/pick: znaki autorskie (kind custom) → 200', await pickStatus({ ...pick, kind: 'custom' }) === 200);
 
+// /figma - asystent projektowy w pluginie lumerw: okno pluginu (origin "null") tylko z nagłówkiem pluginu,
+// narzędzia i wiedza w zapytaniu, zrzuty i wyniki narzędzi przechodzą, zła rozmowa → 400
+const figReq = (body, headers = {}) => new Request('https://agent.test/figma', { method: 'POST', headers: { Origin: 'null', 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) });
+const png1 = png(64, 64, 100);
+const convo = [
+  { role: 'user', content: [{ type: 'text', text: 'Oceń ten baner' }] },
+  { role: 'assistant', content: [{ type: 'tool_use', id: 'tu1', name: 'screenshot_selection', input: {} }] },
+  { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'tu1', content: [{ type: 'image', source: { type: 'base64', media_type: 'image/png', data: png1 } }] }] },
+];
+check('Worker /figma: okno pluginu bez nagłówka → 403', (await worker.fetch(figReq({ messages: convo }), env)).status === 403);
+reply = 'Nagłówek jest czytelny — popraw CTA.';
+sent = null;
+const fr = await worker.fetch(figReq({ messages: convo, lang: 'pl' }, { 'x-lumerw-plugin': '1' }), env), fj = await fr.json();
+check('Worker /figma: narzędzia, wiedza i zrzut w zapytaniu, odpowiedź z krótkim myślnikiem',
+  fr.status === 200 && fr.headers.get('Access-Control-Allow-Origin') === 'null' && sent?.body.tools?.some(t => t.name === 'contrast_scan')
+  && sent.body.system[0].text.includes('WCAG') && sent.body.messages[2].content[0].content[0].type === 'image' && fj.content[0].text.includes(' - '),
+  JSON.stringify(fj).slice(0, 200));
+const badFig = [
+  ['rola', [{ role: 'assistant', content: 'x' }]],
+  ['obce narzędzie', [{ role: 'user', content: 'a' }, { role: 'assistant', content: [{ type: 'tool_use', id: 'x', name: 'delete_everything', input: {} }] }, { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'x', content: 'ok' }] }]],
+  ['obraz nie base64', [{ role: 'user', content: [{ type: 'image', source: { type: 'url', url: 'https://x' } }] }]],
+  ['kończy asystent', [{ role: 'user', content: 'a' }, { role: 'assistant', content: 'b' }]],
+];
+const wrongFig = [];
+for (const [n, m] of badFig) if ((await worker.fetch(figReq({ messages: m }, { 'x-lumerw-plugin': '1' }), env)).status !== 400) wrongFig.push(n);
+check(`Worker /figma: ${badFig.length} złych rozmów → 400`, !wrongFig.length, wrongFig.join(', '));
+check('Worker /figma: inna strona → 403', (await worker.fetch(new Request('https://agent.test/figma', { method: 'POST', headers: { Origin: 'https://example.com', 'content-type': 'application/json' }, body: '{}' }), env)).status === 403);
+
 for (const x of results) console.log(`${x.ok ? '✓' : '✗'} ${x.name}${x.note && !x.ok ? ` - ${x.note}` : ''}`);
 const failed = results.filter(x => !x.ok).length;
 console.log(`\n${results.length - failed}/${results.length} ok`);
