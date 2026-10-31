@@ -5,6 +5,7 @@
 //           logo kropki zapalają się w jego kolorach z przesuwającym się połyskiem - logo stoi, kropki żyją.
 //   figma - duże logo Figmy z kropek na planszy pluginu w panelu Narzędzia: stoi, kropki lekko migoczą.
 //   band  - pasek nad czarnym kontaktem (telefon, tablet): ten sam puls na całą szerokość, wygasa w górę.
+// Siatka: w poziomie pary kolumn (jak komórki Braille'a), w pionie rzędy co 6 px bez przerw.
 // Rysuje na <canvas> (ostro na ekranach retina), stoi, gdy element jest poza ekranem albo otwarty jest panel.
 // Bez ruchu w systemie (prefers-reduced-motion) - jedna nieruchoma klatka.
 
@@ -58,15 +59,16 @@ function pulse(canvas) {
   const layout = () => {
     g = setup(canvas);
     dots = [];
-    const rows = Math.floor((g.h + 8) / (3 * STEP + 8));
-    const top = (g.h - (rows * (3 * STEP + 8) - 8 - STEP)) / 2;
-    for (let cx = 0; cx * CELL < g.w; cx++) for (let cy = 0; cy < rows; cy++) for (let i = 0; i < 2; i++) for (let j = 0; j < 3; j++) {
-      const x = R + 1 + cx * CELL + i * STEP, y = top + cy * (3 * STEP + 8) + j * STEP;
+    // rzędy co STEP bez przerw (szpara między rzędami komórek wypełniona kolejnym rzędem), w poziomie pary kolumn
+    const cells = Math.floor((g.h + 8) / (3 * STEP + 8)), rows = cells * 4 - 1;
+    const top = (g.h - (rows - 1) * STEP) / 2;
+    for (let cx = 0; cx * CELL < g.w; cx++) for (let j = 0; j < rows; j++) for (let i = 0; i < 2; i++) {
+      const x = R + 1 + cx * CELL + i * STEP, y = top + j * STEP;
       const d = { x, y, n: hash(x, y), v: 0, c: -1 };
-      // logo na tej samej siatce: 2 komórki szerokości × wszystkie rzędy (2 × 3 jednostki logo), każda kropka
+      // logo na tej samej siatce: 2 pary kolumn szerokości × wszystkie rzędy (2 × 3 jednostki logo), każda kropka
       // dostaje kolor kształtu, który pokrywa jej pole, i rozmiar wg pokrycia (zaokrąglenia kół i pigułek)
       if (cx >= LOGO_COL && cx < LOGO_COL + 2) {
-        const col = (cx - LOGO_COL) * 2 + i, row = cy * 3 + j, cols = 4, rws = rows * 3;
+        const col = (cx - LOGO_COL) * 2 + i, row = j, cols = 4, rws = rows;
         const f = figmaCover((col / cols) * 2, (row / rws) * 3, ((col + 1) / cols) * 2, ((row + 1) / rws) * 3);
         if (f.cov >= 0.2) { d.c = f.c; d.cov = 0.45 + 0.55 * f.cov; }
       }
@@ -114,12 +116,13 @@ function band(canvas) {
   const layout = () => {
     g = setup(canvas);
     dots = [];
-    const rows = Math.max(1, Math.floor((g.h + 8) / ROW));
-    const top = g.h - R - 1.5 - (rows - 1) * ROW - 2 * STEP;   // ostatni rząd kropek tuż nad czarną krawędzią
+    // rzędy co STEP bez przerw między rzędami komórek (jak przy awatarze), w poziomie pary kolumn
+    const rows = Math.max(3, Math.floor((g.h + 8) / ROW) * 4 - 1);
+    const top = g.h - R - 1.5 - (rows - 1) * STEP;   // ostatni rząd kropek tuż nad czarną krawędzią
     const cols = Math.ceil(g.w / CELL);
     const left = (g.w - (cols * CELL - 6 - STEP)) / 2;
-    for (let cx = 0; cx < cols; cx++) for (let cy = 0; cy < rows; cy++) for (let i = 0; i < 2; i++) for (let j = 0; j < 3; j++) {
-      const x = left + cx * CELL + i * STEP, y = top + cy * ROW + j * STEP;
+    for (let cx = 0; cx < cols; cx++) for (let j = 0; j < rows; j++) for (let i = 0; i < 2; i++) {
+      const x = left + cx * CELL + i * STEP, y = top + j * STEP;
       dots.push({ x, y, n: hash(x, y), v: 0 });
     }
     // jedno źródło pulsu na ~220 px szerokości, każde z innym torem, tempem i fazą
