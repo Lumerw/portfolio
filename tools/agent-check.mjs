@@ -146,6 +146,17 @@ check('Worker /figma: narzędzia, wiedza i zrzut w zapytaniu, odpowiedź z krót
   fr.status === 200 && fr.headers.get('Access-Control-Allow-Origin') === 'null' && sent?.body.tools?.some(t => t.name === 'contrast_scan')
   && sent.body.system[0].text.includes('WCAG') && sent.body.messages[2].content[0].content[0].type === 'image' && fj.content[0].text.includes(' - '),
   JSON.stringify(fj).slice(0, 200));
+// projektant w pętli: build → animate, wyniki narzędzi i nowe pytanie w jednej wiadomości (pętla zatrzymana na limicie)
+const design = [
+  { role: 'user', content: [{ type: 'text', text: 'Zaprojektuj post 4:5' }] },
+  { role: 'assistant', content: [{ type: 'tool_use', id: 'b1', name: 'build', input: { nodes: [{ type: 'frame', w: 1080, h: 1350 }] } }] },
+  { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'b1', content: '{"ids":["1:2"]}' }] },
+  { role: 'assistant', content: [{ type: 'tool_use', id: 'a1', name: 'animate', input: { items: [] } }, { type: 'tool_use', id: 's1', name: 'set_studio', input: { step: 'digital', status: 'review' } }] },
+  { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'a1', content: 'ok' }, { type: 'tool_result', tool_use_id: 's1', content: 'ok' }, { type: 'text', text: 'dalej' }] },
+];
+const desr = await worker.fetch(figReq({ messages: design, lang: 'pl' }, { 'x-lumerw-plugin': '1' }), env);
+check('Worker /figma: narzędzia projektowe (build, animate, studio) przechodzą, wiedza o studiu w zapytaniu',
+  desr.status === 200 && ['build', 'update_nodes', 'animate', 'set_brand', 'set_studio'].every(n => sent?.body.tools?.some(t => t.name === n)) && sent.body.system[0].text.includes('Studio marki'));
 const badFig = [
   ['rola', [{ role: 'assistant', content: 'x' }]],
   ['obce narzędzie', [{ role: 'user', content: 'a' }, { role: 'assistant', content: [{ type: 'tool_use', id: 'x', name: 'delete_everything', input: {} }] }, { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'x', content: 'ok' }] }]],

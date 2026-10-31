@@ -263,7 +263,7 @@ async function lab(body, env, json) {
 // Plugin prowadzi pętlę: wysyła rozmowę (tekst, zrzuty, wyniki narzędzi), dostaje odpowiedź modelu z blokami
 // tool_use, wykonuje je w Figmie i odsyła tool_result. Worker tylko sprawdza rozmowę i dokleja wiedzę i narzędzia.
 const FIGMA_MAX_BYTES = 6_000_000;
-const FIGMA_MAX_MESSAGES = 60;
+const FIGMA_MAX_MESSAGES = 120;   // pętla projektowa: do ~24 kroków narzędzi na pytanie
 const FIGMA_TOOL_NAMES = new Set(FIGMA_TOOLS.map(t => t.name));
 const isImage = b => b?.type === 'image' && b.source?.type === 'base64' && ['image/png', 'image/jpeg'].includes(b.source.media_type)
   && typeof b.source.data === 'string' && b.source.data.length < 2_000_000 && /^[A-Za-z0-9+/=]+$/.test(b.source.data);
@@ -284,16 +284,22 @@ export function validateFigma(list) {
   }
   return list[list.length - 1].role === 'user' ? list : null;
 }
+// cache całej dotychczasowej rozmowy (znacznik na ostatnim bloku): kolejne kroki agenta płacą za nią 5% ceny wejścia
+const cacheTail = list => list.map((m, i) => {
+  if (i !== list.length - 1) return m;
+  const blocks = typeof m.content === 'string' ? [{ type: 'text', text: m.content }] : m.content;
+  return { ...m, content: blocks.map((b, j) => (j === blocks.length - 1 ? { ...b, cache_control: { type: 'ephemeral' } } : b)) };
+});
 async function figma(body, lang, env, json) {
   const messages = validateFigma(body?.messages);
   if (!messages) return json({ error: 'messages' }, 400);
   const res = await anthropic(env, {
-    max_tokens: 6000,
+    max_tokens: 16000,   // projekty budowane narzędziem build to spore struktury JSON
     output_config: { effort: 'medium' },
     // wiedza i narzędzia stałe między pytaniami - cache
     system: [{ type: 'text', text: figmaSystem(lang), cache_control: { type: 'ephemeral' } }],
     tools: FIGMA_TOOLS.map((t, i) => (i === FIGMA_TOOLS.length - 1 ? { ...t, cache_control: { type: 'ephemeral' } } : t)),
-    messages,
+    messages: cacheTail(messages),
   });
   if (!res.ok) {
     const detail = (await res.text().catch(() => '')).slice(0, 300);
