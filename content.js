@@ -518,18 +518,21 @@ export const pl = {
       none: 'Nie trzeba nic zmieniać.',
     },
   },
-  // Narzędzia (panel #narzedzia, otwierany znakiem obok awatara): to, czego używam w pracy i co oddaję klientom.
-  // href - narzędzie działa (otwiera panel), bez href - kafelek „wkrótce”.
+  // Narzędzia (panel #narzedzia, otwierany kropkami obok awatara): jedna plansza - plugin lumerw do Figmy.
+  // plugin.href - link do pluginu w Figma Community; pusty = plansza „wkrótce” (bez linku). Wcześniejsze narzędzia
+  // strony (#generator, #ai-act, #kontrast) działają dalej pod swoimi adresami, ich funkcje są też w pluginie.
   tools: {
     title: 'Narzędzia',
-    line: 'Narzędzia, których używam na co dzień i które dostajesz przy współpracy ze mną.',
-    soon: 'wkrótce',
-    open: 'otwórz',
-    items: [
-      { id: 'generator', name: 'Generator znaków', text: 'Opisz markę - zaprojektuję z Tobą znak od zera albo wylosuję go algorytmem. Pobierasz gotowy SVG.', href: '#generator' },
-      { id: 'legal', name: 'AI Act checker', text: 'Wgrywasz wideo, grafiki i KV - narzędzie sprawdza je pod kątem AI Act i prawa UE i mówi, czy potrzebne jest oznaczenie treści AI. Oznaczenie nałożysz z poziomu panelu.', href: '#ai-act' },
-      { id: 'contrast', name: 'Kontrast checker', text: 'Sprawdza czytelność typografii na grafikach: kontrast z tłem, cienie pod literami, wielkość tekstu - i od razu pokazuje poprawioną wersję.', href: '#kontrast' },
-    ],
+    line: 'Wszystkie moje narzędzia w jednym miejscu - jako plugin do Figmy.',
+    plugin: {
+      href: '',
+      name: 'lumerw',
+      kind: 'plugin do Figmy',
+      text: 'Ocena kreacji i kontrast, porządek w warstwach i komponentach, copywriter PL / EN, animacje na osi czasu, fonty, ikony i import z Photoshopa i Illustratora - a do tego asystent projektowy, który pracuje w Twoim pliku.',
+      features: ['Ocena kreacji', 'Kontrast', 'Porządek', 'Copy', 'Animacja', 'Fonty', 'Ikony', 'Import z Adobe', 'Asystent AI'],
+      soon: 'wkrótce w Figma Community',
+      open: 'otwórz w Figmie',
+    },
   },
   generator: {
     title: 'Generator znaków',
@@ -939,14 +942,16 @@ export const en = {
   },
   tools: {
     title: 'Tools',
-    line: 'Tools I use every day and that you get when we work together.',
-    soon: 'soon',
-    open: 'open',
-    items: [
-      { id: 'generator', name: 'Mark generator', text: 'Describe a brand - I will design a mark with you from scratch or roll one with the algorithm. You download a ready SVG.', href: '#generator' },
-      { id: 'legal', name: 'AI Act checker', text: 'Upload videos, graphics and key visuals - the tool checks them against the AI Act and EU law and tells you whether AI content labelling is required. Apply the label right from the panel.', href: '#ai-act' },
-      { id: 'contrast', name: 'Contrast checker', text: 'Checks typography legibility on graphics: contrast with the background, shadows under the letters, text size - and shows a fixed version right away.', href: '#kontrast' },
-    ],
+    line: 'All my tools in one place - as a Figma plugin.',
+    plugin: {
+      href: '',
+      name: 'lumerw',
+      kind: 'Figma plugin',
+      text: 'Creative score and contrast, tidy layers and components, a PL / EN copywriter, motion on the timeline, fonts, icons and import from Photoshop and Illustrator - plus a design assistant that works in your file.',
+      features: ['Creative score', 'Contrast', 'Tidy up', 'Copy', 'Motion', 'Fonts', 'Icons', 'Import from Adobe', 'AI assistant'],
+      soon: 'coming soon to Figma Community',
+      open: 'open in Figma',
+    },
   },
   generator: {
     title: 'Mark generator',

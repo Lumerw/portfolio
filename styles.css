@@ -1619,45 +1619,28 @@ html:has(.sheet:target) { overflow: hidden; }
 .print-only { display: none; }
 
 /* ==========================================================================
-   Narzędzia (panel #narzedzia): kafelki z kreską 1 px - logo, nazwa, opis, stan. Działające narzędzie
-   odwraca kolory po najechaniu (jak przyciski), „wkrótce” przygaszone. Telefon: kafelki jeden pod drugim.
+   Narzędzia (panel #narzedzia): jedna plansza pluginu lumerw do Figmy - logo Figmy z kropek (dots.js), opis,
+   funkcje, stan. Z linkiem odwraca kolory po najechaniu (jak przyciski), bez linku - kreska przerywana.
    ========================================================================== */
 .tools__line { max-width: 40em; margin-top: var(--s-4); }
-.tools { display: grid; gap: var(--s-2); margin-top: var(--s-5); padding: 0 0 var(--s-8); list-style: none; }
-@media (min-width: 768px) { .tools { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.tools li { display: flex; }
-.tool { flex: 1; display: grid; grid-template-rows: auto auto 1fr auto; gap: var(--s-2); padding: var(--s-3); border: var(--hairline) solid var(--ink); color: inherit; text-decoration: none; transition: background-color .2s, color .2s; }
-.tool__logo { width: 48px; height: 48px; margin-bottom: var(--s-2); fill: none; stroke: currentColor; stroke-width: 1; }
-.tool__name { font-size: var(--fs-project); font-weight: var(--fw-medium); }
-.tool__text { font-size: var(--fs-text); line-height: var(--lh-text); }
-.tool__state { margin-top: var(--s-2); }
-.tool--soon { border-style: dashed; border-color: var(--ink-4); }
-.tool--soon .tool__logo, .tool--soon .tool__name { opacity: .5; }
-@media (hover: hover) {
-  a.tool:hover { background: var(--ink); color: var(--paper); }
-  a.tool:hover .t-muted, a.tool:hover .t-meta { color: inherit; }
-  a.tool:hover img.tool__logo { filter: invert(1); }
-}
-a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
-/* Panel narzędzi: opis i kafelki na środku wysokości panelu (marginesy auto - przy niskim oknie bez ucinania,
+/* Panel narzędzi: opis i plansza na środku wysokości panelu (marginesy auto - przy niskim oknie bez ucinania,
    zwykłe przewijanie) */
 .sheet--tools .sheet__body { display: flex; flex-direction: column; }
 .sheet--tools .tools__line { margin-top: auto; }
-.sheet--tools .tools { margin-bottom: auto; padding-bottom: var(--s-5); }
-/* Oko generatora mruga: co ~6 s pojedynczo, raz na cykl podwójnie. Kolory z motywu (odwrócone po najechaniu). */
-.tool__eye { --eye-bg: var(--ink); --eye-fg: var(--paper); stroke: none; }
-.tool__eye-ball { fill: var(--eye-bg); }
-.tool__eye-lid { fill: none; stroke: var(--eye-fg); stroke-width: 9.5832; }
-.tool__eye-pupil { fill: var(--eye-fg); transform-box: fill-box; transform-origin: 50% 0; }
-@media (prefers-reduced-motion: no-preference) {
-  .tool__eye-pupil { animation: eye-blink 6.4s infinite; }
-}
-@keyframes eye-blink {
-  0%, 58%, 63%, 86%, 89.5%, 93%, 100% { transform: scaleY(1); }
-  60.5% { transform: scaleY(.06); }
-  87.5%, 91.5% { transform: scaleY(.06); }
-}
-@media (hover: hover) { a.tool:hover .tool__eye { --eye-bg: var(--paper); --eye-fg: var(--ink); } }
+.sheet--tools .plugin { margin-bottom: auto; }
+/* plansza pluginu lumerw: duże logo Figmy z kropek i opis; bez linku - „wkrótce” (kreska przerywana) */
+.plugin { display: grid; gap: var(--s-4); margin-top: var(--s-5); margin-bottom: var(--s-5); padding: var(--s-4); border: var(--hairline) solid var(--ink); color: inherit; text-decoration: none; transition: background-color .2s, color .2s; }
+@media (min-width: 768px) { .plugin { grid-template-columns: minmax(200px, 2fr) 3fr; align-items: center; padding: var(--s-5); } }
+.plugin--soon { border-style: dashed; }
+.plugin__logo { display: block; width: 100%; aspect-ratio: 1; max-height: 320px; }
+.plugin__body { display: grid; gap: var(--s-2); align-content: center; }
+.plugin__name { font-size: var(--fs-project); font-weight: var(--fw-medium); }
+.plugin__text { font-size: var(--fs-text); line-height: var(--lh-text); max-width: 38em; }
+.plugin__features { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--s-1); }
+.plugin__feature { padding: 2px 8px; border: var(--hairline) solid var(--ink-4); }
+.plugin__state { margin-top: var(--s-2); }
+@media (hover: hover) { a.plugin:hover { background: var(--ink); color: var(--paper); } a.plugin:hover .t-muted, a.plugin:hover .t-meta { color: inherit; } }
+a.plugin:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
 
 /* ==========================================================================
    AI Act checker (panel #ai-act, checker.js): kanały jako chipy, pole na pliki z kreską przerywaną,
@@ -1758,7 +1741,6 @@ a.tool:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset
 .ct__nums dd { margin: 2px 0 0; font-size: var(--fs-name); line-height: var(--lh-tight); }
 .ct__verdict { font-size: var(--fs-project); }
 .ct__item:not(.is-ok) .ct__verdict { text-decoration: underline; text-decoration-color: #FF3B30; text-underline-offset: 4px; }
-.tool__mark { fill: currentColor; stroke: none; }   /* znaki narzędzi wypełnione kolorem tekstu - odwracają się z kafelkiem */
 
 /* ==========================================================================
    Generator znaków (panel #generator, generator.js) - jak blobmaker.app, w stylu strony: opis marki dla Claude,

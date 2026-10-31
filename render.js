@@ -472,37 +472,29 @@ function project(p, i, c, t) {
   return sheet({ id: p.id, cls: 'sheet--project', bar, body, t });
 }
 
-// Narzędzia (panel #narzedzia, otwierany znakiem obok awatara): kafelki z logo narzędzia, opisem i stanem.
-// Narzędzie z href otwiera swój panel, bez href - kafelek „wkrótce” (nieklikalny).
-const toolLogo = {
-  // Bauhausowe oko (znak 07) w treści strony, żeby mrugało: źrenica spłaszcza się pod kreskę powieki
-  generator: () => '<svg class="tool__logo tool__eye" viewBox="-37.43 -37.43 417.87 417.87" aria-hidden="true"><rect class="tool__eye-ball" x="4.356" y="4.356" width="334.297" height="334.297" rx="167.148"/><path class="tool__eye-lid" d="M74.0527 118.227H222.832V264.85"/><rect class="tool__eye-pupil" x="129.398" y="116.785" width="94.8737" height="94.8737"/></svg>',
-  // ostry znak jak ptak (projekt Wojciecha) - pełny kształt w kolorze tekstu
-  legal: () => '<svg class="tool__logo tool__mark" viewBox="20 -50 393 393" aria-hidden="true"><path d="M410 272L231.255 155.608L23 272L169.507 146L189.756 128.585L23 20L316.014 20.0001L329.332 55.7086L410 55.7086L343.246 93.0166L410 272Z"/></svg>',
-  next: () => '<svg class="tool__logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="6.5" y="6.5" width="35" height="35" stroke-dasharray="3 3"/><path d="M24 17v14M17 24h14"/></svg>',
-  // sygnet nieskończoności (projekt Wojciecha, bez napisu) - dwa koła połączone pętlą
-  contrast: () => '<svg class="tool__logo tool__mark" viewBox="37 10.3 191 191" aria-hidden="true"><path fill-rule="evenodd" d="M84.6855 50.4531C101.621 50.4531 119.243 58.4363 133.432 87.1738C147.163 59.5767 160.436 51.1377 181.49 51.1377C208.724 51.1377 227.489 72.8044 227.489 104.507C227.489 135.981 210.325 160.157 181.032 160.157C160.436 160.157 146.018 151.719 132.516 124.35C121.302 147.157 105.74 159.017 83.7705 159.245C56.9948 159.473 38 138.49 38 105.419C38.0002 73.9448 56.537 50.4533 84.6855 50.4531ZM180.575 66.418C162.496 66.418 153.112 80.5588 141.212 105.419C151.739 130.735 162.724 144.877 180.117 144.877C200.256 144.877 212.386 126.63 212.386 105.647C212.386 83.9804 199.799 66.4181 180.575 66.418ZM86.2041 87.5391C76.1061 87.5391 67.9199 95.7252 67.9199 105.823C67.92 115.921 76.1061 124.107 86.2041 124.107C96.3021 124.107 104.488 115.921 104.488 105.823C104.488 95.7252 96.3021 87.5391 86.2041 87.5391ZM179.957 87.9932C189.784 87.9932 197.751 95.9326 197.751 105.727C197.751 115.52 189.784 123.46 179.957 123.46C170.13 123.46 162.163 115.521 162.163 105.727C162.163 95.9325 170.13 87.9932 179.957 87.9932Z"/></svg>',
-};
+// twarda spacja po jednoliterowych słowach (a, i, o, u, w, z) - nie zostają na końcu linii
+const tie = s => s.replace(/(^|\s)([aiouwzAIOUWZ]) /g, '$1$2\u00A0');
+
+// Narzędzia (panel #narzedzia, otwierany kropkami obok awatara): jedna duża plansza pluginu lumerw do Figmy -
+// logo Figmy z kropek (dots.js, data-dots="figma"), opis, funkcje i link (bez linku: „wkrótce”).
 function tools(c, t) {
-  const T = t.tools;
+  const T = t.tools, P = T.plugin;
   const bar = `
       ${symbol('personal', { cls: 'sheet__symbol', small: true })}
       <h2 id="narzedzia-title" class="t-project">${esc(T.title)}</h2>`;
-  const card = x => {
-    const inner = `${(toolLogo[x.id] ?? toolLogo.next)(c)}
-          <span class="tool__name">${esc(x.name)}</span>
-          <span class="tool__text t-muted">${esc(x.text)}</span>
-          <span class="tool__state t-meta">${esc(x.href ? `${T.open} →` : T.soon)}</span>`;
-    return x.href
-      ? `
-        <li><a class="tool" href="${esc(x.href)}">${inner}</a></li>`
-      : `
-        <li><div class="tool tool--soon">${inner}</div></li>`;
-  };
+  const tag = P.href ? 'a' : 'div';
   const body = `
-      <p class="tools__line t-text t-muted">${esc(T.line)}</p>
-      <ul class="tools">${T.items.map(card).join('')}
-      </ul>`;
+      <p class="tools__line t-text t-muted">${tie(esc(T.line))}</p>
+      <${tag} class="plugin${P.href ? '' : ' plugin--soon'}"${P.href ? ` href="${esc(P.href)}" target="_blank" rel="noopener"` : ''}>
+        <canvas class="plugin__logo" data-dots="figma" aria-hidden="true"></canvas>
+        <span class="plugin__body">
+          <span class="plugin__kind t-meta">${esc(P.kind)}</span>
+          <span class="plugin__name">${esc(P.name)}</span>
+          <span class="plugin__text t-muted">${tie(esc(P.text))}</span>
+          <span class="plugin__features">${P.features.map(f => `<span class="plugin__feature t-meta">${esc(f)}</span>`).join('')}</span>
+          <span class="plugin__state t-meta">${esc(P.href ? `${P.open} →` : P.soon)}</span>
+        </span>
+      </${tag}>`;
   return sheet({ id: 'narzedzia', cls: 'sheet--tools', bar, body, t });
 }
 
