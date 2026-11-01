@@ -129,6 +129,11 @@ Bez `brand.json` synchronizowany jest tylko sygnet (z favicony SVG strony).
 - Cache Rules → „Assety strony - 7 dni w przegladarce”: `starts_with(http.request.uri.path, "/assets/")` → Browser TTL 7 dni. Podmieniony obraz o tej samej nazwie powracający gość zobaczy najpóźniej po tygodniu - przy pilnej zmianie nadaj plikowi nową nazwę;
 - Bot Fight Mode i AI Labyrinth: **wyłączone** (Bot Fight Mode zapisuje ciasteczka, a strona ma ich nie mieć - zero ciasteczek, więc bez banera);
 - statystyka odwiedzin: Cloudflare Web Analytics (`shared.analytics` w `content.js`), bez ciasteczek.
+- Transform Rules → „Naglowki bezpieczenstwa” (wszystkie adresy): `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` i `Content-Security-Policy` (skrypty i połączenia tylko ze strony, Cloudflare Insights, Cal.com i Workera asystenta). **Nowy zewnętrzny adres w JS (API, skrypt, obraz) trzeba dopisać do CSP w tej regule** - inaczej przeglądarka go zablokuje;
+- Transform Rules → „Wczesne wczytanie skryptow”: na `/` i `/en/` nagłówek `Link` z `modulepreload` dla `main.js` i `content.js` (Speed → Early Hints włączone);
+- Cache Rules → „Cala strona w pamieci Cloudflare”: HTML też z pamięci Cloudflare (bez `/api`), na tyle, ile mówi GitHub (10 min); po publikacji workflow czyści pamięć, gdy jest sekret `CLOUDFLARE_PURGE_TOKEN` (token: My Profile → API Tokens → Create Custom Token, uprawnienie Zone → Cache Purge → Purge, strefa lumerw.com);
+- Redirect Rules (302, krótkie linki): `/kontakt` → `/#rozmowa`, `/contact` → `/en/#rozmowa`, `/in` → LinkedIn, `/figma` → `/#narzedzia` (podmień na Figma Community po publikacji pluginu), `/pdf` i `/en/pdf` → PDF-y portfolio;
+- Workers Routes: `lumerw.com/api*` → Worker `portfolio-agent`.
 
 Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokładnie tak, jak są.
 
@@ -191,7 +196,7 @@ Awatar-moneta w hero (tęczowa poświata) otwiera panel `#agent` z czatem (telef
 Na szerokich ekranach (od 1200 px) obok czatu stoi FAQ (`pl/en.agent.faq`): pytania jak wiersze indeksu, odpowiedzi wyłącznie z treści strony, pod każdą „zapytaj asystenta” - zadaje to pytanie w czacie (asystent odpowiada tym samym tekstem, FAQ jest też w jego wiedzy).
 
 - **Tryb lokalny (teraz):** dopóki `shared.agent.endpoint` jest placeholderem, asystent odpowiada gotowymi zdaniami z `content.js` (projekty, kontakt, narzędzia, doświadczenie, marka, PDF). Pytania nie opuszczają strony.
-- **Tryb AI (włączony 20.10.2026, Worker `https://portfolio-agent.teraz-platforma.workers.dev`):** odpowiada Claude, wyłącznie na podstawie treści portfolio (`knowledge()` w `agent.js` - wszystko z `content.js` bez [placeholderów]). Klucz API nie może być w przeglądarce, dlatego pośredniczy darmowy Cloudflare Worker (`agent/worker.js`): sprawdza adres strony (CORS), limituje 10 pytań na minutę z IP i przycina rozmowę. Gdy AI nie odpowiada, czat wraca do trybu lokalnego.
+- **Tryb AI (włączony 20.10.2026, Worker `https://portfolio-agent.teraz-platforma.workers.dev`, od 1.11.2026 strona pyta go pod `https://lumerw.com/api` - trasa Workers Routes `lumerw.com/api*`, Worker zdejmuje przedrostek `/api`; plugin w Figmie dalej używa adresu workers.dev):** odpowiada Claude, wyłącznie na podstawie treści portfolio (`knowledge()` w `agent.js` - wszystko z `content.js` bez [placeholderów]). Klucz API nie może być w przeglądarce, dlatego pośredniczy darmowy Cloudflare Worker (`agent/worker.js`): sprawdza adres strony (CORS), limituje 10 pytań na minutę z IP i przycina rozmowę. Gdy AI nie odpowiada, czat wraca do trybu lokalnego.
 
 Włączenie trybu AI (raz, ok. 10 min):
 

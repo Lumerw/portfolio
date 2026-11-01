@@ -100,7 +100,9 @@ export const shared = {
   // Asystent AI („zapytaj AI” obok przycisku kontakt). endpoint = adres Workera z agent/worker.js
   // (odpowiada model Claude na podstawie treści tego pliku - instrukcja w README).
   // Dopóki to placeholder: tryb lokalny - gotowe odpowiedzi z content.js, pytania nie opuszczają strony.
-  agent: { endpoint: 'https://portfolio-agent.teraz-platforma.workers.dev' },   // Cloudflare Worker (agent/), Claude Opus 5.5
+  // Worker pod adresem strony (trasa lumerw.com/api* w Cloudflare) - ten sam co portfolio-agent.teraz-platforma.workers.dev,
+  // z którego dalej korzysta plugin lumerw w Figmie
+  agent: { endpoint: 'https://lumerw.com/api' },   // Cloudflare Worker (agent/), Claude Opus 5.5
 
   // Generator znaków (panel #generator - otwierają go znaki obok awatara): algorytm w generator.js składa nowe
   // sygnety (domyślnie czarne), kolor do wyboru z palety albo HEX. Moje znaki są tylko wzorem stylu - nie trafiają na stronę.
