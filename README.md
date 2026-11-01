@@ -134,6 +134,7 @@ Bez `brand.json` synchronizowany jest tylko sygnet (z favicony SVG strony).
 - Cache Rules → „Cala strona w pamieci Cloudflare”: HTML też z pamięci Cloudflare (bez `/api`), na tyle, ile mówi GitHub (10 min); po publikacji workflow czyści pamięć, gdy jest sekret `CLOUDFLARE_PURGE_TOKEN` (token: My Profile → API Tokens → Create Custom Token, uprawnienie Zone → Cache Purge → Purge, strefa lumerw.com);
 - Redirect Rules (302, krótkie linki): `/kontakt` → `/#rozmowa`, `/contact` → `/en/#rozmowa`, `/in` → LinkedIn, `/figma` → `/#narzedzia` (podmień na Figma Community po publikacji pluginu), `/pdf` i `/en/pdf` → PDF-y portfolio;
 - Workers Routes: `lumerw.com/api*` → Worker `portfolio-agent`.
+- Email → DMARC Management włączone (1.11.2026): raporty DMARC trafiają do Cloudflare (dodatkowy adres `rua` w rekordzie `_dmarc`; stary adres GoDaddy też został). Podgląd: Email → DMARC Management.
 
 Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokładnie tak, jak są.
 
