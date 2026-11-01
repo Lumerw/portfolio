@@ -35,4 +35,15 @@ async function copyDir(dir) {
   }
 }
 await copyDir(root);
+
+// Style wpisane w strony (index, en, 404) zamiast <link> do styles.css: bez osobnego zapytania, które
+// wstrzymuje pierwsze malowanie. Adresy w url() od korzenia, bo ten sam CSS trafia też do /en/ i strony 404.
+const css = (await readFile(join(out, 'styles.css'), 'utf8'))
+  .replace(/url\((["']?)(?!data:|https?:|#|\/)/g, 'url($1/');
+for (const page of ['index.html', 'en/index.html', '404.html']) {
+  const file = join(out, page), html = await readFile(file, 'utf8');
+  const link = /<link rel="stylesheet" href="(?:\.\.\/|\/)?styles\.css">/;
+  if (!link.test(html)) throw new Error(`${page}: brak <link> do styles.css`);
+  await writeFile(file, html.replace(link, () => `<style>${css}</style>`));
+}
 console.log(`_site/ gotowe · JS/CSS: ${files} plików, ${(before / 1024).toFixed(0)} kB → ${(after / 1024).toFixed(0)} kB`);

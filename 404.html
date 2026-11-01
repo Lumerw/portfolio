@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Strona błędu 404 (GitHub Pages pokazuje ją pod każdym nieistniejącym adresem, więc ścieżki są od korzenia).
+       Po polsku; pod /en/… skrypt niżej przełącza treść na angielski. -->
+  <title>Nie ma takiej strony - Wojciech Lumer</title>
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#FAFAF7">
+  <script>try { const t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch {}</script>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .lost { min-height: 100svh; display: flex; flex-direction: column; }
+    .lost__main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--s-3); padding-block: var(--s-8); }
+    .lost__main .symbol { --size: 32; }
+    .lost__code { margin-bottom: calc(-1 * var(--s-2)); }
+    .lost__foot { padding-block: var(--s-3); display: flex; justify-content: space-between; gap: var(--s-2); }
+    .lost__foot a { color: inherit; }
+  </style>
+</head>
+<body>
+  <div class="lost">
+    <main class="lost__main wrap">
+      <svg class="symbol" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="18"/><circle class="hanko" cx="24" cy="24" r="3.5"/></svg>
+      <p class="lost__code t-meta">404</p>
+      <h1 class="t-name" data-en="This page doesn’t exist.">Nie ma takiej strony.</h1>
+      <p class="t-text t-muted" data-en="The link may have changed, or the page has moved. Everything is on the home page.">Link mógł się zmienić albo strona została przeniesiona. Wszystko znajdziesz na stronie głównej.</p>
+      <p><a class="button button--primary" href="/" data-en="back to home" data-href-en="/en/">wróć na stronę główną</a></p>
+    </main>
+    <footer class="lost__foot wrap t-meta">
+      <a href="mailto:kontakt@lumerw.com">kontakt@lumerw.com</a>
+      <span>Wojciech Lumer</span>
+    </footer>
+  </div>
+  <script>
+    if (/^\/en(\/|$)/.test(location.pathname)) {
+      document.documentElement.lang = 'en';
+      document.title = 'Page not found - Wojciech Lumer';
+      for (const el of document.querySelectorAll('[data-en]')) el.textContent = el.dataset.en;
+      for (const el of document.querySelectorAll('[data-href-en]')) el.href = el.dataset.hrefEn;
+    }
+  </script>
+</body>
+</html>

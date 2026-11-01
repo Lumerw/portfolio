@@ -475,12 +475,17 @@ function project(p, i, c, t) {
 // twarda spacja po jednoliterowych słowach (a, i, o, u, w, z) - nie zostają na końcu linii
 const tie = s => s.replace(/(^|\s)([aiouwzAIOUWZ]) /g, '$1$2\u00A0');
 
+// Znak panelu Narzędzia: logo Figmy z pięciu kropek w jej kolorach (te same kropki co plansza pluginu)
+const FIGMA_MINI = `<svg class="symbol sheet__symbol symbol--figma" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${
+  [[16, 8, '#F24E1E'], [32, 8, '#FF7262'], [16, 24, '#A259FF'], [32, 24, '#1ABCFE'], [16, 40, '#0ACF83']]
+    .map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="7" style="fill:${c};stroke:none"/>`).join('')}</svg>`;
+
 // Narzędzia (panel #narzedzia, otwierany kropkami obok awatara): jedna duża plansza pluginu lumerw do Figmy -
 // logo Figmy z kropek (dots.js, data-dots="figma"), opis, funkcje i link (bez linku: „wkrótce”).
 function tools(c, t) {
   const T = t.tools, P = T.plugin;
   const bar = `
-      ${symbol('personal', { cls: 'sheet__symbol', small: true })}
+      ${FIGMA_MINI}
       <h2 id="narzedzia-title" class="t-project">${esc(T.title)}</h2>`;
   const tag = P.href ? 'a' : 'div';
   const body = `
