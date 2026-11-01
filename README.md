@@ -123,6 +123,13 @@ Bez `brand.json` synchronizowany jest tylko sygnet (z favicony SVG strony).
 5. Po propagacji DNS zaznacz **Enforce HTTPS**.
 6. Wpisz domenę w `shared.siteUrl`, potem `npm run build && npm run pdf` (QR i Open Graph wskażą właściwy adres) i wypchnij zmiany.
 
+**Cloudflare przed GitHub Pages (od 1.11.2026, plan Free):** DNS domeny jest w Cloudflare (tam też poczta - Email Routing, rekordów MX nie ruszać). Cztery rekordy `A` i `www` są *Proxied* (pomarańczowa chmurka), więc ruch idzie przez Cloudflare, a GitHub Pages zostaje źródłem plików. Ustawienia strefy:
+- SSL/TLS: **Full** (nie Flexible - GitHub wymusza HTTPS, Flexible dałby pętlę przekierowań; nie Full strict - strona działa także w chwili odnawiania certyfikatu GitHuba);
+- Caching → Configuration → Browser Cache TTL: **Respect Existing Headers** - HTML, JS i CSS zostają przy 10 minutach z GitHuba, więc nowa wersja strony nie trafia na stary skrypt;
+- Cache Rules → „Assety strony - 7 dni w przegladarce”: `starts_with(http.request.uri.path, "/assets/")` → Browser TTL 7 dni. Podmieniony obraz o tej samej nazwie powracający gość zobaczy najpóźniej po tygodniu - przy pilnej zmianie nadaj plikowi nową nazwę;
+- Bot Fight Mode i AI Labyrinth: **wyłączone** (Bot Fight Mode zapisuje ciasteczka, a strona ma ich nie mieć - zero ciasteczek, więc bez banera);
+- statystyka odwiedzin: Cloudflare Web Analytics (`shared.analytics` w `content.js`), bez ciasteczek.
+
 Plik `.nojekyll` wyłącza przetwarzanie Jekyllem — GitHub serwuje pliki dokładnie tak, jak są.
 
 ## PDF 1080 × 1080 (karuzela)
