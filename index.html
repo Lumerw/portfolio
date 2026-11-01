@@ -34,6 +34,8 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="print.css" media="print">
   <script type="module" src="main.js"></script>
+  <!-- content.js wczytuje się razem z main.js, a nie dopiero po nim (o jedno zapytanie w łańcuchu krócej) -->
+  <link rel="modulepreload" href="content.js">
 </head>
 <body>
   <div id="app">

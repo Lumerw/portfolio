@@ -3,7 +3,8 @@
 # 2) Testy asystenta AI: tryb lokalny i Worker z podstawionym Claude API (tools/agent-check.mjs).
 # 3) Testy planszy i strony w Chromium (tools/reel-check.mjs): kadry, języki, tryb ciemny, bez JS, ruch.
 # Runner macOS - ma Helveticę, więc układ wygląda jak na Twoim Macu.
-# Po testach (tylko main): strona na GitHub Pages - zminifikowana kopia (npm run dist) + PDF-y z GitHub Releases;
+# Po testach (tylko main): strona na GitHub Pages - zminifikowana kopia (npm run dist) + PDF-y z GitHub Releases,
+# potem czyszczenie pamięci Cloudflare (gdy jest sekret CLOUDFLARE_PURGE_TOKEN);
 # asystent AI - Cloudflare Worker z aktualną wiedzą z content.js (gdy jest sekret CLOUDFLARE_API_TOKEN).
 name: Testy i publikacja
 
@@ -98,6 +99,22 @@ jobs:
 
       - id: pages
         uses: actions/deploy-pages@v5
+
+      # Cloudflare trzyma kopię strony (reguła „Cache everything”) - po publikacji czyścimy ją, żeby nowa wersja
+      # była widoczna od razu. Token tylko z uprawnieniem Zone → Cache Purge dla lumerw.com (sekret CLOUDFLARE_PURGE_TOKEN).
+      - name: Wyczyszczenie pamięci Cloudflare
+        env:
+          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          ZONE: 0e914b20bac7b70dc94368e5fa70094e   # lumerw.com (identyfikator strefy, nie sekret)
+        run: |
+          if [ -z "$CLOUDFLARE_PURGE_TOKEN" ]; then
+            echo "::notice::bez sekretu CLOUDFLARE_PURGE_TOKEN - kopia w Cloudflare odświeży się sama najpóźniej po 10 minutach"
+            exit 0
+          fi
+          sleep 45   # GitHub Pages potrzebuje chwili, zanim zacznie serwować nową wersję
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_PURGE_TOKEN" -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' > /dev/null && echo "pamięć Cloudflare wyczyszczona"
 
   # Asystent AI: Worker z wiedzą z aktualnego content.js (sekrety repozytorium: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
   worker:

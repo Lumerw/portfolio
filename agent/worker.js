@@ -14,7 +14,8 @@ export default {
   async fetch(req, env) {
     const origin = req.headers.get('Origin') || '';
     const allowed = (env.ALLOWED_ORIGINS || 'https://lumerw.com').split(',').map(s => s.trim());
-    const path = new URL(req.url).pathname;
+    // Ten sam Worker pod workers.dev i pod lumerw.com/api (trasa w Cloudflare) - przedrostek /api odpada
+    const path = new URL(req.url).pathname.replace(/^\/api(?=\/|$)/, '') || '/';
     // plugin lumerw w Figmie: okno pluginu ma origin "null" - dopuszczony tylko na /figma
     const plugin = path === '/figma' && origin === 'null';
     const ok = allowed.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin) || plugin;
@@ -50,10 +51,10 @@ export default {
     let body;
     try { body = await req.json(); } catch { return json({ error: 'json' }, 400); }
     const lang = body?.lang === 'en' ? 'en' : 'pl';
-    if (new URL(req.url).pathname === '/mark') return mark(body, lang, env, json);
-    if (new URL(req.url).pathname === '/mark/pick') return pickMark(body, lang, env, json);
-    if (new URL(req.url).pathname === '/mark/draw') return drawMark(body, lang, env, json);
-    if (new URL(req.url).pathname === '/lab') return lab(body, env, json);
+    if (path === '/mark') return mark(body, lang, env, json);
+    if (path === '/mark/pick') return pickMark(body, lang, env, json);
+    if (path === '/mark/draw') return drawMark(body, lang, env, json);
+    if (path === '/lab') return lab(body, env, json);
     const messages = validate(body?.messages);
     if (!messages) return json({ error: 'messages' }, 400);
 
