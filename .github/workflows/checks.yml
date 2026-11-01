@@ -100,21 +100,23 @@ jobs:
       - id: pages
         uses: actions/deploy-pages@v5
 
-      # Cloudflare trzyma kopię strony (reguła „Cache everything”) - po publikacji czyścimy ją, żeby nowa wersja
-      # była widoczna od razu. Token tylko z uprawnieniem Zone → Cache Purge dla lumerw.com (sekret CLOUDFLARE_PURGE_TOKEN).
+      # Cloudflare trzyma kopię strony (reguła „Cala strona w pamieci Cloudflare”) - po publikacji czyścimy ją, żeby nowa
+      # wersja była widoczna od razu. Token z uprawnieniem Zone → Cache Purge dla lumerw.com: osobny sekret
+      # CLOUDFLARE_PURGE_TOKEN albo ten sam CLOUDFLARE_API_TOKEN co do Workera (jeden token z oboma uprawnieniami).
       - name: Wyczyszczenie pamięci Cloudflare
         env:
-          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           ZONE: 0e914b20bac7b70dc94368e5fa70094e   # lumerw.com (identyfikator strefy, nie sekret)
         run: |
           if [ -z "$CLOUDFLARE_PURGE_TOKEN" ]; then
-            echo "::notice::bez sekretu CLOUDFLARE_PURGE_TOKEN - kopia w Cloudflare odświeży się sama najpóźniej po 10 minutach"
+            echo "::notice::bez tokena Cloudflare (CLOUDFLARE_PURGE_TOKEN / CLOUDFLARE_API_TOKEN) - kopia w Cloudflare odświeży się sama najpóźniej po 10 minutach"
             exit 0
           fi
           sleep 45   # GitHub Pages potrzebuje chwili, zanim zacznie serwować nową wersję
           curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/purge_cache" \
             -H "Authorization: Bearer $CLOUDFLARE_PURGE_TOKEN" -H "Content-Type: application/json" \
-            --data '{"purge_everything":true}' > /dev/null && echo "pamięć Cloudflare wyczyszczona"
+            --data '{"purge_everything":true}' > /dev/null && echo "pamięć Cloudflare wyczyszczona" \
+            || echo "::warning::nie udało się wyczyścić pamięci Cloudflare - token bez uprawnienia Cache Purge?"
 
   # Asystent AI: Worker z wiedzą z aktualnego content.js (sekrety repozytorium: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
   worker:
