@@ -89,7 +89,7 @@ function cv(lang) {
     </dl>
     <footer class="foot">
       <p class="buttons">
-        <a class="button button--primary" href="mailto:${esc(c.email)}">${icon.mail}${esc(c.email)}</a>
+        <a class="button button--primary" href="mailto:${esc(t.email)}">${icon.mail}${esc(t.email)}</a>
         ${cal ? `<a class="button" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>` : ''}
       </p>
       <ul class="profiles">${profiles.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('')}</ul>

@@ -287,7 +287,7 @@ async function openBooking(sheet) {
   if (!root) return;
   const { initBooking } = await (bookMod ??= import('./booking.js'));
   if (root.__booking) { root.__booking.reload(); return; }
-  root.__booking = initBooking(root, { lang: root.closest('html')?.lang || 'pl', copy: content[root.closest('html')?.lang || 'pl'].booking, email: content.shared.email, calendly: content.shared.calendly });
+  root.__booking = initBooking(root, { lang: root.closest('html')?.lang || 'pl', copy: content[root.closest('html')?.lang || 'pl'].booking, email: content[root.closest('html')?.lang || 'pl'].email, calendly: content.shared.calendly });
 }
 
 /* Ikony obok awatara: każde miejsce zmienia się we własnym, losowym rytmie (ICON_MS) i nigdy nie pokazuje tej samej

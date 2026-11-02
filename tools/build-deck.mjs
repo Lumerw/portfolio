@@ -50,7 +50,7 @@ function deck(lang) {
         <p class="start__line">${esc(t.hero.line)}</p>
         <nav class="index">${projects.map((p, i) => `
           <a class="index__row" href="#s-${p.id}"><span class="t-meta">${String(i + 1).padStart(2, '0')}</span><span class="index__title">${esc(p.title)}</span><span class="t-meta">${esc(p.type)}</span></a>`).join('')}
-          <a class="index__row" href="#s-kontakt"><span class="t-meta">→</span><span class="index__title">${esc(D.contactRow)}</span><span class="t-meta">${esc(c.email)}</span></a>
+          <a class="index__row" href="#s-kontakt"><span class="t-meta">→</span><span class="index__title">${esc(D.contactRow)}</span><span class="t-meta">${esc(t.email)}</span></a>
         </nav>
       </div>
     </section>`;
@@ -90,7 +90,7 @@ function deck(lang) {
       ${top(total, symbol('personal', { cls: 'top__mark' }), back)}
       <div class="contact">
         <h2 class="contact__title">${esc(D.contactTitle)}</h2>
-        <p class="contact__mail">${ext(`mailto:${c.email}`, c.email)}</p>
+        <p class="contact__mail">${ext(`mailto:${t.email}`, t.email)}</p>
         ${links.length ? `<p class="contact__links">${links.join('')}</p>` : ''}
       </div>
       <footer class="contact__foot">

@@ -42,7 +42,7 @@ function doc(lang, fmt, dark) {
   const c = content.shared, t = content[lang], U = t.ui;
   const [W, H] = FORMATS[fmt];
   const site = c.siteUrl.replace(/\/$/, '');
-  const cal = c.booking?.calUsername ? `${site}/${lang === 'en' ? 'en/' : ''}#rozmowa` : (isReal(c.calendly) ? c.calendly : `mailto:${c.email}`);   // kalendarz rozmowy na stronie (30 min)
+  const cal = c.booking?.calUsername ? `${site}/${lang === 'en' ? 'en/' : ''}#rozmowa` : (isReal(c.calendly) ? c.calendly : `mailto:${t.email}`);   // kalendarz rozmowy na stronie (30 min)
   const linkedin = c.links.find(l => l.label === 'LinkedIn')?.href;
   const total = 2 + c.projects.length;
   const counter = n => `${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
@@ -68,7 +68,7 @@ function doc(lang, fmt, dark) {
       <h1 class="cover__title">${esc(t.hero.title)}</h1>
       <p class="cover__line">${esc(t.hero.line)}</p>
       <p class="buttons">
-        <a class="button button--primary" href="mailto:${esc(c.email)}">${icon.mail}${esc(U.contactCta)}</a>
+        <a class="button button--primary" href="mailto:${esc(t.email)}">${icon.mail}${esc(U.contactCta)}</a>
         ${isReal(c.drive) ? `<a class="button" href="${esc(c.drive)}"><svg class="fill" viewBox="0 0 24 24" aria-hidden="true"><path d="${DRIVE_D}"/></svg>${esc(U.drive)}</a>` : ''}
       </p>
     </div>
@@ -116,7 +116,7 @@ function doc(lang, fmt, dark) {
     <header class="bar"><span class="bar__right">${counter(total)}</span></header>
     <div class="contact">
       <h2 class="contact__title">${esc(t.contact.title)}</h2>
-      <p class="contact__mail"><a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
+      <p class="contact__mail"><a class="link-u" href="mailto:${esc(t.email)}">${esc(t.email)}</a></p>
       <p class="buttons">
         <a class="button button--primary" href="${esc(cal)}">${icon.calendar}${esc(U.contactButton)}</a>
         <a class="button agent" href="${esc(site)}/#agent"><span class="agent-glow" aria-hidden="true"></span><img class="agent-face" src="${esc(c.avatar.drawing)}" alt="">${esc(U.askAgent)}</a>

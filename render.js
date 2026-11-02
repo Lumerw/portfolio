@@ -665,7 +665,7 @@ function booking(c, t) {
           <ul class="book__facts t-text t-muted">${(g.facts ?? []).map(f => `<li>${esc(f)}</li>`).join('')}
             <li>${esc(g.tz)}: <span data-book-tz>Europe/Warsaw</span></li>
           </ul>
-          <p class="book__nojs t-text">${esc(g.nojs)} <a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
+          <p class="book__nojs t-text">${esc(g.nojs)} <a class="link-u" href="mailto:${esc(t.email)}">${esc(t.email)}</a></p>
         </div>
         <div class="book__ui" data-booking-ui></div>
       </div>`;
@@ -673,7 +673,7 @@ function booking(c, t) {
 }
 
 function footer(c, t) {
-  const mailHref = isReal(c.email) ? `mailto:${esc(c.email)}` : '#kontakt';
+  const mailHref = isReal(t.email) ? `mailto:${esc(t.email)}` : '#kontakt';
   // Przycisk „umów rozmowę”: własny kalendarz (#rozmowa, Cal.com) → strona rezerwacji (shared.calendly) → mail.
   const cal = url(c.calendly) !== '#' && new URL(c.calendly).pathname.length > 1 ? c.calendly : '';
   const book = hasBooking(c);
@@ -686,8 +686,8 @@ function footer(c, t) {
   ${clean(t.contact.line) ? `<p class="site-footer__line t-text t-muted print-only">${esc(clean(t.contact.line))}</p>` : ''}
   <div class="site-footer__contact">
     <p class="contact__mail">
-      <a class="mail" href="${mailHref}">${esc(c.email)}</a>
-      <button class="copy" type="button" data-copy="${esc(c.email)}" aria-label="${esc(t.ui.copy)}">${copyIcon}</button>
+      <a class="mail" href="${mailHref}">${esc(t.email)}</a>
+      <button class="copy" type="button" data-copy="${esc(t.email)}" aria-label="${esc(t.ui.copy)}">${copyIcon}</button>
       <span class="copy__status t-meta" role="status" aria-live="polite" data-copied="${esc(t.ui.copied)}"></span>
     </p>
     ${links.length ? `<ul class="contact__links t-meta print-only" aria-label="${esc(t.ui.links)}">${links.map(l => `
@@ -746,7 +746,7 @@ function agent(c, t) {
         <ol class="agent__log" role="log" aria-live="polite" aria-label="${esc(g.log)}">
           <li class="agent__msg agent__msg--bot">${esc(g.hello)}</li>
         </ol>
-        <p class="agent__nojs t-text">${esc(g.nojs)} <a class="link-u" href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
+        <p class="agent__nojs t-text">${esc(g.nojs)} <a class="link-u" href="mailto:${esc(t.email)}">${esc(t.email)}</a></p>
         <ul class="agent__chips">${g.suggestions.map(q => `
           <li><button class="button button--small" type="button" data-ask="${esc(q)}">${esc(q)}</button></li>`).join('')}
         </ul>
@@ -825,7 +825,7 @@ function personLd(content, lang, site) {
     name: clean(c.name),
     jobTitle: clean(t.hero.role),
     description: clean(t.hero.line),
-    email: `mailto:${c.email}`,
+    email: `mailto:${t.email}`,
     ...(site && { url: `${site}/`, image: `${site}/assets/og.jpg` }),
     ...(sameAs.length && { sameAs }),
   };

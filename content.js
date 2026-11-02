@@ -12,7 +12,6 @@ export const shared = {
   slug: 'lumer',
   year: '2026',
   siteUrl: 'https://lumerw.com', // adres strony (domena z GoDaddy → GitHub Pages) - QR w PDF, Open Graph, sitemap
-  email: 'kontakt@lumerw.com',         // przekierowanie Cloudflare Email Routing → gmail
   // Zewnętrzna strona rezerwacji rozmowy (zapas dla kalendarza na stronie, CV i deck)
   // Archiwum prac (kampanie, KV, wideo) - publiczny folder Google Drive; wiersz w sekcji Portfolio
   drive: 'https://drive.google.com/drive/folders/1oHAvj983Vswnud6h8LEDwE2bzd2_Og__?usp=sharing',
@@ -242,6 +241,7 @@ export const shared = {
 };
 
 export const pl = {
+  email: 'kontakt@lumerw.com',         // przekierowanie Cloudflare Email Routing → gmail
   meta: {
     title: 'Wojciech Lumer - portfolio',
     description: 'Design to to, jak coś działa. Projektuję identyfikacje, strony i produkty cyfrowe - od pomysłu, przez ciągłe testowanie, do wdrożenia.',
@@ -670,6 +670,7 @@ export const pl = {
 };
 
 export const en = {
+  email: 'contact@lumerw.com',         // przekierowanie Cloudflare Email Routing → gmail
   meta: {
     title: 'Wojciech Lumer - portfolio',
     description: 'Design is how it works. I design identities, websites and digital products - from idea, through continuous testing, to launch.',

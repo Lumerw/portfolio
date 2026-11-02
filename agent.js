@@ -36,7 +36,7 @@ function findProject(c, q) {
   });
 }
 
-const mailLink = c => ({ label: c.email, href: `mailto:${c.email}` });
+const mailLink = t => ({ label: t.email, href: `mailto:${t.email}` });
 // Rozmowa: kalendarz na stronie (panel #rozmowa, 30 min); bez kalendarza - zewnętrzna strona rezerwacji
 const hasCal = c => !!c.booking?.calUsername;
 const callUrl = (c, lang = 'pl') => (hasCal(c) ? `${c.siteUrl.replace(/\/$/, '')}/${lang === 'en' ? 'en/' : ''}#rozmowa` : c.calendly);
@@ -46,7 +46,7 @@ export function localAnswer(content, lang, question) {
   const q = norm(question).trim();
   // Pytanie z FAQ (klik „zapytaj asystenta” pod odpowiedzią) - ta sama odpowiedź co w FAQ
   const faq = (t.agent.faq ?? []).find(f => norm(f.q).trim() === q);
-  if (faq) return { text: faq.a, links: [mailLink(c)] };
+  if (faq) return { text: faq.a, links: [mailLink(t)] };
   const project = findProject(c, q);
   const topic = TOPICS.find(([key, re]) => (key === 'project' ? !!project : re.test(q)))?.[0];
 
@@ -57,9 +57,9 @@ export function localAnswer(content, lang, question) {
 
   switch (topic) {
     case 'greeting': return { text: A.greeting };
-    case 'thanks': return { text: A.thanks, links: [mailLink(c)] };
+    case 'thanks': return { text: A.thanks, links: [mailLink(t)] };
     case 'contact': {
-      const links = [mailLink(c)];
+      const links = [mailLink(t)];
       if (hasCal(c)) links.push({ label: A.call, href: '#rozmowa' });
       else if (realUrl(c.calendly)) links.push({ label: A.call, href: c.calendly, ext: true });
       for (const l of c.links) if (realUrl(l.href)) links.push({ label: l.label, href: l.href, ext: true });
@@ -73,7 +73,7 @@ export function localAnswer(content, lang, question) {
     case 'process': {
       const P = t.process;
       if (!P?.steps?.length) return unknown();
-      const links = hasCal(c) ? [{ label: A.call, href: '#rozmowa' }] : realUrl(c.calendly) ? [{ label: A.call, href: c.calendly, ext: true }] : [mailLink(c)];
+      const links = hasCal(c) ? [{ label: A.call, href: '#rozmowa' }] : realUrl(c.calendly) ? [{ label: A.call, href: c.calendly, ext: true }] : [mailLink(t)];
       return { text: A.process, items: P.steps.map(st => `${st.title} - ${st.text} ${P.get} ${st.result}.`), links };
     }
     case 'pdf': return { text: A.pdf, links: [{ label: A.pdfLink, href: t.ui.pdfFile, download: true }] };
@@ -103,7 +103,7 @@ export function localAnswer(content, lang, question) {
     }
     default: return unknown();
   }
-  function unknown() { return { text: A.unknown, links: [mailLink(c)] }; }
+  function unknown() { return { text: A.unknown, links: [mailLink(t)] }; }
 }
 
 // Wiedza dla modelu: wszystko, co prawdziwe w content.js (bez [placeholderów]), jako zwykły tekst.
@@ -114,7 +114,7 @@ export function knowledge(content, lang) {
     `${c.name} - ${t.hero.role}. ${t.hero.title} ${t.hero.line}`,
     line('Bio', t.about.bio),
     line('Website', c.siteUrl),
-    `E-mail: ${c.email}`,
+    `E-mail: ${t.email}`,
     realUrl(callUrl(c, lang)) ? `Book a 30-minute call in the calendar on this site: ${callUrl(c, lang)} (the "book a call" button in the Contact section)` : null,
     ...c.links.filter(l => realUrl(l.href)).map(l => `${l.label}: ${l.href}`),
     `Portfolio PDF: ${c.siteUrl}/${t.ui.pdfFile}`,
@@ -147,12 +147,12 @@ export function knowledge(content, lang) {
 
 // Instrukcja dla modelu (Worker). Po angielsku - model odpowiada w języku pytania.
 export function systemPrompt(content, lang) {
-  const c = content.shared;
+  const c = content.shared, t = content[lang];
   return `You are the AI assistant on the portfolio website of ${c.name}, a designer (${c.siteUrl}).
 Visitors (recruiters, clients, other designers) ask you about him, his projects, experience and how to work with him.
 
 Rules:
-- Use only the facts in KNOWLEDGE below. If something is not there, say so plainly and suggest emailing ${c.email}. Never guess or invent facts, prices, dates, availability or opinions.
+- Use only the facts in KNOWLEDGE below. If something is not there, say so plainly and suggest emailing ${t.email}. Never guess or invent facts, prices, dates, availability or opinions.
 - Talk about ${c.name.split(' ')[0]} in the third person. Never make promises or commitments on his behalf.
 - Reply in the language of the question (the site is currently shown in ${lang === 'pl' ? 'Polish' : 'English'}). Be brief: 1-4 sentences, plain text, no markdown, no lists with asterisks, no emoji.
 - Use a short hyphen "-" and never long dashes.
