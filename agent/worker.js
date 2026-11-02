@@ -17,12 +17,12 @@ export default {
     // Ten sam Worker pod workers.dev i pod lumerw.com/api (trasa w Cloudflare) - przedrostek /api odpada
     const path = new URL(req.url).pathname.replace(/^\/api(?=\/|$)/, '') || '/';
     // plugin lumerw w Figmie: okno pluginu ma origin "null" - dopuszczony tylko na /figma
-    const plugin = path === '/figma' && origin === 'null';
+    const plugin = (path === '/figma' || path === '/figma/file') && origin === 'null';
     const ok = allowed.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin) || plugin;
     const cors = {
       'Access-Control-Allow-Origin': ok ? origin : allowed[0],
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'content-type, x-lumerw-plugin',
+      'Access-Control-Allow-Headers': 'content-type, x-lumerw-plugin, x-file-name',
       'Vary': 'Origin',
     };
     const json = (body, status = 200) =>
@@ -32,6 +32,13 @@ export default {
     if (req.method !== 'POST') return json({ error: 'method' }, 405);
     if (!ok) return json({ error: 'origin' }, 403);
 
+    // Załącznik z czatu pluginu - tylko z okna pluginu, treść płynie strumieniem do Files API
+    if (path === '/figma/file') {
+      if (!plugin || req.headers.get('x-lumerw-plugin') !== '1') return json({ error: 'origin' }, 403);
+      const lim = env.FILE_LIMITER ?? env.FIGMA_LIMITER;
+      if (lim && !(await lim.limit({ key: `file:${req.headers.get('CF-Connecting-IP') || 'anon'}` })).success) return json({ error: 'rate' }, 429);
+      return figmaFile(req, env, json);
+    }
     // Asystent w pluginie: własny, większy limit (jedna odpowiedź to kilka kroków z narzędziami)
     if (path === '/figma') {
       if (plugin && req.headers.get('x-lumerw-plugin') !== '1') return json({ error: 'origin' }, 403);
@@ -269,6 +276,9 @@ const FIGMA_TOOL_NAMES = new Set(FIGMA_TOOLS.map(t => t.name));
 const isImage = b => b?.type === 'image' && b.source?.type === 'base64' && ['image/png', 'image/jpeg'].includes(b.source.media_type)
   && typeof b.source.data === 'string' && b.source.data.length < 2_000_000 && /^[A-Za-z0-9+/=]+$/.test(b.source.data);
 const isText = b => b?.type === 'text' && typeof b.text === 'string' && b.text.length <= 20_000;
+// załącznik: tylko podpisany odnośnik z /figma/file (file_id nigdy nie przychodzi od klienta bez podpisu)
+const isFile = b => ['document', 'image'].includes(b?.type) && b.source?.type === 'file' && typeof b.source.ref === 'string' && /^file_[A-Za-z0-9_-]{1,100}\.[A-Za-z0-9_-]{43}$/.test(b.source.ref)
+  && (b.title === undefined || (b.type === 'document' && typeof b.title === 'string' && b.title.length <= 255));
 export function validateFigma(list) {
   if (!Array.isArray(list) || !list.length || list.length > FIGMA_MAX_MESSAGES) return null;
   for (const [i, m] of list.entries()) {
@@ -276,7 +286,7 @@ export function validateFigma(list) {
     const blocks = typeof m.content === 'string' ? [{ type: 'text', text: m.content }] : m.content;
     if (!Array.isArray(blocks) || !blocks.length) return null;
     for (const b of blocks) {
-      const okUser = isText(b) || isImage(b) || (b?.type === 'tool_result' && typeof b.tool_use_id === 'string'
+      const okUser = isText(b) || isImage(b) || isFile(b) || (b?.type === 'tool_result' && typeof b.tool_use_id === 'string'
         && (typeof b.content === 'string' ? b.content.length <= 60_000 : Array.isArray(b.content) && b.content.every(c => isText(c) || isImage(c))));
       const okAssistant = isText(b) || (b?.type === 'tool_use' && FIGMA_TOOL_NAMES.has(b.name) && typeof b.id === 'string')
         || ['thinking', 'redacted_thinking'].includes(b?.type);
@@ -291,9 +301,76 @@ const cacheTail = list => list.map((m, i) => {
   const blocks = typeof m.content === 'string' ? [{ type: 'text', text: m.content }] : m.content;
   return { ...m, content: blocks.map((b, j) => (j === blocks.length - 1 ? { ...b, cache_control: { type: 'ephemeral' } } : b)) };
 });
+// ---------- /figma/file: załącznik z czatu pluginu → Files API ----------
+// Plan Free Workera to 10 ms CPU i 128 MB pamięci, więc plik nie jest czytany ani buforowany: Worker dokleja nagłówki
+// formularza i przepuszcza strumień. 100 MB to limit ciała zapytania w planie Free Cloudflare.
+const FILE_MAX_BYTES = 100_000_000;
+const FILE_TTL = 86_400;          // plik wygasa po dobie - rozmowa w pluginie żyje tylko w otwartym oknie
+const FILES_PER_CHAT = 40;
+const FILE_KINDS = { 'application/pdf': 'document', 'text/plain': 'document', 'image/jpeg': 'image', 'image/png': 'image', 'image/gif': 'image', 'image/webp': 'image' };
+const fileName = raw => {
+  let s = '';
+  try { s = decodeURIComponent(raw || ''); } catch {}
+  return s.replace(/[<>:"|?*\\/\u0000-\u001f]/g, '_').slice(0, 200) || 'plik';
+};
+// Files API jest wspólne dla całego konta, więc identyfikator pliku wraca do klienta tylko z podpisem Workera
+// (HMAC kluczem API - bez osobnego sekretu), a przy pytaniu podpis jest sprawdzany: cudzego pliku nie da się wskazać.
+const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const fileSig = async (id, env) => b64url(await crypto.subtle.sign('HMAC',
+  await crypto.subtle.importKey('raw', new TextEncoder().encode(env.ANTHROPIC_API_KEY), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
+  new TextEncoder().encode(`lumerw-file:${id}`)));
+async function figmaFile(req, env, json) {
+  const type = (req.headers.get('content-type') || '').split(';')[0].trim().toLowerCase(), kind = FILE_KINDS[type];
+  if (!kind) return json({ error: 'type' }, 415);
+  const size = +(req.headers.get('content-length') || 0);
+  if (!size || !req.body) return json({ error: 'empty' }, 400);
+  if (size > FILE_MAX_BYTES) return json({ error: 'size' }, 413);
+  const boundary = `lumerw${crypto.randomUUID().replaceAll('-', '')}`, enc = new TextEncoder();
+  const head = enc.encode(`--${boundary}\r\ncontent-disposition: form-data; name="expires_in_seconds"\r\n\r\n${FILE_TTL}\r\n`
+    + `--${boundary}\r\ncontent-disposition: form-data; name="file"; filename="${fileName(req.headers.get('x-file-name'))}"\r\ncontent-type: ${type}\r\n\r\n`);
+  const tail = enc.encode(`\r\n--${boundary}--\r\n`);
+  const { readable, writable } = typeof FixedLengthStream === 'function' ? new FixedLengthStream(head.length + size + tail.length) : new TransformStream();
+  const pump = (async () => {
+    let w = writable.getWriter(); await w.write(head); w.releaseLock();
+    await req.body.pipeTo(writable, { preventClose: true });
+    w = writable.getWriter(); await w.write(tail); await w.close();
+  })();
+  pump.catch(() => {});
+  const res = await logged(fetch('https://api.anthropic.com/v1/files', {
+    method: 'POST',
+    headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': `multipart/form-data; boundary=${boundary}` },
+    body: readable,
+    duplex: 'half',
+  }));
+  if (!res.ok) {
+    const detail = (await res.text().catch(() => '')).slice(0, 300);
+    return json({ error: 'upstream', status: res.status, credit: /credit balance/i.test(detail) }, 502);
+  }
+  const { id } = await res.json();
+  return json({ ref: `${id}.${await fileSig(id, env)}`, kind });
+}
+// podpisane odnośniki → prawdziwe bloki plików; null, gdy podpis się nie zgadza albo plików jest za dużo
+async function resolveFiles(list, env) {
+  let count = 0;
+  const out = [];
+  for (const m of list) {
+    if (!Array.isArray(m.content)) { out.push(m); continue; }
+    const blocks = [];
+    for (const b of m.content) {
+      if (b.source?.type !== 'file') { blocks.push(b); continue; }
+      const [id, sig] = b.source.ref.split('.');
+      if (++count > FILES_PER_CHAT || sig !== await fileSig(id, env)) return null;
+      blocks.push({ type: b.type, source: { type: 'file', file_id: id }, ...(b.title ? { title: b.title } : {}) });
+    }
+    out.push({ ...m, content: blocks });
+  }
+  return out;
+}
 async function figma(body, lang, env, json) {
-  const messages = validateFigma(body?.messages);
-  if (!messages) return json({ error: 'messages' }, 400);
+  const checked = validateFigma(body?.messages);
+  if (!checked) return json({ error: 'messages' }, 400);
+  const messages = await resolveFiles(checked, env);
+  if (!messages) return json({ error: 'file' }, 403);
   const res = await anthropic(env, {
     max_tokens: 16000,   // projekty budowane narzędziem build to spore struktury JSON
     output_config: { effort: 'medium' },
@@ -304,7 +381,8 @@ async function figma(body, lang, env, json) {
   });
   if (!res.ok) {
     const detail = (await res.text().catch(() => '')).slice(0, 300);
-    return json({ error: 'upstream', status: res.status, credit: /credit balance/i.test(detail) }, 502);
+    return json({ error: 'upstream', status: res.status, credit: /credit balance/i.test(detail),
+      gone: /file.*(not found|expired)/i.test(detail), tooBig: /too long|too large|exceed|maximum.*pages|pages.*maximum/i.test(detail) }, 502);
   }
   const data = await res.json();
   if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);

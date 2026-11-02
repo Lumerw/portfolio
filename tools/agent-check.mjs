@@ -168,6 +168,32 @@ for (const [n, m] of badFig) if ((await worker.fetch(figReq({ messages: m }, { '
 check(`Worker /figma: ${badFig.length} złych rozmów → 400`, !wrongFig.length, wrongFig.join(', '));
 check('Worker /figma: inna strona → 403', (await worker.fetch(new Request('https://agent.test/figma', { method: 'POST', headers: { Origin: 'https://example.com', 'content-type': 'application/json' }, body: '{}' }), env)).status === 403);
 
+// /figma/file - załącznik płynie strumieniem do Files API, klient dostaje podpisany odnośnik; bez podpisu pliku nie wskaże
+const fileReq = (bytes, headers = {}) => new Request('https://agent.test/figma/file', { method: 'POST', duplex: 'half', headers: { Origin: 'null', 'x-lumerw-plugin': '1', 'content-type': 'application/pdf', 'content-length': String(bytes.length), 'x-file-name': encodeURIComponent('oferta "ż/1".pdf'), ...headers }, body: bytes });
+const realFetch = globalThis.fetch;
+let upload = null;
+globalThis.fetch = async (url, init) => {
+  if (String(url).endsWith('/v1/files')) { upload = { headers: init.headers, body: await new Response(init.body).text() }; return new Response(JSON.stringify({ id: 'file_abc123' }), { status: 200 }); }
+  return realFetch(url, init);
+};
+const fileRes = await worker.fetch(fileReq(new TextEncoder().encode('%PDF-test')), env), fileJson = await fileRes.json();
+check('Worker /figma/file: plik i czas wygaśnięcia w formularzu, klient dostaje podpisany odnośnik',
+  fileRes.status === 200 && fileJson.kind === 'document' && /^file_abc123\.[\w-]{43}$/.test(fileJson.ref)
+  && upload?.body.includes('%PDF-test') && upload.body.includes('name="expires_in_seconds"') && upload.body.includes('86400') && upload.body.includes('filename="oferta _ż_1_.pdf"'),
+  JSON.stringify(fileJson) + (upload?.body ?? '').slice(0, 300));
+check('Worker /figma/file: bez nagłówka pluginu → 403', (await worker.fetch(fileReq(new Uint8Array(1), { 'x-lumerw-plugin': '' }), env)).status === 403);
+check('Worker /figma/file: obcy typ → 415', (await worker.fetch(fileReq(new Uint8Array(1), { 'content-type': 'application/zip' }), env)).status === 415);
+check('Worker /figma/file: ponad 100 MB → 413', (await worker.fetch(new Request('https://agent.test/figma/file', { method: 'POST', duplex: 'half', headers: { Origin: 'null', 'x-lumerw-plugin': '1', 'content-type': 'application/pdf', 'content-length': '100000001' }, body: new Uint8Array(1) }), env)).status === 413);
+globalThis.fetch = realFetch;
+sent = null; reply = 'Widzę brief.';
+const fileMsg = [{ role: 'user', content: [{ type: 'document', source: { type: 'file', ref: fileJson.ref }, title: 'oferta.pdf' }, { type: 'text', text: 'Co jest w briefie?' }] }];
+const fileAsk = await worker.fetch(figReq({ messages: fileMsg }, { 'x-lumerw-plugin': '1' }), env);
+const sentDoc = sent?.body.messages[0].content[0];
+check('Worker /figma: podpisany odnośnik → blok z file_id, bez podpisu w zapytaniu', fileAsk.status === 200 && sentDoc?.source.file_id === 'file_abc123' && !sentDoc.source.ref && sentDoc.title === 'oferta.pdf', JSON.stringify(sentDoc));
+const forged = ref => [{ role: 'user', content: [{ type: 'document', source: { type: 'file', ref } }, { type: 'text', text: 'x' }] }];
+check('Worker /figma: podrobiony podpis → 403', (await worker.fetch(figReq({ messages: forged(`file_other.${'A'.repeat(43)}`) }, { 'x-lumerw-plugin': '1' }), env)).status === 403);
+check('Worker /figma: goły file_id od klienta → 400', (await worker.fetch(figReq({ messages: [{ role: 'user', content: [{ type: 'document', source: { type: 'file', file_id: 'file_abc123' } }] }] }, { 'x-lumerw-plugin': '1' }), env)).status === 400);
+
 for (const x of results) console.log(`${x.ok ? '✓' : '✗'} ${x.name}${x.note && !x.ok ? ` - ${x.note}` : ''}`);
 const failed = results.filter(x => !x.ok).length;
 console.log(`\n${results.length - failed}/${results.length} ok`);
