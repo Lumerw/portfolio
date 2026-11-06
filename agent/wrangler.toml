@@ -14,6 +14,20 @@ compatibility_date = "2026-09-01"
 ALLOWED_ORIGINS = "https://lumerw.com,https://www.lumerw.com,https://lumerw.github.io"
 # Model Claude. Taniej: claude-haiku-5-5 albo claude-sonnet-5-5.
 MODEL = "claude-opus-5-5"
+# Asystent w pluginie (Figma): dzienne limity, doba liczona wg UTC. Koszt w USD i pliki w MB, na użytkownika; TOTAL to suma całego serwera.
+# Tokeny użytkowników: npx wrangler secret put FIGMA_TOKENS -c agent/wrangler.toml  (postać „nazwa:token,nazwa2:token2”)
+FIGMA_DAILY_USD = "10"
+FIGMA_TOTAL_DAILY_USD = "20"
+FIGMA_DAILY_FILES_MB = "2000"
+
+# Licznik kosztów asystenta w pluginie (agent/figma-usage.js). Durable Object na SQLite działa też w planie Free.
+[[durable_objects.bindings]]
+name = "FIGMA_USAGE"
+class_name = "FigmaUsage"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["FigmaUsage"]
 
 # Najwyżej 10 pytań na minutę z jednego adresu IP.
 [[ratelimits]]

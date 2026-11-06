@@ -211,6 +211,14 @@ Włączenie trybu AI (raz, ok. 10 min):
 3. Adres z wyniku (`https://portfolio-agent.<konto>.workers.dev`) wpisz w `shared.agent.endpoint`, potem `npm run build` i wypchnij zmiany.
 4. Po każdej zmianie `content.js` wdroż Workera ponownie (`npx wrangler deploy -c agent/wrangler.toml`) - wiedza jest w nim wbudowana.
 
+**Asystent w pluginie Figmy (`/figma`, `/figma/file`):** o dostępie decyduje token użytkownika, nie nagłówek ani origin. Sekret `FIGMA_TOKENS` ma postać `nazwa:token,nazwa2:token2` (token min. 32 znaki, np. `openssl rand -hex 32`), bez niego nikt nie wejdzie:
+
+```bash
+npx wrangler secret put FIGMA_TOKENS -c agent/wrangler.toml
+```
+
+Token wpisuje się w pluginie: Profil → „Klucz dostępu do asystenta”. Dzienne limity (`FIGMA_DAILY_USD`, `FIGMA_TOTAL_DAILY_USD`, `FIGMA_DAILY_FILES_MB` w `agent/wrangler.toml`, doba wg UTC, `0` wyłącza) liczy Durable Object `FigmaUsage` (`agent/figma-usage.js`, SQLite, działa w planie Free). Koszt to szacunek ze stawek `PRICE` w `agent/worker.js` - obok zostaw twardy limit wydatków w konsoli Anthropic, który obejmuje też czat na stronie i generator znaków (te trasy są publiczne, chroni je tylko origin i limit zapytań).
+
 Model ustawia `MODEL` w `agent/wrangler.toml` (domyślnie `claude-opus-5-5`; taniej: `claude-sonnet-5-5`, `claude-haiku-5-5`). Własna domena: dopisz ją w `ALLOWED_ORIGINS`.
 
 ## Przewijanie na desktopie

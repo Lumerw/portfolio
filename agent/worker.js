@@ -5,13 +5,14 @@
 import { content } from '../content.js';
 import { systemPrompt } from '../agent.js';
 import { FIGMA_TOOLS, figmaSystem } from './figma-skill.js';
+export { FigmaUsage } from './figma-usage.js';
 
 const MAX_MESSAGES = 12;     // ostatnie wiadomości rozmowy wysyłane do modelu
 const MAX_CHARS = 500;       // = maxlength pola na stronie
 const MAX_TOKENS = 2000;     // limit odpowiedzi razem z myśleniem modelu (Opus 5.5 myśli zawsze; 1-4 zdania z zapasem)
 
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const origin = req.headers.get('Origin') || '';
     const allowed = (env.ALLOWED_ORIGINS || 'https://lumerw.com').split(',').map(s => s.trim());
     // Ten sam Worker pod workers.dev i pod lumerw.com/api (trasa w Cloudflare) - przedrostek /api odpada
@@ -22,7 +23,7 @@ export default {
     const cors = {
       'Access-Control-Allow-Origin': ok ? origin : allowed[0],
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'content-type, x-lumerw-plugin, x-file-name',
+      'Access-Control-Allow-Headers': 'content-type, authorization, x-lumerw-plugin, x-file-name',
       'Vary': 'Origin',
     };
     const json = (body, status = 200) =>
@@ -37,7 +38,9 @@ export default {
       if (!plugin || req.headers.get('x-lumerw-plugin') !== '1') return json({ error: 'origin' }, 403);
       const lim = env.FILE_LIMITER ?? env.FIGMA_LIMITER;
       if (lim && !(await lim.limit({ key: `file:${req.headers.get('CF-Connecting-IP') || 'anon'}` })).success) return json({ error: 'rate' }, 429);
-      return figmaFile(req, env, json);
+      const who = await figmaGate(req, env, json, +(req.headers.get('content-length') || 0) / 1e6);
+      if (who.denied) return who.denied;
+      return figmaFile(req, env, json, who.user, ctx);
     }
     // Asystent w pluginie: własny, większy limit (jedna odpowiedź to kilka kroków z narzędziami)
     if (path === '/figma') {
@@ -45,9 +48,11 @@ export default {
       const lim = env.FIGMA_LIMITER ?? env.LIMITER;
       if (lim && !(await lim.limit({ key: `figma:${req.headers.get('CF-Connecting-IP') || 'anon'}` })).success) return json({ error: 'rate' }, 429);
       if (+(req.headers.get('content-length') || 0) > FIGMA_MAX_BYTES) return json({ error: 'size' }, 413);
+      const who = await figmaGate(req, env, json);
+      if (who.denied) return who.denied;
       let body;
       try { body = await req.json(); } catch { return json({ error: 'json' }, 400); }
-      return figma(body, body?.lang === 'en' ? 'en' : 'pl', env, json);
+      return figma(body, body?.lang === 'en' ? 'en' : 'pl', env, json, cors, who.user, ctx);
     }
     // Limit zapytań na adres IP (wiązanie LIMITER w wrangler.toml).
     if (env.LIMITER) {
@@ -267,6 +272,71 @@ async function lab(body, env, json) {
   return new Response(res.body, { status: 200, headers: { ...cors, 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
 }
 
+// ---------- /figma: dostęp - token użytkownika i dzienny limit kosztów ----------
+// Nagłówek pluginu i origin da się podrobić, więc o dostępie decyduje token: sekret FIGMA_TOKENS w postaci
+// „nazwa:token,nazwa2:token2” (token min. 32 znaki, np. `openssl rand -hex 32`). Bez sekretu nikt nie wejdzie.
+const sha256 = async text => new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)));
+export async function figmaUser(req, env) {
+  const got = /^Bearer (\S+)$/.exec(req.headers.get('Authorization') || '')?.[1];
+  if (!got) return null;
+  const hash = await sha256(got);
+  for (const entry of (env.FIGMA_TOKENS || '').split(',')) {
+    const at = entry.indexOf(':'), name = entry.slice(0, at).trim(), token = entry.slice(at + 1).trim();
+    if (!name || token.length < 32) continue;
+    const other = await sha256(token);
+    if (!hash.reduce((diff, v, i) => diff | (v ^ other[i]), 0)) return name;   // porównanie skrótów bez wczesnego wyjścia
+  }
+  return null;
+}
+const figmaUsage = (env, op) => env.FIGMA_USAGE.get(env.FIGMA_USAGE.idFromName('global'))
+  .fetch('https://usage/', { method: 'POST', body: JSON.stringify(op) }).then(r => r.json());
+// { user } albo { denied: gotowa odpowiedź }. Limit na użytkownika i na cały serwer (wrangler.toml); liczy się po każdej odpowiedzi.
+async function figmaGate(req, env, json, mb = 0) {
+  const user = await figmaUser(req, env);
+  if (!user) return { denied: json({ error: 'token' }, 401) };
+  if (!env.FIGMA_USAGE) return { denied: json({ error: 'config' }, 503) };
+  const limit = (value, fallback) => (value === undefined || value === '' ? fallback : +value);   // „0” wyłącza asystenta
+  const limits = { usd: limit(env.FIGMA_DAILY_USD, 10), total: limit(env.FIGMA_TOTAL_DAILY_USD, 20), mb: limit(env.FIGMA_DAILY_FILES_MB, 2000) };
+  return (await figmaUsage(env, { op: 'check', user, mb, limits })).ok ? { user } : { denied: json({ error: 'budget' }, 429) };
+}
+// Koszt odpowiedzi w USD: stawki za milion tokenów dla Opus 5.5 (wyjście, wejście, zapis i odczyt cache). Tańszy MODEL liczy się
+// zawyżone, czyli bezpiecznie; przy droższym zmień stawki. usage.iterations rozbija odpowiedź na próby (odmowa i model zapasowy).
+const PRICE = { input: 4, output: 20, read: 0.2, write: 5 };
+const costOne = u => ((u.input_tokens || 0) * PRICE.input + (u.output_tokens || 0) * PRICE.output
+  + (u.cache_read_input_tokens || 0) * PRICE.read + (u.cache_creation_input_tokens || 0) * PRICE.write) / 1e6;
+export const costOf = u => Math.max(costOne(u), (u.iterations || []).reduce((sum, x) => sum + costOne(x), 0));
+// Strumień modelu idzie do pluginu bajt w bajt. Plan Free to 10 ms CPU, więc parsowane są tylko dwa zdarzenia z licznikiem tokenów,
+// a treść nie. Klient się rozłączył (przycisk Stop): model też przestaje pisać, a wyjście szacujemy z liczby przesłanych bajtów.
+function meterStream(upstream, env, user, ctx) {
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter(), reader = upstream.getReader(), dec = new TextDecoder();
+  let usage = {}, tail = '', bytes = 0, finished = false, gone = false;
+  writer.closed.catch(() => { gone = true; reader.cancel().catch(() => {}); });   // klient zamknął połączenie
+  const pump = (async () => {
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done || gone) break;
+        bytes += value.length;
+        const lines = (tail + dec.decode(value, { stream: true })).split('\n');
+        tail = lines.pop();
+        for (const line of lines) if (line.includes('"type":"message_')) {
+          try { const d = JSON.parse(line.replace(/^data: ?/, '')), u = d.usage ?? d.message?.usage; if (u) usage = { ...usage, ...u }; } catch { /* zdarzenie bez licznika */ }
+        }
+        await writer.write(value);
+      }
+      finished = !gone;
+      if (finished) await writer.close();
+    } catch {
+      reader.cancel().catch(() => {}); writer.abort().catch(() => {});
+    }
+    if (!finished || !usage.output_tokens) usage.output_tokens = Math.max(usage.output_tokens || 0, Math.ceil(bytes / 30));
+    await figmaUsage(env, { op: 'add', user, usd: costOf(usage) }).catch(e => console.error('usage', e.message));
+  })();
+  if (ctx?.waitUntil) ctx.waitUntil(pump);
+  return readable;
+}
+
 // ---------- /figma: asystent projektowy w pluginie lumerw ----------
 // Plugin prowadzi pętlę: wysyła rozmowę (tekst, zrzuty, wyniki narzędzi), dostaje odpowiedź modelu z blokami
 // tool_use, wykonuje je w Figmie i odsyła tool_result. Worker tylko sprawdza rozmowę i dokleja wiedzę i narzędzia.
@@ -305,7 +375,7 @@ const cacheTail = list => list.map((m, i) => {
 // Plan Free Workera to 10 ms CPU i 128 MB pamięci, więc plik nie jest czytany ani buforowany: Worker dokleja nagłówki
 // formularza i przepuszcza strumień. 100 MB to limit ciała zapytania w planie Free Cloudflare.
 const FILE_MAX_BYTES = 100_000_000;
-const FILE_TTL = 86_400;          // plik wygasa po dobie - rozmowa w pluginie żyje tylko w otwartym oknie
+const FILE_TTL = 86_400;          // plik wygasa po dobie - w zapisanej rozmowie zostaje tylko jego nazwa
 const FILES_PER_CHAT = 40;
 const FILE_KINDS = { 'application/pdf': 'document', 'text/plain': 'document', 'image/jpeg': 'image', 'image/png': 'image', 'image/gif': 'image', 'image/webp': 'image' };
 const fileName = raw => {
@@ -319,7 +389,7 @@ const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(
 const fileSig = async (id, env) => b64url(await crypto.subtle.sign('HMAC',
   await crypto.subtle.importKey('raw', new TextEncoder().encode(env.ANTHROPIC_API_KEY), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']),
   new TextEncoder().encode(`lumerw-file:${id}`)));
-async function figmaFile(req, env, json) {
+async function figmaFile(req, env, json, user, ctx) {
   const type = (req.headers.get('content-type') || '').split(';')[0].trim().toLowerCase(), kind = FILE_KINDS[type];
   if (!kind) return json({ error: 'type' }, 415);
   const size = +(req.headers.get('content-length') || 0);
@@ -347,6 +417,8 @@ async function figmaFile(req, env, json) {
     return json({ error: 'upstream', status: res.status, credit: /credit balance/i.test(detail) }, 502);
   }
   const { id } = await res.json();
+  const counted = figmaUsage(env, { op: 'add', user, mb: size / 1e6 }).catch(e => console.error('usage', e.message));
+  if (ctx?.waitUntil) ctx.waitUntil(counted);
   return json({ ref: `${id}.${await fileSig(id, env)}`, kind });
 }
 // podpisane odnośniki → prawdziwe bloki plików; null, gdy podpis się nie zgadza albo plików jest za dużo
@@ -366,12 +438,13 @@ async function resolveFiles(list, env) {
   }
   return out;
 }
-async function figma(body, lang, env, json) {
+async function figma(body, lang, env, json, cors, user, ctx) {
   const checked = validateFigma(body?.messages);
   if (!checked) return json({ error: 'messages' }, 400);
   const messages = await resolveFiles(checked, env);
   if (!messages) return json({ error: 'file' }, 403);
   const res = await anthropic(env, {
+    stream: true,        // tekst pojawia się w pluginie na bieżąco, a przycisk Stop przerywa też pracę modelu
     max_tokens: 16000,   // projekty budowane narzędziem build to spore struktury JSON
     output_config: { effort: 'medium' },
     // wiedza i narzędzia stałe między pytaniami - cache
@@ -382,10 +455,8 @@ async function figma(body, lang, env, json) {
   if (!res.ok) {
     const detail = (await res.text().catch(() => '')).slice(0, 300);
     return json({ error: 'upstream', status: res.status, credit: /credit balance/i.test(detail),
-      gone: /file.*(not found|expired)/i.test(detail), tooBig: /too long|too large|exceed|maximum.*pages|pages.*maximum/i.test(detail) }, 502);
+      gone: /file.*(not found|expired)/i.test(detail), tooBig: /too long|too large|exceed|maximum.*pages|pages.*maximum/i.test(detail),
+      thinking: /signature.*thinking|thinking.*signature/i.test(detail) }, 502);   // plugin usuwa bloki myślenia i ponawia raz
   }
-  const data = await res.json();
-  if (data.stop_reason === 'refusal') return json({ error: 'refusal' }, 502);
-  const content = (data.content || []).map(b => (b.type === 'text' ? { ...b, text: b.text.replace(/[—–]/g, '-') } : b));
-  return json({ content, stop_reason: data.stop_reason });
+  return new Response(meterStream(res.body, env, user, ctx), { headers: { ...cors, 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
 }

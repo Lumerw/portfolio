@@ -5,7 +5,7 @@
 //     generator znaków: /mark (ustawienia przycięte do dozwolonych) i /mark/pick (tylko PNG 256 × 256, wybór w zakresie).
 import { content } from '../content.js';
 import { localAnswer, knowledge } from '../agent.js';
-import worker from '../agent/worker.js';
+import worker, { FigmaUsage, costOf } from '../agent/worker.js';
 
 const results = [];
 const check = (name, ok, note = '') => results.push({ name, ok, note });
@@ -47,11 +47,32 @@ for (const lang of ['pl', 'en']) {
 
 // Worker z podstawionym Claude API
 let sent = null, reply = 'loom.studio — studio w subskrypcji.';
+// odpowiedź modelu tak, jak strumieniuje ją Claude API
+const sse = text => [
+  ['message_start', { type: 'message_start', message: { role: 'assistant', content: [], usage: { input_tokens: 1000, cache_read_input_tokens: 10000, cache_creation_input_tokens: 2000, output_tokens: 1 } } }],
+  ['content_block_start', { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } }],
+  ['content_block_delta', { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text } }],
+  ['content_block_stop', { type: 'content_block_stop', index: 0 }],
+  ['message_delta', { type: 'message_delta', delta: { stop_reason: 'end_turn' }, usage: { output_tokens: 500 } }],
+  ['message_stop', { type: 'message_stop' }],
+].map(([e, d]) => `event: ${e}\ndata: ${JSON.stringify(d)}\n\n`).join('');
+// prawdziwy licznik kosztów (Durable Object) na pamięci zamiast magazynu Cloudflare
+const memoryStub = () => {
+  const m = new Map(), usage = new FigmaUsage({ storage: {
+    get: async keys => new Map(keys.filter(k => m.has(k)).map(k => [k, m.get(k)])),
+    put: async o => { for (const [k, v] of Object.entries(o)) m.set(k, v); },
+    list: async ({ end }) => new Map([...m].filter(([k]) => k < end)),
+    delete: async keys => keys.forEach(k => m.delete(k)),
+  } });
+  return { store: m, idFromName: () => 'global', get: () => ({ fetch: (u, init) => usage.fetch(new Request(u, init)) }) };
+};
+const TOKEN = 'a'.repeat(40);
 globalThis.fetch = async (url, init) => {
   sent = { url, body: JSON.parse(init.body), headers: init.headers };
+  if (sent.body.stream) return new Response(sse(reply), { headers: { 'content-type': 'text/event-stream' } });
   return new Response(JSON.stringify({ content: [{ type: 'text', text: reply }] }));
 };
-const env = { ANTHROPIC_API_KEY: 'test', LIMITER: { limit: async () => ({ success: true }) } };
+const env = { ANTHROPIC_API_KEY: 'test', LIMITER: { limit: async () => ({ success: true }) }, FIGMA_TOKENS: `wojciech:${TOKEN},slaby:krotki`, FIGMA_USAGE: memoryStub() };
 const req = (body, { origin = 'https://lumerw.com', method = 'POST', path = '/' } = {}) => new Request(`https://agent.test${path}`, {
   method, headers: { Origin: origin, 'content-type': 'application/json' }, body: method === 'POST' ? JSON.stringify(body) : undefined,
 });
@@ -129,9 +150,9 @@ check('Worker /mark/draw: pusty opis → 400', (await worker.fetch(req({ brief: 
 reply = '{"pick": 1, "name": "Fala", "why": "y"}';
 check('Worker /mark/pick: znaki autorskie (kind custom) → 200', await pickStatus({ ...pick, kind: 'custom' }) === 200);
 
-// /figma - asystent projektowy w pluginie lumerw: okno pluginu (origin "null") tylko z nagłówkiem pluginu,
+// /figma - asystent projektowy w pluginie lumerw: okno pluginu (origin "null") tylko z nagłówkiem pluginu i tokenem,
 // narzędzia i wiedza w zapytaniu, zrzuty i wyniki narzędzi przechodzą, zła rozmowa → 400
-const figReq = (body, headers = {}) => new Request('https://agent.test/figma', { method: 'POST', headers: { Origin: 'null', 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) });
+const figReq = (body, headers = {}) => new Request('https://agent.test/figma', { method: 'POST', headers: { Origin: 'null', 'content-type': 'application/json', Authorization: `Bearer ${TOKEN}`, ...headers }, body: JSON.stringify(body) });
 const png1 = png(64, 64, 100);
 const convo = [
   { role: 'user', content: [{ type: 'text', text: 'Oceń ten baner' }] },
@@ -141,11 +162,52 @@ const convo = [
 check('Worker /figma: okno pluginu bez nagłówka → 403', (await worker.fetch(figReq({ messages: convo }), env)).status === 403);
 reply = 'Nagłówek jest czytelny — popraw CTA.';
 sent = null;
-const fr = await worker.fetch(figReq({ messages: convo, lang: 'pl' }, { 'x-lumerw-plugin': '1' }), env), fj = await fr.json();
-check('Worker /figma: narzędzia, wiedza i zrzut w zapytaniu, odpowiedź z krótkim myślnikiem',
-  fr.status === 200 && fr.headers.get('Access-Control-Allow-Origin') === 'null' && sent?.body.tools?.some(t => t.name === 'contrast_scan')
-  && sent.body.system[0].text.includes('WCAG') && sent.body.messages[2].content[0].content[0].type === 'image' && fj.content[0].text.includes(' - '),
-  JSON.stringify(fj).slice(0, 200));
+const pending = [], ctx = { waitUntil: p => pending.push(p) };
+const fr = await worker.fetch(figReq({ messages: convo, lang: 'pl' }, { 'x-lumerw-plugin': '1' }), env, ctx), ft = await fr.text();
+check('Worker /figma: narzędzia, wiedza i zrzut w zapytaniu, odpowiedź strumieniem bajt w bajt (tekst modelu bez zmian)',
+  fr.status === 200 && fr.headers.get('Access-Control-Allow-Origin') === 'null' && fr.headers.get('content-type').startsWith('text/event-stream') && sent?.body.stream === true && sent?.body.tools?.some(t => t.name === 'contrast_scan')
+  && sent.body.system[0].text.includes('WCAG') && sent.body.messages[2].content[0].content[0].type === 'image' && ft === sse(reply),
+  ft.slice(0, 200));
+await Promise.all(pending);
+const dayKey = `${new Date().toISOString().slice(0, 10)}:wojciech`, spent = () => env.FIGMA_USAGE.store.get(dayKey)?.usd ?? 0;
+const oneReply = costOf({ input_tokens: 1000, cache_read_input_tokens: 10000, cache_creation_input_tokens: 2000, output_tokens: 500 });
+check('Worker /figma: koszt odpowiedzi w liczniku (wejście, cache, wyjście)', Math.abs(oneReply - 0.026) < 1e-9 && Math.abs(spent() - oneReply) < 1e-9, `${oneReply} / ${spent()}`);
+check('Worker /figma: koszt z prób przy modelu zapasowym', Math.abs(costOf({ output_tokens: 10, iterations: [{ output_tokens: 500 }, { output_tokens: 500 }] }) - 0.02) < 1e-9);
+// dostęp: bez poprawnego tokenu nie ma zapytania do modelu ani licznika
+const refused = async (e, headers) => { sent = null; const res = await worker.fetch(figReq({ messages: convo }, { 'x-lumerw-plugin': '1', ...headers }), e); return res.status === 401 && !sent; };
+check('Worker /figma: brak tokenu → 401', await refused(env, { Authorization: '' }));
+check('Worker /figma: zły token → 401', await refused(env, { Authorization: `Bearer ${'b'.repeat(40)}` }));
+check('Worker /figma: za krótki token w sekrecie nie działa → 401', await refused(env, { Authorization: 'Bearer krotki' }));
+check('Worker /figma: bez sekretu FIGMA_TOKENS nikt nie wejdzie → 401', await refused({ ...env, FIGMA_TOKENS: undefined }, {}));
+check('Worker /figma: podrobiony Origin strony nic nie daje bez tokenu → 401', (await worker.fetch(new Request('https://agent.test/figma', { method: 'POST', headers: { Origin: 'https://lumerw.com', 'content-type': 'application/json' }, body: JSON.stringify({ messages: convo }) }), env)).status === 401);
+check('Worker /figma: bez licznika kosztów → 503', (await worker.fetch(figReq({ messages: convo }, { 'x-lumerw-plugin': '1' }), { ...env, FIGMA_USAGE: undefined })).status === 503);
+sent = null;
+const overBudget = await worker.fetch(figReq({ messages: convo }, { 'x-lumerw-plugin': '1' }), { ...env, FIGMA_DAILY_USD: String(spent() / 2) }), overJson = await overBudget.json();
+check('Worker /figma: dzienny limit użytkownika → 429 budget, bez zapytania do modelu', overBudget.status === 429 && overJson.error === 'budget' && !sent);
+sent = null;
+check('Worker /figma: limit całego serwera → 429', (await worker.fetch(figReq({ messages: convo }, { 'x-lumerw-plugin': '1' }), { ...env, FIGMA_TOTAL_DAILY_USD: String(spent() / 2) })).status === 429 && !sent);
+sent = null;
+check('Worker /figma: limit „0” wyłącza asystenta → 429', (await worker.fetch(figReq({ messages: convo }, { 'x-lumerw-plugin': '1' }), { ...env, FIGMA_DAILY_USD: '0' })).status === 429 && !sent);
+// Stop: klient się rozłącza w połowie - model przestaje pisać, a koszt i tak trafia do licznika
+{
+  const stub = globalThis.fetch; let cancelled = false; const before = spent();
+  globalThis.fetch = async () => new Response(new ReadableStream({
+    start(c) { c.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: 'message_start', message: { usage: { input_tokens: 100000, output_tokens: 1 } } })}\n\n`)); },
+    cancel() { cancelled = true; },
+  }));
+  const waits = [], cut = await worker.fetch(figReq({ messages: convo }, { 'x-lumerw-plugin': '1' }), env, { waitUntil: p => waits.push(p) });
+  const rd = cut.body.getReader(); await rd.read(); await rd.cancel();
+  await Promise.all(waits); globalThis.fetch = stub;
+  check('Worker /figma: rozłączenie klienta przerywa model i liczy koszt', cancelled && spent() - before >= 0.4, `${cancelled} ${spent() - before}`);
+}
+// historia z unieważnionym blokiem myślenia: plugin dostaje znak, że ma go usunąć i ponowić
+{
+  const stub = globalThis.fetch;
+  globalThis.fetch = async () => new Response('{"error":{"message":"messages.5.content.0: Invalid `signature` in `thinking` block. The block is bound to a different conversation."}}', { status: 400 });
+  const res = await worker.fetch(figReq({ messages: convo }, { 'x-lumerw-plugin': '1' }), env), data = await res.json();
+  globalThis.fetch = stub;
+  check('Worker /figma: unieważnione myślenie → znak dla pluginu', res.status === 502 && data.thinking === true, JSON.stringify(data));
+}
 // projektant w pętli: build → animate, wyniki narzędzi i nowe pytanie w jednej wiadomości (pętla zatrzymana na limicie)
 const design = [
   { role: 'user', content: [{ type: 'text', text: 'Zaprojektuj post 4:5' }] },
@@ -169,7 +231,7 @@ check(`Worker /figma: ${badFig.length} złych rozmów → 400`, !wrongFig.length
 check('Worker /figma: inna strona → 403', (await worker.fetch(new Request('https://agent.test/figma', { method: 'POST', headers: { Origin: 'https://example.com', 'content-type': 'application/json' }, body: '{}' }), env)).status === 403);
 
 // /figma/file - załącznik płynie strumieniem do Files API, klient dostaje podpisany odnośnik; bez podpisu pliku nie wskaże
-const fileReq = (bytes, headers = {}) => new Request('https://agent.test/figma/file', { method: 'POST', duplex: 'half', headers: { Origin: 'null', 'x-lumerw-plugin': '1', 'content-type': 'application/pdf', 'content-length': String(bytes.length), 'x-file-name': encodeURIComponent('oferta "ż/1".pdf'), ...headers }, body: bytes });
+const fileReq = (bytes, headers = {}) => new Request('https://agent.test/figma/file', { method: 'POST', duplex: 'half', headers: { Origin: 'null', 'x-lumerw-plugin': '1', Authorization: `Bearer ${TOKEN}`, 'content-type': 'application/pdf', 'content-length': String(bytes.length), 'x-file-name': encodeURIComponent('oferta "ż/1".pdf'), ...headers }, body: bytes });
 const realFetch = globalThis.fetch;
 let upload = null;
 globalThis.fetch = async (url, init) => {
@@ -181,9 +243,11 @@ check('Worker /figma/file: plik i czas wygaśnięcia w formularzu, klient dostaj
   fileRes.status === 200 && fileJson.kind === 'document' && /^file_abc123\.[\w-]{43}$/.test(fileJson.ref)
   && upload?.body.includes('%PDF-test') && upload.body.includes('name="expires_in_seconds"') && upload.body.includes('86400') && upload.body.includes('filename="oferta _ż_1_.pdf"'),
   JSON.stringify(fileJson) + (upload?.body ?? '').slice(0, 300));
+check('Worker /figma/file: bez tokenu → 401, pliku nie ma w Files API', await (async () => { upload = null; const res = await worker.fetch(fileReq(new Uint8Array(1), { Authorization: '' }), env); return res.status === 401 && !upload; })());
+check('Worker /figma/file: dzienny limit plików → 429', (await worker.fetch(fileReq(new Uint8Array(2_000_000)), { ...env, FIGMA_DAILY_FILES_MB: '1' })).status === 429);
 check('Worker /figma/file: bez nagłówka pluginu → 403', (await worker.fetch(fileReq(new Uint8Array(1), { 'x-lumerw-plugin': '' }), env)).status === 403);
 check('Worker /figma/file: obcy typ → 415', (await worker.fetch(fileReq(new Uint8Array(1), { 'content-type': 'application/zip' }), env)).status === 415);
-check('Worker /figma/file: ponad 100 MB → 413', (await worker.fetch(new Request('https://agent.test/figma/file', { method: 'POST', duplex: 'half', headers: { Origin: 'null', 'x-lumerw-plugin': '1', 'content-type': 'application/pdf', 'content-length': '100000001' }, body: new Uint8Array(1) }), env)).status === 413);
+check('Worker /figma/file: ponad 100 MB → 413', (await worker.fetch(new Request('https://agent.test/figma/file', { method: 'POST', duplex: 'half', headers: { Origin: 'null', 'x-lumerw-plugin': '1', Authorization: `Bearer ${TOKEN}`, 'content-type': 'application/pdf', 'content-length': '100000001' }, body: new Uint8Array(1) }), env)).status === 413);
 globalThis.fetch = realFetch;
 sent = null; reply = 'Widzę brief.';
 const fileMsg = [{ role: 'user', content: [{ type: 'document', source: { type: 'file', ref: fileJson.ref }, title: 'oferta.pdf' }, { type: 'text', text: 'Co jest w briefie?' }] }];
